@@ -59,7 +59,7 @@ class HDDMnn_new(HDDM):
 
     # TODO: CLARIFY WHAT THIS FUNCTION DOES
     def _create_wfpt_parents_dict(self, knodes):
-        wfpt_parents = super(HDDMnn_weibull, self)._create_wfpt_parents_dict(knodes)
+        wfpt_parents = super(HDDMnn_new, self)._create_wfpt_parents_dict(knodes)
         wfpt_parents['beta'] = knodes['beta_bottom']
         wfpt_parents['alpha'] = knodes['alpha_bottom'] if self.k else 3.00
         return wfpt_parents
@@ -67,7 +67,7 @@ class HDDMnn_new(HDDM):
     # TODO: CLARIFY WHAT THIS FUNCTION DOES
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
-        return Knode(self.wfpt_nn_weibull_class, 
+        return Knode(self.wfpt_nn_new_class, 
                     'wfpt', 
                      observed = True, 
                      col_name = ['nn_response', 'rt'], # TODO: One could preprocess at initialization
