@@ -368,9 +368,14 @@ class AccumulatorModel(kabuki.Hierarchical):
         return knodes
 
 
-    def _create_family_trunc_normal(self, name, value=0, lower=None,
-                                   upper=None, std_lower=1e-10,
-                                   std_upper=100, std_value=.1):
+    def _create_family_trunc_normal(self, 
+                                    name, 
+                                    value=0,
+                                    lower=None,
+                                    upper=None, 
+                                    std_lower=1e-10,
+                                    std_upper=100, 
+                                    std_value=.1):
         """Similar to _create_family_normal() but creates a Uniform
         group distribution and a truncated subject distribution.
 
@@ -399,8 +404,11 @@ class AccumulatorModel(kabuki.Hierarchical):
             knodes['%s_bottom'%name] = subj
 
         else:
-            subj = Knode(pm.Uniform, name, lower=lower,
-                         upper=upper, value=value,
+            subj = Knode(pm.Uniform, 
+                         name, 
+                         lower=lower,
+                         upper=upper, 
+                         value=value,
                          depends=self.depends[name])
             knodes['%s_bottom'%name] = subj
 

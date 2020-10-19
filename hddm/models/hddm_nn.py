@@ -48,4 +48,5 @@ def wienernn_like(x, v, sv, a, z, sz, t, st, p_outlier=0):
 
     nn_response = x['nn_response'].values.astype(int)
     return wiener_like_nn(np.absolute(x['rt'].values), nn_response, v, sv, a, z, sz, t, st, p_outlier=p_outlier, **wp)
+
 Wienernn = stochastic_from_dist('wienernn', wienernn_like)

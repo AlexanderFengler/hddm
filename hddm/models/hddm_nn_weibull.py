@@ -21,8 +21,8 @@ class HDDMnn_weibull(HDDM):
 
     def __init__(self, *args, **kwargs):
         self.non_centered = kwargs.pop('non_centered', False)
-        self.free = kwargs.pop('free',True)
-        self.k = kwargs.pop('k',False)
+        self.free = kwargs.pop('free', True)
+        self.k = kwargs.pop('k', False)
         self.wfpt_nn_weibull_class = Wienernn_weibull
 
         super(HDDMnn_weibull, self).__init__(*args, **kwargs)
@@ -34,7 +34,7 @@ class HDDMnn_weibull(HDDM):
             if self.k:
                 knodes.update(self._create_family_gamma_gamma_hnormal('alpha', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
         else:
-            knodes.update(self._create_family_trunc_normal('beta', lower=0.3, upper=7, value=1))
+            knodes.update(self._create_family_trunc_normal('beta', lower=0.3, upper=7, value=1, std_upper = 1))
             if self.k:
                 knodes.update(self._create_family_trunc_normal('alpha', lower=0.3, upper=5, value=1))
         return knodes
@@ -52,7 +52,9 @@ class HDDMnn_weibull(HDDM):
 
 def wienernn_like_weibull(x, v, sv, a, alpha, beta, z, sz, t, st, p_outlier=0): #theta
 
-    wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
+    wiener_params = {'err': 1e-4, 
+                     'n_st': 2, 
+                     'n_sz': 2,
                      'use_adaptive': 1,
                      'simps_err': 1e-3,
                      'w_outlier': 0.1}
@@ -67,5 +69,18 @@ def wienernn_like_weibull(x, v, sv, a, alpha, beta, z, sz, t, st, p_outlier=0): 
 
     #print('hei')
     nn_response = x['nn_response'].values.astype(int)
-    return wiener_like_nn_weibull(np.absolute(x['rt'].values), nn_response, v, sv, a, alpha, beta, z, sz, t, st, p_outlier=p_outlier, **wp)
+    return wiener_like_nn_weibull(np.absolute(x['rt'].values), 
+                                  nn_response, 
+                                  v, 
+                                  sv,
+                                  a, 
+                                  alpha, 
+                                  beta, 
+                                  z, 
+                                  sz, 
+                                  t, 
+                                  st,
+                                  p_outlier=p_outlier, 
+                                  **wp)
+
 Wienernn_weibull = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
