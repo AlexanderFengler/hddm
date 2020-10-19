@@ -5,7 +5,7 @@ try:
     from Cython.Build import cythonize
     ext_modules = cythonize([Extension('wfpt', ['src/wfpt.pyx'], language='c++'), # uncomment for OSX: , extra_compile_args=['-stdlib=libc++'], extra_link_args=['-stdlib=libc++', "-mmacosx-version-min=10.9"]),
                              Extension('cdfdif_wrapper', ['src/cdfdif_wrapper.pyx', 'src/cdfdif.c'])
-    ])
+    ], compiler_directives = {"language_level": "3"})
 
 except ImportError:
     ext_modules = [Extension('wfpt', ['src/wfpt.cpp'], language='c++'),
