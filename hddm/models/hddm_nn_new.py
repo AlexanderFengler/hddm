@@ -117,4 +117,6 @@ def wienernn_like_new(x,
                               **wp)
 
 # TODO CHECK WHAT THIS IS EVEN DOING
-#Wienernn_new = stochastic_from_dist('Wienernn_new', wienernn_like_new)
+
+Wienernn_new = stochastic_from_dist('Wienernn_new', wienernn_like_new)
+
