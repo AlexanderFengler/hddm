@@ -350,24 +350,24 @@ def wiener_like_nn_angle(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] 
 
     return p
 
-def wiener_like_nn_new(np.ndarray[float, ndim = 1] x, 
-                       np.ndarray[float, ndim = 1] nn_response, 
+def wiener_like_nn_new(np.ndarray[double, ndim = 1] x, 
+                       np.ndarray[long, ndim = 1] nn_response, 
                        double v,
                        double sv, 
                        double a, 
-                        double alpha, 
-                        double beta, 
-                        double z, 
-                        double sz, 
-                        double t,
-                        double st, 
-                        double err, 
-                        int n_st=10, 
-                        int n_sz=10, 
-                        bint use_adaptive = 1, 
-                        double simps_err = 1e-8,
-                        double p_outlier = 0,
-                        double w_outlier = 0):
+                       double alpha, 
+                       double beta, 
+                       double z, 
+                       double sz, 
+                       double t,
+                       double st, 
+                       double err, 
+                       int n_st=10, 
+                       int n_sz=10, 
+                       bint use_adaptive = 1, 
+                       double simps_err = 1e-8,
+                       double p_outlier = 0,
+                       double w_outlier = 0):
 
     cdef Py_ssize_t size = x.shape[0]
     #cdef Py_ssize_t i
