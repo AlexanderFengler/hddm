@@ -63,16 +63,10 @@ def mlp_target_weibull(np.ndarray[double, ndim = 2] params,
     #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
     return np.sum(np.core.umath.maximum(weibull_model.predict_on_batch(mlp_input_batch), ll_min))
 
-def mlp_target_new(np.ndarray[float, ndim = 2] data, #np.ndarray[double, ndim = 2] params,
-                   #np.ndarray[double, ndim = 2] data, 
+def mlp_target_new(np.ndarray[float, ndim = 2] data, 
                    ll_min = -16.11809 # corresponds to 1e-7
                    ): 
-
-    #n_params = 6
-    #mlp_input_batch = np.zeros((data.shape[0], params.shape[1] + 2), dtype = np.float32)
-    #mlp_input_batch[:, :n_params] = params
-    #mlp_input_batch[:, n_params:] = data
-    #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
+    
     return np.sum(np.core.umath.maximum(new_model.predict_on_batch(data), ll_min))
 
 
@@ -370,37 +364,23 @@ def wiener_like_nn_new(np.ndarray[double, ndim = 1] x,
                        double w_outlier = 0):
 
     cdef Py_ssize_t size = x.shape[0]
-    #cdef Py_ssize_t i
-    cdef double p
-    #cdef double sum_logp = 0
-    #cdef double wp_outlier = w_outlier * p_outlier
+    cdef float log_p
     cdef int n_params = 6
-
-    #cdef np.ndarray[double, ndim=1] vf = np.repeat(v, size)
-    #cdef np.ndarray[double, ndim=1] af = np.repeat(a, size)
-    #cdef np.ndarray[double, ndim=1] zf = np.repeat(z, size)
-    #cdef np.ndarray[double, ndim=1] tf = np.repeat(t, size)
-    #cdef np.ndarray[double, ndim=1] betaf = np.repeat(beta, size)
-    #cdef np.ndarray[double, ndim=1] alphaf = np.repeat(alpha, size)
-    
+    cdef float ll_min = -16.11809
     cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
     data[:, :n_params] = np.tile([v, a, z, t, alpha, beta], (size, 1)).astype(np.float32)
-    data[:, -2] = x.astype(np.float32)
-    data[:, -1] = nn_response.astype(np.float32)
-    
-    #cdef np.ndarray[float, ndim = 2] params = np.tile([v, a, z, t, beta, alpha], (size, 1))
-    #cdef 
+    data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
+    #data[:, -1] = nn_response.astype(np.float32)
+
     if not p_outlier_in_range(p_outlier):
         return -np.inf
     
-    p = mlp_target_new(data)
-    #p = mlp_target_new(np.array([vf,af,zf,tf,alphaf,betaf]).transpose(),  # parmeters
-    #                   np.array([x,nn_response]).transpose()) # (rt, c)
+    #p = mlp_target_new(data)
 
-    if p == 0: # why this condition?
-        return -np.inf
+    # Call to network:
+    log_p = np.sum(np.core.umath.maximum(new_model.predict_on_batch(data), ll_min))
 
-    return p
+    return log_p
 
 def wiener_like_nn_levy(np.ndarray[double, ndim = 1] x, 
                          np.ndarray[long, ndim = 1] nn_response, 
