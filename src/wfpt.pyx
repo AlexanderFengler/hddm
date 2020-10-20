@@ -39,22 +39,22 @@ angle_model = keras.models.load_model('model_final_angle.h5', compile = False)
 model = keras.models.load_model('model_final.h5', compile = False)
 new_model = keras.models.load_model('model_final_new.h5', compile = False)
 
-def mlp_target(np.ndarray[double, ndim=2] params,
-               np.ndarray[double, ndim=2] data, 
-                   ll_min = -16.11809 # corresponds to 1e-7
-                   ): 
+def mlp_target(np.ndarray[double, ndim = 2] params,
+               np.ndarray[double, ndim = 2] data, 
+               ll_min = -16.11809 # corresponds to 1e-7
+               ): 
 
-    n_params = 4
-    mlp_input_batch = np.zeros((data.shape[0], params.shape[1] + 2), dtype = np.float32)
+    n_params = params.shape[1]
+    mlp_input_batch = np.zeros((data.shape[0], n_params + 2), dtype = np.float32)
     mlp_input_batch[:, :n_params] = params
     mlp_input_batch[:, n_params:] = data
     #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
     return np.sum(np.core.umath.maximum(model.predict_on_batch(mlp_input_batch), ll_min))
 
 def mlp_target_weibull(np.ndarray[double, ndim = 2] params,
-                   np.ndarray[double, ndim = 2] data, 
-                   ll_min = -16.11809 # corresponds to 1e-7
-                   ): 
+                       np.ndarray[double, ndim = 2] data, 
+                       ll_min = -16.11809 # corresponds to 1e-7
+                       ): 
 
     n_params = 6
     mlp_input_batch = np.zeros((data.shape[0], params.shape[1] + 2), dtype = np.float32)
@@ -135,29 +135,45 @@ def wiener_like(np.ndarray[double, ndim=1] x, double v, double sv, double a, dou
 
     return sum_logp
 
+def wiener_like_nn(np.ndarray[double, ndim = 1] x, 
+                   np.ndarray[long, ndim = 1] nn_response, 
+                   double v, 
+                   double sv, 
+                   double a, 
+                   double z, 
+                   double sz, 
+                   double t, 
+                   double st, 
+                   double err, 
+                   int n_st = 10, 
+                   int n_sz = 10, 
+                   bint use_adaptive = 1,
+                   double simps_err = 1e-8,
+                   double p_outlier = 0, 
+                   double w_outlier = 0):
 
-def wiener_like_nn(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response, double v, double sv, double a, double z, double sz, double t, 
-                double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
-                double p_outlier=0, double w_outlier=0):
     cdef Py_ssize_t size = x.shape[0]
-    cdef Py_ssize_t i
+    #cdef Py_ssize_t i
     cdef double p
-    cdef double sum_logp = 0
-    cdef double wp_outlier = w_outlier * p_outlier
-    cdef double n_params = 4
+    #cdef double sum_logp = 0
+    #cdef double wp_outlier = w_outlier * p_outlier
+    #cdef double n_params = 4
 
-    cdef np.ndarray[double, ndim=1] vf = np.repeat(v,size)
-    cdef np.ndarray[double, ndim=1] af = np.repeat(a,size)
-    cdef np.ndarray[double, ndim=1] zf = np.repeat(z,size)
-    cdef np.ndarray[double, ndim=1] tf = np.repeat(t,size)
+    # Make float to begin with
+    cdef np.ndarray[double, ndim = 1] vf = np.repeat(v, size)
+    cdef np.ndarray[double, ndim = 1] af = np.repeat(a, size)
+    cdef np.ndarray[double, ndim = 1] zf = np.repeat(z, size)
+    cdef np.ndarray[double, ndim = 1] tf = np.repeat(t, size)
 
     if not p_outlier_in_range(p_outlier):
-        return -np.inf
+        return - np.inf
 
-    p = mlp_target(np.array([vf,af,zf,tf]).transpose(),np.array([x,nn_response]).transpose())
+    # Avoid the transpose
+    p = mlp_target(np.array([vf, af, zf, tf]).transpose(),
+                   np.array([x, nn_response]).transpose())
 
-    if p == 0:
-        return -np.inf
+    #if p == 0:
+    #    return -np.inf
 
     return p
 
@@ -205,23 +221,42 @@ def wiener_like_nn(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_res
             #print(i)
             #print(x[i])
 
-def wiener_like_multi_nnddm(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response, activations, weights, biases, v, sv, a, z, sz, t, st, alpha, beta, double err, multi=None,
-                      int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-3,
-                      double p_outlier=0, double w_outlier=0):
-    cdef Py_ssize_t size = x.shape[0]
-    cdef Py_ssize_t i
-    cdef double p = 0
-    cdef double sum_logp = 0
-    cdef double wp_outlier = w_outlier * p_outlier
+#def wiener_like_multi_nnddm(np.ndarray[double, ndim=1] x, 
+#                            np.ndarray[long, ndim=1] nn_response, 
+#                            activations, 
+#                            weights, 
+#                            biases, 
+#                            v, 
+#                            sv, 
+#                            a, 
+#                            z, 
+#                            sz, 
+#                            t, 
+#                            st, 
+#                            alpha, 
+#                            beta, 
+#                            double err, 
+#                            multi=None,
+#                            int n_st=10, 
+#                            int n_sz=10, 
+#                            bint use_adaptive=1, 
+#                            double simps_err=1e-3,
+#                            double p_outlier=0, 
+#                            double w_outlier=0):
+#    cdef Py_ssize_t size = x.shape[0]
+#    cdef Py_ssize_t i
+#    cdef double p = 0
+#    cdef double sum_logp = 0
+#    cdef double wp_outlier = w_outlier * p_outlier
 
-    if multi is None:
-        return full_pdf(x, v, sv, a, z, sz, t, st, err)
-    else:
-        params = {'v': v, 'z': z, 't': t, 'a': a, 'sv': sv, 'sz': sz, 'st': st, 'alpha':alpha, 'beta': beta}
-        params_iter = copy(params)
-        for i in range(size):
-            for param in multi:
-                params_iter[param] = params[param][i]
+#    if multi is None:
+#        return full_pdf(x, v, sv, a, z, sz, t, st, err)
+#    else:
+#        params = {'v': v, 'z': z, 't': t, 'a': a, 'sv': sv, 'sz': sz, 'st': st, 'alpha':alpha, 'beta': beta}
+#        params_iter = copy(params)
+#        for i in range(size):
+#            for param in multi:
+#                params_iter[param] = params[param][i]
 
             #print(type(params_iter['a'].astype(float)))
             #print(params_iter['v'][0])
@@ -233,7 +268,7 @@ def wiener_like_multi_nnddm(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=
             #print(x[i])
 
 
-            p = 0.1 #ktnp.predict(np.array([params_iter['v'][0],params_iter['a'],params_iter['z'],params_iter['t'],params_iter['alpha'],params_iter['beta'],x[i], nn_response[i]]), weights, biases, activations, len(activations))
+ #           p = 0.1 #ktnp.predict(np.array([params_iter['v'][0],params_iter['a'],params_iter['z'],params_iter['t'],params_iter['alpha'],params_iter['beta'],x[i], nn_response[i]]), weights, biases, activations, len(activations))
 
             #print(p)
             #full_pdf(x[i], params_iter['v'],
@@ -241,10 +276,10 @@ def wiener_like_multi_nnddm(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=
             #             params_iter['sz'], params_iter[
             #                 't'], params_iter['st'],
             #             err, n_st, n_sz, use_adaptive, simps_err)
-            p = p * (1 - p_outlier) + wp_outlier
-            sum_logp += p
+ #           p = p * (1 - p_outlier) + wp_outlier
+ #           sum_logp += p
 
-        return sum_logp
+ #       return sum_logp
 
 def wiener_like_nn_weibull(np.ndarray[double, ndim = 1] x, 
                            np.ndarray[long, ndim = 1] nn_response, 
@@ -353,6 +388,48 @@ def wiener_like_nn_new(np.ndarray[double, ndim = 1] x,
 
     p = mlp_target_new(np.array([vf,af,zf,tf,alphaf,betaf]).transpose(),  # parmeters
                        np.array([x,nn_response]).transpose()) # (rt, c)
+
+    if p == 0: # why this condition?
+        return -np.inf
+
+    return p
+
+def wiener_like_nn_levy((np.ndarray[double, ndim = 1] x, 
+                         np.ndarray[long, ndim = 1] nn_response, 
+                         double v,
+                         double sv, 
+                         double a, 
+                         double alpha,
+                         double z, 
+                         double sz, 
+                         double t,
+                         double st, 
+                         double err, 
+                         int n_st = 10, 
+                         int n_sz = 10, 
+                         bint use_adaptive = 1, 
+                         double simps_err = 1e-8,
+                         double p_outlier = 0,
+                         double w_outlier = 0):
+
+    cdef Py_ssize_t size = x.shape[0]
+    cdef Py_ssize_t i
+    cdef double p
+    cdef double sum_logp = 0
+    cdef double wp_outlier = w_outlier * p_outlier
+    cdef double n_params = 5
+
+    cdef np.ndarray[double, ndim=1] vf = np.repeat(v, size)
+    cdef np.ndarray[double, ndim=1] af = np.repeat(a, size)
+    cdef np.ndarray[double, ndim=1] zf = np.repeat(z, size)
+    cdef np.ndarray[double, ndim=1] tf = np.repeat(t, size)
+    cdef np.ndarray[double, ndim=1] alphaf = np.repeat(alpha, size)
+
+    if not p_outlier_in_range(p_outlier):
+        return -np.inf
+
+    p = mlp_target(np.array([vf,af,zf,tf,alphaf]).transpose(),  # parmeters
+                   np.array([x, nn_response]).transpose()) # (rt, c)
 
     if p == 0: # why this condition?
         return -np.inf
