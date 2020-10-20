@@ -394,7 +394,7 @@ def wiener_like_nn_new(np.ndarray[double, ndim = 1] x,
 
     return p
 
-def wiener_like_nn_levy((np.ndarray[double, ndim = 1] x, 
+def wiener_like_nn_levy(np.ndarray[double, ndim = 1] x, 
                          np.ndarray[long, ndim = 1] nn_response, 
                          double v,
                          double sv, 
