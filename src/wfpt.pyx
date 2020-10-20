@@ -383,7 +383,7 @@ def wiener_like_nn_new(np.ndarray[double, ndim = 1] x,
     #cdef np.ndarray[double, ndim=1] betaf = np.repeat(beta, size)
     #cdef np.ndarray[double, ndim=1] alphaf = np.repeat(alpha, size)
     
-    cdef np.ndarray[float, ndim = 2] data = np.zeros((n_params + 2, size), dtype = np.float32)
+    cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
     data[:, :n_params] = np.tile([v, a, z, t, beta, alpha], (size, 1)).astype(np.float32)
     data[:, -2] = x.astype(np.float32)
     data[:, -1] = nn_response.astype(np.float32)

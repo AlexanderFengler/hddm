@@ -10733,7 +10733,7 @@ static PyObject *__pyx_pf_4wfpt_20wiener_like_nn_new(CYTHON_UNUSED PyObject *__p
   /* "wfpt.pyx":386
  *     #cdef np.ndarray[double, ndim=1] alphaf = np.repeat(alpha, size)
  * 
- *     cdef np.ndarray[float, ndim = 2] data = np.zeros((n_params + 2, size), dtype = np.float32)             # <<<<<<<<<<<<<<
+ *     cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)             # <<<<<<<<<<<<<<
  *     data[:, :n_params] = np.tile([v, a, z, t, beta, alpha], (size, 1)).astype(np.float32)
  *     data[:, -2] = x.astype(np.float32)
  */
@@ -10742,9 +10742,9 @@ static PyObject *__pyx_pf_4wfpt_20wiener_like_nn_new(CYTHON_UNUSED PyObject *__p
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 386, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_long((__pyx_v_n_params + 2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 386, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_long((__pyx_v_n_params + 2)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 386, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 386, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
@@ -10789,7 +10789,7 @@ static PyObject *__pyx_pf_4wfpt_20wiener_like_nn_new(CYTHON_UNUSED PyObject *__p
 
   /* "wfpt.pyx":387
  * 
- *     cdef np.ndarray[float, ndim = 2] data = np.zeros((n_params + 2, size), dtype = np.float32)
+ *     cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
  *     data[:, :n_params] = np.tile([v, a, z, t, beta, alpha], (size, 1)).astype(np.float32)             # <<<<<<<<<<<<<<
  *     data[:, -2] = x.astype(np.float32)
  *     data[:, -1] = nn_response.astype(np.float32)
@@ -10932,7 +10932,7 @@ static PyObject *__pyx_pf_4wfpt_20wiener_like_nn_new(CYTHON_UNUSED PyObject *__p
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
   /* "wfpt.pyx":388
- *     cdef np.ndarray[float, ndim = 2] data = np.zeros((n_params + 2, size), dtype = np.float32)
+ *     cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
  *     data[:, :n_params] = np.tile([v, a, z, t, beta, alpha], (size, 1)).astype(np.float32)
  *     data[:, -2] = x.astype(np.float32)             # <<<<<<<<<<<<<<
  *     data[:, -1] = nn_response.astype(np.float32)
@@ -19392,7 +19392,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_slice_);
 
   /* "wfpt.pyx":388
- *     cdef np.ndarray[float, ndim = 2] data = np.zeros((n_params + 2, size), dtype = np.float32)
+ *     cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
  *     data[:, :n_params] = np.tile([v, a, z, t, beta, alpha], (size, 1)).astype(np.float32)
  *     data[:, -2] = x.astype(np.float32)             # <<<<<<<<<<<<<<
  *     data[:, -1] = nn_response.astype(np.float32)
