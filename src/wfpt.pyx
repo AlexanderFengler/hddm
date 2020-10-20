@@ -393,8 +393,7 @@ def wiener_like_nn_new(np.ndarray[double, ndim = 1] x,
     if not p_outlier_in_range(p_outlier):
         return -np.inf
     
-    p = mlp_target_new(data[:, :n_params], 
-                       data[:, n_params:])
+    p = mlp_target_new(data)
     #p = mlp_target_new(np.array([vf,af,zf,tf,alphaf,betaf]).transpose(),  # parmeters
     #                   np.array([x,nn_response]).transpose()) # (rt, c)
 
