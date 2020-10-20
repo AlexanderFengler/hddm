@@ -10734,7 +10734,7 @@ static PyObject *__pyx_pf_4wfpt_20wiener_like_nn_new(CYTHON_UNUSED PyObject *__p
  *     #cdef np.ndarray[double, ndim=1] alphaf = np.repeat(alpha, size)
  * 
  *     cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)             # <<<<<<<<<<<<<<
- *     data[:, :n_params] = np.tile([v, a, z, t, beta, alpha], (size, 1)).astype(np.float32)
+ *     data[:, :n_params] = np.tile([v, a, z, t, alpha, beta], (size, 1)).astype(np.float32)
  *     data[:, -2] = x.astype(np.float32)
  */
   __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L1_error)
@@ -10790,7 +10790,7 @@ static PyObject *__pyx_pf_4wfpt_20wiener_like_nn_new(CYTHON_UNUSED PyObject *__p
   /* "wfpt.pyx":387
  * 
  *     cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
- *     data[:, :n_params] = np.tile([v, a, z, t, beta, alpha], (size, 1)).astype(np.float32)             # <<<<<<<<<<<<<<
+ *     data[:, :n_params] = np.tile([v, a, z, t, alpha, beta], (size, 1)).astype(np.float32)             # <<<<<<<<<<<<<<
  *     data[:, -2] = x.astype(np.float32)
  *     data[:, -1] = nn_response.astype(np.float32)
  */
@@ -10807,9 +10807,9 @@ static PyObject *__pyx_pf_4wfpt_20wiener_like_nn_new(CYTHON_UNUSED PyObject *__p
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_t_8 = PyFloat_FromDouble(__pyx_v_t); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 387, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_9 = PyFloat_FromDouble(__pyx_v_beta); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 387, __pyx_L1_error)
+  __pyx_t_9 = PyFloat_FromDouble(__pyx_v_alpha); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 387, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_10 = PyFloat_FromDouble(__pyx_v_alpha); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 387, __pyx_L1_error)
+  __pyx_t_10 = PyFloat_FromDouble(__pyx_v_beta); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 387, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   __pyx_t_11 = PyList_New(6); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 387, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
@@ -10933,7 +10933,7 @@ static PyObject *__pyx_pf_4wfpt_20wiener_like_nn_new(CYTHON_UNUSED PyObject *__p
 
   /* "wfpt.pyx":388
  *     cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
- *     data[:, :n_params] = np.tile([v, a, z, t, beta, alpha], (size, 1)).astype(np.float32)
+ *     data[:, :n_params] = np.tile([v, a, z, t, alpha, beta], (size, 1)).astype(np.float32)
  *     data[:, -2] = x.astype(np.float32)             # <<<<<<<<<<<<<<
  *     data[:, -1] = nn_response.astype(np.float32)
  * 
@@ -10965,7 +10965,7 @@ static PyObject *__pyx_pf_4wfpt_20wiener_like_nn_new(CYTHON_UNUSED PyObject *__p
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
   /* "wfpt.pyx":389
- *     data[:, :n_params] = np.tile([v, a, z, t, beta, alpha], (size, 1)).astype(np.float32)
+ *     data[:, :n_params] = np.tile([v, a, z, t, alpha, beta], (size, 1)).astype(np.float32)
  *     data[:, -2] = x.astype(np.float32)
  *     data[:, -1] = nn_response.astype(np.float32)             # <<<<<<<<<<<<<<
  * 
@@ -19311,7 +19311,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "wfpt.pyx":388
  *     cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
- *     data[:, :n_params] = np.tile([v, a, z, t, beta, alpha], (size, 1)).astype(np.float32)
+ *     data[:, :n_params] = np.tile([v, a, z, t, alpha, beta], (size, 1)).astype(np.float32)
  *     data[:, -2] = x.astype(np.float32)             # <<<<<<<<<<<<<<
  *     data[:, -1] = nn_response.astype(np.float32)
  * 
@@ -19321,7 +19321,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__2);
 
   /* "wfpt.pyx":389
- *     data[:, :n_params] = np.tile([v, a, z, t, beta, alpha], (size, 1)).astype(np.float32)
+ *     data[:, :n_params] = np.tile([v, a, z, t, alpha, beta], (size, 1)).astype(np.float32)
  *     data[:, -2] = x.astype(np.float32)
  *     data[:, -1] = nn_response.astype(np.float32)             # <<<<<<<<<<<<<<
  * 
