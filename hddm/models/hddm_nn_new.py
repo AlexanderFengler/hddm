@@ -11,7 +11,9 @@ import pickle
 from kabuki.hierarchical import Knode # LOOK INTO KABUKI TO FIGURE OUT WHAT KNODE DOES
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
-from wfpt import wiener_like_nn_weibull #TODO
+from wfpt import wiener_like_nn_weibull
+from wfpt import wiener_like_nn_angle #TODO
+from wfpt import wiener_like_nn_ddm
 
 class HDDMnn_new(HDDM):
     """HDDM model that uses NEW neural net likelihood
@@ -22,8 +24,14 @@ class HDDMnn_new(HDDM):
         self.non_centered = kwargs.pop('non_centered', False)
         self.free = kwargs.pop('free', False) # 
         self.k = kwargs.pop('k', False)
-        self.wfpt_nn_new_class = Wienernn_new # attach corresponding likelihood
+        self.model = kwargs.pop('model', 'ddm')
 
+        if self.model == 'weibull':
+            #self.wfpt_nn_new_class = Wienernn_new # attach corresponding likelihood
+            self.wfpt_nn_new_class = stochastic_from_dist('Wienernn_new', wienernn_like_new)
+        else:
+            return 'No valid model specified'
+        
         super(HDDMnn_new, self).__init__(*args, **kwargs)
 
     def _create_stochastic_knodes(self, include):
@@ -118,4 +126,4 @@ def wienernn_like_new(x,
 
 # TODO CHECK WHAT THIS IS EVEN DOING
 
-Wienernn_new = stochastic_from_dist('Wienernn_new', wienernn_like_new)
+#Wienernn_new = stochastic_from_dist('Wienernn_new', wienernn_like_new)
