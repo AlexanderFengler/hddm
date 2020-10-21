@@ -13,7 +13,6 @@ from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
 from wfpt import wiener_like_nn_new #TODO
 
-
 class HDDMnn_new(HDDM):
     """HDDM model that uses NEW neural net likelihood
 
@@ -101,22 +100,22 @@ def wienernn_like_new(x,
     #    activations = pickle.load(tmp_file)
 
     #print('hei')
-    nn_response = x['nn_response'].values.astype(int) # TODO: just request this to be integer to begin with ?!
-    return wiener_like_nn_new(np.absolute(x['rt'].values),
-                              nn_response, 
-                              v, 
-                              sv,
-                              a, 
-                              alpha, 
-                              beta, 
-                              z, 
-                              sz,
-                              t, 
-                              st, 
-                              p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-                              **wp)
+    #nn_response =  # TODO: just request this to be integer to begin with ?!
+    
+    return wiener_like_nn_weibull(np.absolute(x['rt'].values).astype(np.float32),
+                                  x['nn_response'].values.astype(np.float32), 
+                                  v, 
+                                  sv,
+                                  a, 
+                                  alpha, 
+                                  beta,
+                                  z, 
+                                  sz,
+                                  t, 
+                                  st, 
+                                  p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+                                  **wp)
 
 # TODO CHECK WHAT THIS IS EVEN DOING
 
 Wienernn_new = stochastic_from_dist('Wienernn_new', wienernn_like_new)
-

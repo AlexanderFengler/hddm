@@ -50,7 +50,7 @@ class HDDMnn_weibull(HDDM):
         return Knode(self.wfpt_nn_weibull_class, 'wfpt', observed=True, col_name=['nn_response', 'rt'], **wfpt_parents)
 
 
-def wienernn_like_weibull(x, v, sv, a, alpha, beta, z, sz, t, st, p_outlier=0): #theta
+def wienernn_like_weibull(x, v, sv, a, alpha, beta, z, sz, t, st, p_outlier = 0): #theta
 
     wiener_params = {'err': 1e-4, 
                      'n_st': 2, 
@@ -60,15 +60,8 @@ def wienernn_like_weibull(x, v, sv, a, alpha, beta, z, sz, t, st, p_outlier=0): 
                      'w_outlier': 0.1}
     wp = wiener_params
 
-    #with open("weights.pickle", "rb") as tmp_file:
-    #    weights = pickle.load(tmp_file)
-    #with open('biases.pickle', 'rb') as tmp_file:
-    #    biases = pickle.load(tmp_file)
-    #with open('activations.pickle', 'rb') as tmp_file:
-    #    activations = pickle.load(tmp_file)
-
-    #print('hei')
     nn_response = x['nn_response'].values.astype(int)
+    
     return wiener_like_nn_weibull(np.absolute(x['rt'].values), 
                                   nn_response, 
                                   v, 
@@ -80,7 +73,7 @@ def wienernn_like_weibull(x, v, sv, a, alpha, beta, z, sz, t, st, p_outlier=0): 
                                   sz, 
                                   t, 
                                   st,
-                                  p_outlier=p_outlier, 
+                                  p_outlier = p_outlier, 
                                   **wp)
 
 Wienernn_weibull = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
