@@ -14,6 +14,7 @@ from hddm.models import HDDM
 from wfpt import wiener_like_nn_weibull
 from wfpt import wiener_like_nn_angle #TODO
 from wfpt import wiener_like_nn_ddm
+from wfpt import wiener_like_nn_levy
 
 class HDDMnn_levy(HDDM):
     """HDDM model that uses levy neural net likelihood
@@ -25,12 +26,9 @@ class HDDMnn_levy(HDDM):
         self.free = kwargs.pop('free', False) # 
         self.k = kwargs.pop('k', False)
 
-        if self.model == 'weibull':
-            #self.wfpt_nn_new_class = Wienernn_new # attach corresponding likelihood
-            self.wfpt_nn_levy_class = stochastic_from_dist('Wienernn_levy', wienernn_like_levy)
-        else:
-            'No valid model specified'
-        
+        #self.wfpt_nn_new_class = Wienernn_new # attach corresponding likelihood
+        self.wfpt_nn_levy_class = stochastic_from_dist('Wienernn_levy', wienernn_like_levy)
+
         super(HDDMnn_levy, self).__init__(*args, **kwargs)
 
     def _create_stochastic_knodes(self, include):

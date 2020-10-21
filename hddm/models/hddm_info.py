@@ -149,12 +149,16 @@ class HDDM(HDDMBase):
                                                            std_upper = 1 # added AF
                                                            ))
         if 'v' in include:
-            knodes.update(self._create_family_trunc_normal('v', lower=-2.7, upper=2.7, value=1))
+            knodes.update(self._create_family_trunc_normal('v', 
+                                                           lower= - 2.7, 
+                                                           upper = 2.7, 
+                                                           value = 0,
+                                                           std_upper = 1.5))
         if 't' in include:
             knodes.update(self._create_family_trunc_normal('t', 
                                                            lower=1e-3, 
                                                            upper=2, 
-                                                           value=.01,
+                                                           value = .01,
                                                            std_upper = 1 # added AF
                                                            ))
         if 'z' in include:
