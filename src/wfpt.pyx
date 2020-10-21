@@ -469,6 +469,7 @@ def wiener_like_nn_weibull(np.ndarray[float, ndim = 1] x,
     cdef float log_p
     cdef int n_params = 6
     cdef float ll_min = -16.11809
+    
     cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
     data[:, :n_params] = np.tile([v, a, z, t, alpha, beta], (size, 1)).astype(np.float32)
     data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
