@@ -11,7 +11,7 @@ import pickle
 from kabuki.hierarchical import Knode
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
-from wfpt import wiener_like_nn
+from wfpt import wiener_like_nn_ddm
 
 class HDDMnn(HDDM):
     """HDDM model that uses neural net likelihood
