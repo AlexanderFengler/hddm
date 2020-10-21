@@ -39,7 +39,7 @@ angle_model = keras.models.load_model('model_final_angle.h5', compile = False)
 model = keras.models.load_model('model_final.h5', compile = False)
 new_weibull_model = keras.models.load_model('model_final_new.h5', compile = False)
 ddm_model = keras.models.load_model('model_final.h5', compile = False)
-levy_model = keras_model.load_model('model_final_levy.h5', compile = False)
+levy_model = keras_models.load_model('model_final_levy.h5', compile = False)
 #ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)
 
 #def mlp_target(np.ndarray[double, ndim = 2] params,
