@@ -85,7 +85,7 @@ def wienernn_like_ornstein(x,
                      'simps_err': 1e-3, # 
                      'w_outlier': 0.1}
     
-    wp = wiener_params
+    #wp = wiener_params
 
     return wiener_like_nn_ornstein(np.absolute(x['rt'].values).astype(np.float32),
                                    x['nn_response'].values.astype(np.float32), 
@@ -98,7 +98,7 @@ def wienernn_like_ornstein(x,
                                    t, 
                                    st, 
                                    p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-                                   **wp
+                                   **wiener_params)
 
 # TODO CHECK WHAT THIS IS EVEN DOING
 
