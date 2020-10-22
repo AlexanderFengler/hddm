@@ -75,7 +75,7 @@ class HDDMnn_new(HDDM):
                                                            std_upper = 1
                                                            ))
         if 'beta' in include:
-            nodes.update(self._create_family_trunc_normal('beta', 
+            knodes.update(self._create_family_trunc_normal('beta', 
                                                            lower = 0.31, 
                                                            upper = 6.99, 
                                                            value = 3.34,
