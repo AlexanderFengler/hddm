@@ -15,7 +15,7 @@ from wfpt import wiener_like_nn_weibull
 from wfpt import wiener_like_nn_angle #TODO
 from wfpt import wiener_like_nn_ddm
 
-class HDDMnn_weibull(HDDM):
+class HDDMnn_new(HDDM):
     """HDDM model that uses WEIBULL neural net likelihood
 
     """
@@ -32,9 +32,14 @@ class HDDMnn_weibull(HDDM):
         else:
             'No valid model specified'
         
-        print(self.include)
-        super(HDDMnn_weibull, self).__init__(*args, **kwargs)
-        print(self.include)
+        super(HDDMnn_new, self).__init__(*args, **kwargs)
+    
+    # def _create_stochastic_knodes(self, include):
+    #     knodes = OrderedDict()
+    #     print(self.model)
+
+    #     if 'a' in include:
+
 
     def _create_stochastic_knodes(self, include):
         knodes = super(HDDMnn_weibull, self)._create_stochastic_knodes(include) # 
@@ -68,7 +73,7 @@ class HDDMnn_weibull(HDDM):
 
     # TODO: CLARIFY WHAT THIS FUNCTION DOES
     def _create_wfpt_parents_dict(self, knodes):
-        wfpt_parents = super(HDDMnn_weibull, self)._create_wfpt_parents_dict(knodes)
+        wfpt_parents = super(HDDMnn_new, self)._create_wfpt_parents_dict(knodes)
         wfpt_parents['beta'] = knodes['beta_bottom']
         wfpt_parents['alpha'] = knodes['alpha_bottom'] if self.k else 3.00
         return wfpt_parents

@@ -107,7 +107,6 @@ class HDDM(HDDMBase):
                                   'st': 0.1, 'sv': 3, 'z_trans': 0.2, 'z': 0.1,
                                   'p_outlier':1., 'v_std': 1,'alpha':1.5,'dual_alpha':1.5,'theta':0.1}
 
-
         self.is_informative = kwargs.pop('informative', True)
 
         super(HDDM, self).__init__(*args, **kwargs)
@@ -141,60 +140,82 @@ class HDDM(HDDMBase):
 
     def _create_stochastic_knodes_noninfo(self, include):
         knodes = OrderedDict()
-
         print(self.model)
 
         if 'a' in include:
-            knodes.update(self._create_family_trunc_normal('a', 
-                                                           lower=0.3, 
-                                                           upper=2, 
-                                                           value=1,
+            knodes.update(self._create_family_trunc_normal('a',
+                                                           lower = 0.3,
+                                                           upper = 2,
+                                                           value = 1,
                                                            std_upper = 1 # added AF
                                                            ))
         if 'v' in include:
             knodes.update(self._create_family_trunc_normal('v', 
-                                                           lower= - 2.7, 
-                                                           upper = 2.7, 
+                                                           lower = - 2.7,
+                                                           upper = 2.7,
                                                            value = 0,
                                                            std_upper = 1.5))
         if 't' in include:
             knodes.update(self._create_family_trunc_normal('t', 
-                                                           lower=1e-3, 
-                                                           upper=2, 
+                                                           lower = 1e-3,
+                                                           upper = 2, 
                                                            value = .01,
                                                            std_upper = 1 # added AF
                                                            ))
         if 'z' in include:
             knodes.update(self._create_family_invlogit('z',
-                                                       value=.5, 
-                                                       g_tau=10**-2, 
-                                                       std_std=0.5))
+                                                       value = .5,
+                                                       g_tau = 10**-2,
+                                                       std_std = 0.5))
 
         # Below are parameters that are by default treated as global (no group distribution)
         if 'sv' in include:
-            knodes['sv_bottom'] = Knode(pm.Uniform, 'sv', lower=1e-6, upper=1e3, value=1, depends=self.depends['sv'])
+            knodes['sv_bottom'] = Knode(pm.Uniform, 
+                                        'sv', 
+                                        lower = 1e-6,
+                                        upper = 1e3,
+                                        value = 1,
+                                        depends = self.depends['sv'])
         if 'sz' in include:
-            knodes['sz_bottom'] = Knode(pm.Beta, 'sz', alpha=1, beta=1, value=0.01, depends=self.depends['sz'])
+            knodes['sz_bottom'] = Knode(pm.Beta, 
+                                        'sz', 
+                                        alpha = 1,
+                                        beta = 1,
+                                        value = 0.01,
+                                        depends = self.depends['sz'])
         if 'st' in include:
-            knodes['st_bottom'] = Knode(pm.Uniform, 'st', lower=1e-6, upper=1e3, value=0.01, depends=self.depends['st'])
+            knodes['st_bottom'] = Knode(pm.Uniform, 
+                                        'st', 
+                                        lower = 1e-6,
+                                        upper = 1e3,
+                                        value = 0.01,
+                                         depends = self.depends['st'])
         if 'p_outlier' in include:
-            knodes['p_outlier_bottom'] = Knode(pm.Beta, 'p_outlier', alpha=1, beta=1, value=0.01, depends=self.depends['p_outlier'])
-
+            knodes['p_outlier_bottom'] = Knode(pm.Beta, 
+                                               'p_outlier',
+                                               alpha = 1,
+                                               beta = 1,
+                                               value = 0.01,
+                                               depends = self.depends['p_outlier'])
         return knodes
 
     def pre_sample(self, use_slice=True):
         for name, node_descr in self.iter_stochastics():
             node = node_descr['node']
             if isinstance(node, pm.Normal) and np.all([isinstance(x, pm.Normal) for x in node.extended_children]):
-                self.mc.use_step_method(steps.kNormalNormal, node)
+                self.mc.use_step_method(steps.kNormalNormal,
+                                        node)
             else:
                 knode_name = node_descr['knode_name'].replace('_subj', '')
                 if knode_name in ['st', 'sv', 'sz']:
                     left = 0
                 else:
                     left = None
-                self.mc.use_step_method(steps.SliceStep, node, width=self.slice_widths.get(knode_name, 1),
-                                        left=left, maxiter=5000)
+                self.mc.use_step_method(steps.SliceStep,
+                                        node, 
+                                        width = self.slice_widths.get(knode_name, 1),
+                                        left = left,
+                                        maxiter = 5000)
 
     def _create_an_average_model(self):
         """
@@ -209,5 +230,8 @@ class HDDM(HDDMBase):
         assert known_args.issuperset(init_args), "Arguments of the constructor are not as expected"
 
         #create the avg model
-        avg_model  = self.__class__(self.data, include=self.include, is_group_model=False, **self._kwargs)
+        avg_model  = self.__class__(self.data,
+                                    include = self.include, 
+                                    is_group_model = False, 
+                                    **self._kwargs)
         return avg_model
