@@ -52,7 +52,6 @@ class HDDMnn_angle(HDDM):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
         return Knode(self.wfpt_nn_angle_class, 'wfpt', observed=True, col_name=['nn_response', 'rt'], **wfpt_parents)
 
-
 def wienernn_like_angle(x, v, sv, a, theta, z, sz, t, st, p_outlier=0):
 
     wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
