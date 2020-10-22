@@ -25,6 +25,7 @@ class HDDMnn_levy(HDDM):
         self.non_centered = kwargs.pop('non_centered', False)
         self.free = kwargs.pop('free', False) # 
         self.k = kwargs.pop('k', False)
+        self.model = kwargs.pop('model', 'ddm')
 
         #self.wfpt_nn_new_class = Wienernn_new # attach corresponding likelihood
         self.wfpt_nn_levy_class = stochastic_from_dist('Wienernn_levy', wienernn_like_levy)
