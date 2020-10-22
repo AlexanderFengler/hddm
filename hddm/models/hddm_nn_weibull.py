@@ -32,7 +32,7 @@ class HDDMnn_weibull(HDDM):
         else:
             'No valid model specified'
         
-        print(self.include)
+        # print(self.include)
         super(HDDMnn_weibull, self).__init__(*args, **kwargs)
         print(self.include)
 
