@@ -11,6 +11,7 @@ from .hddm_nn_weibull import HDDMnn_weibull
 from .hddm_nn_angle import HDDMnn_angle
 from .hddm_nn_regression import HDDMnnRegressor
 from .hddm_nn_levy import HDDMnn_levy
+from .hddm_nn_ornstein import HDDMnn_ornstein
 #from .hddm_nn_new import HDDMnn_new
 #from .hddm_nn_weibull_regression import HDDMnnWeibullRegressor
 
@@ -28,5 +29,6 @@ __all__ = ['AccumulatorModel',
            'HDDMnn_angle',
            'HDDMnnRegressor',
            'HDDMnn_levy',
+           'HDDMnn_ornstein',
            #'HDDMnnWeibullRegressor',
 ]
