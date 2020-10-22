@@ -2,6 +2,7 @@
 """
 """
 
+from collections import OrderedDict
 from copy import copy
 import numpy as np
 import pymc
