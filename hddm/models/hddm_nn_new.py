@@ -24,19 +24,12 @@ class HDDMnn_new(HDDM):
     def __init__(self, *args, **kwargs):
         self.non_centered = kwargs.pop('non_centered', False)
         self.free = kwargs.pop('free', False) # 
-        self.k = kwargs.pop('k', False)
         self.model = kwargs.pop('model', 'weibull')
-        #self.wfpt_nn_new_class = Wienernn_new # attach corresponding likelihood
         self.wfpt_nn_weibull_class = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
-
+        #self.wfpt_nn_new_class = Wienernn_new # attach corresponding likelihood
+        #self.k = kwargs.pop('k', False)
         super(HDDMnn_new, self).__init__(*args, **kwargs)
     
-    # def _create_stochastic_knodes(self, include):
-    #     knodes = OrderedDict()
-    #     print(self.model)
-
-    #     if 'a' in include:
-
     def _create_stochastic_knodes(self, include):
         knodes = OrderedDict()
 
@@ -81,55 +74,38 @@ class HDDMnn_new(HDDM):
                                                            value = 3.34,
                                                            std_upper = 1
                                                            ))
+
+        print('knodes')
+        print(knodes)
+
         return knodes
 
-
-            
-    # def _create_stochastic_knodes(self, include):
-    #     knodes = super(HDDMnn_weibull, self)._create_stochastic_knodes(include) # 
-    #     if self.free:
-    #         knodes.update(self._create_family_gamma_gamma_hnormal('beta', 
-    #                                                               g_mean = 1.5, 
-    #                                                               g_std = 0.75,
-    #                                                               std_std = 2, 
-    #                                                               std_value = 0.1,
-    #                                                               value = 1)) # TODO: Check if this is a good prior
-    #         if self.k:
-    #             knodes.update(self._create_family_gamma_gamma_hnormal('alpha', 
-    #                                                                   g_mean = 1.5, 
-    #                                                                   g_std = 0.75, 
-    #                                                                   std_std = 2,
-    #                                                                   std_value = 0.1,
-    #                                                                   value = 1)) # TODO: Check if this is a good prior
-    #     else:
-    #         knodes.update(self._create_family_trunc_normal('beta', 
-    #                                                        lower = 0.31, 
-    #                                                        upper = 6.99, 
-    #                                                        value = 3.34,
-    #                                                        std_upper = 1))
-    #         if self.k:
-    #             knodes.update(self._create_family_trunc_normal('alpha',
-    #                                                            lower = 0.31, 
-    #                                                            upper = 4.99, 
-    #                                                            value = 2.34,
-    #                                                            std_upper = 1))
-    #     return knodes
-
-    # TODO: CLARIFY WHAT THIS FUNCTION DOES
-    
     def _create_wfpt_parents_dict(self, knodes):
-        print(knodes)
-        wfpt_parents = super(HDDMnn_new, self)._create_wfpt_parents_dict(knodes)
+        wfpt_parents = OrderedDict()
+        wfpt_parents['a'] = knodes['a_bottom']
+        wfpt_parents['v'] = knodes['v_bottom']
+        wfpt_parents['t'] = knodes['t_bottom']
+
+        wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else 0 #self.default_intervars['sv']
+        wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else 0 #self.default_intervars['sz']
+        wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else 0 #self.default_intervars['st']
+        wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
+
+        wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else 0 #self.p_outlier
+        
+        wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 3 
+        wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else 3
+        
+        print('wfpt parents: ')
         print(wfpt_parents)
-        wfpt_parents['beta'] = knodes['beta_bottom']
-        wfpt_parents['alpha'] = knodes['alpha_bottom'] if self.k else 3.00
         return wfpt_parents
 
-    # TODO: CLARIFY WHAT THIS FUNCTION DOES
+
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
+        
         return Knode(self.wfpt_nn_weibull_class, 
-                    'wfpt', 
+                     'wfpt', 
                      observed = True, 
                      col_name = ['nn_response', 'rt'], # TODO: One could preprocess at initialization
                      **wfpt_parents)
@@ -171,3 +147,48 @@ def wienernn_like_weibull(x,
 # TODO CHECK WHAT THIS IS EVEN DOING
 
 #Wienernn_new = stochastic_from_dist('Wienernn_new', wienernn_like_new)
+
+
+
+            
+    # def _create_stochastic_knodes(self, include):
+    #     knodes = super(HDDMnn_weibull, self)._create_stochastic_knodes(include) # 
+    #     if self.free:
+    #         knodes.update(self._create_family_gamma_gamma_hnormal('beta', 
+    #                                                               g_mean = 1.5, 
+    #                                                               g_std = 0.75,
+    #                                                               std_std = 2, 
+    #                                                               std_value = 0.1,
+    #                                                               value = 1)) # TODO: Check if this is a good prior
+    #         if self.k:
+    #             knodes.update(self._create_family_gamma_gamma_hnormal('alpha', 
+    #                                                                   g_mean = 1.5, 
+    #                                                                   g_std = 0.75, 
+    #                                                                   std_std = 2,
+    #                                                                   std_value = 0.1,
+    #                                                                   value = 1)) # TODO: Check if this is a good prior
+    #     else:
+    #         knodes.update(self._create_family_trunc_normal('beta', 
+    #                                                        lower = 0.31, 
+    #                                                        upper = 6.99, 
+    #                                                        value = 3.34,
+    #                                                        std_upper = 1))
+    #         if self.k:
+    #             knodes.update(self._create_family_trunc_normal('alpha',
+    #                                                            lower = 0.31, 
+    #                                                            upper = 4.99, 
+    #                                                            value = 2.34,
+    #                                                            std_upper = 1))
+    #     return knodes
+
+    # TODO: CLARIFY WHAT THIS FUNCTION DOES
+
+        # def _create_wfpt_parents_dict(self, knodes):
+    #     print(knodes)
+    #     wfpt_parents = super(HDDMnn_new, self)._create_wfpt_parents_dict(knodes)
+    #     print(wfpt_parents)
+    #     wfpt_parents['beta'] = knodes['beta_bottom']
+    #     wfpt_parents['alpha'] = knodes['alpha_bottom'] if self.k else 3.00
+    #     return wfpt_parents
+
+    
