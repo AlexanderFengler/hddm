@@ -116,8 +116,10 @@ class HDDMnn_new(HDDM):
     #     return knodes
 
     # TODO: CLARIFY WHAT THIS FUNCTION DOES
+    
     def _create_wfpt_parents_dict(self, knodes):
         wfpt_parents = super(HDDMnn_new, self)._create_wfpt_parents_dict(knodes)
+        print(wfpt_parents)
         wfpt_parents['beta'] = knodes['beta_bottom']
         wfpt_parents['alpha'] = knodes['alpha_bottom'] if self.k else 3.00
         return wfpt_parents
