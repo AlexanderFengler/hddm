@@ -12,6 +12,7 @@ import pickle
 from kabuki.hierarchical import Knode # LOOK INTO KABUKI TO FIGURE OUT WHAT KNODE DOES
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
+
 from wfpt import wiener_like_nn_weibull
 from wfpt import wiener_like_nn_angle 
 from wfpt import wiener_like_nn_ddm
