@@ -34,13 +34,13 @@ class HDDMnn(HDDM):
             self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
 
         if self.model == 'ddm_sdv':
-            self.wfpt_nn = stochastic_from_dict('Wienernn_ddm_sdv', wienernn_like_ddm_sdv)
+            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv', wienernn_like_ddm_sdv)
         
         if self.model == 'ddm_analytic':
             self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_analytic', wienernn_like_ddm_analytic)
 
         if self.model == 'ddm_sdv_analytic':
-            self.wfpt_nn = stochastic_from_dict('Wienernn_ddm_sdv_analytic', wienernn_like_ddm_sdv_analytic)
+            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv_analytic', wienernn_like_ddm_sdv_analytic)
         
         if self.model == 'weibull' or self.model == 'weibull_cdf':
             self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
