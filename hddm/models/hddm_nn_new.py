@@ -25,7 +25,7 @@ class HDDMnn_new(HDDM):
 
     def __init__(self, *args, **kwargs):
         self.non_centered = kwargs.pop('non_centered', False)
-        self.free = kwargs.pop('free', False) # 
+        #self.free = kwargs.pop('free', False) # 
         self.model = kwargs.pop('model', 'weibull')
 
         if self.model == 'ddm':
