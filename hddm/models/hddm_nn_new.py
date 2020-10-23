@@ -32,48 +32,49 @@ class HDDMnn_new(HDDM):
     
     def _create_stochastic_knodes(self, include):
         knodes = OrderedDict()
-
-        if 'a' in include:
-            knodes.update(self._create_family_trunc_normal('a',
-                                                           lower = 0.3,
-                                                           upper = 2,
-                                                           value = 1,
-                                                           std_upper = 1 # added AF
+        # SPLIT BY MODEL TO ACCOMODATE TRAINED PARAMETER BOUNDS BY MODEL
+        if self.model == 'weibull' or self.model == 'weibull_cdf':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.5,
+                                                               value = 1,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 2.5,
+                                                               upper = 2.5,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
                                                            ))
-        if 'v' in include:
-            knodes.update(self._create_family_trunc_normal('v', 
-                                                           lower = - 2.7,
-                                                           upper = 2.7,
-                                                           value = 0,
-                                                           std_upper = 1.5
-                                                           ))
-        if 't' in include:
-            knodes.update(self._create_family_trunc_normal('t', 
-                                                           lower = 1e-3,
-                                                           upper = 2, 
-                                                           value = .01,
-                                                           std_upper = 1 # added AF
-                                                           ))
-        if 'z' in include:
-            knodes.update(self._create_family_invlogit('z',
-                                                       value = .5,
-                                                       g_tau = 10**-2,
-                                                       std_std = 0.5
-                                                       ))
-        if 'alpha' in include:
-            knodes.update(self._create_family_trunc_normal('alpha',
-                                                           lower = 0.31, 
-                                                           upper = 4.99, 
-                                                           value = 2.34,
-                                                           std_upper = 1
-                                                           ))
-        if 'beta' in include:
-            knodes.update(self._create_family_trunc_normal('beta', 
-                                                           lower = 0.31, 
-                                                           upper = 6.99, 
-                                                           value = 3.34,
-                                                           std_upper = 1
-                                                           ))
+            if 'alpha' in include:
+                knodes.update(self._create_family_trunc_normal('alpha',
+                                                               lower = 0.31, 
+                                                               upper = 4.99, 
+                                                               value = 2.34,
+                                                               std_upper = 1
+                                                               ))
+            if 'beta' in include:
+                knodes.update(self._create_family_trunc_normal('beta', 
+                                                               lower = 0.31, 
+                                                               upper = 6.99, 
+                                                               value = 3.34,
+                                                               std_upper = 1
+                                                               ))
 
         print('knodes')
         print(knodes)
@@ -93,9 +94,17 @@ class HDDMnn_new(HDDM):
 
         wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else 0 #self.p_outlier
         
-        wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 3 
-        wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else 3
-        
+        # MODEL SPECIFIC PARAMETERS
+        if self.model == 'weibull' or self.model == 'weibull_cdf':
+            wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 3 
+            wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else 3
+        if self.model == 'ornstein':
+            wfpt_parents['g'] = knodes['g_bottom'] if 'g' in self.include else 0
+        if self.model == 'levy':
+            wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 2
+        if self.model == 'angle':
+            wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else 0
+
         print('wfpt parents: ')
         print(wfpt_parents)
         return wfpt_parents
