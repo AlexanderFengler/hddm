@@ -29,7 +29,7 @@ class HDDMnn_new(HDDM):
         self.model = kwargs.pop('model', 'weibull')
 
         if self.model == 'ddm':
-            self.wftp_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
+            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
         
         if self.model == 'weibull' or self.model == 'weibull_cdf':
             self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
