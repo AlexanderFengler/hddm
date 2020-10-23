@@ -349,8 +349,8 @@ def wiener_like(np.ndarray[double, ndim=1] x, double v, double sv, double a, dou
 
 #    return p
 
-def wiener_like_nn_ddm(np.ndarray[double, ndim = 1] x, 
-                       np.ndarray[long, ndim = 1] nn_response, 
+def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x, 
+                       np.ndarray[float, ndim = 1] nn_response, 
                        double v, 
                        double sv, 
                        double a, 
@@ -415,8 +415,8 @@ def wiener_like_nn_ddm(np.ndarray[double, ndim = 1] x,
 #
 #    return log_p
 
-def wiener_like_nn_angle(np.ndarray[double, ndim = 1] x, 
-                         np.ndarray[long, ndim = 1] nn_response, 
+def wiener_like_nn_angle(np.ndarray[float, ndim = 1] x, 
+                         np.ndarray[float, ndim = 1] nn_response, 
                          double v, 
                          double sv, 
                          double a, 

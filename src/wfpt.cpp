@@ -1762,8 +1762,8 @@ static double __pyx_f_4wfpt_adaptiveSimpsonsAux_2D(double, double, double, doubl
 static double __pyx_f_4wfpt_adaptiveSimpsons_2D(double, double, double, double, double, double, double, double, double, double, double, double, int, int); /*proto*/
 static CYTHON_INLINE int __pyx_f_4wfpt_p_outlier_in_range(double); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
-static __Pyx_TypeInfo __Pyx_TypeInfo_long = { "long", NULL, sizeof(long), { 0 }, 0, IS_UNSIGNED(long) ? 'U' : 'I', IS_UNSIGNED(long), 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_float = { "float", NULL, sizeof(float), { 0 }, 0, 'R', 0, 0 };
+static __Pyx_TypeInfo __Pyx_TypeInfo_long = { "long", NULL, sizeof(long), { 0 }, 0, IS_UNSIGNED(long) ? 'U' : 'I', IS_UNSIGNED(long), 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_int = { "int", NULL, sizeof(int), { 0 }, 0, IS_UNSIGNED(int) ? 'U' : 'I', IS_UNSIGNED(int), 0 };
 #define __Pyx_MODULE_NAME "wfpt"
 extern int __pyx_module_is_main_wfpt;
@@ -5672,8 +5672,8 @@ static PyObject *__pyx_pf_4wfpt_4wiener_like(CYTHON_UNUSED PyObject *__pyx_self,
 /* "wfpt.pyx":352
  * #    return p
  * 
- * def wiener_like_nn_ddm(np.ndarray[double, ndim = 1] x,             # <<<<<<<<<<<<<<
- *                        np.ndarray[long, ndim = 1] nn_response,
+ * def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,             # <<<<<<<<<<<<<<
+ *                        np.ndarray[float, ndim = 1] nn_response,
  *                        double v,
  */
 
@@ -5979,12 +5979,12 @@ static PyObject *__pyx_pf_4wfpt_6wiener_like_nn_ddm(CYTHON_UNUSED PyObject *__py
   __pyx_pybuffernd_nn_response.rcbuffer = &__pyx_pybuffer_nn_response;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x.rcbuffer->pybuffer, (PyObject*)__pyx_v_x, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 352, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x.rcbuffer->pybuffer, (PyObject*)__pyx_v_x, &__Pyx_TypeInfo_float, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 352, __pyx_L1_error)
   }
   __pyx_pybuffernd_x.diminfo[0].strides = __pyx_pybuffernd_x.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_x.diminfo[0].shape = __pyx_pybuffernd_x.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_nn_response.rcbuffer->pybuffer, (PyObject*)__pyx_v_nn_response, &__Pyx_TypeInfo_long, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 352, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_nn_response.rcbuffer->pybuffer, (PyObject*)__pyx_v_nn_response, &__Pyx_TypeInfo_float, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 352, __pyx_L1_error)
   }
   __pyx_pybuffernd_nn_response.diminfo[0].strides = __pyx_pybuffernd_nn_response.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_nn_response.diminfo[0].shape = __pyx_pybuffernd_nn_response.rcbuffer->pybuffer.shape[0];
 
@@ -6472,8 +6472,8 @@ static PyObject *__pyx_pf_4wfpt_6wiener_like_nn_ddm(CYTHON_UNUSED PyObject *__py
   /* "wfpt.pyx":352
  * #    return p
  * 
- * def wiener_like_nn_ddm(np.ndarray[double, ndim = 1] x,             # <<<<<<<<<<<<<<
- *                        np.ndarray[long, ndim = 1] nn_response,
+ * def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,             # <<<<<<<<<<<<<<
+ *                        np.ndarray[float, ndim = 1] nn_response,
  *                        double v,
  */
 
@@ -6512,8 +6512,8 @@ static PyObject *__pyx_pf_4wfpt_6wiener_like_nn_ddm(CYTHON_UNUSED PyObject *__py
 /* "wfpt.pyx":418
  * #    return log_p
  * 
- * def wiener_like_nn_angle(np.ndarray[double, ndim = 1] x,             # <<<<<<<<<<<<<<
- *                          np.ndarray[long, ndim = 1] nn_response,
+ * def wiener_like_nn_angle(np.ndarray[float, ndim = 1] x,             # <<<<<<<<<<<<<<
+ *                          np.ndarray[float, ndim = 1] nn_response,
  *                          double v,
  */
 
@@ -6831,12 +6831,12 @@ static PyObject *__pyx_pf_4wfpt_8wiener_like_nn_angle(CYTHON_UNUSED PyObject *__
   __pyx_pybuffernd_nn_response.rcbuffer = &__pyx_pybuffer_nn_response;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x.rcbuffer->pybuffer, (PyObject*)__pyx_v_x, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 418, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x.rcbuffer->pybuffer, (PyObject*)__pyx_v_x, &__Pyx_TypeInfo_float, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 418, __pyx_L1_error)
   }
   __pyx_pybuffernd_x.diminfo[0].strides = __pyx_pybuffernd_x.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_x.diminfo[0].shape = __pyx_pybuffernd_x.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_nn_response.rcbuffer->pybuffer, (PyObject*)__pyx_v_nn_response, &__Pyx_TypeInfo_long, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 418, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_nn_response.rcbuffer->pybuffer, (PyObject*)__pyx_v_nn_response, &__Pyx_TypeInfo_float, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 418, __pyx_L1_error)
   }
   __pyx_pybuffernd_nn_response.diminfo[0].strides = __pyx_pybuffernd_nn_response.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_nn_response.diminfo[0].shape = __pyx_pybuffernd_nn_response.rcbuffer->pybuffer.shape[0];
 
@@ -7329,8 +7329,8 @@ static PyObject *__pyx_pf_4wfpt_8wiener_like_nn_angle(CYTHON_UNUSED PyObject *__
   /* "wfpt.pyx":418
  * #    return log_p
  * 
- * def wiener_like_nn_angle(np.ndarray[double, ndim = 1] x,             # <<<<<<<<<<<<<<
- *                          np.ndarray[long, ndim = 1] nn_response,
+ * def wiener_like_nn_angle(np.ndarray[float, ndim = 1] x,             # <<<<<<<<<<<<<<
+ *                          np.ndarray[float, ndim = 1] nn_response,
  *                          double v,
  */
 
@@ -17133,8 +17133,8 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "wfpt.pyx":352
  * #    return p
  * 
- * def wiener_like_nn_ddm(np.ndarray[double, ndim = 1] x,             # <<<<<<<<<<<<<<
- *                        np.ndarray[long, ndim = 1] nn_response,
+ * def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,             # <<<<<<<<<<<<<<
+ *                        np.ndarray[float, ndim = 1] nn_response,
  *                        double v,
  */
   __pyx_tuple__18 = PyTuple_Pack(21, __pyx_n_s_x, __pyx_n_s_nn_response, __pyx_n_s_v, __pyx_n_s_sv, __pyx_n_s_a, __pyx_n_s_z, __pyx_n_s_sz, __pyx_n_s_t, __pyx_n_s_st, __pyx_n_s_err, __pyx_n_s_n_st, __pyx_n_s_n_sz, __pyx_n_s_use_adaptive, __pyx_n_s_simps_err, __pyx_n_s_p_outlier, __pyx_n_s_w_outlier, __pyx_n_s_size, __pyx_n_s_log_p, __pyx_n_s_n_params, __pyx_n_s_ll_min, __pyx_n_s_data); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 352, __pyx_L1_error)
@@ -17145,8 +17145,8 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "wfpt.pyx":418
  * #    return log_p
  * 
- * def wiener_like_nn_angle(np.ndarray[double, ndim = 1] x,             # <<<<<<<<<<<<<<
- *                          np.ndarray[long, ndim = 1] nn_response,
+ * def wiener_like_nn_angle(np.ndarray[float, ndim = 1] x,             # <<<<<<<<<<<<<<
+ *                          np.ndarray[float, ndim = 1] nn_response,
  *                          double v,
  */
   __pyx_tuple__20 = PyTuple_Pack(22, __pyx_n_s_x, __pyx_n_s_nn_response, __pyx_n_s_v, __pyx_n_s_sv, __pyx_n_s_a, __pyx_n_s_theta, __pyx_n_s_z, __pyx_n_s_sz, __pyx_n_s_t, __pyx_n_s_st, __pyx_n_s_err, __pyx_n_s_n_st, __pyx_n_s_n_sz, __pyx_n_s_use_adaptive, __pyx_n_s_simps_err, __pyx_n_s_p_outlier, __pyx_n_s_w_outlier, __pyx_n_s_size, __pyx_n_s_log_p, __pyx_n_s_n_params, __pyx_n_s_ll_min, __pyx_n_s_data); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 418, __pyx_L1_error)
@@ -17907,8 +17907,8 @@ if (!__Pyx_RefNanny) {
   /* "wfpt.pyx":352
  * #    return p
  * 
- * def wiener_like_nn_ddm(np.ndarray[double, ndim = 1] x,             # <<<<<<<<<<<<<<
- *                        np.ndarray[long, ndim = 1] nn_response,
+ * def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,             # <<<<<<<<<<<<<<
+ *                        np.ndarray[float, ndim = 1] nn_response,
  *                        double v,
  */
   __pyx_t_3 = PyCFunction_NewEx(&__pyx_mdef_4wfpt_7wiener_like_nn_ddm, NULL, __pyx_n_s_wfpt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 352, __pyx_L1_error)
@@ -17919,8 +17919,8 @@ if (!__Pyx_RefNanny) {
   /* "wfpt.pyx":418
  * #    return log_p
  * 
- * def wiener_like_nn_angle(np.ndarray[double, ndim = 1] x,             # <<<<<<<<<<<<<<
- *                          np.ndarray[long, ndim = 1] nn_response,
+ * def wiener_like_nn_angle(np.ndarray[float, ndim = 1] x,             # <<<<<<<<<<<<<<
+ *                          np.ndarray[float, ndim = 1] nn_response,
  *                          double v,
  */
   __pyx_t_3 = PyCFunction_NewEx(&__pyx_mdef_4wfpt_9wiener_like_nn_angle, NULL, __pyx_n_s_wfpt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 418, __pyx_L1_error)
