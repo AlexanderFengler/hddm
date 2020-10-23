@@ -132,7 +132,7 @@ class HDDMnn_new(HDDM):
                                                                ))
             if 'v' in include:
                 knodes.update(self._create_family_trunc_normal('v', 
-                                                               lower = - 3.0
+                                                               lower = - 3.0,
                                                                upper = 3.0,
                                                                value = 0,
                                                                std_upper = 1.5
