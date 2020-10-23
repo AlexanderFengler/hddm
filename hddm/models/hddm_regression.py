@@ -12,7 +12,10 @@ from kabuki import Knode
 from kabuki.utils import stochastic_from_dist
 import kabuki.step_methods as steps
 
-def generate_wfpt_reg_stochastic_class(wiener_params=None, sampling_method='cdf', cdf_range=(-5,5), sampling_dt=1e-4):
+def generate_wfpt_reg_stochastic_class(wiener_params = None, 
+                                       sampling_method = 'cdf', 
+                                       cdf_range = (-5,5), 
+                                       sampling_dt = 1e-4):
 
     #set wiener_params
     if wiener_params is None:
@@ -20,6 +23,7 @@ def generate_wfpt_reg_stochastic_class(wiener_params=None, sampling_method='cdf'
                          'use_adaptive':1,
                          'simps_err':1e-3,
                          'w_outlier': 0.1}
+    
     wp = wiener_params
 
     def wiener_multi_like(value, v, sv, a, z, sz, t, st, reg_outcomes, p_outlier=0):
@@ -81,21 +85,21 @@ class KnodeRegress(kabuki.hierarchical.Knode):
         parents = {'args': args}
 
         # Make sure design matrix is kosher
-        dm = dmatrix(reg['model'], data=data)
+        dm = dmatrix(reg['model'], data = data)
         if math.isnan(dm.sum()):
             raise NotImplementedError('DesignMatrix contains NaNs.')
 
-        def func(args, design_matrix=dmatrix(reg['model'], data=data), link_func=reg['link_func']):
+        def func(args, design_matrix = dmatrix(reg['model'], data = data), link_func = reg['link_func']):
             # convert parents to matrix
             params = np.matrix(args)
             # Apply design matrix to input data
             if design_matrix.shape[1] != params.shape[1]:
                 raise NotImplementedError('Missing columns in design matrix. You need data for all conditions for all subjects.')
-            predictor = link_func(pd.DataFrame((design_matrix * params).sum(axis=1), index=data.index))
+            predictor = link_func(pd.DataFrame((design_matrix * params).sum(axis=1), index = data.index))
 
             return pd.DataFrame(predictor, index=data.index)
 
-        return self.pymc_node(func, kwargs['doc'], name, parents=parents, trace=self.keep_regressor_trace)
+        return self.pymc_node(func, kwargs['doc'], name, parents = parents, trace = self.keep_regressor_trace)
 
 class HDDMRegressor(HDDM):
     """HDDMRegressor allows estimation of the DDM where parameter

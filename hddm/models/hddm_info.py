@@ -100,9 +100,24 @@ class HDDM(HDDMBase):
     """
 
     def __init__(self, *args, **kwargs):
-        self.slice_widths = {'a':1, 't':0.01, 'a_std': 1, 't_std': 0.15, 'sz': 1.1, 'v': 1.5,
-                             'st': 0.1, 'sv': 3, 'z_trans': 0.2, 'z': 0.1,
-                             'p_outlier':1., 'v_std': 1,'alpha':1.5,'dual_alpha':1.5,'theta':0.1}
+        self.slice_widths = {'a': 1, 
+                             't': 0.01, 
+                             'a_std': 1,
+                             't_std': 0.15, 
+                             'sz': 1.1, 
+                             'v': 1.5,
+                             'st': 0.1, 
+                             'sv': 0.5, # from sv = 3.00 
+                             'z_trans': 0.2, 
+                             'z': 0.1,
+                             'p_outlier': 1., 
+                             'v_std': 1, 
+                             'alpha': 1., 
+                             'dual_alpha': 1.5, 
+                             'theta':0.1,
+                             'beta': 1.,
+                             'g': 0.5}
+
         self.emcee_dispersions = {'a':1, 't': 0.1, 'a_std': 1, 't_std': 0.15, 'sz': 1.1, 'v': 1.5,
                                   'st': 0.1, 'sv': 3, 'z_trans': 0.2, 'z': 0.1,
                                   'p_outlier':1., 'v_std': 1,'alpha':1.5,'dual_alpha':1.5,'theta':0.1}
