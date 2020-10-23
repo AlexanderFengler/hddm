@@ -87,7 +87,6 @@ ornstein_model = keras.models.load_model('model_final_ornstein.h5', compile = Fa
     #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
 #    return np.sum(np.core.umath.maximum(angle_model.predict_on_batch(mlp_input_batch), ll_min))
 
-
 def pdf_array(np.ndarray[double, ndim=1] x, double v, double sv, double a, double z, double sz,
               double t, double st, double err=1e-4, bint logp=0, int n_st=2, int n_sz=2, bint use_adaptive=1,
               double simps_err=1e-3, double p_outlier=0, double w_outlier=0):
@@ -850,9 +849,16 @@ def wiener_like_rl(np.ndarray[long, ndim=1] response,
     return sum_logp
 
 
-def wiener_like_multi(np.ndarray[double, ndim=1] x, v, sv, a, z, sz, t, st, double err, multi=None,
-                      int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-3,
-                      double p_outlier=0, double w_outlier=0):
+def wiener_like_multi(np.ndarray[double, ndim = 1] x, v, sv, a, z, sz, t, st, 
+                      double err, 
+                      multi = None,
+                      int n_st = 10, 
+                      int n_sz = 10, 
+                      bint use_adaptive = 1, 
+                      double simps_err = 1e-3,
+                      double p_outlier = 0, 
+                      double w_outlier = 0):
+
     cdef Py_ssize_t size = x.shape[0]
     cdef Py_ssize_t i
     cdef double p = 0
@@ -870,8 +876,7 @@ def wiener_like_multi(np.ndarray[double, ndim=1] x, v, sv, a, z, sz, t, st, doub
 
             p = full_pdf(x[i], params_iter['v'],
                          params_iter['sv'], params_iter['a'], params_iter['z'],
-                         params_iter['sz'], params_iter[
-                             't'], params_iter['st'],
+                         params_iter['sz'], params_iter['t'], params_iter['st'],
                          err, n_st, n_sz, use_adaptive, simps_err)
             p = p * (1 - p_outlier) + wp_outlier
             sum_logp += log(p)
