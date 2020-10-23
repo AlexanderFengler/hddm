@@ -224,9 +224,9 @@ class HDDMnn_new(HDDM):
                                                            ))
             if 'alpha' in include:
                 knodes.update(self._create_family_trunc_normal('alpha',
-                                                               lower = -1.0, 
-                                                               upper = 1.0, 
-                                                               value = 0.5,
+                                                               lower = 1.0, 
+                                                               upper = 2.0, 
+                                                               value = 1.5,
                                                                std_upper = 1
                                                                ))
                                                                # should have lower = 0.1, upper = 0.9
