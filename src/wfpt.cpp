@@ -1933,7 +1933,7 @@ static const char __pyx_k_wiener_like_contaminant[] = "wiener_like_contaminant";
 static const char __pyx_k_wiener_like_nn_ornstein[] = "wiener_like_nn_ornstein";
 static const char __pyx_k_model_final_ddm_analytic_h5[] = "model_final_ddm_analytic.h5";
 static const char __pyx_k_wiener_like_nn_ddm_analytic[] = "wiener_like_nn_ddm_analytic";
-static const char __pyx_k_model_final_ddm_sdv_analytic[] = "model_final_ddm_sdv_analytic";
+static const char __pyx_k_model_final_ddm_sdv_analytic_h5[] = "model_final_ddm_sdv_analytic.h5";
 static const char __pyx_k_numpy_core_multiarray_failed_to[] = "numpy.core.multiarray failed to import";
 static const char __pyx_k_wiener_like_nn_ddm_sdv_analytic[] = "wiener_like_nn_ddm_sdv_analytic";
 static const char __pyx_k_at_least_one_of_the_parameters_i[] = "at least one of the parameters is out of the support";
@@ -2007,7 +2007,7 @@ static PyObject *__pyx_n_s_model;
 static PyObject *__pyx_kp_u_model_final_angle_h5;
 static PyObject *__pyx_kp_u_model_final_ddm_analytic_h5;
 static PyObject *__pyx_kp_u_model_final_ddm_h5;
-static PyObject *__pyx_n_u_model_final_ddm_sdv_analytic;
+static PyObject *__pyx_kp_u_model_final_ddm_sdv_analytic_h5;
 static PyObject *__pyx_kp_u_model_final_ddm_sdv_h5;
 static PyObject *__pyx_kp_u_model_final_h5;
 static PyObject *__pyx_kp_u_model_final_levy_h5;
@@ -19361,7 +19361,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_model_final_angle_h5, __pyx_k_model_final_angle_h5, sizeof(__pyx_k_model_final_angle_h5), 0, 1, 0, 0},
   {&__pyx_kp_u_model_final_ddm_analytic_h5, __pyx_k_model_final_ddm_analytic_h5, sizeof(__pyx_k_model_final_ddm_analytic_h5), 0, 1, 0, 0},
   {&__pyx_kp_u_model_final_ddm_h5, __pyx_k_model_final_ddm_h5, sizeof(__pyx_k_model_final_ddm_h5), 0, 1, 0, 0},
-  {&__pyx_n_u_model_final_ddm_sdv_analytic, __pyx_k_model_final_ddm_sdv_analytic, sizeof(__pyx_k_model_final_ddm_sdv_analytic), 0, 1, 0, 1},
+  {&__pyx_kp_u_model_final_ddm_sdv_analytic_h5, __pyx_k_model_final_ddm_sdv_analytic_h5, sizeof(__pyx_k_model_final_ddm_sdv_analytic_h5), 0, 1, 0, 0},
   {&__pyx_kp_u_model_final_ddm_sdv_h5, __pyx_k_model_final_ddm_sdv_h5, sizeof(__pyx_k_model_final_ddm_sdv_h5), 0, 1, 0, 0},
   {&__pyx_kp_u_model_final_h5, __pyx_k_model_final_h5, sizeof(__pyx_k_model_final_h5), 0, 1, 0, 0},
   {&__pyx_kp_u_model_final_levy_h5, __pyx_k_model_final_levy_h5, sizeof(__pyx_k_model_final_levy_h5), 0, 1, 0, 0},
@@ -19627,7 +19627,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * levy_model = keras.models.load_model('model_final_levy.h5', compile = False)
  * ornstein_model = keras.models.load_model('model_final_ornstein.h5', compile = False)             # <<<<<<<<<<<<<<
  * ddm_sdv_model = keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
- * ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)
+ * ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
  */
   __pyx_tuple__15 = PyTuple_Pack(1, __pyx_kp_u_model_final_ornstein_h5); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 44, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__15);
@@ -19637,7 +19637,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * levy_model = keras.models.load_model('model_final_levy.h5', compile = False)
  * ornstein_model = keras.models.load_model('model_final_ornstein.h5', compile = False)
  * ddm_sdv_model = keras.models.load_model('model_final_ddm_sdv.h5', compile = False)             # <<<<<<<<<<<<<<
- * ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)
+ * ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
  * #ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)
  */
   __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_u_model_final_ddm_sdv_h5); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 45, __pyx_L1_error)
@@ -19647,11 +19647,11 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "wfpt.pyx":46
  * ornstein_model = keras.models.load_model('model_final_ornstein.h5', compile = False)
  * ddm_sdv_model = keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
- * ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)             # <<<<<<<<<<<<<<
+ * ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)             # <<<<<<<<<<<<<<
  * #ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)
  * 
  */
-  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_n_u_model_final_ddm_sdv_analytic); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_kp_u_model_final_ddm_sdv_analytic_h5); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__17);
   __Pyx_GIVEREF(__pyx_tuple__17);
 
@@ -20470,7 +20470,7 @@ if (!__Pyx_RefNanny) {
  * levy_model = keras.models.load_model('model_final_levy.h5', compile = False)
  * ornstein_model = keras.models.load_model('model_final_ornstein.h5', compile = False)             # <<<<<<<<<<<<<<
  * ddm_sdv_model = keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
- * ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)
+ * ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
  */
   __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_keras); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 44, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -20494,7 +20494,7 @@ if (!__Pyx_RefNanny) {
  * levy_model = keras.models.load_model('model_final_levy.h5', compile = False)
  * ornstein_model = keras.models.load_model('model_final_ornstein.h5', compile = False)
  * ddm_sdv_model = keras.models.load_model('model_final_ddm_sdv.h5', compile = False)             # <<<<<<<<<<<<<<
- * ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)
+ * ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
  * #ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)
  */
   __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_keras); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
@@ -20518,7 +20518,7 @@ if (!__Pyx_RefNanny) {
   /* "wfpt.pyx":46
  * ornstein_model = keras.models.load_model('model_final_ornstein.h5', compile = False)
  * ddm_sdv_model = keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
- * ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)             # <<<<<<<<<<<<<<
+ * ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)             # <<<<<<<<<<<<<<
  * #ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)
  * 
  */

@@ -43,7 +43,7 @@ ddm_analytic_model = keras.models.load_model('model_final_ddm_analytic.h5', comp
 levy_model = keras.models.load_model('model_final_levy.h5', compile = False)
 ornstein_model = keras.models.load_model('model_final_ornstein.h5', compile = False)
 ddm_sdv_model = keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
-ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)
+ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
 #ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)
 
 #def mlp_target(np.ndarray[double, ndim = 2] params,
