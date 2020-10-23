@@ -13,8 +13,10 @@ from kabuki.hierarchical import Knode # LOOK INTO KABUKI TO FIGURE OUT WHAT KNOD
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
 from wfpt import wiener_like_nn_weibull
-from wfpt import wiener_like_nn_angle #TODO
+from wfpt import wiener_like_nn_angle 
 from wfpt import wiener_like_nn_ddm
+from wfpt import wiener_like_nn_levy
+from wfpt import wiener_like_nn_ornstein
 
 class HDDMnn_new(HDDM):
     """HDDM model that uses WEIBULL neural net likelihood
@@ -25,14 +27,30 @@ class HDDMnn_new(HDDM):
         self.non_centered = kwargs.pop('non_centered', False)
         self.free = kwargs.pop('free', False) # 
         self.model = kwargs.pop('model', 'weibull')
-        self.wfpt_nn_weibull_class = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
+
+        if self.model == 'ddm':
+            self.wftp_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
+        
+        if self.model == 'weibull' or self.model == 'weibull_cdf':
+            self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
+        
+        if self.model == 'angle':
+            self.wfpt_nn = stochastic_from_dist('Wienernn_angle', wienernn_like_angle) 
+
+        if self.model == 'levy':
+            self.wfpt_nn = stochastic_from_dist('Wienernn_levy', wienernn_like_levy) 
+
+        if self.model == 'ornstein':
+            self.wfpt_nn = stochastic_from_dist('Wienernn_ornstein', wienernn_like_ornstein)
+
+
         #self.wfpt_nn_new_class = Wienernn_new # attach corresponding likelihood
         #self.k = kwargs.pop('k', False)
         super(HDDMnn_new, self).__init__(*args, **kwargs)
     
     def _create_stochastic_knodes(self, include):
         knodes = OrderedDict()
-        # SPLIT BY MODEL TO ACCOMODATE TRAINED PARAMETER BOUNDS BY MODEL
+        # SPLIT BY MODEL TO ACCOMMODATE TRAINED PARAMETER BOUNDS BY MODEL
         if self.model == 'weibull' or self.model == 'weibull_cdf':
             if 'a' in include:
                 knodes.update(self._create_family_trunc_normal('a',
@@ -60,7 +78,7 @@ class HDDMnn_new(HDDM):
                                                            value = .5,
                                                            g_tau = 10**-2,
                                                            std_std = 0.5
-                                                           ))
+                                                           )) # should have lower = 0.2, upper = 0.8
             if 'alpha' in include:
                 knodes.update(self._create_family_trunc_normal('alpha',
                                                                lower = 0.31, 
@@ -76,6 +94,143 @@ class HDDMnn_new(HDDM):
                                                                std_upper = 1
                                                                ))
 
+        if self.model == 'ddm':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.5,
+                                                               value = 1.4,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 3.0,
+                                                               upper = 3.0,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           )) # should have lower = 0.1, upper = 0.9
+        if self.model == 'angle':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.0,
+                                                               value = 1,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 3.0
+                                                               upper = 3.0,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           ))
+            if 'theta' in include:
+                knodes.update(self._create_family_trunc_normal('theta',
+                                                               lower = -0.1, 
+                                                               upper = 1.45, 
+                                                               value = 0.5,
+                                                               std_upper = 1
+                                                               )) # should have lower = 0.2, upper = 0.8
+
+        if self.model == 'ornstein':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.0,
+                                                               value = 1,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 2.0
+                                                               upper = 2.0,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           ))
+            if 'g' in include:
+                knodes.update(self._create_family_trunc_normal('g',
+                                                               lower = -1.0, 
+                                                               upper = 1.0, 
+                                                               value = 0.5,
+                                                               std_upper = 1
+                                                               )) # should have lower = 0.2, upper = 0.8
+        
+        if self.model == 'levy':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.0,
+                                                               value = 1,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 3.0
+                                                               upper = 3.0,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           ))
+            if 'alpha' in include:
+                knodes.update(self._create_family_trunc_normal('alpha',
+                                                               lower = -1.0, 
+                                                               upper = 1.0, 
+                                                               value = 0.5,
+                                                               std_upper = 1
+                                                               ))
+                                                               # should have lower = 0.1, upper = 0.9
+                      
         print('knodes')
         print(knodes)
 
@@ -113,7 +268,7 @@ class HDDMnn_new(HDDM):
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
         
-        return Knode(self.wfpt_nn_weibull_class, 
+        return Knode(self.wfpt_nn, 
                      'wfpt', 
                      observed = True, 
                      col_name = ['nn_response', 'rt'], # TODO: One could preprocess at initialization
@@ -152,6 +307,135 @@ def wienernn_like_weibull(x,
                                   st, 
                                   p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
                                   **wiener_params)
+
+def wienernn_like_levy(x, 
+                       v, 
+                       sv, 
+                       a, 
+                       alpha,
+                       z, 
+                       sz, 
+                       t, 
+                       st, 
+                       p_outlier = 0): #theta
+
+    wiener_params = {'err': 1e-4, # 
+                     'n_st': 2, #
+                     'n_sz': 2, # 
+                     'use_adaptive': 1, #
+                     'simps_err': 1e-3, # 
+                     'w_outlier': 0.1}
+    
+   #wp = wiener_params
+
+    return wiener_like_nn_levy(np.absolute(x['rt'].values).astype(np.float32),
+                               x['nn_response'].values.astype(np.float32), 
+                               v, 
+                               sv,
+                               a, 
+                               alpha, 
+                               z, 
+                               sz,
+                               t, 
+                               st, 
+                               p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+                               **wiener_params)
+
+def wienernn_like_ornstein(x, 
+                           v, 
+                           sv, 
+                           a, 
+                           g,
+                           z, 
+                           sz, 
+                           t, 
+                           st, 
+                           p_outlier = 0): #theta
+    
+    wiener_params = {'err': 1e-4, # 
+                     'n_st': 2, #
+                     'n_sz': 2, # 
+                     'use_adaptive': 1, #
+                     'simps_err': 1e-3, # 
+                     'w_outlier': 0.1}
+    
+    #wp = wiener_params
+
+    return wiener_like_nn_ornstein(np.absolute(x['rt'].values).astype(np.float32),
+                                   x['nn_response'].values.astype(np.float32), 
+                                   v, 
+                                   sv,
+                                   a, 
+                                   g, 
+                                   z, 
+                                   sz,
+                                   t, 
+                                   st, 
+                                   p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+                                   **wiener_params)
+
+def wienernn_like_ddm(x, 
+                      v, 
+                      sv, 
+                      a, 
+                      z, 
+                      sz, 
+                      t, 
+                      st, 
+                      p_outlier = 0):
+
+    wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
+                     'use_adaptive': 1,
+                     'simps_err': 1e-3,
+                     'w_outlier': 0.1}
+    #wp = wiener_params
+
+    #nn_response = x['nn_response'].values.astype(int)
+    
+    return wiener_like_nn_ddm(np.absolute(x['rt'].values).astype(np.float32),
+                              x['nn_response'].values.astype(np.float32),  
+                              v, 
+                              sv, 
+                              a, 
+                              z, 
+                              sz, 
+                              t, 
+                              st, 
+                              p_outlier = p_outlier,
+                              **wiener_params)
+
+def wienernn_like_angle(x, 
+                        v, 
+                        sv, 
+                        a, 
+                        theta, 
+                        z, 
+                        sz,
+                        t, 
+                        st, 
+                        p_outlier = 0):
+
+    wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
+                     'use_adaptive': 1,
+                     'simps_err': 1e-3,
+                     'w_outlier': 0.1}
+    #wp = wiener_params
+
+    #nn_response = x['nn_response'].values.astype(int)
+    
+    return wiener_like_nn_angle(np.absolute(x['rt'].values).astype(np.float32),
+                                x['nn_response'].values.astype(np.float32),  
+                                v, 
+                                sv, 
+                                a, 
+                                theta,
+                                z, 
+                                sz, 
+                                t, 
+                                st, 
+                                p_outlier = p_outlier,
+                                **wiener_params)
+#Wienernn_angle = 
 
 # TODO CHECK WHAT THIS IS EVEN DOING
 
