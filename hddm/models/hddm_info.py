@@ -190,7 +190,7 @@ class HDDM(HDDMBase):
         if 'a' in include:
             knodes.update(self._create_family_trunc_normal('a',
                                                            lower = 0.1,
-                                                           upper = 4,
+                                                           upper = 6,
                                                            value = 1,
                                                            std_upper = 1 # added AF
                                                            ))
