@@ -135,21 +135,52 @@ class HDDM(HDDMBase):
     def _create_stochastic_knodes_info(self, include):
         knodes = OrderedDict()
         if 'a' in include:
-            knodes.update(self._create_family_gamma_gamma_hnormal('a', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
+            knodes.update(self._create_family_gamma_gamma_hnormal('a', 
+                                                                  g_mean = 1.5,
+                                                                  g_std = 0.75, 
+                                                                  std_std = 2,
+                                                                  std_value = 0.1, 
+                                                                  value = 1))
         if 'v' in include:
-            knodes.update(self._create_family_normal_normal_hnormal('v', value=2, g_mu=2, g_tau=3**-2, std_std=2))
+            knodes.update(self._create_family_normal_normal_hnormal('v', 
+                                                                    value = 2,
+                                                                    g_mu = 2, 
+                                                                    g_tau = 3**-2, 
+                                                                    std_std = 2))
         if 't' in include:
-            knodes.update(self._create_family_gamma_gamma_hnormal('t', g_mean=.4, g_std=0.2, value=0.001, std_std=1, std_value=0.2))
+            knodes.update(self._create_family_gamma_gamma_hnormal('t', 
+                                                                  g_mean = .4, 
+                                                                  g_std = 0.2, 
+                                                                  value = 0.001, 
+                                                                  std_std = 1, 
+                                                                  std_value = 0.2))
         if 'sv' in include:
-            knodes['sv_bottom'] = Knode(pm.HalfNormal, 'sv', tau=2**-2, value=1, depends=self.depends['sv'])
+            knodes['sv_bottom'] = Knode(pm.HalfNormal, 'sv', 
+                                        tau = 2**-2, 
+                                        value = 1, 
+                                        depends = self.depends['sv'])
         if 'sz' in include:
-            knodes['sz_bottom'] = Knode(pm.Beta, 'sz', alpha=1, beta=3, value=0.01, depends=self.depends['sz'])
+            knodes['sz_bottom'] = Knode(pm.Beta, 'sz', 
+                                        alpha = 1,
+                                        beta = 3, 
+                                        value = 0.01, 
+                                        depends = self.depends['sz'])
         if 'st' in include:
-            knodes['st_bottom'] = Knode(pm.HalfNormal, 'st', tau=0.3**-2, value=0.001, depends=self.depends['st'])
+            knodes['st_bottom'] = Knode(pm.HalfNormal, 'st', 
+                                        tau = 0.3**-2, 
+                                        value = 0.001, 
+                                        depends = self.depends['st'])
         if 'z' in include:
-            knodes.update(self._create_family_invlogit('z', value=.5, g_tau=0.5**-2, std_std=0.05))
+            knodes.update(self._create_family_invlogit('z', 
+                                                       value = .5, 
+                                                       g_tau = 0.5**-2, 
+                                                       std_std = 0.05))
         if 'p_outlier' in include:
-            knodes['p_outlier_bottom'] = Knode(pm.Beta, 'p_outlier', alpha=1, beta=15, value=0.01, depends=self.depends['p_outlier'])
+            knodes['p_outlier_bottom'] = Knode(pm.Beta, 'p_outlier', 
+                                               alpha = 1, 
+                                               beta = 15, 
+                                               value = 0.01, 
+                                               depends = self.depends['p_outlier'])
 
         return knodes
 
@@ -158,15 +189,15 @@ class HDDM(HDDMBase):
 
         if 'a' in include:
             knodes.update(self._create_family_trunc_normal('a',
-                                                           lower = 0.3,
-                                                           upper = 2,
+                                                           lower = 0.1,
+                                                           upper = 4,
                                                            value = 1,
                                                            std_upper = 1 # added AF
                                                            ))
         if 'v' in include:
             knodes.update(self._create_family_trunc_normal('v', 
-                                                           lower = - 2.7,
-                                                           upper = 2.7,
+                                                           lower = - 3.0,
+                                                           upper = 3.0,
                                                            value = 0,
                                                            std_upper = 1.5))
         if 't' in include:
