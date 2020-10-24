@@ -44,7 +44,7 @@ class HDDMnn(HDDM):
         if self.model == 'ddm_sdv_analytic':
             self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv_analytic', wienernn_like_ddm_sdv_analytic)
         
-        if self.model == 'weibull' or self.model == 'weibull_cdf':
+        if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
             self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
         
         if self.model == 'angle':
@@ -93,6 +93,48 @@ class HDDMnn(HDDM):
             if 'alpha' in include:
                 knodes.update(self._create_family_trunc_normal('alpha',
                                                                lower = 0.31, 
+                                                               upper = 4.99, 
+                                                               value = 2.34,
+                                                               std_upper = 2
+                                                               ))
+            if 'beta' in include:
+                knodes.update(self._create_family_trunc_normal('beta', 
+                                                               lower = 0.31, 
+                                                               upper = 6.99, 
+                                                               value = 3.34,
+                                                               std_upper = 2
+                                                               ))
+        if self.model == 'weibull_cdf_concave':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.5,
+                                                               value = 1,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 2.5,
+                                                               upper = 2.5,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           )) # should have lower = 0.2, upper = 0.8
+            if 'alpha' in include:
+                knodes.update(self._create_family_trunc_normal('alpha',
+                                                               lower = 1.00, # this guarantees concavity
                                                                upper = 4.99, 
                                                                value = 2.34,
                                                                std_upper = 2
@@ -297,7 +339,7 @@ class HDDMnn(HDDM):
         wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else 0 #self.p_outlier
         
         # MODEL SPECIFIC PARAMETERS
-        if self.model == 'weibull' or self.model == 'weibull_cdf':
+        if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
             wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 3 
             wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else 3
         
@@ -477,7 +519,6 @@ def wienernn_like_ddm_analytic(x,
                                        p_outlier = p_outlier,
                                        **wiener_params)
 
-
 def wienernn_like_ddm_sdv(x, 
                           v, 
                           sv, 
@@ -553,14 +594,14 @@ def wienernn_like_angle(x,
                      'w_outlier': 0.1}
 
     return wiener_like_nn_angle(np.absolute(x['rt'].values).astype(np.float32),
-                                x['nn_response'].values.astype(np.float32),  
-                                v, 
-                                sv, 
-                                a, 
-                                theta,
-                                z, 
-                                sz, 
-                                t, 
-                                st, 
-                                p_outlier = p_outlier,
-                                **wiener_params)
+                                            x['nn_response'].values.astype(np.float32),  
+                                            v, 
+                                            sv, 
+                                            a, 
+                                            theta,
+                                            z, 
+                                            sz, 
+                                            t, 
+                                            st, 
+                                            p_outlier = p_outlier,
+                                            **wiener_params)
