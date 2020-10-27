@@ -150,10 +150,10 @@ def generate_wfpt_nn_angle_reg_stochastic_class(wiener_params = None,
         for tmp_str in ['v', 'a', 'z', 't', 'theta']:
 
             if tmp_str in reg_outcomes:
-                print('params_tmp_str')
-                print(params[tmp_str])
-                print('current shape: ')
-                print(params[tmp_str].loc[value['rt'].index].values[:, 0].shape)
+                #print('params_tmp_str')
+                #print(params[tmp_str])
+                #print('current shape: ')
+                #print(params[tmp_str].loc[value['rt'].index].values[:, 0].shape)
                 data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
             else:
                 data[:, cnt] = params[tmp_str]
