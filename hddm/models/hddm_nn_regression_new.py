@@ -42,6 +42,8 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params = None,
         params = {'v': v, 'sv': sv, 'a': a, 'z': z, 'sz': sz, 't': t, 'st': st}
         print('printing params inside likelihood: ')
         print(params)
+        print('reg_outcomes')
+        print(reg_outcomes)
         
         # QAF: Is all of this necessary?
         # Note: Reg outcomes can only be parameters as listed in params
@@ -62,6 +64,8 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params = None,
             if tmp_str in reg_outcomes:
                 print('params_tmp_str')
                 print(params[tmp_str])
+                print('current shape: ')
+                print(params[tmp_str].loc[value['rt'].index].values[:, 0].shape)
                 data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
             else:
                 data[:, cnt] = params[tmp_str]
