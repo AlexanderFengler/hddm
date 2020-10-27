@@ -370,6 +370,7 @@ class HDDMnnRegressor(HDDM):
 
         print('knodes')
         print(knodes)
+        return knodes
 
 
     def _create_stochastic_knodes(self, include):
