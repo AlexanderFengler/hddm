@@ -344,7 +344,7 @@ class HDDMnnRegressor(HDDM):
         knodes = OrderedDict()
         print('Printing reg outcome:')
         print(self.reg_outcomes)
-        include = set(include) # TD: Check why here include is not coming in as a set // This worked in hddm_nn.py 
+        #include = set(include) # TD: Check why here include is not coming in as a set // This worked in hddm_nn.py 
         include_remainder = include.difference(self.reg_outcomes)
         
         if self.model == 'ddm' or self.model == 'ddm_analytic':
@@ -405,6 +405,8 @@ class HDDMnnRegressor(HDDM):
                 if inter:
                     # Intercept parameter should have original prior (not centered on 0)
                     param_lookup = param[:param.find('_')]
+                    print('param_lookup passed to _create stochastic_knodes')
+                    print(param_lookup)
                     reg_family = self._create_stochastic_knodes([param_lookup])
                     
                     # Rename nodes to avoid collissions
