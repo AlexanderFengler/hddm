@@ -336,19 +336,10 @@ class HDDMnnRegressor(HDDM):
 
     #     return knodes    
 
-    def _create_stochastic_knodes(self, include):
-        # Create all stochastic knodes except for the ones that we want to replace
-        # with regressors. '.difference' makes that happen
-        #knodes = self._create_stochastic_knodes_nn(include.difference(self.reg_outcomes))
-        
+    # TD def _create_stochastic_knodes_base(self, include:)
+    def _create_stochastic_knodes_basic(self, include):
         knodes = OrderedDict()
-        print('Printing reg outcome:')
-        print(self.reg_outcomes)
-        #include = set(include) # TD: Check why here include is not coming in as a set // This worked in hddm_nn.py 
-        include_remainder = include.difference(self.reg_outcomes)
-        
         if self.model == 'ddm' or self.model == 'ddm_analytic':
-            
             if 'a' in include_remainder:
                 knodes.update(self._create_family_trunc_normal('a',
                                                                lower = 0.3,
@@ -380,6 +371,52 @@ class HDDMnnRegressor(HDDM):
         print('knodes')
         print(knodes)
 
+
+    def _create_stochastic_knodes(self, include):
+        # Create all stochastic knodes except for the ones that we want to replace
+        # with regressors. '.difference' makes that happen
+        #knodes = self._create_stochastic_knodes_nn(include.difference(self.reg_outcomes))
+
+        print('Printing reg outcome:')
+        print(self.reg_outcomes)
+        #include = set(include) # TD: Check why here include is not coming in as a set // This worked in hddm_nn.py
+        #include = set(include) 
+        includes_remainder = set(include).difference(self.reg_outcomes)
+        knodes = self._create_stochastic_knodes(includes_remainder)
+
+        # if self.model == 'ddm' or self.model == 'ddm_analytic':
+            
+        #     if 'a' in include_remainder:
+        #         knodes.update(self._create_family_trunc_normal('a',
+        #                                                        lower = 0.3,
+        #                                                        upper = 2.5,
+        #                                                        value = 1.4,
+        #                                                        std_upper = 1 # added AF
+        #                                                        ))
+        #     if 'v' in include_remainder:
+        #         knodes.update(self._create_family_trunc_normal('v', 
+        #                                                        lower = - 3.0,
+        #                                                        upper = 3.0,
+        #                                                        value = 0,
+        #                                                        std_upper = 1.5
+        #                                                        ))
+        #     if 't' in include_remainder:
+        #         knodes.update(self._create_family_trunc_normal('t', 
+        #                                                        lower = 1e-3,
+        #                                                        upper = 2, 
+        #                                                        value = .01,
+        #                                                        std_upper = 1 # added AF
+        #                                                        ))
+        #     if 'z' in include_remainder:
+        #         knodes.update(self._create_family_invlogit('z',
+        #                                                    value = .5,
+        #                                                    g_tau = 10**-2,
+        #                                                    std_std = 0.5
+        #                                                    )) # should have lower = 0.1, upper = 0.9  
+
+        print('knodes')
+        print(knodes)
+
         #knodes = self._create_stochastic_knodes(include = include.difference(self.reg_outcomes))
         
         # This is in dire need of refactoring. Like any monster, it just grew over time.
@@ -407,7 +444,7 @@ class HDDMnnRegressor(HDDM):
                     param_lookup = param[:param.find('_')]
                     print('param_lookup passed to _create stochastic_knodes')
                     print(param_lookup)
-                    reg_family = self._create_stochastic_knodes([param_lookup])
+                    reg_family = self._create_stochastic_knodes_basic([param_lookup])
                     
                     # Rename nodes to avoid collissions
                     names = list(reg_family.keys())
