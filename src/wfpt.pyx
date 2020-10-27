@@ -564,6 +564,17 @@ def wiener_like_multi_nn_ddm(np.ndarray[float, ndim = 2] data,
     log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
     return log_p 
 
+
+def wiener_like_multi_nn_angle(np.ndarray[float, ndim = 2] data,
+                              double p_outlier = 0, 
+                              double w_outlier = 0):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    log_p = np.sum(np.core.umath.maximum(angle_model.predict_on_batch(data), ll_min))
+    return log_p 
+
 #def wiener_like_multi_nn_ddm(np.ndarray[double, ndim = 1] x, 
 #                             v, 
 #                             sv, 
