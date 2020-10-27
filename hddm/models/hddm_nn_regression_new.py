@@ -340,28 +340,28 @@ class HDDMnnRegressor(HDDM):
     def _create_stochastic_knodes_basic(self, include):
         knodes = OrderedDict()
         if self.model == 'ddm' or self.model == 'ddm_analytic':
-            if 'a' in include_remainder:
+            if 'a' in include:
                 knodes.update(self._create_family_trunc_normal('a',
                                                                lower = 0.3,
                                                                upper = 2.5,
                                                                value = 1.4,
                                                                std_upper = 1 # added AF
                                                                ))
-            if 'v' in include_remainder:
+            if 'v' in include:
                 knodes.update(self._create_family_trunc_normal('v', 
                                                                lower = - 3.0,
                                                                upper = 3.0,
                                                                value = 0,
                                                                std_upper = 1.5
                                                                ))
-            if 't' in include_remainder:
+            if 't' in include:
                 knodes.update(self._create_family_trunc_normal('t', 
                                                                lower = 1e-3,
                                                                upper = 2, 
                                                                value = .01,
                                                                std_upper = 1 # added AF
                                                                ))
-            if 'z' in include_remainder:
+            if 'z' in include:
                 knodes.update(self._create_family_invlogit('z',
                                                            value = .5,
                                                            g_tau = 10**-2,
