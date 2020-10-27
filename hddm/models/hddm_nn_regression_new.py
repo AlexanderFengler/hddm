@@ -14,9 +14,9 @@ from kabuki import Knode
 from kabuki.utils import stochastic_from_dist
 import kabuki.step_methods as steps
 
-
+##########################################################
 # Defining only the model likelihood at this point !
-def generate_wfpt_nn_reg_stochastic_class(wiener_params = None,
+def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                           sampling_method = 'cdf',
                                           cdf_range = (-5, 5), 
                                           sampling_dt = 1e-4):
@@ -39,7 +39,7 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params = None,
 
         """Log-likelihood for the full DDM using the interpolation method"""
 
-        params = {'v': v, 'sv': sv, 'a': a, 'z': z, 'sz': sz, 't': t, 'st': st}
+        params = {'v': v, 'a': a, 'z': z, 't': t}
         #print('printing params inside likelihood: ')
         #print(params)
         #print('reg_outcomes')
@@ -99,9 +99,100 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params = None,
     return stoch
 
 
-wfpt_reg_like = generate_wfpt_nn_reg_stochastic_class(sampling_method = 'drift')
-
+#wfpt_reg_like = generate_wfpt_nn_reg_stochastic_class(sampling_method = 'drift')
 ################################################################################################
+
+
+
+# Defining only the model likelihood at this point !
+def generate_wfpt_nn_angle_reg_stochastic_class(wiener_params = None,
+                                                sampling_method = 'cdf',
+                                                cdf_range = (-5, 5), 
+                                                sampling_dt = 1e-4):
+
+    #set wiener_params
+    if wiener_params is None:
+        wiener_params = {'err': 1e-4,
+                         'n_st': 2, 
+                         'n_sz': 2,
+                         'use_adaptive': 1,
+                         'simps_err': 1e-3,
+                         'w_outlier': 0.1}
+    
+    wp = wiener_params
+
+    def wiener_multi_like_nn_angle(value, v, sv, a, theta, z, sz, t, st, 
+                                   reg_outcomes, 
+                                   p_outlier = 0, 
+                                   w_outlier = 0.1):
+
+        """Log-likelihood for the full DDM using the interpolation method"""
+
+        params = {'v': v, 'a': a, 'z': z, 't': t, 'theta': theta}
+        #print('printing params inside likelihood: ')
+        #print(params)
+        #print('reg_outcomes')
+        #print(reg_outcomes)
+        
+        # QAF: Is all of this necessary?
+        # Note: Reg outcomes can only be parameters as listed in params
+
+        # for reg_outcome in reg_outcomes:
+        #     params[reg_outcome] = params[reg_outcome].loc[value['rt'].index].values
+
+        n_params = int(5)
+        size = int(value.shape[0])
+        data = np.zeros((size, 7), dtype = np.float32)
+        #data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
+        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
+
+        cnt = 0
+        for tmp_str in ['v', 'a', 'z', 't', 'theta']:
+
+            if tmp_str in reg_outcomes:
+                #print('params_tmp_str')
+                #print(params[tmp_str])
+                #print('current shape: ')
+                #print(params[tmp_str].loc[value['rt'].index].values[:, 0].shape)
+                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+            else:
+                data[:, cnt] = params[tmp_str]
+
+            cnt += 1
+
+        # THIS IS NOT YET FINISHED !
+        return hddm.wfpt.wiener_like_multi_nn_angle(data,
+                                                    p_outlier = p_outlier,
+                                                    w_outlier = w_outlier)
+
+
+    def random(self):
+        param_dict = deepcopy(self.parents.value)
+        del param_dict['reg_outcomes']
+        sampled_rts = self.value.copy()
+
+        for i in self.value.index:
+            #get current params
+            for p in self.parents['reg_outcomes']:
+                param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+            #sample
+            samples = hddm.generate.gen_rts(method=sampling_method,
+                                            size=1, dt=sampling_dt, **param_dict)
+
+            sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+        return sampled_rts
+
+    stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_angle)
+    stoch.random = random
+
+    return stoch
+
+
+#wfpt_reg_like = generate_wfpt_nn_reg_stochastic_class(sampling_method = 'drift')
+################################################################################################
+
+
 
 class KnodeRegress(kabuki.hierarchical.Knode):
     def __init__(self, *args, **kwargs):
@@ -224,7 +315,7 @@ class HDDMnnRegressor(HDDM):
         
         group_only_nodes = list(kwargs.get('group_only_nodes', ()))
         self.reg_outcomes = set() # holds all the parameters that are going to modeled as outcome
-        self.model = model
+        self.model = deepcopy(model)
         # Initialize data-structure that contains model descriptors
         self.model_descrs = []
 
@@ -264,8 +355,12 @@ class HDDMnnRegressor(HDDM):
                 kwargs['group_only_nodes'] = group_only_nodes
             self.reg_outcomes.add(outcome)
 
+        
         # Attach the likelihood !
-        self.wfpt_reg_class = deepcopy(wfpt_reg_like)
+        if self.model == 'ddm':
+            self.wfpt_reg_class = generate_wfpt_nn_ddm_reg_stochastic_class(sampling_method = 'drift')
+        if self.model == 'angle':
+            self.wfpt_reg_class = generate_wfpt_nn_angle_reg_stochastic_class(sampling_method = 'drift')
 
         super(HDDMnnRegressor, self).__init__(data, **kwargs)
 
@@ -315,6 +410,9 @@ class HDDMnnRegressor(HDDM):
         wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
 
         wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else 0 #self.p_outlier
+
+        if self.model == 'angle':
+            wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else 0
 
         print('wfpt parents: ')
         print(wfpt_parents)
@@ -375,7 +473,43 @@ class HDDMnnRegressor(HDDM):
                                                            value = .5,
                                                            g_tau = 10**-2,
                                                            std_std = 0.5
-                                                           )) # should have lower = 0.1, upper = 0.9  
+                                                           )) # should have lower = 0.1, upper = 0.9 
+                                                           
+        if self.model == 'angle' or self.model == 'angle2':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.0,
+                                                               value = 1,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 3.0,
+                                                               upper = 3.0,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           ))
+            if 'theta' in include:
+                knodes.update(self._create_family_trunc_normal('theta',
+                                                               lower = -0.1, 
+                                                               upper = 1.45, 
+                                                               value = 0.5,
+                                                               std_upper = 1
+                                                               )) # should have lower = 0.2, upper = 0.8
 
         print('knodes')
         print(knodes)
