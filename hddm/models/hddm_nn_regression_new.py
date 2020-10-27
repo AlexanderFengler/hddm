@@ -16,15 +16,18 @@ import kabuki.step_methods as steps
 
 
 # Defining only the model likelihood at this point !
-def generate_wfpt_nn_reg_stochastic_class(wiener_params=None, sampling_method='cdf', cdf_range=(-5,5), sampling_dt=1e-4):
+def generate_wfpt_nn_reg_stochastic_class(wiener_params = None,
+                                          sampling_method = 'cdf',
+                                          cdf_range = (-5, 5), 
+                                          sampling_dt = 1e-4):
 
     #set wiener_params
     if wiener_params is None:
         wiener_params = {'err': 1e-4,
-                         'n_st':2, 
-                         'n_sz':2,
-                         'use_adaptive':1,
-                         'simps_err':1e-3,
+                         'n_st': 2, 
+                         'n_sz': 2,
+                         'use_adaptive': 1,
+                         'simps_err': 1e-3,
                          'w_outlier': 0.1}
     
     wp = wiener_params
@@ -37,6 +40,7 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params=None, sampling_method='c
         """Log-likelihood for the full DDM using the interpolation method"""
 
         params = {'v': v, 'sv': sv, 'a': a, 'z': z, 'sz': sz, 't': t, 'st': st}
+        print('printing params inside likelihood: ')
         print(params)
         
         # QAF: Is all of this necessary?
@@ -49,7 +53,7 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params=None, sampling_method='c
         size = int(value.shape[0])
         data = np.zeros((size, 6), dtype = np.float32)
         #data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
-        data[:, n_params:] = np.stack([ value['rt'].astype(np.float32), value['nn_reponse'].astype(np.float32) ], axis = 1)
+        data[:, n_params:] = np.stack([ value['rt'].astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
 
         cnt = 0
         
