@@ -315,7 +315,7 @@ class HDDMnnRegressor(HDDM):
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
 
-        return Knode(self.wfpt_nn,
+        return Knode(self.wfpt_reg_class,
                      'wfpt',
                      observed = True,
                      col_name = ['nn_response', 'rt'],
@@ -402,7 +402,7 @@ class HDDMnnRegressor(HDDM):
                 if inter:
                     # Intercept parameter should have original prior (not centered on 0)
                     param_lookup = param[:param.find('_')]
-                    reg_family = self._create_stochastic_knodes_nn([param_lookup])
+                    reg_family = self._create_stochastic_knodes([param_lookup])
                     
                     # Rename nodes to avoid collissions
                     names = list(reg_family.keys())
