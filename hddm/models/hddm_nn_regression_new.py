@@ -98,11 +98,8 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
 
     return stoch
 
-
 #wfpt_reg_like = generate_wfpt_nn_reg_stochastic_class(sampling_method = 'drift')
 ################################################################################################
-
-
 
 # Defining only the model likelihood at this point !
 def generate_wfpt_nn_angle_reg_stochastic_class(wiener_params = None,
@@ -165,7 +162,6 @@ def generate_wfpt_nn_angle_reg_stochastic_class(wiener_params = None,
                                                     p_outlier = p_outlier,
                                                     w_outlier = w_outlier)
 
-
     def random(self):
         param_dict = deepcopy(self.parents.value)
         del param_dict['reg_outcomes']
@@ -188,11 +184,271 @@ def generate_wfpt_nn_angle_reg_stochastic_class(wiener_params = None,
 
     return stoch
 
+# Defining only the model likelihood at this point !
+def generate_wfpt_nn_levy_reg_stochastic_class(wiener_params = None,
+                                               sampling_method = 'cdf',
+                                               cdf_range = (-5, 5), 
+                                               sampling_dt = 1e-4):
+
+    #set wiener_params
+    if wiener_params is None:
+        wiener_params = {'err': 1e-4,
+                         'n_st': 2, 
+                         'n_sz': 2,
+                         'use_adaptive': 1,
+                         'simps_err': 1e-3,
+                         'w_outlier': 0.1}
+    
+    wp = wiener_params
+
+    def wiener_multi_like_nn_levy(value, v, sv, a, alpha, z, sz, t, st, 
+                                  reg_outcomes, 
+                                  p_outlier = 0, 
+                                  w_outlier = 0.1):
+
+        """Log-likelihood for the full DDM using the interpolation method"""
+
+        params = {'v': v, 'a': a, 'z': z, 'alpha': alpha, 't': t}
+        
+        #print('printing params inside likelihood: ')
+        #print(params)
+        #print('reg_outcomes')
+        #print(reg_outcomes)
+        
+        # QAF: Is all of this necessary?
+        # Note: Reg outcomes can only be parameters as listed in params
+
+        # for reg_outcome in reg_outcomes:
+        #     params[reg_outcome] = params[reg_outcome].loc[value['rt'].index].values
+
+        n_params = int(5)
+        size = int(value.shape[0])
+        data = np.zeros((size, 7), dtype = np.float32)
+        #data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
+        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
+
+        cnt = 0
+        for tmp_str in ['v', 'a', 'z', 'alpha', 't']:
+
+            if tmp_str in reg_outcomes:
+                #print('params_tmp_str')
+                #print(params[tmp_str])
+                #print('current shape: ')
+                #print(params[tmp_str].loc[value['rt'].index].values[:, 0].shape)
+                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+            else:
+                data[:, cnt] = params[tmp_str]
+
+            cnt += 1
+
+        # THIS IS NOT YET FINISHED !
+        return hddm.wfpt.wiener_like_multi_nn_levy(data,
+                                                    p_outlier = p_outlier,
+                                                    w_outlier = w_outlier)
+
+    def random(self):
+        param_dict = deepcopy(self.parents.value)
+        del param_dict['reg_outcomes']
+        sampled_rts = self.value.copy()
+
+        for i in self.value.index:
+            #get current params
+            for p in self.parents['reg_outcomes']:
+                param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+            #sample
+            samples = hddm.generate.gen_rts(method=sampling_method,
+                                            size=1, dt=sampling_dt, **param_dict)
+
+            sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+        return sampled_rts
+
+    stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_levy)
+    stoch.random = random
+
+    return stoch
 
 #wfpt_reg_like = generate_wfpt_nn_reg_stochastic_class(sampling_method = 'drift')
 ################################################################################################
 
 
+
+
+# Defining only the model likelihood at this point !
+def generate_wfpt_nn_ornstein_reg_stochastic_class(wiener_params = None,
+                                                sampling_method = 'cdf',
+                                                cdf_range = (-5, 5), 
+                                                sampling_dt = 1e-4):
+
+    #set wiener_params
+    if wiener_params is None:
+        wiener_params = {'err': 1e-4,
+                         'n_st': 2, 
+                         'n_sz': 2,
+                         'use_adaptive': 1,
+                         'simps_err': 1e-3,
+                         'w_outlier': 0.1}
+    
+    wp = wiener_params
+
+    def wiener_multi_like_nn_ornstein(value, v, sv, a, g, z, sz, t, st, 
+                                  reg_outcomes, 
+                                  p_outlier = 0, 
+                                  w_outlier = 0.1):
+
+        """Log-likelihood for the full DDM using the interpolation method"""
+
+        params = {'v': v, 'a': a, 'z': z, 'g': g, 't': t}
+        
+        #print('printing params inside likelihood: ')
+        #print(params)
+        #print('reg_outcomes')
+        #print(reg_outcomes)
+        
+        # QAF: Is all of this necessary?
+        # Note: Reg outcomes can only be parameters as listed in params
+
+        # for reg_outcome in reg_outcomes:
+        #     params[reg_outcome] = params[reg_outcome].loc[value['rt'].index].values
+
+        n_params = int(5)
+        size = int(value.shape[0])
+        data = np.zeros((size, 7), dtype = np.float32)
+        #data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
+        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
+
+        cnt = 0
+        for tmp_str in ['v', 'a', 'z', 'g', 't']:
+
+            if tmp_str in reg_outcomes:
+                #print('params_tmp_str')
+                #print(params[tmp_str])
+                #print('current shape: ')
+                #print(params[tmp_str].loc[value['rt'].index].values[:, 0].shape)
+                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+            else:
+                data[:, cnt] = params[tmp_str]
+
+            cnt += 1
+
+        # THIS IS NOT YET FINISHED !
+        return hddm.wfpt.wiener_like_multi_nn_ornstein(data,
+                                                       p_outlier = p_outlier,
+                                                       w_outlier = w_outlier)
+
+
+    def random(self):
+        param_dict = deepcopy(self.parents.value)
+        del param_dict['reg_outcomes']
+        sampled_rts = self.value.copy()
+
+        for i in self.value.index:
+            #get current params
+            for p in self.parents['reg_outcomes']:
+                param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+            #sample
+            samples = hddm.generate.gen_rts(method=sampling_method,
+                                            size=1, dt=sampling_dt, **param_dict)
+
+            sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+        return sampled_rts
+
+    stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_ornstein)
+    stoch.random = random
+
+    return stoch
+
+#wfpt_reg_like = generate_wfpt_nn_reg_stochastic_class(sampling_method = 'drift')
+################################################################################################
+
+# Defining only the model likelihood at this point !
+def generate_wfpt_nn_weibull_reg_stochastic_class(wiener_params = None,
+                                                  sampling_method = 'cdf',
+                                                  cdf_range = (-5, 5), 
+                                                  sampling_dt = 1e-4):
+
+    #set wiener_params
+    if wiener_params is None:
+        wiener_params = {'err': 1e-4,
+                         'n_st': 2, 
+                         'n_sz': 2,
+                         'use_adaptive': 1,
+                         'simps_err': 1e-3,
+                         'w_outlier': 0.1}
+    
+    wp = wiener_params
+
+    def wiener_multi_like_nn_weibull(value, v, sv, a, alpha, beta, z, sz, t, st, 
+                                     reg_outcomes, 
+                                     p_outlier = 0, 
+                                     w_outlier = 0.1):
+
+        """Log-likelihood for the full DDM using the interpolation method"""
+
+        params = {'v': v, 'a': a, 'z': z, 't': t, 'alpha': alpha, 'beta': beta}
+        
+        #print('printing params inside likelihood: ')
+        #print(params)
+        #print('reg_outcomes')
+        #print(reg_outcomes)
+        
+        # QAF: Is all of this necessary?
+        # Note: Reg outcomes can only be parameters as listed in params
+
+        # for reg_outcome in reg_outcomes:
+        #     params[reg_outcome] = params[reg_outcome].loc[value['rt'].index].values
+
+        n_params = int(5)
+        size = int(value.shape[0])
+        data = np.zeros((size, 8), dtype = np.float32)
+        #data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
+        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
+
+        cnt = 0
+        for tmp_str in ['v', 'a', 'z', 't', 'alpha', 'beta']:
+
+            if tmp_str in reg_outcomes:
+                #print('params_tmp_str')
+                #print(params[tmp_str])
+                #print('current shape: ')
+                #print(params[tmp_str].loc[value['rt'].index].values[:, 0].shape)
+                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+            else:
+                data[:, cnt] = params[tmp_str]
+
+            cnt += 1
+
+        # THIS IS NOT YET FINISHED !
+        return hddm.wfpt.wiener_like_multi_nn_weibull(data,
+                                                      p_outlier = p_outlier,
+                                                      w_outlier = w_outlier)
+
+
+    def random(self):
+        param_dict = deepcopy(self.parents.value)
+        del param_dict['reg_outcomes']
+        sampled_rts = self.value.copy()
+
+        for i in self.value.index:
+            #get current params
+            for p in self.parents['reg_outcomes']:
+                param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+            #sample
+            samples = hddm.generate.gen_rts(method=sampling_method,
+                                            size=1, dt=sampling_dt, **param_dict)
+
+            sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+        return sampled_rts
+
+    stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_weibull)
+    stoch.random = random
+
+    return stoch
+
+#wfpt_reg_like = generate_wfpt_nn_reg_stochastic_class(sampling_method = 'drift')
+################################################################################################
 
 class KnodeRegress(kabuki.hierarchical.Knode):
     def __init__(self, *args, **kwargs):
@@ -307,8 +563,9 @@ class HDDMnnRegressor(HDDM):
             and v_C(condition)[T.cond2] for cond1 + cond2.
 
         """
-        self.free = kwargs.pop('free',True)
-        self.k = kwargs.pop('k',False)
+        # self.free = kwargs.pop('free', True)
+        #self.k = kwargs.pop('k', False)
+        
         self.keep_regressor_trace = keep_regressor_trace
         if isinstance(models, (str, dict)):
             models = [models]
@@ -345,6 +602,7 @@ class HDDMnnRegressor(HDDM):
                            'params': ['{out}_{reg}'.format(out=outcome, reg=reg) for reg in covariates],
                            'link_func': link_func
             }
+            
             self.model_descrs.append(model_descr)
 
             print("Adding these covariates:")
@@ -355,12 +613,17 @@ class HDDMnnRegressor(HDDM):
                 kwargs['group_only_nodes'] = group_only_nodes
             self.reg_outcomes.add(outcome)
 
-        
         # Attach the likelihood !
         if self.model == 'ddm':
             self.wfpt_reg_class = generate_wfpt_nn_ddm_reg_stochastic_class(sampling_method = 'drift')
         if self.model == 'angle':
             self.wfpt_reg_class = generate_wfpt_nn_angle_reg_stochastic_class(sampling_method = 'drift')
+        if self.model == 'ornstein':
+            self.wfpt_reg_class = generate_wfpt_nn_ornstein_reg_stochastic_class(sampling_method = 'drift')
+        if self.model == 'levy':
+            self.wfpt_reg_class = generate_wfpt_nn_levy_reg_stochastic_class(sampling_method = 'drift')
+        if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull2':
+            self.wfpt_reg_class = generate_wfpt_nn_weibull_reg_stochastic_class(sampling_method = 'drift')
 
         super(HDDMnnRegressor, self).__init__(data, **kwargs)
 
@@ -411,6 +674,17 @@ class HDDMnnRegressor(HDDM):
 
         wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else 0 #self.p_outlier
 
+        # MODEL SPECIFIC PARAMETERS
+        if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
+            wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 3 
+            wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else 3
+        
+        if self.model == 'ornstein':
+            wfpt_parents['g'] = knodes['g_bottom'] if 'g' in self.include else 0
+        
+        if self.model == 'levy':
+            wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 2
+        
         if self.model == 'angle':
             wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else 0
 
@@ -446,6 +720,93 @@ class HDDMnnRegressor(HDDM):
     # TD def _create_stochastic_knodes_base(self, include:)
     def _create_stochastic_knodes_basic(self, include):
         knodes = OrderedDict()
+        
+        # SPLIT BY MODEL TO ACCOMMODATE TRAINED PARAMETER BOUNDS BY MODEL
+        if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull2':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.5,
+                                                               value = 1,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 2.5,
+                                                               upper = 2.5,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           )) # should have lower = 0.2, upper = 0.8
+            if 'alpha' in include:
+                knodes.update(self._create_family_trunc_normal('alpha',
+                                                               lower = 0.31, 
+                                                               upper = 4.99, 
+                                                               value = 2.34,
+                                                               std_upper = 2
+                                                               ))
+            if 'beta' in include:
+                knodes.update(self._create_family_trunc_normal('beta', 
+                                                               lower = 0.31, 
+                                                               upper = 6.99, 
+                                                               value = 3.34,
+                                                               std_upper = 2
+                                                               ))
+        if self.model == 'weibull_cdf_concave':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.5,
+                                                               value = 1,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 2.5,
+                                                               upper = 2.5,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           )) # should have lower = 0.2, upper = 0.8
+            if 'alpha' in include:
+                knodes.update(self._create_family_trunc_normal('alpha',
+                                                               lower = 1.00, # this guarantees initial concavity of the likelihood
+                                                               upper = 4.99, 
+                                                               value = 2.34,
+                                                               std_upper = 2
+                                                               ))
+            if 'beta' in include:
+                knodes.update(self._create_family_trunc_normal('beta', 
+                                                               lower = 0.31, 
+                                                               upper = 6.99, 
+                                                               value = 3.34,
+                                                               std_upper = 2
+                                                               ))
+
         if self.model == 'ddm' or self.model == 'ddm_analytic':
             if 'a' in include:
                 knodes.update(self._create_family_trunc_normal('a',
@@ -473,9 +834,44 @@ class HDDMnnRegressor(HDDM):
                                                            value = .5,
                                                            g_tau = 10**-2,
                                                            std_std = 0.5
-                                                           )) # should have lower = 0.1, upper = 0.9 
-                                                           
-        if self.model == 'angle' or self.model == 'angle2':
+                                                           )) # should have lower = 0.1, upper = 0.9
+        
+        if self.model == 'ddm_sdv' or self.model == 'ddm_sdv_analytic':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.5,
+                                                               value = 1.4,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 3.0,
+                                                               upper = 3.0,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           )) # should have lower = 0.1, upper = 0.9
+            if 'sv' in include:
+                knodes.update(self._create_family_trunc_normal('sv', 
+                                                               lower = 1e-3,
+                                                               upper = 2.5, 
+                                                               value = 1,
+                                                               std_upper = 1 # added AF
+                                                               ))
+        if self.model == 'angle':
             if 'a' in include:
                 knodes.update(self._create_family_trunc_normal('a',
                                                                lower = 0.3,
@@ -511,6 +907,79 @@ class HDDMnnRegressor(HDDM):
                                                                std_upper = 1
                                                                )) # should have lower = 0.2, upper = 0.8
 
+        if self.model == 'ornstein':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.0,
+                                                               value = 1,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 2.0,
+                                                               upper = 2.0,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           ))
+            if 'g' in include:
+                knodes.update(self._create_family_trunc_normal('g',
+                                                               lower = -1.0, 
+                                                               upper = 1.0, 
+                                                               value = 0.5,
+                                                               std_upper = 1
+                                                               )) # should have lower = 0.2, upper = 0.8
+        
+        if self.model == 'levy':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.0,
+                                                               value = 1,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 3.0,
+                                                               upper = 3.0,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           ))
+            if 'alpha' in include:
+                knodes.update(self._create_family_trunc_normal('alpha',
+                                                               lower = 1.0, 
+                                                               upper = 2.0, 
+                                                               value = 1.5,
+                                                               std_upper = 1
+                                                               ))
+                                                               # should have lower = 0.1, upper = 0.9
+                      
         print('knodes')
         print(knodes)
         return knodes

@@ -486,7 +486,7 @@ def wiener_like_nn_weibull(np.ndarray[float, ndim = 1] x,
 
     return log_p
 #
-def wiener_like_nn_levy(np.ndarray[float, ndim = 1] x, 
+def wiener_like_nn_levy(np.ndarray[float, ndim = 1] x,
                         np.ndarray[float, ndim = 1] nn_response, 
                         double v,
                         double sv, 
@@ -566,8 +566,8 @@ def wiener_like_multi_nn_ddm(np.ndarray[float, ndim = 2] data,
 
 
 def wiener_like_multi_nn_angle(np.ndarray[float, ndim = 2] data,
-                              double p_outlier = 0, 
-                              double w_outlier = 0):
+                               double p_outlier = 0, 
+                               double w_outlier = 0):
     
     cdef float ll_min = -16.11809
     cdef float log_p
@@ -575,6 +575,35 @@ def wiener_like_multi_nn_angle(np.ndarray[float, ndim = 2] data,
     log_p = np.sum(np.core.umath.maximum(angle_model.predict_on_batch(data), ll_min))
     return log_p 
 
+def wiener_like_multi_nn_weibull(np.ndarray[float, ndim = 2] data,
+                                 double p_outlier = 0, 
+                                 double w_outlier = 0):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    log_p = np.sum(np.core.umath.maximum(new_weibull_model.predict_on_batch(data), ll_min))
+    return log_p 
+
+def wiener_like_multi_nn_levy(np.ndarray[float, ndim = 2] data,
+                              double p_outlier = 0, 
+                              double w_outlier = 0):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    log_p = np.sum(np.core.umath.maximum(levy_model.predict_on_batch(data), ll_min))
+    return log_p 
+
+def wiener_like_multi_nn_ornstein(np.ndarray[float, ndim = 2] data,
+                                  double p_outlier = 0, 
+                                  double w_outlier = 0):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    log_p = np.sum(np.core.umath.maximum(ornstein_model.predict_on_batch(data), ll_min))
+    return log_p 
 #def wiener_like_multi_nn_ddm(np.ndarray[double, ndim = 1] x, 
 #                             v, 
 #                             sv, 
