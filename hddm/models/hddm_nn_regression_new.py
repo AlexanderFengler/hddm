@@ -382,6 +382,7 @@ class HDDMnnRegressor(HDDM):
         #include = set(include) # TD: Check why here include is not coming in as a set // This worked in hddm_nn.py
         #include = set(include) 
         includes_remainder = set(include).difference(self.reg_outcomes)
+        print(includes_remainder)
         knodes = self._create_stochastic_knodes_basic(includes_remainder)
 
         # if self.model == 'ddm' or self.model == 'ddm_analytic':
@@ -426,6 +427,7 @@ class HDDMnnRegressor(HDDM):
 
         # Create regressor params
         for reg in self.model_descrs:
+            print('reg: ', reg)
             reg_parents = {}
             # Find intercept parameter
             intercept = np.asarray([param.find('Intercept') for param in reg['params']]) != -1
@@ -448,7 +450,10 @@ class HDDMnnRegressor(HDDM):
                     
                     # Rename nodes to avoid collissions
                     names = list(reg_family.keys())
+                    print(names)
                     for name in names:
+                        print('name: ', name)
+                        print('names: ', names)
                         knode = reg_family.pop(name)
                         knode.name = knode.name.replace(param_lookup, param, 1)
                         reg_family[name.replace(param_lookup, param, 1)] = knode
