@@ -55,10 +55,9 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params = None,
         size = int(value.shape[0])
         data = np.zeros((size, 6), dtype = np.float32)
         #data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
-        data[:, n_params:] = np.stack([ value['rt'].astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
+        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
 
         cnt = 0
-        
         for tmp_str in ['v', 'a', 'z', 't']:
 
             if tmp_str in reg_outcomes:
