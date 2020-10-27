@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from copy import deepcopy
 import math
 import numpy as np
@@ -28,35 +29,43 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params=None, sampling_method='c
     
     wp = wiener_params
 
-    def wienerNN_multi_like(value, v, sv, a, z, sz, t, st, alpha, beta, reg_outcomes, p_outlier = 0):
+    def wiener_multi_like_nn_ddm(value, v, sv, a, z, sz, t, st, 
+                                 reg_outcomes, 
+                                 p_outlier = 0, 
+                                 w_outlier = 0.1):
+
         """Log-likelihood for the full DDM using the interpolation method"""
-        nn_response = value['nn_response'].values.astype(int)
-        with open("weights.pickle", "rb") as tmp_file:
-            weights = pickle.load(tmp_file)
-        with open('biases.pickle', 'rb') as tmp_file:
-            biases = pickle.load(tmp_file)
-        with open('activations.pickle', 'rb') as tmp_file:
-            activations = pickle.load(tmp_file)
-        params = {'v': v, 'sv': sv, 'a': a, 'z': z, 'sz': sz, 't': t, 'st': st, 'alpha': alpha,'beta': beta}
+
+        params = {'v': v, 'sv': sv, 'a': a, 'z': z, 'sz': sz, 't': t, 'st': st}
+        print(params)
         
-        for reg_outcome in reg_outcomes:
-            params[reg_outcome] = params[reg_outcome].loc[value['rt'].index].values
-        return hddm.wfpt.wiener_like_multi_nnddm(np.absolute(value['rt'].values), 
-                                                 nn_response, 
-                                                 activations,
-                                                 weights, 
-                                                 biases, 
-                                                 params['v'], 
-                                                 params['sv'], 
-                                                 params['a'], 
-                                                 params['z'],
-                                                 params['sz'], 
-                                                 params['t'],
-                                                 params['st'],
-                                                 params['alpha'],
-                                                 params['beta'], 1e-4,
-                                           reg_outcomes,
-                                           p_outlier = p_outlier)
+        # QAF: Is all of this necessary?
+        # Note: Reg outcomes can only be parameters as listed in params
+
+        # for reg_outcome in reg_outcomes:
+        #     params[reg_outcome] = params[reg_outcome].loc[value['rt'].index].values
+
+        n_params = int(4)
+        size = int(value.shape[0])
+        data = np.zeros((size, 6), dtype = np.float32)
+        #data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
+        data[:, n_params:] = np.stack([ value['rt'].astype(np.float32), value['nn_reponse'].astype(np.float32) ], axis = 1)
+
+        cnt = 0
+        
+        for tmp_str in ['v', 'a', 'z', 't']:
+
+            if tmp_str in reg_outcomes:
+                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values
+            else:
+                data[:, cnt] = params[tmp_str]
+
+            cnt += 1
+
+        # THIS IS NOT YET FINISHED !
+        return hddm.wfpt.wiener_like_multi_nn_ddm(data,
+                                                  p_outlier = p_outlier,
+                                                  w_outlier = w_outlier)
 
     def random(self):
         param_dict = deepcopy(self.parents.value)
@@ -75,14 +84,13 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params=None, sampling_method='c
 
         return sampled_rts
 
-    stoch = stochastic_from_dist('wfpt_reg', wienerNN_multi_like)
+    stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_ddm)
     stoch.random = random
 
     return stoch
 
 
 wfpt_reg_like = generate_wfpt_nn_reg_stochastic_class(sampling_method = 'drift')
-
 
 ################################################################################################
 
@@ -227,9 +235,10 @@ class HDDMnnRegressor(HDDM):
             separator = model_str.find('~')
             assert separator != -1, 'No outcome variable specified.'
             outcome = model_str[:separator].strip(' ')
-            model_stripped = model_str[(separator+1):]
+            model_stripped = model_str[(separator + 1):]
             covariates = dmatrix(model_stripped, data).design_info.column_names # this uses Patsy to get a data matrix back
 
+            print('outcomes: ', outcome)
             # Build model descriptor
             model_descr = {'outcome': outcome,
                            'model': model_stripped,
@@ -246,7 +255,7 @@ class HDDMnnRegressor(HDDM):
                 kwargs['group_only_nodes'] = group_only_nodes
             self.reg_outcomes.add(outcome)
 
-        #set wfpt_reg
+        # Attach the likelihood !
         self.wfpt_reg_class = deepcopy(wfpt_reg_like)
 
         super(HDDMnnRegressor, self).__init__(data, **kwargs)
@@ -272,30 +281,103 @@ class HDDMnnRegressor(HDDM):
             model['link_func'] = lambda x: x
         super(HDDMnnRegressor, self).__setstate__(d)
 
-    def _create_stochastic_knodes_nn(self, include):
-        knodes = super(HDDMnnRegressor, self)._create_stochastic_knodes(include)     
-        if self.free:
-            knodes.update(self._create_family_gamma_gamma_hnormal('beta', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
-            if self.k:
-                knodes.update(self._create_family_gamma_gamma_hnormal('alpha', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
-        else:
-            knodes.update(self._create_family_trunc_normal('beta', lower=0.3, upper=7, value=1))
-            if self.k:
-                knodes.update(self._create_family_trunc_normal('alpha', lower=0.3, upper=5, value=1))
-        return knodes
+    # def _create_stochastic_knodes_nn(self, include):
+    #     knodes = super(HDDMnnRegressor, self)._create_stochastic_knodes(include)     
+    #     if self.free:
+    #         knodes.update(self._create_family_gamma_gamma_hnormal('beta', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
+    #         if self.k:
+    #             knodes.update(self._create_family_gamma_gamma_hnormal('alpha', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
+    #     else:
+    #         knodes.update(self._create_family_trunc_normal('beta', lower=0.3, upper=7, value=1))
+    #         if self.k:
+    #             knodes.update(self._create_family_trunc_normal('alpha', lower=0.3, upper=5, value=1))
+    #     return knodes
+
+    def _create_wfpt_parents_dict(self, knodes):
+        wfpt_parents = OrderedDict()
+
+        wfpt_parents['a'] = knodes['a_bottom']
+        wfpt_parents['v'] = knodes['v_bottom']
+        wfpt_parents['t'] = knodes['t_bottom']
+
+        wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else 0 #self.default_intervars['sv']
+        wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else 0 #self.default_intervars['sz']
+        wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else 0 #self.default_intervars['st']
+        wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
+
+        wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else 0 #self.p_outlier
+
+        print('wfpt parents: ')
+        print(wfpt_parents)
+
+        return wfpt_parents
 
     def _create_wfpt_knode(self, knodes):
-        wfpt_parents = super(HDDMnnRegressor, self)._create_wfpt_parents_dict(knodes)
-        wfpt_parents['beta'] = knodes['beta_bottom']
-        wfpt_parents['alpha'] = knodes['alpha_bottom'] if self.k else 3.00
-        return Knode(self.wfpt_reg_class, 'wfpt', observed = True,
-                     col_name=['nn_response', 'rt'],
-                     reg_outcomes=self.reg_outcomes, **wfpt_parents)
+        wfpt_parents = self._create_wfpt_parents_dict(knodes)
+
+        return Knode(self.wfpt_nn,
+                     'wfpt',
+                     observed = True,
+                     col_name = ['nn_response', 'rt'],
+                     reg_outcomes = self.reg_outcomes,
+                     **wfpt_parents)
+
+    # def _create_wfpt_knode(self, knodes):
+        
+    #     wfpt_parents = super(HDDMnnRegressor, self)._create_wfpt_parents_dict(knodes)
+    #     wfpt_parents['beta'] = knodes['beta_bottom']
+    #     wfpt_parents['alpha'] = knodes['alpha_bottom'] if self.k else 3.00
+        
+    #     return Knode(self.wfpt_reg_class, 'wfpt', observed = True,
+    #                  col_name=['nn_response', 'rt'],
+    #                  reg_outcomes=self.reg_outcomes, **wfpt_parents)
+
+    # def _create_stochastic_knodes(self, include):
+
+    #     return knodes    
 
     def _create_stochastic_knodes(self, include):
         # Create all stochastic knodes except for the ones that we want to replace
         # with regressors. '.difference' makes that happen
-        knodes = self._create_stochastic_knodes_nn(include.difference(self.reg_outcomes))
+        #knodes = self._create_stochastic_knodes_nn(include.difference(self.reg_outcomes))
+        
+        knodes = OrderedDict()
+        include_remainder = include.difference(self.reg_outcomes)
+        
+        if self.model == 'ddm' or self.model == 'ddm_analytic':
+            
+            if 'a' in include_remainder:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.5,
+                                                               value = 1.4,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include_remainder:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 3.0,
+                                                               upper = 3.0,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include_remainder:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 1e-3,
+                                                               upper = 2, 
+                                                               value = .01,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include_remainder:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           )) # should have lower = 0.1, upper = 0.9  
+
+        print('knodes')
+        print(knodes)
+
+        #knodes = self._create_stochastic_knodes(include = include.difference(self.reg_outcomes))
         
         # This is in dire need of refactoring. Like any monster, it just grew over time.
         # The main problem is that it's not always clear which prior to use. For the intercept
@@ -321,6 +403,7 @@ class HDDMnnRegressor(HDDM):
                     # Intercept parameter should have original prior (not centered on 0)
                     param_lookup = param[:param.find('_')]
                     reg_family = self._create_stochastic_knodes_nn([param_lookup])
+                    
                     # Rename nodes to avoid collissions
                     names = list(reg_family.keys())
                     for name in names:
@@ -335,8 +418,10 @@ class HDDMnnRegressor(HDDM):
                     param_lookup = param
 
                 reg_parents[param] = reg_family['%s_bottom' % param_lookup]
+                
                 if reg not in self.group_only_nodes:
                     reg_family['%s_subj_reg' % param] = reg_family.pop('%s_bottom' % param_lookup)
+                
                 knodes.update(reg_family)
                 self.slice_widths[param] = .05
 
@@ -351,5 +436,5 @@ class HDDMnnRegressor(HDDM):
                                      **reg_parents)
 
             knodes['%s_bottom' % reg['outcome']] = reg_knode
-
+            print(reg_knode)
         return knodes

@@ -9,7 +9,7 @@ import pymc
 import wfpt
 import pickle
 
-from kabuki.hierarchical import Knode # LOOK INTO KABUKI TO FIGURE OUT WHAT KNODE DOES
+from kabuki.hierarchical import Knode # LOOK INTO KABUKI TO FIGURE OUT WHAT KNODE EXACTLY DOES
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
 
@@ -23,8 +23,8 @@ from wfpt import wiener_like_nn_ddm_sdv
 from wfpt import wiener_like_nn_ddm_sdv_analytic
 
 class HDDMnn(HDDM):
-    """HDDM model that uses WEIBULL neural net likelihood
-
+    """ HDDM model class that uses neural net likelihoods for
+    WEIBULL, ANGLE,  ORNSTEIN, LEVY models.
     """
 
     def __init__(self, *args, **kwargs):
@@ -134,7 +134,7 @@ class HDDMnn(HDDM):
                                                            )) # should have lower = 0.2, upper = 0.8
             if 'alpha' in include:
                 knodes.update(self._create_family_trunc_normal('alpha',
-                                                               lower = 1.00, # this guarantees concavity
+                                                               lower = 1.00, # this guarantees initial concavity of the likelihood
                                                                upper = 4.99, 
                                                                value = 2.34,
                                                                std_upper = 2
@@ -355,7 +355,6 @@ class HDDMnn(HDDM):
         print('wfpt parents: ')
         print(wfpt_parents)
         return wfpt_parents
-
 
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)

@@ -416,39 +416,6 @@ def wiener_like_nn_ddm_analytic(np.ndarray[float, ndim = 1] x,
 
     return log_p
 
-#def wiener_like_nn_ddm_analytic(np.ndarray[double, ndim = 1] x, 
-#                                 np.ndarray[long, ndim = 1] nn_response, 
-#                                 double v,
-#                                 double sv, 
-#                                 double a,
-#                                 double z, 
-#                                 double sz, 
-#                                 double t,
-#                                 double st, 
-#                                 double err, 
-#                                 int n_st = 10, 
-#                                 int n_sz = 10, 
-#                                 bint use_adaptive = 1, 
-#                                 double simps_err = 1e-8,
-#                                 double p_outlier = 0,
-#                                 double w_outlier = 0):
-#
-#    cdef Py_ssize_t size = x.shape[0]
-#    cdef float log_p
-#    cdef int n_params = 4
-#    cdef float ll_min = -16.11809
-#    cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
-#    data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
-#    data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
-#
-#    if not p_outlier_in_range(p_outlier):
-#        return -np.inf
-#    
-#    # Call to network:
-#    log_p = np.sum(np.core.umath.maximum(ddm_analytic_model.predict_on_batch(data), ll_min))
-#
-#    return log_p
-
 def wiener_like_nn_angle(np.ndarray[float, ndim = 1] x, 
                          np.ndarray[float, ndim = 1] nn_response, 
                          double v, 
@@ -586,6 +553,52 @@ def wiener_like_nn_ornstein(np.ndarray[float, ndim = 1] x,
     log_p = np.sum(np.core.umath.maximum(ornstein_model.predict_on_batch(data), ll_min))
 
     return log_p
+
+def wiener_like_multi_nn_ddm(np.ndarray[float, ndim = 2] data,
+                             double p_outlier = 0, 
+                             double w_outlier = 0):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
+    return log_p 
+
+#def wiener_like_multi_nn_ddm(np.ndarray[double, ndim = 1] x, 
+#                             v, 
+#                             sv, 
+#                             a, 
+#                             z, 
+#                             sz, 
+#                             t, 
+#                             st, 
+#                             double err, 
+#                             multi = None,
+#                             int n_st = 10, 
+#                             int n_sz = 10, 
+#                             bint use_adaptive = 1, 
+#                             double simps_err = 1e-3,
+#                             double p_outlier = 0, 
+#                             double w_outlier = 0):
+#
+#    cdef Py_ssize_t size = x.shape[0]
+#    cdef Py_ssize_t i
+#    cdef double p = 0
+#    cdef double sum_logp = 0
+#    cdef float ll_min = -16.11809
+#    cdef float log_p
+#    cdef double wp_outlier = w_outlier * p_outlier
+#    cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
+#    
+#    if multi is None:
+#        data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
+#        data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
+#        log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
+#        return log_p
+#    else:
+#        data[:, :] = np.stack([v, a, z, t, x.astype(np.float32), nn_response.astype(float32)], axis = 1)    
+#        log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
+#        return log_p              
 #
 def wiener_like_nn_ddm_sdv(np.ndarray[float, ndim = 1] x, 
                            np.ndarray[float, ndim = 1] nn_response, 
@@ -646,40 +659,7 @@ def wiener_like_nn_ddm_sdv_analytic(np.ndarray[float, ndim = 1] x,
     log_p = np.sum(np.core.umath.maximum(ddm_sdv_analytic_model.predict_on_batch(data), ll_min))
 
     return log_p
-#
-#def wiener_like_nn_ddm_sdv(np.ndarray[double, ndim = 1] x, 
-#                           np.ndarray[long, ndim = 1] nn_response, 
-#                           double v,
-#                           double sv, 
-#                           double a,
-#                           double z, 
-#                           double sz, 
-#                           double t,
-#                           double st, 
-#                           double err, 
-#                           int n_st = 10, 
-#                           int n_sz = 10, 
-#                           bint use_adaptive = 1, 
-#                           double simps_err = 1e-8,
-#                           double p_outlier = 0,
-#                           double w_outlier = 0):
-#
-#    cdef Py_ssize_t size = x.shape[0]
-#    cdef float log_p
-#    cdef int n_params = 5
-#    cdef float ll_min = -16.11809
-#    cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
-#    data[:, :n_params] = np.tile([v, a, z, t, sv], (size, 1)).astype(np.float32)
-#    data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
-#
-#    if not p_outlier_in_range(p_outlier):
-#        return -np.inf
-#    
-#    # Call to network:
-#    log_p = np.sum(np.core.umath.maximum(ddm_sdv_model.predict_on_batch(data), ll_min))
-#
-#    return log_p
-#
+
 #
 #def wiener_like_nn_full_ddm(np.ndarray[double, ndim = 1] x, 
 #                            np.ndarray[long, ndim = 1] nn_response, 
@@ -722,6 +702,7 @@ def wiener_like_rlddm(np.ndarray[double, ndim=1] x,
                       double sv, double a, double z, double sz, double t,
                       double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                       double p_outlier=0, double w_outlier=0):
+    
     cdef Py_ssize_t size = x.shape[0]
     cdef Py_ssize_t i, j
     cdef Py_ssize_t s_size
@@ -912,7 +893,6 @@ def wiener_like_multi(np.ndarray[double, ndim = 1] x, v, sv, a, z, sz, t, st,
             sum_logp += log(p)
 
         return sum_logp
-
 
 def gen_rts_from_cdf(double v, double sv, double a, double z, double sz, double t,
                      double st, int samples=1000, double cdf_lb=-6, double cdf_ub=6, double dt=1e-2):
