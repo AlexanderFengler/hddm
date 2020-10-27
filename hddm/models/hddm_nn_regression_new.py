@@ -342,6 +342,7 @@ class HDDMnnRegressor(HDDM):
         #knodes = self._create_stochastic_knodes_nn(include.difference(self.reg_outcomes))
         
         knodes = OrderedDict()
+        print('Printing reg outcome:')
         print(self.reg_outcomes)
         include = set(include) # TD: Check why here include is not coming in as a set // This worked in hddm_nn.py 
         include_remainder = include.difference(self.reg_outcomes)
