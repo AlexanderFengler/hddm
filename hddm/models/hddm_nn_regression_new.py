@@ -152,7 +152,7 @@ class HDDMnnRegressor(HDDM):
     fMRI or different conditions).
     """
 
-    def __init__(self, data, models, group_only_regressors = True, keep_regressor_trace = False, **kwargs):
+    def __init__(self, data, models, model = 'ddm', group_only_regressors = True, keep_regressor_trace = False, **kwargs):
         """Instantiate a regression model.
         
         :Arguments:
@@ -212,10 +212,10 @@ class HDDMnnRegressor(HDDM):
         self.keep_regressor_trace = keep_regressor_trace
         if isinstance(models, (str, dict)):
             models = [models]
-
+        
         group_only_nodes = list(kwargs.get('group_only_nodes', ()))
         self.reg_outcomes = set() # holds all the parameters that are going to modeled as outcome
-
+        self.model = model
         # Initialize data-structure that contains model descriptors
         self.model_descrs = []
 
