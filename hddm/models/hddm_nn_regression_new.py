@@ -399,7 +399,7 @@ def generate_wfpt_nn_weibull_reg_stochastic_class(wiener_params = None,
         # for reg_outcome in reg_outcomes:
         #     params[reg_outcome] = params[reg_outcome].loc[value['rt'].index].values
 
-        n_params = int(5)
+        n_params = int(6)
         size = int(value.shape[0])
         data = np.zeros((size, 8), dtype = np.float32)
         #data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
@@ -962,7 +962,7 @@ class HDDMnnRegressor(HDDM):
                 knodes.update(self._create_family_trunc_normal('t', 
                                                                lower = 1e-3,
                                                                upper = 2, 
-                                                               value = .01,
+                                                               value = .5,
                                                                std_upper = 1 # added AF
                                                                ))
             if 'z' in include:
