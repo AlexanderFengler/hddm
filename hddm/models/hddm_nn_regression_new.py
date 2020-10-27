@@ -62,7 +62,7 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params = None,
             if tmp_str in reg_outcomes:
                 print('params_tmp_str')
                 print(params[tmp_str])
-                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values
+                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
             else:
                 data[:, cnt] = params[tmp_str]
 
