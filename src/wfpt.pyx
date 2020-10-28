@@ -46,7 +46,7 @@ levy_model = keras.models.load_model('model_final_levy.h5', compile = False)
 ornstein_model = keras.models.load_model('model_final_ornstein.h5', compile = False)
 ddm_sdv_model = keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
 ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
-full_ddm_model = keras_models.load_model('model_final_full_ddm.h5', compile = False)
+full_ddm_model = keras.models.load_model('model_final_full_ddm.h5', compile = False)
 
 ###############
 # Basic Navarro Fuss likelihoods
