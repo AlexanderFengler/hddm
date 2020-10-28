@@ -243,8 +243,8 @@ def generate_wfpt_nn_levy_reg_stochastic_class(wiener_params = None,
 
         # THIS IS NOT YET FINISHED !
         return hddm.wfpt.wiener_like_multi_nn_levy(data,
-                                                    p_outlier = p_outlier,
-                                                    w_outlier = w_outlier)
+                                                   p_outlier = p_outlier,
+                                                   w_outlier = w_outlier)
 
     def random(self):
         param_dict = deepcopy(self.parents.value)
@@ -270,8 +270,6 @@ def generate_wfpt_nn_levy_reg_stochastic_class(wiener_params = None,
 
 #wfpt_reg_like = generate_wfpt_nn_reg_stochastic_class(sampling_method = 'drift')
 ################################################################################################
-
-
 
 
 # Defining only the model likelihood at this point !
