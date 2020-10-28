@@ -21,6 +21,7 @@ from wfpt import wiener_like_nn_levy
 from wfpt import wiener_like_nn_ornstein
 from wfpt import wiener_like_nn_ddm_sdv
 from wfpt import wiener_like_nn_ddm_sdv_analytic
+from wfpt import wiener_like_nn_full_ddm
 
 class HDDMnn(HDDM):
     """ HDDM model class that uses neural net likelihoods for
@@ -56,6 +57,8 @@ class HDDMnn(HDDM):
         if self.model == 'ornstein':
             self.wfpt_nn = stochastic_from_dist('Wienernn_ornstein', wienernn_like_ornstein)
 
+        if self.model == 'full_ddm' or self.model == 'full_ddm':
+            self.wfpt_nn = stochastic_from_dist('Wienernn_full_ddm', wienernn_like_full_ddm)
         super(HDDMnn, self).__init__(*args, **kwargs)
     
     def _create_stochastic_knodes(self, include):
@@ -211,6 +214,60 @@ class HDDMnn(HDDM):
                                                                value = 1,
                                                                std_upper = 1 # added AF
                                                                ))
+
+        if self.model == 'full_ddm' or self.model == 'full_ddm2':
+            if 'a' in include:
+                knodes.update(self._create_family_trunc_normal('a',
+                                                               lower = 0.3,
+                                                               upper = 2.5,
+                                                               value = 1.4,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'v' in include:
+                knodes.update(self._create_family_trunc_normal('v', 
+                                                               lower = - 3.0,
+                                                               upper = 3.0,
+                                                               value = 0,
+                                                               std_upper = 1.5
+                                                               ))
+            if 't' in include:
+                knodes.update(self._create_family_trunc_normal('t', 
+                                                               lower = 0.25,
+                                                               upper = 2.25, 
+                                                               value = .5,
+                                                               std_upper = 1 # added AF
+                                                               ))
+            if 'z' in include:
+                knodes.update(self._create_family_invlogit('z',
+                                                           value = .5,
+                                                           g_tau = 10**-2,
+                                                           std_std = 0.5
+                                                           )) # should have lower = 0.1, upper = 0.9
+
+            if 'sz' in include:
+                knodes.update(self._create_family_trunc_normal('sv', 
+                                                               lower = 1e-3,
+                                                               upper = 0.2, 
+                                                               value = 0.1,
+                                                               std_upper = 0.1 # added AF
+                                                               ))
+
+            if 'sv' in include:
+                knodes.update(self._create_family_trunc_normal('sv', 
+                                                               lower = 1e-3,
+                                                               upper = 2.0, 
+                                                               value = 1.0,
+                                                               std_upper = 0.5 # added AF
+                                                               ))
+
+            if 'st' in include:
+                knodes.update(self._create_family_trunc_normal('sv', 
+                                                               lower = 1e-3,
+                                                               upper = 0.25, 
+                                                               value = 0.125,
+                                                               std_upper = 0.1 # added AF
+                                                               ))
+
         if self.model == 'angle':
             if 'a' in include:
                 knodes.update(self._create_family_trunc_normal('a',
@@ -575,6 +632,35 @@ def wienernn_like_ddm_sdv_analytic(x,
                                            st, 
                                            p_outlier = p_outlier,
                                            **wiener_params)
+
+def wienernn_like_full_ddm(x, 
+                           v, 
+                           sv, 
+                           a, 
+                           z, 
+                           sz, 
+                           t, 
+                           st, 
+                           p_outlier = 0):
+
+    wiener_params = {'err': 1e-4, 
+                     'n_st': 2, 
+                     'n_sz': 2,
+                     'use_adaptive': 1,
+                     'simps_err': 1e-3,
+                     'w_outlier': 0.1}
+
+    return wiener_like_nn_full_ddm(np.absolute(x['rt'].values).astype(np.float32),
+                                   x['nn_response'].values.astype(np.float32),  
+                                   v, 
+                                   sv, 
+                                   a, 
+                                   z, 
+                                   sz, 
+                                   t, 
+                                   st, 
+                                   p_outlier = p_outlier,
+                                   **wiener_params)
 
 def wienernn_like_angle(x, 
                         v, 

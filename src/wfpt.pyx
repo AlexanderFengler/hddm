@@ -33,6 +33,8 @@ from cython.parallel import *
 # include "pdf.pxi"
 include 'integrate.pxi'
 
+
+# LOADING MODELS
 # TODO: Refactor this ?
 weibull_model = keras.models.load_model('model_final_weibull.h5', compile = False)
 angle_model = keras.models.load_model('model_final_angle.h5', compile = False)
@@ -44,51 +46,10 @@ levy_model = keras.models.load_model('model_final_levy.h5', compile = False)
 ornstein_model = keras.models.load_model('model_final_ornstein.h5', compile = False)
 ddm_sdv_model = keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
 ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
-#ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic', compile = False)
+full_ddm_model = keras_models.load_model('model_final_full_ddm.h5', compile = False)
 
-#def mlp_target(np.ndarray[double, ndim = 2] params,
-#               np.ndarray[double, ndim = 2] data, 
-#               ll_min = -16.11809 # corresponds to 1e-7
-#               ): 
-#
-#    n_params = params.shape[1]
-#    mlp_input_batch = np.zeros((data.shape[0], n_params + 2), dtype = np.float32)
-#    mlp_input_batch[:, :n_params] = params
-#    mlp_input_batch[:, n_params:] = data
-#    #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
-#    return np.sum(np.core.umath.maximum(model.predict_on_batch(mlp_input_batch), ll_min))
-
-#def mlp_target_weibull(np.ndarray[double, ndim = 2] params,
-#                       np.ndarray[double, ndim = 2] data, 
-#                       ll_min = -16.11809 # corresponds to 1e-7
-#                       ): 
-#
-#    n_params = 6
-#    mlp_input_batch = np.zeros((data.shape[0], params.shape[1] + 2), dtype = np.float32)
-#    mlp_input_batch[:, :n_params] = params
-#    mlp_input_batch[:, n_params:] = data
-#    #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
-#    return np.sum(np.core.umath.maximum(weibull_model.predict_on_batch(mlp_input_batch), ll_min))
-
-#def mlp_target_new(np.ndarray[float, ndim = 2] data, 
-#                   ll_min = -16.11809 # corresponds to 1e-7
-#                   ): 
-    
-#    return np.sum(np.core.umath.maximum(new_model.predict_on_batch(data), ll_min))
-
-
-#def mlp_target_angle(np.ndarray[double, ndim = 2] params,
-#                   np.ndarray[double, ndim = 2] data, 
-#                   ll_min = -16.11809 # corresponds to 1e-7
-#                   ): 
-
-#    n_params = 5
-#    mlp_input_batch = np.zeros((data.shape[0], params.shape[1] + 2), dtype = np.float32)
-#    mlp_input_batch[:, :n_params] = params
-#    mlp_input_batch[:, n_params:] = data
-    #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
-#    return np.sum(np.core.umath.maximum(angle_model.predict_on_batch(mlp_input_batch), ll_min))
-
+###############
+# Basic Navarro Fuss likelihoods
 def pdf_array(np.ndarray[double, ndim=1] x, double v, double sv, double a, double z, double sz,
               double t, double st, double err=1e-4, bint logp=0, int n_st=2, int n_sz=2, bint use_adaptive=1,
               double simps_err=1e-3, double p_outlier=0, double w_outlier=0):
@@ -135,220 +96,42 @@ def wiener_like(np.ndarray[double, ndim=1] x, double v, double sv, double a, dou
 
     return sum_logp
 
-#def wiener_like_nn(np.ndarray[double, ndim = 1] x, 
-#                   np.ndarray[long, ndim = 1] nn_response, 
-#                   double v, 
-#                   double sv, 
-#                   double a, 
-#                   double z, 
-#                   double sz, 
-#                   double t, 
-#                   double st, 
-#                   double err, 
-#                   int n_st = 10, 
-#                   int n_sz = 10, 
-#                   bint use_adaptive = 1,
-#                   double simps_err = 1e-8,
-#                   double p_outlier = 0, 
-#                   double w_outlier = 0):
-#
-#    cdef Py_ssize_t size = x.shape[0]
-#    #cdef Py_ssize_t i
-#    cdef double p
-#    #cdef double sum_logp = 0
-#    #cdef double wp_outlier = w_outlier * p_outlier
-#    #cdef double n_params = 4
-#
-#    # Make float to begin with
-#    cdef np.ndarray[double, ndim = 1] vf = np.repeat(v, size)
-#    cdef np.ndarray[double, ndim = 1] af = np.repeat(a, size)
-#    cdef np.ndarray[double, ndim = 1] zf = np.repeat(z, size)
-#    cdef np.ndarray[double, ndim = 1] tf = np.repeat(t, size)
-#
-#    if not p_outlier_in_range(p_outlier):
-#        return - np.inf
-#
-#    # Avoid the transpose
-#    p = mlp_target(np.array([vf, af, zf, tf]).transpose(),
-#                   np.array([x, nn_response]).transpose())
-#
-#    #if p == 0:
-#    #    return -np.inf
-#
-#    return p
+###########
+# Basic MLP likelihoods
 
-#def wiener_like_multi_nnddm_weibull(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response, activations, weights, biases, v, sv, a, z, sz, t, st, alpha, beta, double err, multi=None,
-#                      int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-3,
-#                      double p_outlier=0, double w_outlier=0):
-#    cdef Py_ssize_t size = x.shape[0]
-#    cdef Py_ssize_t i
-#    cdef double p = 0
-#    cdef double sum_logp = 0
-#    cdef double wp_outlier = w_outlier * p_outlier
+def wiener_like_nn_full_ddm(np.ndarray[float, ndim = 1] x, 
+                            np.ndarray[float, ndim = 1] nn_response, 
+                            double v, 
+                            double sv, 
+                            double a, 
+                            double z, 
+                            double sz, 
+                            double t, 
+                            double st, 
+                            double err, 
+                            int n_st = 10, 
+                            int n_sz = 10, 
+                            bint use_adaptive = 1,
+                            double simps_err = 1e-8,
+                            double p_outlier = 0, 
+                            double w_outlier = 0):
 
- #   if multi is None:
- #       return full_pdf(x, v, sv, a, z, sz, t, st, err)
- #   else:
- #       params = {'v': v, 'z': z, 't': t, 'a': a, 'sv': sv, 'sz': sz, 'st': st, 'alpha':alpha, 'beta': beta}
- #       params_iter = copy(params)
- #       for i in range(size):
- #           for param in multi:
- #               params_iter[param] = params[param][i]
+    cdef Py_ssize_t size = x.shape[0]
+    cdef float log_p
+    cdef int n_params = 7
+    cdef float ll_min = -16.11809
+    cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
+    data[:, :n_params] = np.tile([v, a, z, t, sz, sv, st], (size, 1)).astype(np.float32)
+    data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
 
+    if not p_outlier_in_range(p_outlier):
+        return -np.inf
+    
+    # Call to network:
+    log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
 
-  #          cdef np.ndarray[double, ndim=1] vf = np.repeat(v,size)
-  #          cdef np.ndarray[double, ndim=1] af = np.repeat(a,size)
-  #          cdef np.ndarray[double, ndim=1] zf = np.repeat(z,size)
-  #          cdef np.ndarray[double, ndim=1] tf = np.repeat(t,size)
-  #          cdef np.ndarray[double, ndim=1] betaf = np.repeat(beta,size)
-  #         cdef np.ndarray[double, ndim=1] alphaf = np.repeat(alpha,size)
+    return log_p
 
-   #         if not p_outlier_in_range(p_outlier):
-   #             return -np.inf
-
-    #        p = mlp_target_weibull(np.array([vf,af,zf,tf,alphaf,betaf]).transpose(),np.array([x,nn_response]).transpose())
-
-     #       if p == 0:
-      #          return -np.inf
-
-       #     return p
-            #print(type(params_iter['a'].astype(float)))
-            #print(params_iter['v'][0])
-            #print(params_iter['z'])
-            #print(params_iter['t'])
-            #print(params_iter['theta'])
-            #print(params_iter['a'])
-            #print(i)
-            #print(x[i])
-
-#def wiener_like_multi_nnddm(np.ndarray[double, ndim=1] x, 
-#                            np.ndarray[long, ndim=1] nn_response, 
-#                            activations, 
-#                            weights, 
-#                            biases, 
-#                            v, 
-#                            sv, 
-#                            a, 
-#                            z, 
-#                            sz, 
-#                            t, 
-#                            st, 
-#                            alpha, 
-#                            beta, 
-#                            double err, 
-#                            multi=None,
-#                            int n_st=10, 
-#                            int n_sz=10, 
-#                            bint use_adaptive=1, 
-#                            double simps_err=1e-3,
-#                            double p_outlier=0, 
-#                            double w_outlier=0):
-#    cdef Py_ssize_t size = x.shape[0]
-#    cdef Py_ssize_t i
-#    cdef double p = 0
-#    cdef double sum_logp = 0
-#    cdef double wp_outlier = w_outlier * p_outlier
-
-#    if multi is None:
-#        return full_pdf(x, v, sv, a, z, sz, t, st, err)
-#    else:
-#        params = {'v': v, 'z': z, 't': t, 'a': a, 'sv': sv, 'sz': sz, 'st': st, 'alpha':alpha, 'beta': beta}
-#        params_iter = copy(params)
-#        for i in range(size):
-#            for param in multi:
-#                params_iter[param] = params[param][i]
-
-            #print(type(params_iter['a'].astype(float)))
-            #print(params_iter['v'][0])
-            #print(params_iter['z'])
-            #print(params_iter['t'])
-            #print(params_iter['theta'])
-            #print(params_iter['a'])
-            #print(i)
-            #print(x[i])
-
-
- #           p = 0.1 #ktnp.predict(np.array([params_iter['v'][0],params_iter['a'],params_iter['z'],params_iter['t'],params_iter['alpha'],params_iter['beta'],x[i], nn_response[i]]), weights, biases, activations, len(activations))
-
-            #print(p)
-            #full_pdf(x[i], params_iter['v'],
-            #             params_iter['sv'], params_iter['a'], params_iter['z'],
-            #             params_iter['sz'], params_iter[
-            #                 't'], params_iter['st'],
-            #             err, n_st, n_sz, use_adaptive, simps_err)
- #           p = p * (1 - p_outlier) + wp_outlier
- #           sum_logp += p
-#
-# #       return sum_logp
-#
-#def wiener_like_nn_weibull(np.ndarray[double, ndim = 1] x, 
-#                           np.ndarray[long, ndim = 1] nn_response, 
-#                           double v,
-#                           double sv, 
-#                           double a, 
-#                           double alpha, 
-#                           double beta, 
-#                           double z, 
-#                           double sz, 
-#                           double t,
-#                           double st, 
-#                           double err, 
-#                           int n_st=10, 
-#                           int n_sz=10, 
-#                           bint use_adaptive = 1, 
-#                           double simps_err = 1e-8,
-#                           double p_outlier = 0,
-#                           double w_outlier = 0):
-#
-#    cdef Py_ssize_t size = x.shape[0]
-#    cdef Py_ssize_t i
-#    cdef double p
-#    cdef double sum_logp = 0
-#    cdef double wp_outlier = w_outlier * p_outlier
-#    cdef double n_params = 6
-#
-#    cdef np.ndarray[double, ndim=1] vf = np.repeat(v,size)
-#    cdef np.ndarray[double, ndim=1] af = np.repeat(a,size)
-#    cdef np.ndarray[double, ndim=1] zf = np.repeat(z,size)
-#    cdef np.ndarray[double, ndim=1] tf = np.repeat(t,size)
-#    cdef np.ndarray[double, ndim=1] betaf = np.repeat(beta,size)
-#    cdef np.ndarray[double, ndim=1] alphaf = np.repeat(alpha,size)
-#
-#    if not p_outlier_in_range(p_outlier):
-#        return -np.inf
-#
-#    p = mlp_target_weibull(np.array([vf,af,zf,tf,alphaf,betaf]).transpose(),np.array([x,nn_response]).transpose())
-#
-#    if p == 0:
-#        return -np.inf
-#
-#    return p
-#
-##def wiener_like_nn_angle(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response, double v, double sv, double a, double theta, double z, double sz, double t,
-#                double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
-#                double p_outlier=0, double w_outlier=0):
-#    cdef Py_ssize_t size = x.shape[0]
-#    cdef Py_ssize_t i
-#    cdef double p
-#    cdef double sum_logp = 0
-#    cdef double wp_outlier = w_outlier * p_outlier
-#    cdef double n_params = 5
-
-#    cdef np.ndarray[double, ndim=1] vf = np.repeat(v,size)
-#    cdef np.ndarray[double, ndim=1] af = np.repeat(a,size)
-#    cdef np.ndarray[double, ndim=1] zf = np.repeat(z,size)
-#    cdef np.ndarray[double, ndim=1] tf = np.repeat(t,size)
-#    cdef np.ndarray[double, ndim=1] thetaf = np.repeat(theta,size)
-
-#    if not p_outlier_in_range(p_outlier):
-#        return -np.inf
-
-#    p = mlp_target_angle(np.array([vf,af,zf,tf,thetaf]).transpose(),np.array([x,nn_response]).transpose())
-
-#    if p == 0:
-#        return -np.inf
-
-#    return p
 
 def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x, 
                        np.ndarray[float, ndim = 1] nn_response, 
@@ -519,7 +302,7 @@ def wiener_like_nn_levy(np.ndarray[float, ndim = 1] x,
     log_p = np.sum(np.core.umath.maximum(levy_model.predict_on_batch(data), ll_min))
 
     return log_p
-#
+
 def wiener_like_nn_ornstein(np.ndarray[float, ndim = 1] x, 
                             np.ndarray[float, ndim = 1] nn_response, 
                             double v,
@@ -554,97 +337,6 @@ def wiener_like_nn_ornstein(np.ndarray[float, ndim = 1] x,
 
     return log_p
 
-def wiener_like_multi_nn_ddm(np.ndarray[float, ndim = 2] data,
-                             double p_outlier = 0, 
-                             double w_outlier = 0):
-    
-    cdef float ll_min = -16.11809
-    cdef float log_p
-
-    log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
-    return log_p 
-
-
-def wiener_like_multi_nn_angle(np.ndarray[float, ndim = 2] data,
-                               double p_outlier = 0, 
-                               double w_outlier = 0):
-    
-    cdef float ll_min = -16.11809
-    cdef float log_p
-
-    log_p = np.sum(np.core.umath.maximum(angle_model.predict_on_batch(data), ll_min))
-    return log_p 
-
-def wiener_like_multi_nn_weibull(np.ndarray[float, ndim = 2] data,
-                                 double p_outlier = 0, 
-                                 double w_outlier = 0):
-    
-    cdef float ll_min = -16.11809
-    cdef float log_p
-
-    log_p = np.sum(np.core.umath.maximum(new_weibull_model.predict_on_batch(data), ll_min))
-    return log_p 
-
-def wiener_like_multi_nn_levy(np.ndarray[float, ndim = 2] data,
-                              double p_outlier = 0, 
-                              double w_outlier = 0):
-    
-    cdef float ll_min = -16.11809
-    cdef float log_p
-
-    if (np.min(data[:,3]) < 1.0):
-        return - np.inf
-    if (np.max(data[:, 3] > 2.0)):
-        return - np.inf
-
-    log_p = np.sum(np.core.umath.maximum(levy_model.predict_on_batch(data), ll_min))
-    return log_p 
-
-def wiener_like_multi_nn_ornstein(np.ndarray[float, ndim = 2] data,
-                                  double p_outlier = 0, 
-                                  double w_outlier = 0):
-    
-    cdef float ll_min = -16.11809
-    cdef float log_p
-
-    log_p = np.sum(np.core.umath.maximum(ornstein_model.predict_on_batch(data), ll_min))
-    return log_p 
-#def wiener_like_multi_nn_ddm(np.ndarray[double, ndim = 1] x, 
-#                             v, 
-#                             sv, 
-#                             a, 
-#                             z, 
-#                             sz, 
-#                             t, 
-#                             st, 
-#                             double err, 
-#                             multi = None,
-#                             int n_st = 10, 
-#                             int n_sz = 10, 
-#                             bint use_adaptive = 1, 
-#                             double simps_err = 1e-3,
-#                             double p_outlier = 0, 
-#                             double w_outlier = 0):
-#
-#    cdef Py_ssize_t size = x.shape[0]
-#    cdef Py_ssize_t i
-#    cdef double p = 0
-#    cdef double sum_logp = 0
-#    cdef float ll_min = -16.11809
-#    cdef float log_p
-#    cdef double wp_outlier = w_outlier * p_outlier
-#    cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
-#    
-#    if multi is None:
-#        data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
-#        data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
-#        log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
-#        return log_p
-#    else:
-#        data[:, :] = np.stack([v, a, z, t, x.astype(np.float32), nn_response.astype(float32)], axis = 1)    
-#        log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
-#        return log_p              
-#
 def wiener_like_nn_ddm_sdv(np.ndarray[float, ndim = 1] x, 
                            np.ndarray[float, ndim = 1] nn_response, 
                            double v,
@@ -705,40 +397,76 @@ def wiener_like_nn_ddm_sdv_analytic(np.ndarray[float, ndim = 1] x,
 
     return log_p
 
-#
-#def wiener_like_nn_full_ddm(np.ndarray[double, ndim = 1] x, 
-#                            np.ndarray[long, ndim = 1] nn_response, 
-#                            double v,
-#                            double sv, 
-#                            double a,
-#                            double z, 
-#                            double sz, 
-#                            double t,
-#                            double st, 
-#                            double err, 
-#                            int n_st = 10, 
-#                            int n_sz = 10, 
-#                            bint use_adaptive = 1, 
-#                            double simps_err = 1e-8,
-#                            double p_outlier = 0,
-#                            double w_outlier = 0):
-#
-#    cdef Py_ssize_t size = x.shape[0]
-#    cdef float log_p
-#    cdef int n_params = 7
-#    cdef float ll_min = -16.11809
-#    cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
-#    data[:, :n_params] = np.tile([v, a, z, t, sz, sv, st], (size, 1)).astype(np.float32)
-#    data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
-#
-#    if not p_outlier_in_range(p_outlier):
-#        return -np.inf
-#    
-#    # Call to network:
-#    log_p = np.sum(np.core.umath.maximum(full_ddm_model.predict_on_batch(data), ll_min))
-#
-#    return log_p
-#
+###############
+# Regression style likelihoods: (Can prob simplify and make all mlp likelihoods of this form)
+
+def wiener_like_multi_nn_ddm(np.ndarray[float, ndim = 2] data,
+                             double p_outlier = 0, 
+                             double w_outlier = 0):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
+    return log_p 
+
+
+def wiener_like_multi_nn_angle(np.ndarray[float, ndim = 2] data,
+                               double p_outlier = 0, 
+                               double w_outlier = 0):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    log_p = np.sum(np.core.umath.maximum(angle_model.predict_on_batch(data), ll_min))
+    return log_p 
+
+def wiener_like_multi_nn_weibull(np.ndarray[float, ndim = 2] data,
+                                 double p_outlier = 0, 
+                                 double w_outlier = 0):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    log_p = np.sum(np.core.umath.maximum(new_weibull_model.predict_on_batch(data), ll_min))
+    return log_p 
+
+def wiener_like_multi_nn_levy(np.ndarray[float, ndim = 2] data,
+                              double p_outlier = 0, 
+                              double w_outlier = 0):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    if (np.min(data[:,3]) < 1.0):
+        return - np.inf
+    if (np.max(data[:, 3] > 2.0)):
+        return - np.inf
+
+    log_p = np.sum(np.core.umath.maximum(levy_model.predict_on_batch(data), ll_min))
+    return log_p 
+
+def wiener_like_multi_nn_ornstein(np.ndarray[float, ndim = 2] data,
+                                  double p_outlier = 0, 
+                                  double w_outlier = 0):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    log_p = np.sum(np.core.umath.maximum(ornstein_model.predict_on_batch(data), ll_min))
+    return log_p 
+
+def wiener_like_multi_nn_full_ddm(np.ndarray[float, ndim = 2] data,
+                                  double p_outlier = 0, 
+                                  double w_outlier = 0):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    log_p = np.sum(np.core.umath.maximum(full_ddm_model.predict_on_batch(data), ll_min))
+    return log_p 
+
+# RL - DDM
 def wiener_like_rlddm(np.ndarray[double, ndim=1] x,
                       np.ndarray[long, ndim=1] response,
                       np.ndarray[double, ndim=1] feedback,
@@ -1050,3 +778,124 @@ def split_cdf(np.ndarray[double, ndim=1] x, np.ndarray[double, ndim=1] data):
     ub -= ub[0]
 
     return (x_lb, lb, x_ub, ub)
+
+
+###### 
+# UNUSED
+
+
+#def wiener_like_multi_nnddm(np.ndarray[double, ndim=1] x, 
+#                            np.ndarray[long, ndim=1] nn_response, 
+#                            activations, 
+#                            weights, 
+#                            biases, 
+#                            v, 
+#                            sv, 
+#                            a, 
+#                            z, 
+#                            sz, 
+#                            t, 
+#                            st, 
+#                            alpha, 
+#                            beta, 
+#                            double err, 
+#                            multi=None,
+#                            int n_st=10, 
+#                            int n_sz=10, 
+#                            bint use_adaptive=1, 
+#                            double simps_err=1e-3,
+#                            double p_outlier=0, 
+#                            double w_outlier=0):
+#    cdef Py_ssize_t size = x.shape[0]
+#    cdef Py_ssize_t i
+#    cdef double p = 0
+#    cdef double sum_logp = 0
+#    cdef double wp_outlier = w_outlier * p_outlier
+
+#    if multi is None:
+#        return full_pdf(x, v, sv, a, z, sz, t, st, err)
+#    else:
+#        params = {'v': v, 'z': z, 't': t, 'a': a, 'sv': sv, 'sz': sz, 'st': st, 'alpha':alpha, 'beta': beta}
+#        params_iter = copy(params)
+#        for i in range(size):
+#            for param in multi:
+#                params_iter[param] = params[param][i]
+
+            #print(type(params_iter['a'].astype(float)))
+            #print(params_iter['v'][0])
+            #print(params_iter['z'])
+            #print(params_iter['t'])
+            #print(params_iter['theta'])
+            #print(params_iter['a'])
+            #print(i)
+            #print(x[i])
+
+
+ #           p = 0.1 #ktnp.predict(np.array([params_iter['v'][0],params_iter['a'],params_iter['z'],params_iter['t'],params_iter['alpha'],params_iter['beta'],x[i], nn_response[i]]), weights, biases, activations, len(activations))
+
+            #print(p)
+            #full_pdf(x[i], params_iter['v'],
+            #             params_iter['sv'], params_iter['a'], params_iter['z'],
+            #             params_iter['sz'], params_iter[
+            #                 't'], params_iter['st'],
+            #             err, n_st, n_sz, use_adaptive, simps_err)
+ #           p = p * (1 - p_outlier) + wp_outlier
+ #           sum_logp += p
+#
+# #       return sum_logp
+#
+#def wiener_like_nn_weibull(np.ndarray[double, ndim = 1] x, 
+#                           np.ndarray[long, ndim = 1] nn_response, 
+#                           double v,
+#                           double sv, 
+#                           double a, 
+#                           double alpha, 
+#                           double beta, 
+#                           double z, 
+#                           double sz, 
+#                           double t,
+#                           double st, 
+#                           double err, 
+#                           int n_st=10, 
+#                           int n_sz=10, 
+#                           bint use_adaptive = 1, 
+#                           double simps_err = 1e-8,
+#                           double p_outlier = 0,
+#                           double w_outlier = 0):
+#
+#    cdef Py_ssize_t size = x.shape[0]
+#    cdef Py_ssize_t i
+#    cdef double p
+#    cdef double sum_logp = 0
+#    cdef double wp_outlier = w_outlier * p_outlier
+#    cdef double n_params = 6
+#
+#    cdef np.ndarray[double, ndim=1] vf = np.repeat(v,size)
+#    cdef np.ndarray[double, ndim=1] af = np.repeat(a,size)
+#    cdef np.ndarray[double, ndim=1] zf = np.repeat(z,size)
+#    cdef np.ndarray[double, ndim=1] tf = np.repeat(t,size)
+#    cdef np.ndarray[double, ndim=1] betaf = np.repeat(beta,size)
+#    cdef np.ndarray[double, ndim=1] alphaf = np.repeat(alpha,size)
+#
+#    if not p_outlier_in_range(p_outlier):
+#        return -np.inf
+#
+#    p = mlp_target_weibull(np.array([vf,af,zf,tf,alphaf,betaf]).transpose(),np.array([x,nn_response]).transpose())
+#
+#    if p == 0:
+#        return -np.inf
+#
+#    return p
+#
+
+#def mlp_target_weibull(np.ndarray[double, ndim = 2] params,
+#                       np.ndarray[double, ndim = 2] data, 
+#                       ll_min = -16.11809 # corresponds to 1e-7
+#                       ): 
+#
+#    n_params = 6
+#    mlp_input_batch = np.zeros((data.shape[0], params.shape[1] + 2), dtype = np.float32)
+#    mlp_input_batch[:, :n_params] = params
+#    mlp_input_batch[:, n_params:] = data
+#    #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
+#    return np.sum(np.core.umath.maximum(weibull_model.predict_on_batch(mlp_input_batch), ll_min))
