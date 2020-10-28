@@ -209,7 +209,7 @@ def generate_wfpt_nn_levy_reg_stochastic_class(wiener_params = None,
         """Log-likelihood for the full DDM using the interpolation method"""
 
         params = {'v': v, 'a': a, 'z': z, 'alpha': alpha, 't': t}
-        print(alpha)
+        # print(alpha)
         #print('printing params inside likelihood: ')
         #print(params)
         #print('reg_outcomes')
