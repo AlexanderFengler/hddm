@@ -592,6 +592,9 @@ def wiener_like_multi_nn_levy(np.ndarray[float, ndim = 2] data,
     cdef float ll_min = -16.11809
     cdef float log_p
 
+    if np.min(data[:,3]) < 1.0:
+        return - np.inf
+
     log_p = np.sum(np.core.umath.maximum(levy_model.predict_on_batch(data), ll_min))
     return log_p 
 
