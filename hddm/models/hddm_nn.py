@@ -245,7 +245,7 @@ class HDDMnn(HDDM):
                                                            )) # should have lower = 0.1, upper = 0.9
 
             if 'sz' in include:
-                knodes.update(self._create_family_trunc_normal('sv', 
+                knodes.update(self._create_family_trunc_normal('sz', 
                                                                lower = 1e-3,
                                                                upper = 0.2, 
                                                                value = 0.1,
@@ -261,7 +261,7 @@ class HDDMnn(HDDM):
                                                                ))
 
             if 'st' in include:
-                knodes.update(self._create_family_trunc_normal('sv', 
+                knodes.update(self._create_family_trunc_normal('st', 
                                                                lower = 1e-3,
                                                                upper = 0.25, 
                                                                value = 0.125,
