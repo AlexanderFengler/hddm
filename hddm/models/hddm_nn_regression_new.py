@@ -209,7 +209,7 @@ def generate_wfpt_nn_levy_reg_stochastic_class(wiener_params = None,
         """Log-likelihood for the full DDM using the interpolation method"""
 
         params = {'v': v, 'a': a, 'z': z, 'alpha': alpha, 't': t}
-        
+        print(alpha)
         #print('printing params inside likelihood: ')
         #print(params)
         #print('reg_outcomes')
@@ -681,7 +681,7 @@ class HDDMnnRegressor(HDDM):
             wfpt_parents['g'] = knodes['g_bottom'] if 'g' in self.include else 0
         
         if self.model == 'levy':
-            wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 2
+            wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 1.5
         
         if self.model == 'angle':
             wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else 0
