@@ -6443,7 +6443,7 @@ static PyObject *__pyx_pf_4wfpt_6wiener_like_nn_full_ddm(CYTHON_UNUSED PyObject 
   /* "wfpt.pyx":131
  * 
  *     # Call to network:
- *     log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))             # <<<<<<<<<<<<<<
+ *     log_p = np.sum(np.core.umath.maximum(full_ddm_model.predict_on_batch(data), ll_min))             # <<<<<<<<<<<<<<
  * 
  *     return log_p
  */
@@ -6463,7 +6463,7 @@ static PyObject *__pyx_pf_4wfpt_6wiener_like_nn_full_ddm(CYTHON_UNUSED PyObject 
   __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_maximum); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_ddm_model); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 131, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_full_ddm_model); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_predict_on_batch); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
@@ -6555,7 +6555,7 @@ static PyObject *__pyx_pf_4wfpt_6wiener_like_nn_full_ddm(CYTHON_UNUSED PyObject 
   __pyx_v_log_p = __pyx_t_15;
 
   /* "wfpt.pyx":133
- *     log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
+ *     log_p = np.sum(np.core.umath.maximum(full_ddm_model.predict_on_batch(data), ll_min))
  * 
  *     return log_p             # <<<<<<<<<<<<<<
  * 

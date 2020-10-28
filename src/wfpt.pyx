@@ -128,7 +128,7 @@ def wiener_like_nn_full_ddm(np.ndarray[float, ndim = 1] x,
         return -np.inf
     
     # Call to network:
-    log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
+    log_p = np.sum(np.core.umath.maximum(full_ddm_model.predict_on_batch(data), ll_min))
 
     return log_p
 

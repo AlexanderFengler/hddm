@@ -57,7 +57,7 @@ class HDDMnn(HDDM):
         if self.model == 'ornstein':
             self.wfpt_nn = stochastic_from_dist('Wienernn_ornstein', wienernn_like_ornstein)
 
-        if self.model == 'full_ddm' or self.model == 'full_ddm':
+        if self.model == 'full_ddm' or self.model == 'full_ddm2':
             self.wfpt_nn = stochastic_from_dist('Wienernn_full_ddm', wienernn_like_full_ddm)
         super(HDDMnn, self).__init__(*args, **kwargs)
     
