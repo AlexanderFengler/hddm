@@ -244,7 +244,7 @@ class HDDM(HDDMBase):
                                                depends = self.depends['p_outlier'])
         return knodes
 
-    def pre_sample(self, use_slice=True):
+    def pre_sample(self, use_slice = True):
         for name, node_descr in self.iter_stochastics():
             node = node_descr['node']
             if isinstance(node, pm.Normal) and np.all([isinstance(x, pm.Normal) for x in node.extended_children]):

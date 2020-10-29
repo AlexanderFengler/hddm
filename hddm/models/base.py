@@ -859,7 +859,7 @@ class HDDMBase(AccumulatorModel):
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
 
-        return Knode(self.wfpt_class, 'wfpt', observed=True, col_name='rt', **wfpt_parents)
+        return Knode(self.wfpt_class, 'wfpt', observed = True, col_name = 'rt', **wfpt_parents)
 
     def create_knodes(self):
         knodes = self._create_stochastic_knodes(self.include)
