@@ -46,7 +46,7 @@ class HDDMnnStimCoding(HDDM):
         self.split_param = kwargs.pop('split_param', 'z')
         self.drift_criterion = kwargs.pop('drift_criterion', False)
         self.model = kwargs.pop('model', 'weibull')
-
+        print(kwargs['include'])
         # Attach likelihood corresponding to model
         if self.model == 'ddm':
             self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
