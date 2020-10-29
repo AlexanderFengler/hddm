@@ -99,7 +99,7 @@ class HDDMnnStimCoding(HDDM):
         knodes = OrderedDict()
 
         if self.drift_criterion:
-            knodes.update(self._create_familty_normal_normal_hnormal('dc',
+            knodes.update(self._create_family_normal_normal_hnormal('dc',
                                                                      value = 0,
                                                                      g_mu = 0,
                                                                      g_tau = 3**-2,
