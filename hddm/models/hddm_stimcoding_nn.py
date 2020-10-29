@@ -434,7 +434,7 @@ class HDDMnnStimCoding(HDDM):
     #     return knodes
 
     def _create_wfpt_parents_dict(self, knodes):
-        
+        print(knodes)
         wfpt_parents = OrderedDict()
         wfpt_parents['a'] = knodes['a_bottom']
         wfpt_parents['v'] = knodes['v_bottom']
@@ -449,16 +449,20 @@ class HDDMnnStimCoding(HDDM):
         
         # MODEL SPECIFIC PARAMETERS
         if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
+            
             wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 3 
             wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else 3
         
         if self.model == 'ornstein':
+            
             wfpt_parents['g'] = knodes['g_bottom'] if 'g' in self.include else 0
         
         if self.model == 'levy':
+           
             wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 2
         
         if self.model == 'angle':
+            
             wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else 0
 
         # SPECIFIC TO STIMCODING
