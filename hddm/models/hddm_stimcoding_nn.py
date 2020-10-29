@@ -93,7 +93,7 @@ class HDDMnnStimCoding(HDDM):
 
         super(HDDMnnStimCoding, self).__init__(*args, **kwargs)
 
-    def _create_stochastc_knodes(self, include):
+    def _create_stochastic_knodes(self, include):
 
         #def _create_stochastic_knodes(self, include):
         knodes = OrderedDict()
@@ -472,7 +472,6 @@ class HDDMnnStimCoding(HDDM):
         print('wfpt parents: ')
         print(wfpt_parents)
         return wfpt_parents
-
 
     # def _create_wfpt_parents_dict(self, knodes):
     #     wfpt_parents = super(HDDMStimCoding, self)._create_wfpt_parents_dict(knodes)
