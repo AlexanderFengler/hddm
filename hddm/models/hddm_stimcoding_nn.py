@@ -1,5 +1,6 @@
 from copy import copy
 import numpy as np
+from collections import OrderedDict
 
 from kabuki.hierarchical import Knode
 from kabuki.utils import stochastic_from_dist
