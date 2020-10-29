@@ -84,6 +84,7 @@ class HDDMnnStimCoding(HDDM):
             if 'include' in kwargs and 'z' not in kwargs['include']:
                 kwargs['include'].append('z')
             else:
+                print('passing through here...')
                 kwargs['include'] = ['z']
             print("Adding z to includes.")
 
