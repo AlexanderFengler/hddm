@@ -537,7 +537,7 @@ def wienernn_like_ddm(x,
                       sz, 
                       t, 
                       st, 
-                      p_outlier):
+                      p_outlier = 0):
 
     # print(p_outlier)
 
@@ -557,7 +557,7 @@ def wienernn_like_ddm(x,
                               sz, 
                               t, 
                               st, 
-                              p_outlier,
+                              p_outlier = p_outlier,
                               **wiener_params)
                               #**wiener_params)
 
