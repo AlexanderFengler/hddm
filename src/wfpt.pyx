@@ -166,10 +166,10 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
     if p_outlier == 0:
         log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
     else:
-        #log_p = (np.exp(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min)) * (1.0 - p_outlier)) + (w_outlier * p_outlier)
-        log_p = np.sum(np.log(np.add(np.multiply(np.exp(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min)), 
-                            (1.0 - p_outlier)), 
-                      (w_outlier * p_outlier))))
+        log_p = np.sum(np.log(np.exp(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
+        #log_p = np.sum(np.log(np.add(np.multiply(np.exp(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min)), 
+        #                    (1.0 - p_outlier)), 
+        #              (w_outlier * p_outlier))))
     return log_p
 
     
