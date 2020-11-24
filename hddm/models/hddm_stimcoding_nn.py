@@ -517,7 +517,7 @@ class KnodeWfptStimCoding(Knode):
 
         dc = kwargs.pop('dc', None)
         
-        if all(data[self.stim_col] == self.stims[1]):
+        if all(data[self.stim_col] == self.stims[1]): # AF NOTE: Reversed this, previously self.stims[0], compare what is expected as data to my simulator...
             if self.split_param == 'z':
                 kwargs['z'] = 1 - kwargs['z']
             elif self.split_param == 'v' and dc is None:
