@@ -132,23 +132,21 @@ def wiener_like_nn_full_ddm(np.ndarray[float, ndim = 1] x,
 
     return log_p
 
-
 def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x, 
                        np.ndarray[float, ndim = 1] nn_response, 
-                       double v, 
-                       double sv, 
+                       double v, # double sv,
                        double a, 
-                       double z, 
-                       double sz, 
-                       double t, 
-                       double st,
+                       double z, # double sz,
+                       double t, #  double st,
                        double p_outlier = 0, 
-                       double err = 1e-4, 
-                       int n_st = 10, 
-                       int n_sz = 10, 
-                       bint use_adaptive = 1,
-                       double simps_err = 1e-8,
                        double w_outlier = 0):
+
+    
+    # double err = 1e-4, 
+    # int n_st = 10, 
+    # int n_sz = 10, 
+    # bint use_adaptive = 1,
+    # double simps_err = 1e-8,
 
     cdef Py_ssize_t size = x.shape[0]
     cdef float log_p
@@ -159,8 +157,8 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
     data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
 
     #print(p_outlier)
-    if not p_outlier_in_range(p_outlier):
-        return -np.inf
+    #if not p_outlier_in_range(p_outlier):
+    #    return -np.inf
     
     # Call to network:
     if p_outlier == 0:
