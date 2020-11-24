@@ -108,6 +108,7 @@ class HDDMnn(HDDM):
                                                                value = 3.34,
                                                                std_upper = 2
                                                                ))
+
         if self.model == 'weibull_cdf_concave':
             if 'a' in include:
                 knodes.update(self._create_family_trunc_normal('a',
@@ -179,6 +180,13 @@ class HDDMnn(HDDM):
                                                            g_tau = 10**-2,
                                                            std_std = 0.5
                                                            )) # should have lower = 0.1, upper = 0.9
+            
+            if 'p_outlier' in include:
+                knodes.update(self._create_family_invlogit('p_outlier',
+                                                            value = 0.05,
+                                                            g_tau = 10**-2,
+                                                            std_std = 0.5
+                                                           ))
         
         if self.model == 'ddm_sdv' or self.model == 'ddm_sdv_analytic':
             if 'a' in include:
@@ -394,7 +402,7 @@ class HDDMnn(HDDM):
         wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else 0 #self.default_intervars['st']
         wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
 
-        wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else 0 #self.p_outlier
+        wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
         
         # MODEL SPECIFIC PARAMETERS
         if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
