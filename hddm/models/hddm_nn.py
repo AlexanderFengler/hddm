@@ -29,6 +29,7 @@ class HDDMnn(HDDM):
     """
 
     def __init__(self, *args, **kwargs):
+        self.nn = True
         self.non_centered = kwargs.pop('non_centered', False)
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
 
