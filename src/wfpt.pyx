@@ -158,6 +158,7 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
     data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
     data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
 
+    print(p_outlier)
     if not p_outlier_in_range(p_outlier):
         return -np.inf
     
