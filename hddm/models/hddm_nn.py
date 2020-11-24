@@ -584,8 +584,6 @@ def wienernn_like_ddm(x,
                               w_outlier = 0.1) #wiener_params)
                               #**wiener_params)
 
-
-
 def wienernn_like_ddm_analytic(x, 
                                v, 
                                sv, 

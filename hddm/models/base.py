@@ -33,6 +33,7 @@ except ImportError:
 
 class AccumulatorModel(kabuki.Hierarchical):
     def __init__(self, data, **kwargs):
+        print(kwargs)
         # Flip sign for lower boundary RTs
         data = hddm.utils.flip_errors(data)
         self.std_depends = kwargs.pop('std_depends', False)

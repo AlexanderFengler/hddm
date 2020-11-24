@@ -31,7 +31,7 @@ def generate_wfpt_stochastic_class(wiener_params=None, sampling_method='cdf', cd
     """
     create a wfpt stochastic class by creating a pymc nodes and then adding quantile functions.
     Input:
-        wiener_params <dict> - dictonary of wiener_params for wfpt likelihoods
+        wiener_params <dict> - dictonary of wiener_params for wfpt 
         sampling_method <string> - an argument used by hddm.generate.gen_rts
         cdf_range <sequance> -  an argument used by hddm.generate.gen_rts
         sampling_dt <float> - an argument used by hddm.generate.gen_rts
