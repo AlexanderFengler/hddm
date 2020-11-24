@@ -38,7 +38,7 @@ include 'integrate.pxi'
 # TODO: Refactor this ?
 weibull_model = keras.models.load_model('model_final_weibull.h5', compile = False)
 angle_model = keras.models.load_model('model_final_angle.h5', compile = False)
-model = keras.models.load_model('model_final.h5', compile = False)
+#model = keras.models.load_model('model_final.h5', compile = False)
 new_weibull_model = keras.models.load_model('model_final_new.h5', compile = False)
 ddm_model = keras.models.load_model('model_final_ddm.h5', compile = False)
 ddm_analytic_model = keras.models.load_model('model_final_ddm_analytic.h5', compile = False)
@@ -162,9 +162,14 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
         return -np.inf
     
     # Call to network:
-    log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
+    if p_outlier == 0:
+        log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
+        return log_p
+    else:
+        log_p = np.log((np.exp(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min)) * (1 - p_outlier)) + (w_outlier * p_outlier))
+        return log_p
 
-    return log_p
+    
 
 def wiener_like_nn_ddm_analytic(np.ndarray[float, ndim = 1] x, 
                                 np.ndarray[float, ndim = 1] nn_response, 

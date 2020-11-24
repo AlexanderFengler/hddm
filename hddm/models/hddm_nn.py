@@ -60,6 +60,7 @@ class HDDMnn(HDDM):
         if self.model == 'full_ddm' or self.model == 'full_ddm2':
             self.wfpt_nn = stochastic_from_dist('Wienernn_full_ddm', wienernn_like_full_ddm)
         super(HDDMnn, self).__init__(*args, **kwargs)
+        print(self.p_outlier)
     
     def _create_stochastic_knodes(self, include):
         knodes = OrderedDict()
