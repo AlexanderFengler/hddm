@@ -186,7 +186,7 @@ class HDDMnn(HDDM):
                                                             value = 0.05,
                                                             g_tau = 10**-2,
                                                             std_std = 0.5
-                                                           ))
+                                                            ))
         
         if self.model == 'ddm_sdv' or self.model == 'ddm_sdv_analytic':
             if 'a' in include:
@@ -535,6 +535,8 @@ def wienernn_like_ddm(x,
                       t, 
                       st, 
                       p_outlier = 0):
+
+    print(p_outlier)
 
     wiener_params = {'err': 1e-4, 
                      'n_st': 2, 
