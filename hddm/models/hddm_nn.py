@@ -184,7 +184,7 @@ class HDDMnn(HDDM):
             
             if 'p_outlier' in include:
                 knodes.update(self._create_family_invlogit('p_outlier',
-                                                            value = 0.05,
+                                                            value = 0.2,
                                                             g_tau = 10**-2,
                                                             std_std = 0.5
                                                             ))
@@ -537,16 +537,16 @@ def wienernn_like_ddm(x,
                       sz, 
                       t, 
                       st, 
-                      p_outlier = 0):
+                      p_outlier):
 
     # print(p_outlier)
 
-    wiener_params = {'err': 1e-4, 
-                     'n_st': 2, 
-                     'n_sz': 2,
-                     'use_adaptive': 1,
-                     'simps_err': 1e-3,
-                     'w_outlier': 0.1}
+    # wiener_params = {'err': 1e-4, 
+    #                  'n_st': 2, 
+    #                  'n_sz': 2,
+    #                  'use_adaptive': 1,
+    #                  'simps_err': 1e-3,
+    #                  'w_outlier': 0.1}
 
     return wiener_like_nn_ddm(np.absolute(x['rt'].values).astype(np.float32),
                               x['nn_response'].values.astype(np.float32),  
@@ -557,8 +557,9 @@ def wienernn_like_ddm(x,
                               sz, 
                               t, 
                               st, 
-                              p_outlier = p_outlier,
-                              **wiener_params)
+                              p_outlier,
+                              w_outlier = 0.1)
+                              #**wiener_params)
 
 def wienernn_like_ddm_analytic(x, 
                                v, 
