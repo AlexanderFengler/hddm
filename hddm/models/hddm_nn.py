@@ -30,6 +30,7 @@ class HDDMnn(HDDM):
 
     def __init__(self, *args, **kwargs):
         self.non_centered = kwargs.pop('non_centered', False)
+        self.w_outlier = kwargs.pop('w_outlier', 0.1)
 
         # Make model specific likelihood
         self.model = kwargs.pop('model', 'weibull')
@@ -401,6 +402,7 @@ class HDDMnn(HDDM):
         wfpt_parents['t'] = knodes['t_bottom']
         wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
         wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
+        wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
         
         # MODEL SPECIFIC PARAMETERS
         if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
@@ -563,7 +565,8 @@ def wienernn_like_ddm(x,
                       a, 
                       z,  
                       t, 
-                      p_outlier = 0):
+                      p_outlier = 0,
+                      w_outlier = 0.1):
 
     # print(p_outlier)
     # wiener_params = {'err': 1e-4, 
@@ -581,7 +584,7 @@ def wienernn_like_ddm(x,
                               z, # sz,
                               t, # st,
                               p_outlier = p_outlier,
-                              w_outlier = 0.1) #wiener_params)
+                              w_outlier = w_outlier) #wiener_params)
                               #**wiener_params)
 
 def wienernn_like_ddm_analytic(x, 
