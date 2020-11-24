@@ -162,7 +162,7 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
     if not p_outlier_in_range(p_outlier):
         return -np.inf
     
-     Call to network:
+    # Call to network:
     if p_outlier == 0:
         log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
     else:
