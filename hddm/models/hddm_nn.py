@@ -399,12 +399,7 @@ class HDDMnn(HDDM):
         wfpt_parents['a'] = knodes['a_bottom']
         wfpt_parents['v'] = knodes['v_bottom']
         wfpt_parents['t'] = knodes['t_bottom']
-
-        wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else 0 #self.default_intervars['sv']
-        wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else 0 #self.default_intervars['sz']
-        wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else 0 #self.default_intervars['st']
         wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
-
         wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
         
         # MODEL SPECIFIC PARAMETERS
@@ -420,6 +415,11 @@ class HDDMnn(HDDM):
         
         if self.model == 'angle':
             wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else 0
+
+        if self.model == 'full_ddm' or self.model =='full_ddm2':
+            wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else 0 #self.default_intervars['sv']
+            wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else 0 #self.default_intervars['sz']
+            wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else 0 #self.default_intervars['st']
 
         print('wfpt parents: ')
         print(wfpt_parents)
