@@ -147,7 +147,7 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
                        int n_sz = 10, 
                        bint use_adaptive = 1,
                        double simps_err = 1e-8,
-                       double p_outlier = 0, 
+                       double p_outlier = 0,
                        double w_outlier = 0):
 
     cdef Py_ssize_t size = x.shape[0]
@@ -158,7 +158,7 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
     data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
     data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
 
-    print(p_outlier)
+    #print(p_outlier)
     if not p_outlier_in_range(p_outlier):
         return -np.inf
     
@@ -167,12 +167,12 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
         log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
         return log_p
     else:
-        log_p = np.exp(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min)) * (1 - p_outlier)
-        print('passed exp')
-        log_p = log_p + (w_outlier * p_outlier)
-        print('passed plus')
-        log_p = np.log(log_p)
-        print('passed log')
+        log_p = np.multiply(np.exp(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min)) * (1.0 - p_outlier))
+        #print('passed exp')
+        log_p = np.add(log_p, (w_outlier * p_outlier))
+        #print('passed plus')
+        log_p = np.sum(np.log(log_p))
+        #print('passed log')
         return log_p
 
     

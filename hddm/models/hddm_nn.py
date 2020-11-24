@@ -180,6 +180,7 @@ class HDDMnn(HDDM):
                                                            g_tau = 10**-2,
                                                            std_std = 0.5
                                                            )) # should have lower = 0.1, upper = 0.9
+
             
             if 'p_outlier' in include:
                 knodes.update(self._create_family_invlogit('p_outlier',
@@ -187,6 +188,8 @@ class HDDMnn(HDDM):
                                                             g_tau = 10**-2,
                                                             std_std = 0.5
                                                             ))
+            print(knodes.keys())
+
         
         if self.model == 'ddm_sdv' or self.model == 'ddm_sdv_analytic':
             if 'a' in include:
@@ -536,7 +539,7 @@ def wienernn_like_ddm(x,
                       st, 
                       p_outlier = 0):
 
-    print(p_outlier)
+    # print(p_outlier)
 
     wiener_params = {'err': 1e-4, 
                      'n_st': 2, 
