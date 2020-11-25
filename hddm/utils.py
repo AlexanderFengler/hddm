@@ -47,7 +47,7 @@ def flip_errors_nn(data):
                 Input array with RTs sign flipped where 'response' < 0
 
     """
-    data = pd.DataFrame(data.values.astype(np.float32).copy())
+    data = pd.DataFrame(data.copy()).values.astype(np.float32)
 
     if np.any(data['response'] != 1.0):
         idx = data['response'] < 1.0
