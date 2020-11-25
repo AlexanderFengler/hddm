@@ -434,7 +434,7 @@ class HDDMnn(HDDM):
         return Knode(self.wfpt_nn, 
                      'wfpt', 
                      observed = True, 
-                     col_name = ['nn_response', 'rt'], # TODO: One could preprocess at initialization
+                     col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
                      **wfpt_parents)
 
 def wienernn_like_weibull(x, 
