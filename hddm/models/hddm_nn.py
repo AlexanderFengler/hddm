@@ -568,8 +568,8 @@ def wienernn_like_ddm_sdv_analytic(x,
                                    a, 
                                    z, 
                                    t, 
-                                   p_outlier = p_outlier,
-                                   w_outlier = w_outlier):
+                                   p_outlier = 0,
+                                   w_outlier = 0):
 
     #wiener_params = {'err': 1e-4, 
     #                 'n_st': 2, 
