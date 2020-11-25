@@ -108,11 +108,6 @@ def wiener_like_nn_full_ddm(np.ndarray[float, ndim = 1] x,
                             double sz, 
                             double t, 
                             double st, 
-                            double err, 
-                            int n_st = 10, 
-                            int n_sz = 10, 
-                            bint use_adaptive = 1,
-                            double simps_err = 1e-8,
                             double p_outlier = 0, 
                             double w_outlier = 0):
 
@@ -124,11 +119,11 @@ def wiener_like_nn_full_ddm(np.ndarray[float, ndim = 1] x,
     data[:, :n_params] = np.tile([v, a, z, t, sz, sv, st], (size, 1)).astype(np.float32)
     data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
 
-    if not p_outlier_in_range(p_outlier):
-        return -np.inf
-    
     # Call to network:
-    log_p = np.sum(np.core.umath.maximum(full_ddm_model.predict_on_batch(data), ll_min))
+    if p_outlier == 0:
+        log_p = np.sum(np.core.umath.maximum(full_ddm_model.predict_on_batch(data), ll_min))
+    else:
+        log_p = np.sum(np.log(np.exp(np.core.umath.maximum(full_ddm_model.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
 
     return log_p
 
@@ -154,7 +149,7 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
     cdef float ll_min = -16.11809
     cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
     data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
-    data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
+    data[:, n_params:] = np.stack([x, nn_response], axis = 1)
 
     #print(p_outlier)
     #if not p_outlier_in_range(p_outlier):
@@ -175,17 +170,9 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
 def wiener_like_nn_ddm_analytic(np.ndarray[float, ndim = 1] x, 
                                 np.ndarray[float, ndim = 1] nn_response, 
                                 double v, 
-                                double sv, 
                                 double a, 
                                 double z, 
-                                double sz, 
                                 double t, 
-                                double st, 
-                                double err, 
-                                int n_st = 10, 
-                                int n_sz = 10, 
-                                bint use_adaptive = 1,
-                                double simps_err = 1e-8,
                                 double p_outlier = 0, 
                                 double w_outlier = 0):
 
@@ -197,29 +184,20 @@ def wiener_like_nn_ddm_analytic(np.ndarray[float, ndim = 1] x,
     data[:, :n_params] = np.tile([v, a, z, t], (size, 1)).astype(np.float32)
     data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
 
-    if not p_outlier_in_range(p_outlier):
-        return -np.inf
-    
-    # Call to network:
-    log_p = np.sum(np.core.umath.maximum(ddm_analytic_model.predict_on_batch(data), ll_min))
-
+    # Call to network
+    if p_outlier == 0:
+        log_p = np.sum(np.core.umath.maximum(ddm_analytic_model.predict_on_batch(data), ll_min))
+    else:
+        log_p = np.sum(np.log(np.exp(np.core.umath.maximum(ddm_analytic_model.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
     return log_p
 
 def wiener_like_nn_angle(np.ndarray[float, ndim = 1] x, 
                          np.ndarray[float, ndim = 1] nn_response, 
-                         double v, 
-                         double sv, 
+                         double v,
                          double a, 
                          double theta, 
-                         double z, 
-                         double sz, 
+                         double z,
                          double t,
-                         double st, 
-                         double err,
-                         int n_st=10, 
-                         int n_sz=10, 
-                         bint use_adaptive=1, 
-                         double simps_err=1e-8,
                          double p_outlier=0, 
                          double w_outlier=0):
     
@@ -231,12 +209,12 @@ def wiener_like_nn_angle(np.ndarray[float, ndim = 1] x,
     data[:, :n_params] = np.tile([v, a, z, t, theta], (size, 1)).astype(np.float32)
     data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
 
-    if not p_outlier_in_range(p_outlier):
-        return -np.inf
-    
     # Call to network:
-    log_p = np.sum(np.core.umath.maximum(angle_model.predict_on_batch(data), ll_min))
-
+    if p_outlier == 0:
+        log_p = np.sum(np.core.umath.maximum(angle_model.predict_on_batch(data), ll_min))
+    else:
+        log_p = np.sum(np.log(np.exp(np.core.umath.maximum(angle_model.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
+    
     return log_p
 
 def wiener_like_nn_weibull(np.ndarray[float, ndim = 1] x, 
@@ -278,18 +256,10 @@ def wiener_like_nn_weibull(np.ndarray[float, ndim = 1] x,
 def wiener_like_nn_levy(np.ndarray[float, ndim = 1] x,
                         np.ndarray[float, ndim = 1] nn_response, 
                         double v,
-                        double sv, 
                         double a, 
                         double alpha,
                         double z, 
-                        double sz, 
                         double t,
-                        double st, 
-                        double err, 
-                        int n_st = 10, 
-                        int n_sz = 10, 
-                        bint use_adaptive = 1, 
-                        double simps_err = 1e-8,
                         double p_outlier = 0,
                         double w_outlier = 0):
 
@@ -301,29 +271,21 @@ def wiener_like_nn_levy(np.ndarray[float, ndim = 1] x,
     data[:, :n_params] = np.tile([v, a, z, alpha, t], (size, 1)).astype(np.float32)
     data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
 
-    if not p_outlier_in_range(p_outlier):
-        return -np.inf
-    
     # Call to network:
-    log_p = np.sum(np.core.umath.maximum(levy_model.predict_on_batch(data), ll_min))
-
+    if p_outlier == 0:
+        log_p = np.sum(np.core.umath.maximum(levy_model.predict_on_batch(data), ll_min))
+    else:
+        log_p = np.sum(np.log(np.exp(np.core.umath.maximum(levy_model.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
+    
     return log_p
 
 def wiener_like_nn_ornstein(np.ndarray[float, ndim = 1] x, 
                             np.ndarray[float, ndim = 1] nn_response, 
                             double v,
-                            double sv, 
                             double a, 
                             double g,
                             double z, 
-                            double sz, 
-                            double t,
-                            double st, 
-                            double err, 
-                            int n_st = 10, 
-                            int n_sz = 10, 
-                            bint use_adaptive = 1, 
-                            double simps_err = 1e-8,
+                            double t, 
                             double p_outlier = 0,
                             double w_outlier = 0):
     
@@ -335,28 +297,21 @@ def wiener_like_nn_ornstein(np.ndarray[float, ndim = 1] x,
     data[:, :n_params] = np.tile([v, a, z, g, t], (size, 1)).astype(np.float32)
     data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
 
-    if not p_outlier_in_range(p_outlier):
-        return -np.inf
-    
     # Call to network:
-    log_p = np.sum(np.core.umath.maximum(ornstein_model.predict_on_batch(data), ll_min))
-
+    if p_outlier == 0:
+        log_p = np.sum(np.core.umath.maximum(ornstein_model.predict_on_batch(data), ll_min))
+    else:
+        log_p = np.sum(np.log(np.exp(np.core.umath.maximum(ornstein_model.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
+    
     return log_p
 
 def wiener_like_nn_ddm_sdv(np.ndarray[float, ndim = 1] x, 
                            np.ndarray[float, ndim = 1] nn_response, 
                            double v,
-                           double sv, 
+                           double sv,
                            double a,
-                           double z, 
-                           double sz, 
+                           double z,
                            double t,
-                           double st, 
-                           double err, 
-                           int n_st = 10, 
-                           int n_sz = 10, 
-                           bint use_adaptive = 1, 
-                           double simps_err = 1e-8,
                            double p_outlier = 0,
                            double w_outlier = 0):
 
@@ -369,7 +324,10 @@ def wiener_like_nn_ddm_sdv(np.ndarray[float, ndim = 1] x,
     data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
 
     # Call to network:
-    log_p = np.sum(np.core.umath.maximum(ddm_sdv_model.predict_on_batch(data), ll_min))
+    if p_outlier == 0:
+        log_p = np.sum(np.core.umath.maximum(ddm_sdv_model.predict_on_batch(data), ll_min))
+    else:
+        log_p = np.sum(np.log(np.exp(np.core.umath.maximum(ddm_sdv_model.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
 
     return log_p
 
@@ -379,14 +337,7 @@ def wiener_like_nn_ddm_sdv_analytic(np.ndarray[float, ndim = 1] x,
                                     double sv, 
                                     double a,
                                     double z, 
-                                    double sz, 
                                     double t,
-                                    double st, 
-                                    double err, 
-                                    int n_st = 10, 
-                                    int n_sz = 10, 
-                                    bint use_adaptive = 1, 
-                                    double simps_err = 1e-8,
                                     double p_outlier = 0,
                                     double w_outlier = 0):
 
@@ -399,7 +350,10 @@ def wiener_like_nn_ddm_sdv_analytic(np.ndarray[float, ndim = 1] x,
     data[:, n_params:] = np.stack([x.astype(np.float32), nn_response.astype(np.float32)], axis = 1)
 
     # Call to network:
-    log_p = np.sum(np.core.umath.maximum(ddm_sdv_analytic_model.predict_on_batch(data), ll_min))
+    if p_outlier == 0:
+        log_p = np.sum(np.core.umath.maximum(ddm_sdv_analytic_model.predict_on_batch(data), ll_min))
+    else:
+        log_p = np.sum(np.log(np.exp(np.core.umath.maximum(ddm_sdv_analytic_model.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
 
     return log_p
 

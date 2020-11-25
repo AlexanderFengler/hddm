@@ -457,7 +457,7 @@ def wienernn_like_weibull(x,
                      'w_outlier': 0.1}
 
     return wiener_like_nn_weibull(np.absolute(x['rt'].values).astype(np.float32),
-                                  x['nn_response'].values.astype(np.float32), 
+                                  x['response'].values.astype(np.float32), 
                                   v, 
                                   sv,
                                   a, 
@@ -470,97 +470,6 @@ def wienernn_like_weibull(x,
                                   p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
                                   **wiener_params)
 
-def wienernn_like_levy(x, 
-                       v, 
-                       sv, 
-                       a, 
-                       alpha,
-                       z, 
-                       sz, 
-                       t, 
-                       st, 
-                       p_outlier = 0): #theta
-
-    wiener_params = {'err': 1e-4, # 
-                     'n_st': 2, #
-                     'n_sz': 2, # 
-                     'use_adaptive': 1, #
-                     'simps_err': 1e-3, # 
-                     'w_outlier': 0.1}
-    
-    return wiener_like_nn_levy(np.absolute(x['rt'].values).astype(np.float32),
-                               x['nn_response'].values.astype(np.float32), 
-                               v, 
-                               sv,
-                               a, 
-                               alpha, 
-                               z, 
-                               sz,
-                               t, 
-                               st, 
-                               p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-                               **wiener_params)
-
-def wienernn_like_ornstein(x, 
-                           v, 
-                           sv, 
-                           a, 
-                           g,
-                           z, 
-                           sz, 
-                           t, 
-                           st, 
-                           p_outlier = 0): #theta
-    
-    wiener_params = {'err': 1e-4, # 
-                     'n_st': 2, #
-                     'n_sz': 2, # 
-                     'use_adaptive': 1, #
-                     'simps_err': 1e-3, # 
-                     'w_outlier': 0.1}
-    
-    return wiener_like_nn_ornstein(np.absolute(x['rt'].values).astype(np.float32),
-                                   x['nn_response'].values.astype(np.float32), 
-                                   v, 
-                                   sv,
-                                   a, 
-                                   g, 
-                                   z, 
-                                   sz,
-                                   t, 
-                                   st, 
-                                   p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-                                   **wiener_params)
-
-# def wienernn_like_ddm(x, 
-#                       v, 
-#                       sv, 
-#                       a, 
-#                       z, 
-#                       sz, 
-#                       t, 
-#                       st, 
-#                       p_outlier = 0):
-
-#     # print(p_outlier)
-#     # wiener_params = {'err': 1e-4, 
-#     #                  'n_st': 2, 
-#     #                  'n_sz': 2,
-#     #                  'use_adaptive': 1,
-#     #                  'simps_err': 1e-3}
-
-#     #wiener_params = {'w_outlier': 0.1}
-
-#     return wiener_like_nn_ddm(np.absolute(x['rt'].values).astype(np.float32),
-#                               x['nn_response'].values.astype(np.float32),  
-#                               v, # sv,
-#                               a, 
-#                               z, # sz,
-#                               t, # st,
-#                               p_outlier = p_outlier,
-#                               w_outlier = 0.1) #wiener_params)
-#                               #**wiener_params)
-
 def wienernn_like_ddm(x, 
                       v,  
                       a, 
@@ -569,24 +478,6 @@ def wienernn_like_ddm(x,
                       p_outlier = 0,
                       w_outlier = 0.1):
 
-    # print(p_outlier)
-    # wiener_params = {'err': 1e-4, 
-    #                  'n_st': 2, 
-    #                  'n_sz': 2,
-    #                  'use_adaptive': 1,
-    #                  'simps_err': 1e-3}
-
-    #wiener_params = {'w_outlier': 0.1}
-
-    # return wiener_like_nn_ddm(x['rt'].values.astype(np.float32),
-    #                           x['response'].values.astype(np.float32),  
-    #                           v, # sv,
-    #                           a, 
-    #                           z, # sz,
-    #                           t, # st,
-    #                           p_outlier = p_outlier,
-    #                           w_outlier = w_outlier) #wiener_params)
-    #                           #**wiener_params)
     return wiener_like_nn_ddm(x['rt'].values,
                               x['response'].values,  
                               v, # sv,
@@ -594,95 +485,108 @@ def wienernn_like_ddm(x,
                               z, # sz,
                               t, # st,
                               p_outlier = p_outlier,
-                              w_outlier = w_outlier) #wiener_params)
-                              #**wiener_params)
+                              w_outlier = w_outlier)
+
+
+def wienernn_like_levy(x, 
+                       v, 
+                       a, 
+                       alpha,
+                       z,
+                       t,
+                       p_outlier = 0.1,
+                       w_outlier = 0.1): #theta
+
+    return wiener_like_nn_levy(x['rt'].values,
+                               x['response'].values, 
+                               v,
+                               a, 
+                               alpha, 
+                               z,
+                               t, 
+                               p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+                               w_outlier = w_outlier)
+
+def wienernn_like_ornstein(x, 
+                           v, 
+                           a, 
+                           g,
+                           z, 
+                           t,
+                           p_outlier = 0,
+                           w_outlier = 0): #theta
+    
+    return wiener_like_nn_ornstein(x['rt'].values,
+                                   x['response'].values, 
+                                   v, 
+                                   a, 
+                                   g, 
+                                   z, 
+                                   t, 
+                                   p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+                                   w_outlier = w_outlier)
 
 def wienernn_like_ddm_analytic(x, 
                                v, 
-                               sv, 
                                a, 
                                z, 
-                               sz, 
-                               t, 
-                               st, 
-                               p_outlier = 0):
+                               t,
+                               p_outlier = 0,
+                               w_outlier = 0):
 
-    wiener_params = {'err': 1e-4, 
-                     'n_st': 2, 
-                     'n_sz': 2,
-                     'use_adaptive': 1,
-                     'simps_err': 1e-3,
-                     'w_outlier': 0.1}
-
-    return wiener_like_nn_ddm_analytic(np.absolute(x['rt'].values).astype(np.float32),
-                                       x['nn_response'].values.astype(np.float32),  
-                                       v, 
-                                       sv, 
-                                       a, 
-                                       z, 
-                                       sz, 
+    return wiener_like_nn_ddm_analytic(x['rt'].values,
+                                       x['response'].values,  
+                                       v,
+                                       a,
+                                       z,
                                        t, 
-                                       st, 
-                                       p_outlier = p_outlier,
-                                       **wiener_params)
+                                       p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+                                       w_outlier = w_outlier)
 
 def wienernn_like_ddm_sdv(x, 
-                          v, 
-                          sv, 
+                          v,
+                          sv,
                           a, 
                           z, 
-                          sz, 
-                          t, 
-                          st, 
-                          p_outlier = 0):
+                          t,
+                          p_outlier = 0,
+                          w_outlier = 0):
 
-    wiener_params = {'err': 1e-4, 
-                     'n_st': 2, 
-                     'n_sz': 2,
-                     'use_adaptive': 1,
-                     'simps_err': 1e-3,
-                     'w_outlier': 0.1}
-
-    return wiener_like_nn_ddm_sdv(np.absolute(x['rt'].values).astype(np.float32),
-                                  x['nn_response'].values.astype(np.float32),  
-                                  v, 
-                                  sv, 
-                                  a, 
+    return wiener_like_nn_ddm_sdv(x['rt'].values,
+                                  x['response'].values,  
+                                  v,
+                                  sv,
+                                  a,
                                   z, 
-                                  sz, 
                                   t, 
-                                  st, 
                                   p_outlier = p_outlier,
-                                  **wiener_params)
+                                  w_outlier = w_outlier)
 
 def wienernn_like_ddm_sdv_analytic(x, 
                                    v, 
-                                   sv, 
+                                   sv,
                                    a, 
                                    z, 
-                                   sz, 
                                    t, 
-                                   st, 
-                                   p_outlier = 0):
+                                   p_outlier = p_outlier,
+                                   w_outlier = w_outlier):
 
-    wiener_params = {'err': 1e-4, 
-                     'n_st': 2, 
-                     'n_sz': 2,
-                     'use_adaptive': 1,
-                     'simps_err': 1e-3,
-                     'w_outlier': 0.1}
+    #wiener_params = {'err': 1e-4, 
+    #                 'n_st': 2, 
+    #                 'n_sz': 2,
+    #                 'use_adaptive': 1,
+    #                 'simps_err': 1e-3,
+    #                 'w_outlier': 0.1}
 
-    return wiener_like_nn_ddm_sdv_analytic(np.absolute(x['rt'].values).astype(np.float32),
-                                           x['nn_response'].values.astype(np.float32),  
+    return wiener_like_nn_ddm_sdv_analytic(x['rt'].values,
+                                           x['response'].values,  
                                            v, 
                                            sv, 
                                            a, 
                                            z, 
-                                           sz, 
-                                           t, 
-                                           st, 
+                                           t,
                                            p_outlier = p_outlier,
-                                           **wiener_params)
+                                           w_outlier = w_outlier)
 
 def wienernn_like_full_ddm(x, 
                            v, 
@@ -692,17 +596,18 @@ def wienernn_like_full_ddm(x,
                            sz, 
                            t, 
                            st, 
-                           p_outlier = 0):
+                           p_outlier = 0,
+                           w_outlier = 0):
 
-    wiener_params = {'err': 1e-4, 
-                     'n_st': 2, 
-                     'n_sz': 2,
-                     'use_adaptive': 1,
-                     'simps_err': 1e-3,
-                     'w_outlier': 0.1}
+    #wiener_params = {'err': 1e-4, 
+    #                 'n_st': 2, 
+    #                 'n_sz': 2,
+    #                 'use_adaptive': 1,
+    #                 'simps_err': 1e-3,
+    #                 'w_outlier': 0.1}
 
-    return wiener_like_nn_full_ddm(np.absolute(x['rt'].values).astype(np.float32),
-                                   x['nn_response'].values.astype(np.float32),  
+    return wiener_like_nn_full_ddm(x['rt'].values,
+                                   x['response'].values,  
                                    v, 
                                    sv, 
                                    a, 
@@ -711,33 +616,28 @@ def wienernn_like_full_ddm(x,
                                    t, 
                                    st, 
                                    p_outlier = p_outlier,
-                                   **wiener_params)
+                                   w_outlier = w_outlier)
 
 def wienernn_like_angle(x, 
                         v, 
-                        sv, 
                         a, 
                         theta, 
-                        z, 
-                        sz,
-                        t, 
-                        st, 
-                        p_outlier = 0):
+                        z,
+                        t,
+                        p_outlier = 0,
+                        w_outlier = 0):
 
-    wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
-                     'use_adaptive': 1,
-                     'simps_err': 1e-3,
-                     'w_outlier': 0.1}
+    #wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
+    #                 'use_adaptive': 1,
+    #                 'simps_err': 1e-3,
+    #                 'w_outlier': 0.1}
 
-    return wiener_like_nn_angle(np.absolute(x['rt'].values).astype(np.float32),
-                                            x['nn_response'].values.astype(np.float32),  
-                                            v, 
-                                            sv, 
-                                            a, 
-                                            theta,
-                                            z, 
-                                            sz, 
-                                            t, 
-                                            st, 
-                                            p_outlier = p_outlier,
-                                            **wiener_params)
+    return wiener_like_nn_angle(x['rt'].values,
+                                x['response'].values,  
+                                v,
+                                a, 
+                                theta,
+                                z,
+                                t,
+                                p_outlier = p_outlier,
+                                w_outlier = w_outlier)
