@@ -58,7 +58,7 @@ def flip_errors_nn(data):
         data.loc[idx, 'response'] == -1.0
     
     # Check if data is already flipped
-    if not np.any(data['rt'] < 0):
+    if np.any(data['rt'] < 0) != False:
         return data
 
     # Copy data
@@ -69,6 +69,12 @@ def flip_errors_nn(data):
     data.loc[idx, 'rt'] = - data.loc[idx, 'rt']
     #data = data.values.astype(np.float32).copy()
 
+    print('RT')
+    print(np.min(data['rt'].values))
+    print(np.max(data['rt'].values))
+
+    print('Response')
+    print(np.unique(data['response']))
     return data
 
 def check_params_valid(**params):
