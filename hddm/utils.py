@@ -54,8 +54,9 @@ def flip_errors_nn(data):
     data['rt'] = data['rt'].values.astype(np.float32)
 
     if np.any(data['response'] != 1.0):
+        #print('passed through ')
         idx = data['response'] < 1.0
-        data.loc[idx, 'response'] == -1.0
+        data.loc[idx, 'response'] = -1.0
     
     # Check if data is already flipped
     if np.any(data['rt'] < 0) != False:
