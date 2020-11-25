@@ -32,7 +32,38 @@ def flip_errors(data):
 
     # Flip sign for lower boundary response
     idx = data['response'] == 0
-    data.loc[idx, 'rt'] = -data.loc[idx, 'rt']
+    data.loc[idx, 'rt'] = - data.loc[idx, 'rt']
+
+    return data
+
+def flip_errors_nn(data):
+    """Flip sign for lower boundary responses in case they were supplied ready for standard hddm.
+
+        :Arguments:
+            data : numpy.recarray
+                Input array with at least one column named 'RT' and one named 'response'
+        :Returns:
+            data : numpy.recarray
+                Input array with RTs sign flipped where 'response' < 0
+
+    """
+    data = pd.DataFrame(data.values.astype(np.float32).copy())
+
+    if np.any(data['response'] != 1.0):
+        idx = data['response'] < 1.0
+        data.loc[idx, 'response'] == -1.0
+    
+    # Check if data is already flipped
+    if not np.any(data['rt'] < 0):
+        return data
+
+    # Copy data
+    #data = pd.DataFrame(data.copy())
+
+    # Flip sign for lower boundary response
+    idx = data['rt'] < 0.0
+    data.loc[idx, 'rt'] = - data.loc[idx, 'rt']
+    #data = data.values.astype(np.float32).copy()
 
     return data
 

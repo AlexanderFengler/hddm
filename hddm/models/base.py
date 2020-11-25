@@ -34,10 +34,9 @@ except ImportError:
 class AccumulatorModel(kabuki.Hierarchical):
     def __init__(self, data, **kwargs):
         # Flip sign for lower boundary RTs
-        
         if self.nn:
-            print('recognized neural net')
-            pass
+            print('Recognized HDDMnn')
+            data = hddm.utils.flip_errors_nn(data)
         else:
             data = hddm.utils.flip_errors(data)
         self.std_depends = kwargs.pop('std_depends', False)
