@@ -587,8 +587,8 @@ def wienernn_like_ddm(x,
     #                           p_outlier = p_outlier,
     #                           w_outlier = w_outlier) #wiener_params)
     #                           #**wiener_params)
-    return wiener_like_nn_ddm(x['rt'],
-                              x['response'],  
+    return wiener_like_nn_ddm(x['rt'].values,
+                              x['response'].values,  
                               v, # sv,
                               a, 
                               z, # sz,
