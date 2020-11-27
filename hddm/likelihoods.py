@@ -33,7 +33,7 @@ def generate_wfpt_stochastic_class(wiener_params=None, sampling_method='cdf', cd
     Input:
         wiener_params <dict> - dictonary of wiener_params for wfpt 
         sampling_method <string> - an argument used by hddm.generate.gen_rts
-        cdf_range <sequance> -  an argument used by hddm.generate.gen_rts
+        cdf_range <sequence> -  an argument used by hddm.generate.gen_rts
         sampling_dt <float> - an argument used by hddm.generate.gen_rts
     Ouput:
         wfpt <class> - the wfpt stochastic
@@ -208,7 +208,7 @@ def add_quantiles_functions_to_pymc_class(pymc_class):
         #theoretical porportion
         proportion = np.diff(theo_cdf)
 
-        #make sure there is no zeros since it causes bugs later on
+        # make sure there is no zeros since it causes bugs later on
         epsi = 1e-6
         proportion[proportion <= epsi] = epsi
         return proportion

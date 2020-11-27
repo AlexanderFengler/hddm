@@ -32,7 +32,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
         n_params = int(4)
         size = int(value.shape[0])
         data = np.zeros((size, 6), dtype = np.float32)
-        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
+        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
         cnt = 0
         for tmp_str in ['v', 'a', 'z', 't']:
@@ -75,9 +75,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
 ################################################################################################
 # Defining only the model likelihood at this point !
 def generate_wfpt_nn_full_ddm_reg_stochastic_class(wiener_params = None,
-                                                sampling_method = 'cdf',
-                                                cdf_range = (-5, 5), 
-                                                sampling_dt = 1e-4):
+                                                   sampling_method = 'cdf',
+                                                   cdf_range = (-5, 5), 
+                                                   sampling_dt = 1e-4):
 
     def wiener_multi_like_nn_full_ddm(value, v, sv, a, z, sz, t, st, 
                                       reg_outcomes, 
@@ -91,7 +91,7 @@ def generate_wfpt_nn_full_ddm_reg_stochastic_class(wiener_params = None,
         n_params = int(7)
         size = int(value.shape[0])
         data = np.zeros((size, 9), dtype = np.float32)
-        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
+        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
         cnt = 0
         for tmp_str in ['v', 'a', 'z', 't', 'sz', 'sv', 'st']:
@@ -147,7 +147,7 @@ def generate_wfpt_nn_angle_reg_stochastic_class(wiener_params = None,
         n_params = int(5)
         size = int(value.shape[0])
         data = np.zeros((size, 7), dtype = np.float32)
-        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
+        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
         cnt = 0
         for tmp_str in ['v', 'a', 'z', 't', 'theta']:
@@ -214,7 +214,7 @@ def generate_wfpt_nn_levy_reg_stochastic_class(wiener_params = None,
         n_params = int(5)
         size = int(value.shape[0])
         data = np.zeros((size, 7), dtype = np.float32)
-        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
+        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
         cnt = 0
         for tmp_str in ['v', 'a', 'z', 'alpha', 't']:
@@ -264,9 +264,9 @@ def generate_wfpt_nn_ornstein_reg_stochastic_class(wiener_params = None,
                                                 sampling_dt = 1e-4):
 
     def wiener_multi_like_nn_ornstein(value, v, sv, a, g, z, sz, t, st, 
-                                  reg_outcomes, 
-                                  p_outlier = 0, 
-                                  w_outlier = 0.1):
+                                      reg_outcomes, 
+                                      p_outlier = 0, 
+                                      w_outlier = 0.1):
 
         """Log-likelihood for the full DDM using the interpolation method"""
 
@@ -275,7 +275,7 @@ def generate_wfpt_nn_ornstein_reg_stochastic_class(wiener_params = None,
         n_params = int(5)
         size = int(value.shape[0])
         data = np.zeros((size, 7), dtype = np.float32)
-        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
+        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
         cnt = 0
         for tmp_str in ['v', 'a', 'z', 'g', 't']:
@@ -333,7 +333,7 @@ def generate_wfpt_nn_weibull_reg_stochastic_class(wiener_params = None,
         n_params = int(6)
         size = int(value.shape[0])
         data = np.zeros((size, 8), dtype = np.float32)
-        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['nn_response'].astype(np.float32) ], axis = 1)
+        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
         cnt = 0
         for tmp_str in ['v', 'a', 'z', 't', 'alpha', 'beta']:
@@ -370,7 +370,7 @@ def generate_wfpt_nn_weibull_reg_stochastic_class(wiener_params = None,
 
     stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_weibull)
     stoch.random = random
-
+    
     return stoch
 ################################################################################################
 
@@ -488,12 +488,14 @@ class HDDMnnRegressor(HDDM):
 
         """
 
+        self.nn = True
+        self.w_outlier = kwargs.pop('w_outlier', 0.1)
         self.keep_regressor_trace = keep_regressor_trace
         if isinstance(models, (str, dict)):
             models = [models]
         
         group_only_nodes = list(kwargs.get('group_only_nodes', ()))
-        self.reg_outcomes = set() # holds all the parameters that are going to modeled as outcome
+        self.reg_outcomes = set() # holds all the parameters that are going to be modeled as outcomes
         self.model = deepcopy(model)
         
         # Initialize data-structure that contains model descriptors
@@ -579,13 +581,9 @@ class HDDMnnRegressor(HDDM):
         wfpt_parents['a'] = knodes['a_bottom']
         wfpt_parents['v'] = knodes['v_bottom']
         wfpt_parents['t'] = knodes['t_bottom']
-
-        wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else 0 #self.default_intervars['sv']
-        wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else 0 #self.default_intervars['sz']
-        wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else 0 #self.default_intervars['st']
         wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
-
         wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else 0 #self.p_outlier
+        wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
 
         # MODEL SPECIFIC PARAMETERS
         if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
@@ -601,6 +599,12 @@ class HDDMnnRegressor(HDDM):
         if self.model == 'angle':
             wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else 0
 
+        if self.model == 'full_ddm' or self.model == 'full_ddm2':
+            wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else 0 #self.default_intervars['sv']
+            wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else 0 #self.default_intervars['sz']
+            wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else 0 #self.default_intervars['st']
+       
+
         print('wfpt parents: ')
         print(wfpt_parents)
 
@@ -612,14 +616,22 @@ class HDDMnnRegressor(HDDM):
         return Knode(self.wfpt_reg_class,
                      'wfpt',
                      observed = True,
-                     col_name = ['nn_response', 'rt'],
+                     col_name = ['response', 'rt'],
                      reg_outcomes = self.reg_outcomes,
                      **wfpt_parents)
 
     # TD def _create_stochastic_knodes_base(self, include:)
     def _create_stochastic_knodes_basic(self, include):
         knodes = OrderedDict()
-        
+
+        # PARAMETERS TO ACCOMODATE TRAINED PARAMETER BOUNDS BY MODEL
+        if 'p_outlier' in include:
+            knodes.update(self._create_family_invlogit('p_outlier',
+                                                        value = 0.2,
+                                                        g_tau = 10**-2,
+                                                        std_std = 0.5
+                                                        ))
+
         # SPLIT BY MODEL TO ACCOMMODATE TRAINED PARAMETER BOUNDS BY MODEL
         if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull2':
             if 'a' in include:
@@ -937,7 +949,6 @@ class HDDMnnRegressor(HDDM):
         print('knodes')
         print(knodes)
         return knodes
-
 
     def _create_stochastic_knodes(self, include):
         # Create all stochastic knodes except for the ones that we want to replace

@@ -30,13 +30,18 @@ class HDDMnn(HDDM):
 
     def __init__(self, *args, **kwargs):
         self.nn = True
+        self.network_type = kwargs.pop('network_type', 'mlp')
+        self.network = None #LAX
         self.non_centered = kwargs.pop('non_centered', False)
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
 
         # Make model specific likelihood
         self.model = kwargs.pop('model', 'weibull')
         if self.model == 'ddm':
+
             self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
+            #if self.network_type == 'MLP':
+                #self.network = keras.models.load_model(...)
 
         if self.model == 'ddm_sdv':
             self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv', wienernn_like_ddm_sdv)
@@ -68,6 +73,15 @@ class HDDMnn(HDDM):
         knodes = OrderedDict()
         
         # SPLIT BY MODEL TO ACCOMMODATE TRAINED PARAMETER BOUNDS BY MODEL
+
+        # PARAMETERS COMMON TO ALL MODELS
+        if 'p_outlier' in include:
+            knodes.update(self._create_family_invlogit('p_outlier',
+                                                        value = 0.2,
+                                                        g_tau = 10**-2,
+                                                        std_std = 0.5
+                                                        ))
+
         if self.model == 'weibull' or self.model == 'weibull_cdf':
             if 'a' in include:
                 knodes.update(self._create_family_trunc_normal('a',
@@ -183,13 +197,6 @@ class HDDMnn(HDDM):
                                                            std_std = 0.5
                                                            )) # should have lower = 0.1, upper = 0.9
 
-            
-            if 'p_outlier' in include:
-                knodes.update(self._create_family_invlogit('p_outlier',
-                                                            value = 0.2,
-                                                            g_tau = 10**-2,
-                                                            std_std = 0.5
-                                                            ))
             print(knodes.keys())
 
         
@@ -430,45 +437,35 @@ class HDDMnn(HDDM):
 
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
-        
+        # my_dict = {'wfpt_parents':wfpt_parents, 'network':self.network} #LAX
+
         return Knode(self.wfpt_nn, 
                      'wfpt', 
                      observed = True, 
                      col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
                      **wfpt_parents)
+        #return Knode(..., **my_dict)
 
 def wienernn_like_weibull(x, 
-                          v, 
-                          sv, 
+                          v,
                           a, 
                           alpha,
                           beta,
-                          z, 
-                          sz, 
-                          t, 
-                          st, 
-                          p_outlier = 0): #theta
+                          z,
+                          t,
+                          p_outlier = 0,
+                          w_outlier = 0): #theta
 
-    wiener_params = {'err': 1e-4, # 
-                     'n_st': 2, #
-                     'n_sz': 2, # 
-                     'use_adaptive': 1, #
-                     'simps_err': 1e-3, # 
-                     'w_outlier': 0.1}
-
-    return wiener_like_nn_weibull(np.absolute(x['rt'].values).astype(np.float32),
-                                  x['response'].values.astype(np.float32), 
+    return wiener_like_nn_weibull(x['rt'].values,
+                                  x['response'].values, 
                                   v, 
-                                  sv,
                                   a, 
                                   alpha, 
                                   beta,
                                   z, 
-                                  sz,
                                   t, 
-                                  st, 
                                   p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-                                  **wiener_params)
+                                  w_outlier = w_outlier)
 
 def wienernn_like_ddm(x, 
                       v,  
@@ -571,13 +568,6 @@ def wienernn_like_ddm_sdv_analytic(x,
                                    p_outlier = 0,
                                    w_outlier = 0):
 
-    #wiener_params = {'err': 1e-4, 
-    #                 'n_st': 2, 
-    #                 'n_sz': 2,
-    #                 'use_adaptive': 1,
-    #                 'simps_err': 1e-3,
-    #                 'w_outlier': 0.1}
-
     return wiener_like_nn_ddm_sdv_analytic(x['rt'].values,
                                            x['response'].values,  
                                            v, 
@@ -599,13 +589,6 @@ def wienernn_like_full_ddm(x,
                            p_outlier = 0,
                            w_outlier = 0):
 
-    #wiener_params = {'err': 1e-4, 
-    #                 'n_st': 2, 
-    #                 'n_sz': 2,
-    #                 'use_adaptive': 1,
-    #                 'simps_err': 1e-3,
-    #                 'w_outlier': 0.1}
-
     return wiener_like_nn_full_ddm(x['rt'].values,
                                    x['response'].values,  
                                    v, 
@@ -626,11 +609,6 @@ def wienernn_like_angle(x,
                         t,
                         p_outlier = 0,
                         w_outlier = 0):
-
-    #wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
-    #                 'use_adaptive': 1,
-    #                 'simps_err': 1e-3,
-    #                 'w_outlier': 0.1}
 
     return wiener_like_nn_angle(x['rt'].values,
                                 x['response'].values,  
