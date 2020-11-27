@@ -47,7 +47,7 @@ class HDDMnnStimCoding(HDDM):
         self.split_param = kwargs.pop('split_param', 'z')
         self.drift_criterion = kwargs.pop('drift_criterion', False)
         self.model = kwargs.pop('model', 'weibull')
-        self.model = kwargs.pop('w_outlier', 0.1)
+        self.w_outlier = kwargs.pop('w_outlier', 0.1)
 
         print(kwargs['include'])
         # Attach likelihood corresponding to model
