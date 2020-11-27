@@ -95,7 +95,7 @@ class HDDMnnStimCoding(HDDM):
         assert len(self.stims) == 2, "%s must contain two stimulus types" % self.stim_col
 
         super(HDDMnnStimCoding, self).__init__(*args, **kwargs)
-
+        print(self.p_outlier)
     def _create_stochastic_knodes(self, include):
 
         #def _create_stochastic_knodes(self, include):
@@ -453,7 +453,7 @@ class HDDMnnStimCoding(HDDM):
         wfpt_parents['t'] = knodes['t_bottom']
         wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
 
-        wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else 0 #self.p_outlier
+        wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
         wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
 
 
