@@ -21,7 +21,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                               cdf_range = (-5, 5), 
                                               sampling_dt = 1e-4):
 
-    def wiener_multi_like_nn_ddm(value, v, sv, a, z, sz, t, st, 
+    def wiener_multi_like_nn_ddm(value, v, a, z, t, 
                                  reg_outcomes, 
                                  p_outlier = 0, 
                                  w_outlier = 0.1):
@@ -370,7 +370,7 @@ def generate_wfpt_nn_weibull_reg_stochastic_class(wiener_params = None,
 
     stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_weibull)
     stoch.random = random
-    
+
     return stoch
 ################################################################################################
 
