@@ -30,12 +30,4 @@ __all__ = ['AccumulatorModel',
            'HDDMnn',
            'HDDMnnRegressor',
            'HDDMnnStimCoding'
-           #'HDDMnn_weibull',
-           #'HDDMnn_weibull',
-           #'HDDMnn_angle',
-           #'HDDMnnRegressor',
-           #'HDDMnn_levy',
-           #'HDDMnn_ornstein',
-           #'HDDMnn_new',
-           #'HDDMnnWeibullRegressor',
 ]

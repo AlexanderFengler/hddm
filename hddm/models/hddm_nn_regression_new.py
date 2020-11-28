@@ -582,7 +582,7 @@ class HDDMnnRegressor(HDDM):
         wfpt_parents['v'] = knodes['v_bottom']
         wfpt_parents['t'] = knodes['t_bottom']
         wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
-        wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else 0 #self.p_outlier
+        wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
         wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
 
         # MODEL SPECIFIC PARAMETERS
