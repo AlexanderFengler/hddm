@@ -58,7 +58,6 @@ class HDDMStimCoding(HDDM):
                                                                     g_mu=0,
                                                                     g_tau=3**-2,
                                                                     std_std=2))
-
         return knodes
 
     def _create_wfpt_parents_dict(self, knodes):
@@ -97,11 +96,11 @@ class KnodeWfptStimCoding(Knode):
         dc = kwargs.pop('dc', None)
         if all(data[self.stim_col] == self.stims[0]):
             if self.split_param == 'z':
-                kwargs['z'] = 1-kwargs['z']
+                kwargs['z'] = 1 - kwargs['z']
             elif self.split_param == 'v' and dc is None:
-                kwargs['v'] = -kwargs['v']
+                kwargs['v'] = - kwargs['v']
             elif self.split_param == 'v' and dc != 0:
-                kwargs['v'] = -kwargs['v'] + dc
+                kwargs['v'] = - kwargs['v'] + dc
             else:
                 raise ValueError('split_var must be either v or z, but is %s' % self.split_var)
 
