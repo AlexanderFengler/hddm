@@ -29,7 +29,7 @@ class HDDMnn(HDDM):
     """
 
     def __init__(self, *args, **kwargs):
-        self.nn = True
+        kwargs['nn'] = True
         self.network_type = kwargs.pop('network_type', 'mlp')
         self.network = None #LAX
         self.non_centered = kwargs.pop('non_centered', False)

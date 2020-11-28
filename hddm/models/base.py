@@ -34,6 +34,7 @@ except ImportError:
 class AccumulatorModel(kabuki.Hierarchical):
     def __init__(self, data, **kwargs):
         # Flip sign for lower boundary RTs
+        self.nn = kwargs.pop('nn', False)
         if self.nn:
             print('Recognized HDDMnn')
             data = hddm.utils.flip_errors_nn(data)
@@ -791,8 +792,8 @@ class HDDMBase(AccumulatorModel):
     """HDDM base class. Not intended to be used directly. Instead, use hddm.HDDM.
     """
 
-    def __init__(self, data, bias=False, include=(),
-                 wiener_params=None, p_outlier=0.05, **kwargs):
+    def __init__(self, data, bias = False, include=(),
+                 wiener_params = None, p_outlier=0.05, **kwargs):
 
         self.default_intervars = kwargs.pop('default_intervars', {'sz': 0, 'st': 0, 'sv': 0})
 
