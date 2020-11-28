@@ -136,7 +136,7 @@ def generate_wfpt_nn_angle_reg_stochastic_class(wiener_params = None,
                                                 cdf_range = (-5, 5), 
                                                 sampling_dt = 1e-4):
 
-    def wiener_multi_like_nn_angle(value, v, sv, a, theta, z, sz, t, st, 
+    def wiener_multi_like_nn_angle(value, v, a, theta, z, t, 
                                    reg_outcomes, 
                                    p_outlier = 0, 
                                    w_outlier = 0.1):
@@ -203,7 +203,7 @@ def generate_wfpt_nn_levy_reg_stochastic_class(wiener_params = None,
     
     wp = wiener_params
 
-    def wiener_multi_like_nn_levy(value, v, sv, a, alpha, z, sz, t, st, 
+    def wiener_multi_like_nn_levy(value, v, a, alpha, z, t, 
                                   reg_outcomes, 
                                   p_outlier = 0, 
                                   w_outlier = 0.1):
@@ -263,7 +263,7 @@ def generate_wfpt_nn_ornstein_reg_stochastic_class(wiener_params = None,
                                                 cdf_range = (-5, 5), 
                                                 sampling_dt = 1e-4):
 
-    def wiener_multi_like_nn_ornstein(value, v, sv, a, g, z, sz, t, st, 
+    def wiener_multi_like_nn_ornstein(value, v, a, g, z, t, 
                                       reg_outcomes, 
                                       p_outlier = 0, 
                                       w_outlier = 0.1):
@@ -322,7 +322,7 @@ def generate_wfpt_nn_weibull_reg_stochastic_class(wiener_params = None,
                                                   cdf_range = (-5, 5), 
                                                   sampling_dt = 1e-4):
 
-    def wiener_multi_like_nn_weibull(value, v, sv, a, alpha, beta, z, sz, t, st, 
+    def wiener_multi_like_nn_weibull(value, v, a, alpha, beta, z, t, 
                                      reg_outcomes, 
                                      p_outlier = 0, 
                                      w_outlier = 0.1):
