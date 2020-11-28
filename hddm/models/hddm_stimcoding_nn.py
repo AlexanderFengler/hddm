@@ -498,7 +498,7 @@ class HDDMnnStimCoding(HDDM):
     def _create_wfpt_knode(self, knodes):
         
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
-        
+        print('wfpt parents in _create_wfpt_knode', wfpt_parents)
         # Here we use a special Knode (see below) that either inverts v or z
         # depending on what the correct stimulus was for that trial type.
         
