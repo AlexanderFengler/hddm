@@ -88,7 +88,11 @@ class HDDMnnStimCoding(HDDM):
                 kwargs['include'].append('z')
             else:
                 print('passing through here...')
-                kwargs['include'] = ['z']
+                if 'include' not in kwargs:
+                    kwargs['include'] = ['z']
+                else:
+                    pass
+                
             print("Adding z to includes.")
 
         self.stims = np.asarray(np.sort(np.unique(args[0][self.stim_col])))
