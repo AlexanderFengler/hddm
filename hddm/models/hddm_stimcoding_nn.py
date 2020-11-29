@@ -1,4 +1,3 @@
-import hddm
 from copy import copy
 import numpy as np
 from collections import OrderedDict
@@ -7,8 +6,9 @@ from kabuki.hierarchical import Knode
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
 
+
 from wfpt import wiener_like_nn_weibull
-from wfpt import wiener_like_nn_angle 
+from wfpt import wiener_like_nn_angle
 from wfpt import wiener_like_nn_ddm
 from wfpt import wiener_like_nn_ddm_analytic
 from wfpt import wiener_like_nn_levy

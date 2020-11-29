@@ -12,6 +12,7 @@ import pickle
 from kabuki.hierarchical import Knode # LOOK INTO KABUKI TO FIGURE OUT WHAT KNODE EXACTLY DOES
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
+from hddm.keras_models import load_mlp
 
 from wfpt import wiener_like_nn_weibull
 from wfpt import wiener_like_nn_angle 
@@ -38,7 +39,8 @@ class HDDMnn(HDDM):
         # Make model specific likelihood
         self.model = kwargs.pop('model', 'weibull')
         if self.model == 'ddm':
-
+            self.mlp = load_mlp(model = self.model)
+            print('successfully loaded mlp')
             self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
             #if self.network_type == 'MLP':
                 #self.network = keras.models.load_model(...)
