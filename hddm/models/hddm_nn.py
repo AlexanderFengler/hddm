@@ -51,7 +51,7 @@ class HDDMnn(HDDM):
             # Previous
             #self.wfpt_nn = generate_wfpt_stochastic_class()
             if self.network_type == 'mlp':
-
+                pass
                 #self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', partial(wienernn_like_ddm, **network_dict))
             #likelihood_fun = wienernn_like_ddm
             print('Loaded MLP Likelihood for ', self.model, ' model!')
