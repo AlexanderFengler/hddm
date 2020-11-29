@@ -39,10 +39,10 @@ class HDDMnn(HDDM):
         # Make model specific likelihood
         self.model = kwargs.pop('model', 'weibull')
         if self.model == 'ddm':
-            #self.mlp = load_mlp(model = self.model)
+            self.mlp = load_mlp(model = self.model)
             print('successfully loaded mlp')
-            self.wfpt_nn = generate_wfpt_stochastic_class()
-            #self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
+            #self.wfpt_nn = generate_wfpt_stochastic_class()
+            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
             #if self.network_type == 'MLP':
                 #self.network = keras.models.load_model(...)
 
@@ -414,6 +414,8 @@ class HDDMnn(HDDM):
         wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
         wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
         wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
+
+        wfpt_parents['network'] = self.mlp
         
         # MODEL SPECIFIC PARAMETERS
         if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
@@ -449,40 +451,6 @@ class HDDMnn(HDDM):
                      **wfpt_parents)
         #return Knode(..., **my_dict)
 
-def generate_wfpt_stochastic_class(wiener_params = None, model = 'ddm'):
-    """
-    create a wfpt stochastic class by creating a pymc node and then adding quantile functions.
-    Input:
-        wiener_params <dict> - dictonary of wiener_params for wfpt 
-        sampling_method <string> - an argument used by hddm.generate.gen_rts
-        cdf_range <sequence> -  an argument used by hddm.generate.gen_rts
-        sampling_dt <float> - an argument used by hddm.generate.gen_rts
-    Ouput:
-        wfpt <class> - the wfpt stochastic
-    """
-    
-    mlp = load_mlp(model = model)
-
-    def wfpt_like(x, v, a, z, t, p_outlier = 0, w_outlier = 0):
-        size = x.shape[0]
-        n_params = 4
-        ll_min = -16.11809
-        data = np.zeros((size, n_params + 2), dtype = np.float32)
-        data[:, :n_params] = np.tile([v,a,z,t], (size, 1))
-        data[:, n_params:] = x.values
-        return np.sum(np.core.umath.maximum(mlp.predict_on_batch(data), ll_min))
-   
-    wfpt = stochastic_from_dist('wfpt', wfpt_like)
-
-    #wfpt.pdf = pdf
-    #wfpt.cdf_vec = lambda self: hddm.wfpt.gen_cdf_using_pdf(time=cdf_range[1], **dict(list(self.parents.items()) + list(wp.items())))
-    #wfpt.cdf = cdf
-    #wfpt.random = random
-
-    #add quantiles functions
-    #add_quantiles_functions_to_pymc_class(wfpt)
-    return wfpt
-
 def wienernn_like_weibull(x, 
                           v,
                           a, 
@@ -510,7 +478,8 @@ def wienernn_like_ddm(x,
                       z,  
                       t, 
                       p_outlier = 0,
-                      w_outlier = 0.1):
+                      w_outlier = 0.1,
+                      network = {}):
 
     return wiener_like_nn_ddm(x['rt'].values,
                               x['response'].values,  
@@ -519,7 +488,8 @@ def wienernn_like_ddm(x,
                               z, # sz,
                               t, # st,
                               p_outlier = p_outlier,
-                              w_outlier = w_outlier)
+                              w_outlier = w_outlier,
+                              network = {})
 
 
 def wienernn_like_levy(x, 
@@ -656,3 +626,39 @@ def wienernn_like_angle(x,
                                 t,
                                 p_outlier = p_outlier,
                                 w_outlier = w_outlier)
+
+
+
+# def generate_wfpt_stochastic_class(wiener_params = None, model = 'ddm'):
+#     """
+#     create a wfpt stochastic class by creating a pymc node and then adding quantile functions.
+#     Input:
+#         wiener_params <dict> - dictonary of wiener_params for wfpt 
+#         sampling_method <string> - an argument used by hddm.generate.gen_rts
+#         cdf_range <sequence> -  an argument used by hddm.generate.gen_rts
+#         sampling_dt <float> - an argument used by hddm.generate.gen_rts
+#     Ouput:
+#         wfpt <class> - the wfpt stochastic
+#     """
+    
+#     mlp = load_mlp(model = model)
+
+#     def wfpt_like(x, v, a, z, t, p_outlier = 0, w_outlier = 0):
+#         size = x.shape[0]
+#         n_params = 4
+#         ll_min = -16.11809
+#         data = np.zeros((size, n_params + 2), dtype = np.float32)
+#         data[:, :n_params] = np.tile([v,a,z,t], (size, 1))
+#         data[:, n_params:] = x.values
+#         return np.sum(np.core.umath.maximum(mlp.predict_on_batch(data), ll_min))
+   
+#     wfpt = stochastic_from_dist('wfpt', wfpt_like)
+
+#     #wfpt.pdf = pdf
+#     #wfpt.cdf_vec = lambda self: hddm.wfpt.gen_cdf_using_pdf(time=cdf_range[1], **dict(list(self.parents.items()) + list(wp.items())))
+#     #wfpt.cdf = cdf
+#     #wfpt.random = random
+
+#     #add quantiles functions
+#     #add_quantiles_functions_to_pymc_class(wfpt)
+#     return wfpt
