@@ -7,7 +7,7 @@ from .hddm_regression import HDDMRegressor
 from .hddm_rl import HDDMrl
 from .rl import Hrl
 from .hddm_nn import HDDMnn
-from .hddm_nn_weibull import HDDMnn_weibull
+#from .hddm_nn_weibull import HDDMnn_weibull
 from .hddm_nn_regression_new import HDDMnnRegressor
 from .hddm_stimcoding_nn import HDDMnnStimCoding
 #from .hddm_nn_angle import HDDMnn_angle
