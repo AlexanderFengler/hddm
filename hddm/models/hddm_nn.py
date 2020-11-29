@@ -479,7 +479,7 @@ def wienernn_like_ddm(x,
                       t, 
                       p_outlier = 0,
                       w_outlier = 0.1,
-                      network = None):
+                      network):
 
     return wiener_like_nn_ddm(x['rt'].values,
                               x['response'].values,  
@@ -489,7 +489,7 @@ def wienernn_like_ddm(x,
                               t, # st,
                               p_outlier = p_outlier,
                               w_outlier = w_outlier,
-                              network = None)
+                              network)
 
 
 def wienernn_like_levy(x, 

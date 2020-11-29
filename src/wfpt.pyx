@@ -138,7 +138,7 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
                        double t, #  double st,
                        double p_outlier = 0, 
                        double w_outlier = 0,
-                       network = None):
+                       network):
 
     
     # double err = 1e-4, 
