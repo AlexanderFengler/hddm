@@ -38,27 +38,38 @@ class HDDMnn(HDDM):
         self.non_centered = kwargs.pop('non_centered', False)
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
 
-        # Make model specific likelihood
         self.model = kwargs.pop('model', 'weibull')
+        # Load Network
+        if self.network_type == 'mlp':
+                self.mlp = load_mlp(model = self.model)
+                network_dict = {'network': self.mlp}
+                likelihood_ = make_mlp_likelihood(model = self.model)
+
+        # Make model specific likelihood
+        self.wfpt_nn = stochastic_from_dist('Wienernn' + '_' + self.model, partial(likelihood_, **network_dict))
         if self.model == 'ddm':
             # Previous
             #self.wfpt_nn = generate_wfpt_stochastic_class()
             if self.network_type == 'mlp':
-                self.mlp = load_mlp(model = self.model)
-                network_dict = {'network': self.mlp}
-                self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', partial(wienernn_like_ddm, **network_dict))
-                print('Loaded MLP Likelihood for ', self.model, ' model!')
+
+                #self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', partial(wienernn_like_ddm, **network_dict))
+            #likelihood_fun = wienernn_like_ddm
+            print('Loaded MLP Likelihood for ', self.model, ' model!')
                 
         if self.model == 'ddm_sdv':
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv', wienernn_like_ddm_sdv)
+            if self.network_type == 'mlp':
+                self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv', partial(wienernn_like_ddm_sdv, **network_dict))
         
         if self.model == 'ddm_analytic':
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_analytic', wienernn_like_ddm_analytic)
+            if self.network_type == 'mlp':
+                self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_analytic', partial(wienernn_like_ddm_analytic, **network_dict))
 
         if self.model == 'ddm_sdv_analytic':
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv_analytic', wienernn_like_ddm_sdv_analytic)
+            if self.network_type == 'mlp':
+                self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv_analytic', partial(wienernn_like_ddm_sdv_analytic, **network_dict))
         
         if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
+            if self.network_type == 'mlp':
             self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
         
         if self.model == 'angle':
@@ -483,25 +494,27 @@ def wienernn_like_weibull(x,
                                   p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
                                   w_outlier = w_outlier)
 
-def wienernn_like_ddm(x, 
-                      v,  
-                      a, 
-                      z,  
-                      t, 
-                      p_outlier = 0,
-                      w_outlier = 0.1,
-                      **kwargs):
-
-    return wiener_like_nn_ddm(x['rt'].values,
-                              x['response'].values,  
-                              v, # sv,
+def make_mlp_likelihood(model):
+    if model == 'ddm':
+        def wienernn_like_ddm(x, 
+                              v,  
                               a, 
-                              z, # sz,
-                              t, # st,
-                              p_outlier = p_outlier,
-                              w_outlier = w_outlier,
-                              **kwargs)
+                              z,  
+                              t, 
+                              p_outlier = 0,
+                              w_outlier = 0.1,
+                              **kwargs):
 
+            return wiener_like_nn_ddm(x['rt'].values,
+                                    x['response'].values,  
+                                    v, # sv,
+                                    a, 
+                                    z, # sz,
+                                    t, # st,
+                                    p_outlier = p_outlier,
+                                    w_outlier = w_outlier,
+                                    **kwargs)
+        return wienernn_like_ddm
 
 def wienernn_like_levy(x, 
                        v, 
