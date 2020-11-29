@@ -497,6 +497,8 @@ class HDDMnnRegressor(HDDM):
         """
         kwargs['nn'] = True
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
+        self.network_type = kwargs.pop('network_type', 'mlp')
+        self.network = None
         self.keep_regressor_trace = keep_regressor_trace
         if isinstance(models, (str, dict)):
             models = [models]
