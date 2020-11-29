@@ -28,6 +28,8 @@ cimport numpy as np
 cimport cython
 
 from cython.parallel import *
+from hddm.keras_models import load_mlp
+
 # cimport openmp
 
 # include "pdf.pxi"
@@ -36,17 +38,19 @@ include 'integrate.pxi'
 
 # LOADING MODELS
 # TODO: Refactor this ?
-weibull_model = keras.models.load_model('model_final_weibull.h5', compile = False)
-angle_model = keras.models.load_model('model_final_angle.h5', compile = False)
+#ddm_model = load_mlp(model = 'ddm')
+
+weibull_model = load_mlp(model == 'weibull_cdf') # keras.models.load_model('model_final_weibull.h5', compile = False)
+angle_model = load_mlp(model == 'angle') #keras.models.load_model('model_final_angle.h5', compile = False)
 #model = keras.models.load_model('model_final.h5', compile = False)
-new_weibull_model = keras.models.load_model('model_final_new.h5', compile = False)
-ddm_model = keras.models.load_model('model_final_ddm.h5', compile = False)
-ddm_analytic_model = keras.models.load_model('model_final_ddm_analytic.h5', compile = False)
-levy_model = keras.models.load_model('model_final_levy.h5', compile = False)
-ornstein_model = keras.models.load_model('model_final_ornstein.h5', compile = False)
-ddm_sdv_model = keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
-ddm_sdv_analytic_model = keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
-full_ddm_model = keras.models.load_model('model_final_full_ddm.h5', compile = False)
+new_weibull_model = load_mlp(model == 'weibull_cdf') # keras.models.load_model('model_final_new.h5', compile = False)
+ddm_model = load_mlp(model == 'ddm') # keras.models.load_model('model_final_ddm.h5', compile = False)
+ddm_analytic_model = load_mlp(model = 'ddm_analytic') #keras.models.load_model('model_final_ddm_analytic.h5', compile = False)
+levy_model = load_mlp(model == 'levy') # keras.models.load_model('model_final_levy.h5', compile = False)
+ornstein_model = load_mlp(model == 'ornstein') # keras.models.load_model('model_final_ornstein.h5', compile = False)
+ddm_sdv_model = load_mlp(model == 'ddm_sdv') # keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
+ddm_sdv_analytic_model = load_mlp(model == 'ddm_sdv_analytic') # keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
+full_ddm_model = load_mlp(model = 'full_ddm') #keras.models.load_model('model_final_full_ddm.h5', compile = False)
 
 ###############
 # Basic Navarro Fuss likelihoods
