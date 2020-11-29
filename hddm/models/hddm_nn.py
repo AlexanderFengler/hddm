@@ -70,7 +70,7 @@ class HDDMnn(HDDM):
         
         if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
             if self.network_type == 'mlp':
-            self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
+                self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
         
         if self.model == 'angle':
             self.wfpt_nn = stochastic_from_dist('Wienernn_angle', wienernn_like_angle) 
