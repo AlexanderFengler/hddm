@@ -467,7 +467,7 @@ def generate_wfpt_stochastic_class(wiener_params = None, model = 'ddm'):
         size = x.shape[0]
         n_params = 4
         ll_min = -16.11809
-        data = np.zeros((size, n_params, + 2), dtype = np.float32)
+        data = np.zeros((size, n_params + 2), dtype = np.float32)
         data[:, :n_params] = np.tile([v,a,z,t], (size, 1))
         data[:, n_params:] = x.values
         return np.sum(np.core.umath.maximum(mlp.predict_on_batch(data), ll_min))
