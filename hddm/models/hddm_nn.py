@@ -44,7 +44,7 @@ class HDDMnn(HDDM):
             my_dict = {'network': self.mlp}
             print('successfully loaded mlp')
             #self.wfpt_nn = generate_wfpt_stochastic_class()
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm, my_dict)
+            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm, **my_dict)
             #if self.network_type == 'MLP':
                 #self.network = keras.models.load_model(...)
 
