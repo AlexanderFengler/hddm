@@ -5,70 +5,78 @@ import numpy as np
 import pymc as pm
 import pandas as pd
 from patsy import dmatrix
-import pickle
+#import pickle
 
 import hddm
 from hddm.models import HDDM
+from hddm.keras_models import load_mlp
 import kabuki
 from kabuki import Knode
 from kabuki.utils import stochastic_from_dist
 import kabuki.step_methods as steps
+from functools import partial
+import wfpt
 
 ##########################################################
 # Defining only the model likelihood at this point !
 def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                               sampling_method = 'cdf',
                                               cdf_range = (-5, 5), 
-                                              sampling_dt = 1e-4):
+                                              sampling_dt = 1e-4,
+                                              model = None,
+                                              **kwargs):
 
-    def wiener_multi_like_nn_ddm(value, v, a, z, t, 
-                                 reg_outcomes, 
-                                 p_outlier = 0, 
-                                 w_outlier = 0.1):
+    if model == 'ddm':
+        def wiener_multi_like_nn_ddm(value, v, a, z, t, 
+                                    reg_outcomes, 
+                                    p_outlier = 0, 
+                                    w_outlier = 0.1,
+                                    **kwargs):
 
-        """Log-likelihood for the full DDM using the interpolation method"""
+            """Log-likelihood for the full DDM using the interpolation method"""
 
-        params = {'v': v, 'a': a, 'z': z, 't': t}
-        n_params = int(4)
-        size = int(value.shape[0])
-        data = np.zeros((size, 6), dtype = np.float32)
-        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+            params = {'v': v, 'a': a, 'z': z, 't': t}
+            n_params = int(4)
+            size = int(value.shape[0])
+            data = np.zeros((size, 6), dtype = np.float32)
+            data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
-        cnt = 0
-        for tmp_str in ['v', 'a', 'z', 't']:
+            cnt = 0
+            for tmp_str in ['v', 'a', 'z', 't']:
 
-            if tmp_str in reg_outcomes:
-                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
-            else:
-                data[:, cnt] = params[tmp_str]
+                if tmp_str in reg_outcomes:
+                    data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                else:
+                    data[:, cnt] = params[tmp_str]
 
-            cnt += 1
+                cnt += 1
 
-        # THIS IS NOT YET FINISHED !
-        return hddm.wfpt.wiener_like_multi_nn_ddm(data,
-                                                  p_outlier = p_outlier,
-                                                  w_outlier = w_outlier)
+            # THIS IS NOT YET FINISHED !
+            return hddm.wfpt.wiener_like_multi_nn_ddm(data,
+                                                    p_outlier = p_outlier,
+                                                    w_outlier = w_outlier,
+                                                    **kwargs)
 
-    # Need to rewrite these random parts !
-    def random(self):
-        param_dict = deepcopy(self.parents.value)
-        del param_dict['reg_outcomes']
-        sampled_rts = self.value.copy()
+        # Need to rewrite these random parts !
+        def random(self):
+            param_dict = deepcopy(self.parents.value)
+            del param_dict['reg_outcomes']
+            sampled_rts = self.value.copy()
 
-        for i in self.value.index:
-            #get current params
-            for p in self.parents['reg_outcomes']:
-                param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
-            #sample
-            samples = hddm.generate.gen_rts(method=sampling_method,
-                                            size=1, dt=sampling_dt, **param_dict)
+            for i in self.value.index:
+                #get current params
+                for p in self.parents['reg_outcomes']:
+                    param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+                #sample
+                samples = hddm.generate.gen_rts(method=sampling_method,
+                                                size=1, dt=sampling_dt, **param_dict)
 
-            sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+                sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
 
-        return sampled_rts
+            return sampled_rts
 
-    stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_ddm)
-    stoch.random = random
+        stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ddm, **kwargs))
+        stoch.random = random
 
     return stoch
 
@@ -488,7 +496,6 @@ class HDDMnnRegressor(HDDM):
 
         """
         kwargs['nn'] = True
-        #self.nn = True
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
         self.keep_regressor_trace = keep_regressor_trace
         if isinstance(models, (str, dict)):
@@ -538,19 +545,28 @@ class HDDMnnRegressor(HDDM):
                 kwargs['group_only_nodes'] = group_only_nodes
             self.reg_outcomes.add(outcome)
 
+        if self.network_type == 'mlp':
+            self.network = load_mlp(model = self.model)
+            network_dict = {'network': self.network}
+            #likelihood_ = hddm.likelihoods_mlp.make_mlp_likelihoods(model = self.model)
+
+        # self.wfpt_nn = stochastic_from_dist('Wiennernn' + '_' + self.model,
+        #                                     partial(likelihood_, **network_dict))
+        self.wfpt_reg_cass = generate_wfpt_nn_ddm_reg_stochastic_class(sampling_method = 'drift', model = self.model, **network_dict)
+       
         # Attach the likelihood !
-        if self.model == 'ddm':
-            self.wfpt_reg_class = generate_wfpt_nn_ddm_reg_stochastic_class(sampling_method = 'drift')
-        if self.model == 'angle':
-            self.wfpt_reg_class = generate_wfpt_nn_angle_reg_stochastic_class(sampling_method = 'drift')
-        if self.model == 'ornstein':
-            self.wfpt_reg_class = generate_wfpt_nn_ornstein_reg_stochastic_class(sampling_method = 'drift')
-        if self.model == 'levy':
-            self.wfpt_reg_class = generate_wfpt_nn_levy_reg_stochastic_class(sampling_method = 'drift')
-        if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull2':
-            self.wfpt_reg_class = generate_wfpt_nn_weibull_reg_stochastic_class(sampling_method = 'drift')
-        if self.model == 'full_ddm' or self.model == 'full_ddm2':
-            self.wfpt_reg_class = generate_wfpt_nn_full_ddm_reg_stochastic_class(sampling_method = 'drift')
+        # if self.model == 'ddm':
+        #     self.wfpt_reg_class = generate_wfpt_nn_ddm_reg_stochastic_class(sampling_method = 'drift', model = 'ddm')
+        # if self.model == 'angle':
+        #     self.wfpt_reg_class = generate_wfpt_nn_angle_reg_stochastic_class(sampling_method = 'drift')
+        # if self.model == 'ornstein':
+        #     self.wfpt_reg_class = generate_wfpt_nn_ornstein_reg_stochastic_class(sampling_method = 'drift')
+        # if self.model == 'levy':
+        #     self.wfpt_reg_class = generate_wfpt_nn_levy_reg_stochastic_class(sampling_method = 'drift')
+        # if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull2':
+        #     self.wfpt_reg_class = generate_wfpt_nn_weibull_reg_stochastic_class(sampling_method = 'drift')
+        # if self.model == 'full_ddm' or self.model == 'full_ddm2':
+        #     self.wfpt_reg_class = generate_wfpt_nn_full_ddm_reg_stochastic_class(sampling_method = 'drift')
 
         super(HDDMnnRegressor, self).__init__(data, **kwargs)
 

@@ -5,17 +5,20 @@ from collections import OrderedDict
 from kabuki.hierarchical import Knode
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
+from hddm.keras_models import load_mlp
 
+import wfpt
+from functools import partial
 
-from wfpt import wiener_like_nn_weibull
-from wfpt import wiener_like_nn_angle
-from wfpt import wiener_like_nn_ddm
-from wfpt import wiener_like_nn_ddm_analytic
-from wfpt import wiener_like_nn_levy
-from wfpt import wiener_like_nn_ornstein
-from wfpt import wiener_like_nn_ddm_sdv
-from wfpt import wiener_like_nn_ddm_sdv_analytic
-from wfpt import wiener_like_nn_full_ddm
+# from wfpt import wiener_like_nn_weibull
+# from wfpt import wiener_like_nn_angle
+# from wfpt import wiener_like_nn_ddm
+# from wfpt import wiener_like_nn_ddm_analytic
+# from wfpt import wiener_like_nn_levy
+# from wfpt import wiener_like_nn_ornstein
+# from wfpt import wiener_like_nn_ddm_sdv
+# from wfpt import wiener_like_nn_ddm_sdv_analytic
+# from wfpt import wiener_like_nn_full_ddm
 
 class HDDMnnStimCoding(HDDM):
     """HDDM model that can be used when stimulus coding and estimation
@@ -44,6 +47,8 @@ class HDDMnnStimCoding(HDDM):
     """
     def __init__(self, *args, **kwargs):
         kwargs['nn'] = True
+        self.network_type = kwargs.pop('network_type', 'mlp')
+        self.network = None
         self.stim_col = kwargs.pop('stim_col', 'stim')
         self.split_param = kwargs.pop('split_param', 'z')
         self.drift_criterion = kwargs.pop('drift_criterion', False)
@@ -52,34 +57,42 @@ class HDDMnnStimCoding(HDDM):
 
         print(kwargs['include'])
         # Attach likelihood corresponding to model
-        if self.model == 'ddm':
-            self.mlp = hddm.keras_models.load_mlp(model = self.model)
-            print('Successfully loaded model')
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
+        # if self.model == 'ddm':
+        #     self.mlp = hddm.keras_models.load_mlp(model = self.model)
+        #     print('Successfully loaded model')
+        #     self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
 
-        if self.model == 'ddm_sdv':
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv', wienernn_like_ddm_sdv)
+        if self.network_type == 'mlp':
+            self.network = load_mlp(model = self.model)
+            network_dict = {'network': self.network}
+            likelihood_ = hddm.likelihoods_mlp.make_mlp_likelihoods(model = self.model)
+
+        self.wfpt_nn = stochastic_from_dist('Wiennernn' + '_' + self.model,
+                                            partial(likelihood_, **network_dict))
+
+        # if self.model == 'ddm_sdv':
+        #     self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv', wienernn_like_ddm_sdv)
         
-        if self.model == 'ddm_analytic':
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_analytic', wienernn_like_ddm_analytic)
+        # if self.model == 'ddm_analytic':
+        #     self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_analytic', wienernn_like_ddm_analytic)
 
-        if self.model == 'ddm_sdv_analytic':
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv_analytic', wienernn_like_ddm_sdv_analytic)
+        # if self.model == 'ddm_sdv_analytic':
+        #     self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv_analytic', wienernn_like_ddm_sdv_analytic)
         
-        if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
-            self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
+        # if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
+        #     self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
         
-        if self.model == 'angle':
-            self.wfpt_nn = stochastic_from_dist('Wienernn_angle', wienernn_like_angle) 
+        # if self.model == 'angle':
+        #     self.wfpt_nn = stochastic_from_dist('Wienernn_angle', wienernn_like_angle) 
 
-        if self.model == 'levy':
-            self.wfpt_nn = stochastic_from_dist('Wienernn_levy', wienernn_like_levy) 
+        # if self.model == 'levy':
+        #     self.wfpt_nn = stochastic_from_dist('Wienernn_levy', wienernn_like_levy) 
 
-        if self.model == 'ornstein':
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ornstein', wienernn_like_ornstein)
+        # if self.model == 'ornstein':
+        #     self.wfpt_nn = stochastic_from_dist('Wienernn_ornstein', wienernn_like_ornstein)
 
-        if self.model == 'full_ddm' or self.model == 'full_ddm2':
-            self.wfpt_nn = stochastic_from_dist('Wienernn_full_ddm', wienernn_like_full_ddm)
+        # if self.model == 'full_ddm' or self.model == 'full_ddm2':
+        #     self.wfpt_nn = stochastic_from_dist('Wienernn_full_ddm', wienernn_like_full_ddm)
 
         if self.split_param == 'z':
             assert not self.drift_criterion, "Setting drift_criterion requires split_param='v'."
@@ -554,176 +567,176 @@ class KnodeWfptStimCoding(Knode):
                 kwargs['v'] = kwargs['v'] + dc
             return self.pymc_node(name, **kwargs)
 
-def wienernn_like_weibull(x, 
-                          v,
-                          a, 
-                          alpha,
-                          beta,
-                          z,
-                          t,
-                          p_outlier = 0,
-                          w_outlier = 0): #theta
+# def wienernn_like_weibull(x, 
+#                           v,
+#                           a, 
+#                           alpha,
+#                           beta,
+#                           z,
+#                           t,
+#                           p_outlier = 0,
+#                           w_outlier = 0): #theta
 
-    return wiener_like_nn_weibull(x['rt'].values,
-                                  x['response'].values, 
-                                  v, 
-                                  a, 
-                                  alpha, 
-                                  beta,
-                                  z, 
-                                  t, 
-                                  p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-                                  w_outlier = w_outlier)
+#     return wiener_like_nn_weibull(x['rt'].values,
+#                                   x['response'].values, 
+#                                   v, 
+#                                   a, 
+#                                   alpha, 
+#                                   beta,
+#                                   z, 
+#                                   t, 
+#                                   p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+#                                   w_outlier = w_outlier)
 
-def wienernn_like_ddm(x, 
-                      v,  
-                      a, 
-                      z,  
-                      t, 
-                      p_outlier = 0,
-                      w_outlier = 0.1):
+# def wienernn_like_ddm(x, 
+#                       v,  
+#                       a, 
+#                       z,  
+#                       t, 
+#                       p_outlier = 0,
+#                       w_outlier = 0.1):
 
-    return wiener_like_nn_ddm(x['rt'].values,
-                              x['response'].values,  
-                              v, # sv,
-                              a, 
-                              z, # sz,
-                              t, # st,
-                              p_outlier = p_outlier,
-                              w_outlier = w_outlier)
+#     return wiener_like_nn_ddm(x['rt'].values,
+#                               x['response'].values,  
+#                               v, # sv,
+#                               a, 
+#                               z, # sz,
+#                               t, # st,
+#                               p_outlier = p_outlier,
+#                               w_outlier = w_outlier)
 
 
-def wienernn_like_levy(x, 
-                       v, 
-                       a, 
-                       alpha,
-                       z,
-                       t,
-                       p_outlier = 0.1,
-                       w_outlier = 0.1): #theta
+# def wienernn_like_levy(x, 
+#                        v, 
+#                        a, 
+#                        alpha,
+#                        z,
+#                        t,
+#                        p_outlier = 0.1,
+#                        w_outlier = 0.1): #theta
 
-    return wiener_like_nn_levy(x['rt'].values,
-                               x['response'].values, 
-                               v,
-                               a, 
-                               alpha, 
-                               z,
-                               t, 
-                               p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-                               w_outlier = w_outlier)
+#     return wiener_like_nn_levy(x['rt'].values,
+#                                x['response'].values, 
+#                                v,
+#                                a, 
+#                                alpha, 
+#                                z,
+#                                t, 
+#                                p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+#                                w_outlier = w_outlier)
 
-def wienernn_like_ornstein(x, 
-                           v, 
-                           a, 
-                           g,
-                           z, 
-                           t,
-                           p_outlier = 0,
-                           w_outlier = 0): #theta
+# def wienernn_like_ornstein(x, 
+#                            v, 
+#                            a, 
+#                            g,
+#                            z, 
+#                            t,
+#                            p_outlier = 0,
+#                            w_outlier = 0): #theta
     
-    return wiener_like_nn_ornstein(x['rt'].values,
-                                   x['response'].values, 
-                                   v, 
-                                   a, 
-                                   g, 
-                                   z, 
-                                   t, 
-                                   p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-                                   w_outlier = w_outlier)
+#     return wiener_like_nn_ornstein(x['rt'].values,
+#                                    x['response'].values, 
+#                                    v, 
+#                                    a, 
+#                                    g, 
+#                                    z, 
+#                                    t, 
+#                                    p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+#                                    w_outlier = w_outlier)
 
-def wienernn_like_ddm_analytic(x, 
-                               v, 
-                               a, 
-                               z, 
-                               t,
-                               p_outlier = 0,
-                               w_outlier = 0):
+# def wienernn_like_ddm_analytic(x, 
+#                                v, 
+#                                a, 
+#                                z, 
+#                                t,
+#                                p_outlier = 0,
+#                                w_outlier = 0):
 
-    return wiener_like_nn_ddm_analytic(x['rt'].values,
-                                       x['response'].values,  
-                                       v,
-                                       a,
-                                       z,
-                                       t, 
-                                       p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-                                       w_outlier = w_outlier)
+#     return wiener_like_nn_ddm_analytic(x['rt'].values,
+#                                        x['response'].values,  
+#                                        v,
+#                                        a,
+#                                        z,
+#                                        t, 
+#                                        p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+#                                        w_outlier = w_outlier)
 
-def wienernn_like_ddm_sdv(x, 
-                          v,
-                          sv,
-                          a, 
-                          z, 
-                          t,
-                          p_outlier = 0,
-                          w_outlier = 0):
+# def wienernn_like_ddm_sdv(x, 
+#                           v,
+#                           sv,
+#                           a, 
+#                           z, 
+#                           t,
+#                           p_outlier = 0,
+#                           w_outlier = 0):
 
-    return wiener_like_nn_ddm_sdv(x['rt'].values,
-                                  x['response'].values,  
-                                  v,
-                                  sv,
-                                  a,
-                                  z, 
-                                  t, 
-                                  p_outlier = p_outlier,
-                                  w_outlier = w_outlier)
+#     return wiener_like_nn_ddm_sdv(x['rt'].values,
+#                                   x['response'].values,  
+#                                   v,
+#                                   sv,
+#                                   a,
+#                                   z, 
+#                                   t, 
+#                                   p_outlier = p_outlier,
+#                                   w_outlier = w_outlier)
 
-def wienernn_like_ddm_sdv_analytic(x, 
-                                   v, 
-                                   sv,
-                                   a, 
-                                   z, 
-                                   t, 
-                                   p_outlier = 0,
-                                   w_outlier = 0):
+# def wienernn_like_ddm_sdv_analytic(x, 
+#                                    v, 
+#                                    sv,
+#                                    a, 
+#                                    z, 
+#                                    t, 
+#                                    p_outlier = 0,
+#                                    w_outlier = 0):
 
-    return wiener_like_nn_ddm_sdv_analytic(x['rt'].values,
-                                           x['response'].values,  
-                                           v, 
-                                           sv, 
-                                           a, 
-                                           z, 
-                                           t,
-                                           p_outlier = p_outlier,
-                                           w_outlier = w_outlier)
+#     return wiener_like_nn_ddm_sdv_analytic(x['rt'].values,
+#                                            x['response'].values,  
+#                                            v, 
+#                                            sv, 
+#                                            a, 
+#                                            z, 
+#                                            t,
+#                                            p_outlier = p_outlier,
+#                                            w_outlier = w_outlier)
 
-def wienernn_like_full_ddm(x, 
-                           v, 
-                           sv, 
-                           a, 
-                           z, 
-                           sz, 
-                           t, 
-                           st, 
-                           p_outlier = 0,
-                           w_outlier = 0):
+# def wienernn_like_full_ddm(x, 
+#                            v, 
+#                            sv, 
+#                            a, 
+#                            z, 
+#                            sz, 
+#                            t, 
+#                            st, 
+#                            p_outlier = 0,
+#                            w_outlier = 0):
 
-    return wiener_like_nn_full_ddm(x['rt'].values,
-                                   x['response'].values,  
-                                   v, 
-                                   sv, 
-                                   a, 
-                                   z, 
-                                   sz, 
-                                   t, 
-                                   st, 
-                                   p_outlier = p_outlier,
-                                   w_outlier = w_outlier)
+#     return wiener_like_nn_full_ddm(x['rt'].values,
+#                                    x['response'].values,  
+#                                    v, 
+#                                    sv, 
+#                                    a, 
+#                                    z, 
+#                                    sz, 
+#                                    t, 
+#                                    st, 
+#                                    p_outlier = p_outlier,
+#                                    w_outlier = w_outlier)
 
-def wienernn_like_angle(x, 
-                        v, 
-                        a, 
-                        theta, 
-                        z,
-                        t,
-                        p_outlier = 0,
-                        w_outlier = 0):
+# def wienernn_like_angle(x, 
+#                         v, 
+#                         a, 
+#                         theta, 
+#                         z,
+#                         t,
+#                         p_outlier = 0,
+#                         w_outlier = 0):
 
-    return wiener_like_nn_angle(x['rt'].values,
-                                x['response'].values,  
-                                v,
-                                a, 
-                                theta,
-                                z,
-                                t,
-                                p_outlier = p_outlier,
-                                w_outlier = w_outlier)
+#     return wiener_like_nn_angle(x['rt'].values,
+#                                 x['response'].values,  
+#                                 v,
+#                                 a, 
+#                                 theta,
+#                                 z,
+#                                 t,
+#                                 p_outlier = p_outlier,
+#                                 w_outlier = w_outlier)
