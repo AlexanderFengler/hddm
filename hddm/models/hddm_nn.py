@@ -41,14 +41,14 @@ class HDDMnn(HDDM):
         # Make model specific likelihood
         self.model = kwargs.pop('model', 'weibull')
         if self.model == 'ddm':
-            self.mlp = load_mlp(model = self.model)
-            print('successfully loaded mlp')
-            network_dict = {'network': self.mlp}
+            # Previous
             #self.wfpt_nn = generate_wfpt_stochastic_class()
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', partial(wienernn_like_ddm, **network_dict))
-            #if self.network_type == 'MLP':
-                #self.network = keras.models.load_model(...)
-
+            if self.network_type == 'mlp':
+                self.mlp = load_mlp(model = self.model)
+                network_dict = {'network': self.mlp}
+                self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', partial(wienernn_like_ddm, **network_dict))
+                print('Loaded MLP Likelihood for ', self.model, ' model!')
+                
         if self.model == 'ddm_sdv':
             self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv', wienernn_like_ddm_sdv)
         
