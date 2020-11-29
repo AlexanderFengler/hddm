@@ -29,7 +29,7 @@ def general_WienerCont(err=1e-4, n_st=2, n_sz=2, use_adaptive=1, simps_err=1e-3)
 
 def generate_wfpt_stochastic_class(wiener_params=None, sampling_method='cdf', cdf_range=(-5,5), sampling_dt=1e-4):
     """
-    create a wfpt stochastic class by creating a pymc nodes and then adding quantile functions.
+    create a wfpt stochastic class by creating a pymc node and then adding quantile functions.
     Input:
         wiener_params <dict> - dictonary of wiener_params for wfpt 
         sampling_method <string> - an argument used by hddm.generate.gen_rts

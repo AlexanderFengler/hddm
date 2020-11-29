@@ -39,9 +39,10 @@ class HDDMnn(HDDM):
         # Make model specific likelihood
         self.model = kwargs.pop('model', 'weibull')
         if self.model == 'ddm':
-            self.mlp = load_mlp(model = self.model)
+            #self.mlp = load_mlp(model = self.model)
             print('successfully loaded mlp')
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
+            self.wfpt_nn = generate_wfpt_stochastic_class()
+            #self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
             #if self.network_type == 'MLP':
                 #self.network = keras.models.load_model(...)
 
@@ -447,6 +448,40 @@ class HDDMnn(HDDM):
                      col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
                      **wfpt_parents)
         #return Knode(..., **my_dict)
+
+def generate_wfpt_stochastic_class(wiener_params = None, model = 'ddm'):
+    """
+    create a wfpt stochastic class by creating a pymc node and then adding quantile functions.
+    Input:
+        wiener_params <dict> - dictonary of wiener_params for wfpt 
+        sampling_method <string> - an argument used by hddm.generate.gen_rts
+        cdf_range <sequence> -  an argument used by hddm.generate.gen_rts
+        sampling_dt <float> - an argument used by hddm.generate.gen_rts
+    Ouput:
+        wfpt <class> - the wfpt stochastic
+    """
+    
+    mlp = load_mlp(model = model)
+
+    def wfpt_like(x, v, sv, a, z, t, p_outlier = 0, w_outlier = 0):
+        size = x.shape[0]
+        n_params = 4
+        ll_min = -16.11809
+        data = np.zeros((size, n_params, + 2), dtype = np.float32)
+        data[:, :n_params] = np.tile([v,a,z,t], (size, 1))
+        data[:, n_params:] = x.values
+        return np.sum(np.core.umath.maximum(mlp.predict_on_batch(data), ll_min))
+   
+    wfpt = stochastic_from_dist('wfpt', wfpt_like)
+
+    #wfpt.pdf = pdf
+    #wfpt.cdf_vec = lambda self: hddm.wfpt.gen_cdf_using_pdf(time=cdf_range[1], **dict(list(self.parents.items()) + list(wp.items())))
+    #wfpt.cdf = cdf
+    #wfpt.random = random
+
+    #add quantiles functions
+    #add_quantiles_functions_to_pymc_class(wfpt)
+    return wfpt
 
 def wienernn_like_weibull(x, 
                           v,

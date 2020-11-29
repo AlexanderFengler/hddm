@@ -35,7 +35,6 @@ from hddm.keras_models import load_mlp
 # include "pdf.pxi"
 include 'integrate.pxi'
 
-
 # LOADING MODELS
 # TODO: Refactor this ?
 #ddm_model = load_mlp(model = 'ddm')
