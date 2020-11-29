@@ -5,6 +5,7 @@ __docformat__ = 'restructuredtext'
 __version__ = '0.7.5'
 
 from . import likelihoods
+form . import likelihoods_mlp
 from . import generate
 from . import utils
 from . import models

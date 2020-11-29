@@ -1,7 +1,7 @@
 
 """
 """
-
+import hddm
 from collections import OrderedDict
 from copy import copy
 import numpy as np
@@ -9,7 +9,6 @@ import pymc
 import wfpt
 import pickle
 from functools import partial
-
 
 from kabuki.hierarchical import Knode # LOOK INTO KABUKI TO FIGURE OUT WHAT KNODE EXACTLY DOES
 from kabuki.utils import stochastic_from_dist
@@ -30,60 +29,24 @@ class HDDMnn(HDDM):
     """ HDDM model class that uses neural net likelihoods for
     WEIBULL, ANGLE,  ORNSTEIN, LEVY models.
     """
-
     def __init__(self, *args, **kwargs):
         kwargs['nn'] = True
         self.network_type = kwargs.pop('network_type', 'mlp')
         self.network = None #LAX
         self.non_centered = kwargs.pop('non_centered', False)
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
-
         self.model = kwargs.pop('model', 'weibull')
-        # Load Network
+        
+        # Load Network and likelihood function
         if self.network_type == 'mlp':
-                self.mlp = load_mlp(model = self.model)
-                network_dict = {'network': self.mlp}
-                likelihood_ = make_mlp_likelihood(model = self.model)
+                self.network = load_mlp(model = self.model)
+                network_dict = {'network': self.network}
+                likelihood_ = hddm.likelihoods_mlp.make_mlp_likelihood(model = self.model)
 
         # Make model specific likelihood
-        self.wfpt_nn = stochastic_from_dist('Wienernn' + '_' + self.model, partial(likelihood_, **network_dict))
-        
-        # if self.model == 'ddm':
-        #     # Previous
-        #     #self.wfpt_nn = generate_wfpt_stochastic_class()
-        #     if self.network_type == 'mlp':
-        #         pass
-        #         #self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', partial(wienernn_like_ddm, **network_dict))
-        #     #likelihood_fun = wienernn_like_ddm
-        #     print('Loaded MLP Likelihood for ', self.model, ' model!')
-                
-        # if self.model == 'ddm_sdv':
-        #     if self.network_type == 'mlp':
-        #         self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv', partial(wienernn_like_ddm_sdv, **network_dict))
-        
-        # if self.model == 'ddm_analytic':
-        #     if self.network_type == 'mlp':
-        #         self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_analytic', partial(wienernn_like_ddm_analytic, **network_dict))
-
-        # if self.model == 'ddm_sdv_analytic':
-        #     if self.network_type == 'mlp':
-        #         self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv_analytic', partial(wienernn_like_ddm_sdv_analytic, **network_dict))
-        
-        # if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
-        #     if self.network_type == 'mlp':
-        #         self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
-        
-        # if self.model == 'angle':
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_angle', wienernn_like_angle) 
-
-        # if self.model == 'levy':
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_levy', wienernn_like_levy) 
-
-        # if self.model == 'ornstein':
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_ornstein', wienernn_like_ornstein)
-
-        # if self.model == 'full_ddm' or self.model == 'full_ddm2':
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_full_ddm', wienernn_like_full_ddm)
+        self.wfpt_nn = stochastic_from_dist('Wienernn' + '_' + self.model,
+                                            partial(likelihood_, **network_dict))
+        # Initialize super class
         super(HDDMnn, self).__init__(*args, **kwargs)
         print(self.p_outlier)
     
@@ -429,11 +392,7 @@ class HDDMnn(HDDM):
         wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
         wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
         wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
-        
-        # if self.model == 'ddm': 
-        #     wfpt_parents['network'] = self.mlp
-        
-        
+
         # MODEL SPECIFIC PARAMETERS
         if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
             wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 3 
@@ -459,23 +418,14 @@ class HDDMnn(HDDM):
 
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
-        #f self.model == 'ddm':
-            #my_dict = {'wfpt_parents': wfpt_parents, 'network': self.mlp} #LAX
-            # return Knode(self.wfpt_nn, 
-            #          'wfpt', 
-            #          observed = True, 
-            #          col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
-            #          **wfpt_parents)
-        # else:
+
         return Knode(self.wfpt_nn, 
                     'wfpt', 
                     observed = True, 
                     col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
                     **wfpt_parents)
-        #return Knode(..., **my_dict)
 
-
-
+# Defining the likelihood functions
 def make_mlp_likelihood(model):
     if model == 'weibull_cdf' or model == 'weibull':
         def wienernn_like_weibull(x, 
@@ -664,7 +614,6 @@ def make_mlp_likelihood(model):
 
         return wienern_like_full_ddm
 
-
     if model == 'angle':
         def wienernn_like_angle(x, 
                         v, 
@@ -690,3 +639,46 @@ def make_mlp_likelihood(model):
         return wienernn_like_angle
     else:
         return 'Not implemented errror: Failed to load likelihood because the model specified is not implemented'
+
+
+
+# UNUSED -------------------------------------------------------------
+        
+# if self.model == 'ddm':
+#     # Previous
+#     #self.wfpt_nn = generate_wfpt_stochastic_class()
+#     if self.network_type == 'mlp':
+#         pass
+#         #self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', partial(wienernn_like_ddm, **network_dict))
+#     #likelihood_fun = wienernn_like_ddm
+#     print('Loaded MLP Likelihood for ', self.model, ' model!')
+        
+# if self.model == 'ddm_sdv':
+#     if self.network_type == 'mlp':
+#         self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv', partial(wienernn_like_ddm_sdv, **network_dict))
+
+# if self.model == 'ddm_analytic':
+#     if self.network_type == 'mlp':
+#         self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_analytic', partial(wienernn_like_ddm_analytic, **network_dict))
+
+# if self.model == 'ddm_sdv_analytic':
+#     if self.network_type == 'mlp':
+#         self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv_analytic', partial(wienernn_like_ddm_sdv_analytic, **network_dict))
+
+# if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
+#     if self.network_type == 'mlp':
+#         self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
+
+# if self.model == 'angle':
+#     self.wfpt_nn = stochastic_from_dist('Wienernn_angle', wienernn_like_angle) 
+
+# if self.model == 'levy':
+#     self.wfpt_nn = stochastic_from_dist('Wienernn_levy', wienernn_like_levy) 
+
+# if self.model == 'ornstein':
+#     self.wfpt_nn = stochastic_from_dist('Wienernn_ornstein', wienernn_like_ornstein)
+
+# if self.model == 'full_ddm' or self.model == 'full_ddm2':
+#     self.wfpt_nn = stochastic_from_dist('Wienernn_full_ddm', wienernn_like_full_ddm)
+
+# ------------------------------------------------------------------------
