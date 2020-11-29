@@ -10,7 +10,7 @@ from scipy.stats import uniform, norm
 from copy import copy
 
 
-def gen_single_params_set(include=()):
+def gen_single_params_set(include = ()):
     """Returns a dict of DDM parameters with random values for a single conditions
     the function is used by gen_rand_params.
 
@@ -53,7 +53,7 @@ def gen_single_params_set(include=()):
 
     return params
 
-def gen_rand_params(include=(), cond_dict=None, seed=None):
+def gen_rand_params(include = (), cond_dict = None, seed = None):
     """Returns a dict of DDM parameters with random values.
 
         :Optional:
