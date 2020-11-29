@@ -297,28 +297,28 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                          w_outlier = 0.1,
                                          **kwargs):
 
-        params = {'v': v, 'a': a, 'z': z, 't': t, 'sz': sz, 'sv': sv, 'st': st}
+            params = {'v': v, 'a': a, 'z': z, 't': t, 'sz': sz, 'sv': sv, 'st': st}
 
-        n_params = int(7)
-        size = int(value.shape[0])
-        data = np.zeros((size, 9), dtype = np.float32)
-        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+            n_params = int(7)
+            size = int(value.shape[0])
+            data = np.zeros((size, 9), dtype = np.float32)
+            data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
-        cnt = 0
-        for tmp_str in ['v', 'a', 'z', 't', 'sz', 'sv', 'st']:
+            cnt = 0
+            for tmp_str in ['v', 'a', 'z', 't', 'sz', 'sv', 'st']:
 
-            if tmp_str in reg_outcomes:
-                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
-            else:
-                data[:, cnt] = params[tmp_str]
+                if tmp_str in reg_outcomes:
+                    data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                else:
+                    data[:, cnt] = params[tmp_str]
 
-            cnt += 1
+                cnt += 1
 
-        # THIS IS NOT YET FINISHED !
-        return hddm.wfpt.wiener_like_multi_nn_full_ddm(data,
-                                                       p_outlier = p_outlier,
-                                                       w_outlier = w_outlier,
-                                                       **kwargs)
+            # THIS IS NOT YET FINISHED !
+            return hddm.wfpt.wiener_like_multi_nn_full_ddm(data,
+                                                        p_outlier = p_outlier,
+                                                        w_outlier = w_outlier,
+                                                        **kwargs)
 
         def random(self):
             param_dict = deepcopy(self.parents.value)
@@ -347,29 +347,29 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                    w_outlier = 0.1,
                                    **kwargs):
 
-        """Log-likelihood for the full DDM using the interpolation method"""
+            """Log-likelihood for the full DDM using the interpolation method"""
 
-        params = {'v': v, 'a': a, 'z': z, 't': t, 'theta': theta}
-        n_params = int(5)
-        size = int(value.shape[0])
-        data = np.zeros((size, 7), dtype = np.float32)
-        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+            params = {'v': v, 'a': a, 'z': z, 't': t, 'theta': theta}
+            n_params = int(5)
+            size = int(value.shape[0])
+            data = np.zeros((size, 7), dtype = np.float32)
+            data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
-        cnt = 0
-        for tmp_str in ['v', 'a', 'z', 't', 'theta']:
+            cnt = 0
+            for tmp_str in ['v', 'a', 'z', 't', 'theta']:
 
-            if tmp_str in reg_outcomes:
-                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
-            else:
-                data[:, cnt] = params[tmp_str]
+                if tmp_str in reg_outcomes:
+                    data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                else:
+                    data[:, cnt] = params[tmp_str]
 
-            cnt += 1
+                cnt += 1
 
-        # THIS IS NOT YET FINISHED !
-        return hddm.wfpt.wiener_like_multi_nn_angle(data,
-                                                    p_outlier = p_outlier,
-                                                    w_outlier = w_outlier,
-                                                    **kwargs)
+            # THIS IS NOT YET FINISHED !
+            return hddm.wfpt.wiener_like_multi_nn_angle(data,
+                                                        p_outlier = p_outlier,
+                                                        w_outlier = w_outlier,
+                                                        **kwargs)
 
         def random(self):
             param_dict = deepcopy(self.parents.value)
@@ -398,29 +398,29 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                         w_outlier = 0.1,
                                         **kwargs):
 
-                """Log-likelihood for the full DDM using the interpolation method"""
+            """Log-likelihood for the full DDM using the interpolation method"""
 
-                params = {'v': v, 'a': a, 'z': z, 'alpha': alpha, 't': t}
-                n_params = int(5)
-                size = int(value.shape[0])
-                data = np.zeros((size, 7), dtype = np.float32)
-                data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+            params = {'v': v, 'a': a, 'z': z, 'alpha': alpha, 't': t}
+            n_params = int(5)
+            size = int(value.shape[0])
+            data = np.zeros((size, 7), dtype = np.float32)
+            data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
-                cnt = 0
-                for tmp_str in ['v', 'a', 'z', 'alpha', 't']:
+            cnt = 0
+            for tmp_str in ['v', 'a', 'z', 'alpha', 't']:
 
-                    if tmp_str in reg_outcomes:
-                        data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
-                    else:
-                        data[:, cnt] = params[tmp_str]
+                if tmp_str in reg_outcomes:
+                    data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                else:
+                    data[:, cnt] = params[tmp_str]
 
-                    cnt += 1
+                cnt += 1
 
-                # THIS IS NOT YET FINISHED !
-                return hddm.wfpt.wiener_like_multi_nn_levy(data,
-                                                        p_outlier = p_outlier,
-                                                        w_outlier = w_outlier,
-                                                        **kwargs)
+            # THIS IS NOT YET FINISHED !
+            return hddm.wfpt.wiener_like_multi_nn_levy(data,
+                                                    p_outlier = p_outlier,
+                                                    w_outlier = w_outlier,
+                                                    **kwargs)
 
         def random(self):
             param_dict = deepcopy(self.parents.value)
@@ -449,28 +449,28 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                       w_outlier = 0.1,
                                       **kwargs):
 
-        params = {'v': v, 'a': a, 'z': z, 'g': g, 't': t}
-        
-        n_params = int(5)
-        size = int(value.shape[0])
-        data = np.zeros((size, 7), dtype = np.float32)
-        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+            params = {'v': v, 'a': a, 'z': z, 'g': g, 't': t}
+            
+            n_params = int(5)
+            size = int(value.shape[0])
+            data = np.zeros((size, 7), dtype = np.float32)
+            data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
-        cnt = 0
-        for tmp_str in ['v', 'a', 'z', 'g', 't']:
+            cnt = 0
+            for tmp_str in ['v', 'a', 'z', 'g', 't']:
 
-            if tmp_str in reg_outcomes:
-                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
-            else:
-                data[:, cnt] = params[tmp_str]
+                if tmp_str in reg_outcomes:
+                    data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                else:
+                    data[:, cnt] = params[tmp_str]
 
-            cnt += 1
+                cnt += 1
 
-        # THIS IS NOT YET FINISHED !
-        return hddm.wfpt.wiener_like_multi_nn_ornstein(data,
-                                                       p_outlier = p_outlier,
-                                                       w_outlier = w_outlier,
-                                                       **kwargs)
+            # THIS IS NOT YET FINISHED !
+            return hddm.wfpt.wiener_like_multi_nn_ornstein(data,
+                                                        p_outlier = p_outlier,
+                                                        w_outlier = w_outlier,
+                                                        **kwargs)
 
         def random(self):
             param_dict = deepcopy(self.parents.value)
@@ -499,27 +499,27 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                          w_outlier = 0.1,
                                          **kwargs):
 
-        params = {'v': v, 'a': a, 'z': z, 't': t, 'alpha': alpha, 'beta': beta}
-        n_params = int(6)
-        size = int(value.shape[0])
-        data = np.zeros((size, 8), dtype = np.float32)
-        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+            params = {'v': v, 'a': a, 'z': z, 't': t, 'alpha': alpha, 'beta': beta}
+            n_params = int(6)
+            size = int(value.shape[0])
+            data = np.zeros((size, 8), dtype = np.float32)
+            data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
-        cnt = 0
-        for tmp_str in ['v', 'a', 'z', 't', 'alpha', 'beta']:
+            cnt = 0
+            for tmp_str in ['v', 'a', 'z', 't', 'alpha', 'beta']:
 
-            if tmp_str in reg_outcomes:
-                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
-            else:
-                data[:, cnt] = params[tmp_str]
+                if tmp_str in reg_outcomes:
+                    data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                else:
+                    data[:, cnt] = params[tmp_str]
 
-            cnt += 1
+                cnt += 1
 
-        # THIS IS NOT YET FINISHED !
-        return hddm.wfpt.wiener_like_multi_nn_weibull(data,
-                                                      p_outlier = p_outlier,
-                                                      w_outlier = w_outlier,
-                                                      **kwargs)
+            # THIS IS NOT YET FINISHED !
+            return hddm.wfpt.wiener_like_multi_nn_weibull(data,
+                                                        p_outlier = p_outlier,
+                                                        w_outlier = w_outlier,
+                                                        **kwargs)
 
 
         def random(self):
@@ -541,8 +541,5 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
 
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_weibull, **kwargs))
         stoch.random = random
-
-
-
     return stoch
 
