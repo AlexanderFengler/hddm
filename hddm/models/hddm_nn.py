@@ -42,10 +42,9 @@ class HDDMnn(HDDM):
         self.model = kwargs.pop('model', 'weibull')
         if self.model == 'ddm':
             self.mlp = load_mlp(model = self.model)
-            my_dict = {'network': self.mlp}
             print('successfully loaded mlp')
             #self.wfpt_nn = generate_wfpt_stochastic_class()
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', partial(wienernn_like_ddm, **my_dict))
+            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', partial(wienernn_like_ddm, **{'network': self.mlp}))
             #if self.network_type == 'MLP':
                 #self.network = keras.models.load_model(...)
 
