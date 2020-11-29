@@ -40,16 +40,16 @@ include 'integrate.pxi'
 # TODO: Refactor this ?
 #ddm_model = load_mlp(model = 'ddm')
 
-weibull_model = load_mlp(model == 'weibull_cdf') # keras.models.load_model('model_final_weibull.h5', compile = False)
-angle_model = load_mlp(model == 'angle') #keras.models.load_model('model_final_angle.h5', compile = False)
+weibull_model = load_mlp(model = 'weibull_cdf') # keras.models.load_model('model_final_weibull.h5', compile = False)
+angle_model = load_mlp(model = 'angle') #keras.models.load_model('model_final_angle.h5', compile = False)
 #model = keras.models.load_model('model_final.h5', compile = False)
-new_weibull_model = load_mlp(model == 'weibull_cdf') # keras.models.load_model('model_final_new.h5', compile = False)
-ddm_model = load_mlp(model == 'ddm') # keras.models.load_model('model_final_ddm.h5', compile = False)
+new_weibull_model = load_mlp(model = 'weibull_cdf') # keras.models.load_model('model_final_new.h5', compile = False)
+ddm_model = load_mlp(model = 'ddm') # keras.models.load_model('model_final_ddm.h5', compile = False)
 ddm_analytic_model = load_mlp(model = 'ddm_analytic') #keras.models.load_model('model_final_ddm_analytic.h5', compile = False)
-levy_model = load_mlp(model == 'levy') # keras.models.load_model('model_final_levy.h5', compile = False)
-ornstein_model = load_mlp(model == 'ornstein') # keras.models.load_model('model_final_ornstein.h5', compile = False)
-ddm_sdv_model = load_mlp(model == 'ddm_sdv') # keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
-ddm_sdv_analytic_model = load_mlp(model == 'ddm_sdv_analytic') # keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
+levy_model = load_mlp(model = 'levy') # keras.models.load_model('model_final_levy.h5', compile = False)
+ornstein_model = load_mlp(model = 'ornstein') # keras.models.load_model('model_final_ornstein.h5', compile = False)
+ddm_sdv_model = load_mlp(model = 'ddm_sdv') # keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
+ddm_sdv_analytic_model = load_mlp(model = 'ddm_sdv_analytic') # keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
 full_ddm_model = load_mlp(model = 'full_ddm') #keras.models.load_model('model_final_full_ddm.h5', compile = False)
 
 ###############
@@ -161,9 +161,9 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
     
     # Call to network:
     if p_outlier == 0: # ddm_model
-        log_p = np.sum(np.core.umath.maximum(mlp.predict_on_batch(data), ll_min))
+        log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
     else:
-        log_p = np.sum(np.log(np.exp(np.core.umath.maximum(mlp.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
+        log_p = np.sum(np.log(np.exp(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
         #log_p = np.sum(np.log(np.add(np.multiply(np.exp(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min)), 
         #                    (1.0 - p_outlier)), 
         #              (w_outlier * p_outlier))))
