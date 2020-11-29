@@ -444,7 +444,7 @@ class HDDMnn(HDDM):
 
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
-        if self.model == 'ddm'
+        if self.model == 'ddm':
             my_dict = {'wfpt_parents':wfpt_parents, 'network':self.network} #LAX
             return Knode(self.wfpt_nn, 
                      'wfpt', 
