@@ -463,7 +463,7 @@ def generate_wfpt_stochastic_class(wiener_params = None, model = 'ddm'):
     
     mlp = load_mlp(model = model)
 
-    def wfpt_like(x, v, sv, a, z, t, p_outlier = 0, w_outlier = 0):
+    def wfpt_like(x, v, a, z, t, p_outlier = 0, w_outlier = 0):
         size = x.shape[0]
         n_params = 4
         ll_min = -16.11809
