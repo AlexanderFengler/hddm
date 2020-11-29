@@ -1,3 +1,4 @@
+import hddm
 from copy import copy
 import numpy as np
 from collections import OrderedDict
