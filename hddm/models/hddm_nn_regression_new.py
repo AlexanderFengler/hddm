@@ -554,7 +554,7 @@ class HDDMnnRegressor(HDDM):
 
         # self.wfpt_nn = stochastic_from_dist('Wiennernn' + '_' + self.model,
         #                                     partial(likelihood_, **network_dict))
-        self.wfpt_reg_cass = generate_wfpt_nn_ddm_reg_stochastic_class(sampling_method = 'drift', model = self.model, **network_dict)
+        self.wfpt_reg_class = generate_wfpt_nn_ddm_reg_stochastic_class(sampling_method = 'drift', model = self.model, **network_dict)
        
         # Attach the likelihood !
         # if self.model == 'ddm':
