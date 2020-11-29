@@ -42,7 +42,7 @@ class HDDMnnStimCoding(HDDM):
 
     """
     def __init__(self, *args, **kwargs):
-        self.nn = True
+        kwargs['nn'] = True
         self.stim_col = kwargs.pop('stim_col', 'stim')
         self.split_param = kwargs.pop('split_param', 'z')
         self.drift_criterion = kwargs.pop('drift_criterion', False)
@@ -52,6 +52,8 @@ class HDDMnnStimCoding(HDDM):
         print(kwargs['include'])
         # Attach likelihood corresponding to model
         if self.model == 'ddm':
+            self.mlp = hddm.keras_models.load_mlp(model = self.model)
+            print('Successfully loaded model')
             self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
 
         if self.model == 'ddm_sdv':
@@ -92,7 +94,7 @@ class HDDMnnStimCoding(HDDM):
                     kwargs['include'] = ['z']
                 else:
                     pass
-                
+
             print("Adding z to includes.")
 
         self.stims = np.asarray(np.sort(np.unique(args[0][self.stim_col])))

@@ -487,8 +487,8 @@ class HDDMnnRegressor(HDDM):
             and v_C(condition)[T.cond2] for cond1 + cond2.
 
         """
-
-        self.nn = True
+        kwargs['nn'] = True
+        #self.nn = True
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
         self.keep_regressor_trace = keep_regressor_trace
         if isinstance(models, (str, dict)):
