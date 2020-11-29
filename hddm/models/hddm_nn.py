@@ -9,6 +9,7 @@ import pymc
 import wfpt
 import pickle
 
+
 from kabuki.hierarchical import Knode # LOOK INTO KABUKI TO FIGURE OUT WHAT KNODE EXACTLY DOES
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
@@ -40,9 +41,10 @@ class HDDMnn(HDDM):
         self.model = kwargs.pop('model', 'weibull')
         if self.model == 'ddm':
             self.mlp = load_mlp(model = self.model)
+            my_dict = {'network': self.mlp}
             print('successfully loaded mlp')
             #self.wfpt_nn = generate_wfpt_stochastic_class()
-            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
+            self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm, my_dict)
             #if self.network_type == 'MLP':
                 #self.network = keras.models.load_model(...)
 
@@ -444,19 +446,19 @@ class HDDMnn(HDDM):
 
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
-        if self.model == 'ddm':
-            my_dict = {'wfpt_parents': wfpt_parents, 'network': self.mlp} #LAX
-            return Knode(self.wfpt_nn, 
-                     'wfpt', 
-                     observed = True, 
-                     col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
-                     **my_dict)
-        else:
-            return Knode(self.wfpt_nn, 
-                     'wfpt', 
-                     observed = True, 
-                     col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
-                     **wfpt_parents)
+        #f self.model == 'ddm':
+            #my_dict = {'wfpt_parents': wfpt_parents, 'network': self.mlp} #LAX
+            # return Knode(self.wfpt_nn, 
+            #          'wfpt', 
+            #          observed = True, 
+            #          col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
+            #          **wfpt_parents)
+        # else:
+        return Knode(self.wfpt_nn, 
+                    'wfpt', 
+                    observed = True, 
+                    col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
+                    **wfpt_parents)
         #return Knode(..., **my_dict)
 
 def wienernn_like_weibull(x, 
