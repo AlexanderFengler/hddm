@@ -78,21 +78,12 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ddm, **kwargs))
         stoch.random = random
 
-    return stoch
-
-################################################################################################
-# Defining only the model likelihood at this point !
-def generate_wfpt_nn_full_ddm_reg_stochastic_class(wiener_params = None,
-                                                   sampling_method = 'cdf',
-                                                   cdf_range = (-5, 5), 
-                                                   sampling_dt = 1e-4):
-
-    def wiener_multi_like_nn_full_ddm(value, v, sv, a, z, sz, t, st, 
-                                      reg_outcomes, 
-                                      p_outlier = 0, 
-                                      w_outlier = 0.1):
-
-        """Log-likelihood for the full DDM using the interpolation method"""
+    if model == 'full_ddm' or model == 'full_ddm2':
+        def wiener_multi_like_nn_full_ddm(value, v, sv, a, z, sz, t, st, 
+                                         reg_outcomes, 
+                                         p_outlier = 0, 
+                                         w_outlier = 0.1,
+                                         **kwargs):
 
         params = {'v': v, 'a': a, 'z': z, 't': t, 'sz': sz, 'sv': sv, 'st': st}
 
@@ -114,40 +105,35 @@ def generate_wfpt_nn_full_ddm_reg_stochastic_class(wiener_params = None,
         # THIS IS NOT YET FINISHED !
         return hddm.wfpt.wiener_like_multi_nn_full_ddm(data,
                                                        p_outlier = p_outlier,
-                                                       w_outlier = w_outlier)
+                                                       w_outlier = w_outlier,
+                                                       **kwargs)
 
-    def random(self):
-        param_dict = deepcopy(self.parents.value)
-        del param_dict['reg_outcomes']
-        sampled_rts = self.value.copy()
+        def random(self):
+            param_dict = deepcopy(self.parents.value)
+            del param_dict['reg_outcomes']
+            sampled_rts = self.value.copy()
 
-        for i in self.value.index:
-            #get current params
-            for p in self.parents['reg_outcomes']:
-                param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
-            #sample
-            samples = hddm.generate.gen_rts(method=sampling_method,
-                                            size=1, dt=sampling_dt, **param_dict)
+            for i in self.value.index:
+                #get current params
+                for p in self.parents['reg_outcomes']:
+                    param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+                #sample
+                samples = hddm.generate.gen_rts(method=sampling_method,
+                                                size=1, dt=sampling_dt, **param_dict)
 
-            sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+                sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
 
-        return sampled_rts
+            return sampled_rts
 
-    stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_full_ddm)
-    stoch.random = random
+        stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_full_ddm, **kwargs))
+        stoch.random = random
 
-    return stoch
-
-# Defining only the model likelihood at this point !
-def generate_wfpt_nn_angle_reg_stochastic_class(wiener_params = None,
-                                                sampling_method = 'cdf',
-                                                cdf_range = (-5, 5), 
-                                                sampling_dt = 1e-4):
-
-    def wiener_multi_like_nn_angle(value, v, a, theta, z, t, 
+    if model == 'angle':
+        def wiener_multi_like_nn_angle(value, v, a, theta, z, t, 
                                    reg_outcomes, 
                                    p_outlier = 0, 
-                                   w_outlier = 0.1):
+                                   w_outlier = 0.1,
+                                   **kwargs):
 
         """Log-likelihood for the full DDM using the interpolation method"""
 
@@ -170,113 +156,86 @@ def generate_wfpt_nn_angle_reg_stochastic_class(wiener_params = None,
         # THIS IS NOT YET FINISHED !
         return hddm.wfpt.wiener_like_multi_nn_angle(data,
                                                     p_outlier = p_outlier,
-                                                    w_outlier = w_outlier)
+                                                    w_outlier = w_outlier,
+                                                    **kwargs)
 
-    def random(self):
-        param_dict = deepcopy(self.parents.value)
-        del param_dict['reg_outcomes']
-        sampled_rts = self.value.copy()
+        def random(self):
+            param_dict = deepcopy(self.parents.value)
+            del param_dict['reg_outcomes']
+            sampled_rts = self.value.copy()
 
-        for i in self.value.index:
-            #get current params
-            for p in self.parents['reg_outcomes']:
-                param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
-            #sample
-            samples = hddm.generate.gen_rts(method=sampling_method,
-                                            size=1, dt=sampling_dt, **param_dict)
+            for i in self.value.index:
+                #get current params
+                for p in self.parents['reg_outcomes']:
+                    param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+                #sample
+                samples = hddm.generate.gen_rts(method=sampling_method,
+                                                size=1, dt=sampling_dt, **param_dict)
 
-            sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+                sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
 
-        return sampled_rts
+            return sampled_rts
 
-    stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_angle)
-    stoch.random = random
+        stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_angle, **kwargs))
+        stoch.random = random
 
-    return stoch
+    if model == 'levy':
+        def wiener_multi_like_nn_levy(value, v, a, alpha, z, t, 
+                                        reg_outcomes, 
+                                        p_outlier = 0, 
+                                        w_outlier = 0.1,
+                                        **kwargs):
 
-# Defining only the model likelihood at this point !
-def generate_wfpt_nn_levy_reg_stochastic_class(wiener_params = None,
-                                               sampling_method = 'cdf',
-                                               cdf_range = (-5, 5), 
-                                               sampling_dt = 1e-4):
+                """Log-likelihood for the full DDM using the interpolation method"""
 
-    #set wiener_params
-    if wiener_params is None:
-        wiener_params = {'err': 1e-4,
-                         'n_st': 2, 
-                         'n_sz': 2,
-                         'use_adaptive': 1,
-                         'simps_err': 1e-3,
-                         'w_outlier': 0.1}
+                params = {'v': v, 'a': a, 'z': z, 'alpha': alpha, 't': t}
+                n_params = int(5)
+                size = int(value.shape[0])
+                data = np.zeros((size, 7), dtype = np.float32)
+                data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+
+                cnt = 0
+                for tmp_str in ['v', 'a', 'z', 'alpha', 't']:
+
+                    if tmp_str in reg_outcomes:
+                        data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                    else:
+                        data[:, cnt] = params[tmp_str]
+
+                    cnt += 1
+
+                # THIS IS NOT YET FINISHED !
+                return hddm.wfpt.wiener_like_multi_nn_levy(data,
+                                                        p_outlier = p_outlier,
+                                                        w_outlier = w_outlier,
+                                                        **kwargs)
+
+        def random(self):
+            param_dict = deepcopy(self.parents.value)
+            del param_dict['reg_outcomes']
+            sampled_rts = self.value.copy()
+
+            for i in self.value.index:
+                #get current params
+                for p in self.parents['reg_outcomes']:
+                    param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+                #sample
+                samples = hddm.generate.gen_rts(method=sampling_method,
+                                                size=1, dt=sampling_dt, **param_dict)
+
+                sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+            return sampled_rts
+
+        stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_levy, **kwargs))
+        stoch.random = random
     
-    wp = wiener_params
-
-    def wiener_multi_like_nn_levy(value, v, a, alpha, z, t, 
-                                  reg_outcomes, 
-                                  p_outlier = 0, 
-                                  w_outlier = 0.1):
-
-        """Log-likelihood for the full DDM using the interpolation method"""
-
-        params = {'v': v, 'a': a, 'z': z, 'alpha': alpha, 't': t}
-        n_params = int(5)
-        size = int(value.shape[0])
-        data = np.zeros((size, 7), dtype = np.float32)
-        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
-
-        cnt = 0
-        for tmp_str in ['v', 'a', 'z', 'alpha', 't']:
-
-            if tmp_str in reg_outcomes:
-                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
-            else:
-                data[:, cnt] = params[tmp_str]
-
-            cnt += 1
-
-        # THIS IS NOT YET FINISHED !
-        return hddm.wfpt.wiener_like_multi_nn_levy(data,
-                                                   p_outlier = p_outlier,
-                                                   w_outlier = w_outlier)
-
-    def random(self):
-        param_dict = deepcopy(self.parents.value)
-        del param_dict['reg_outcomes']
-        sampled_rts = self.value.copy()
-
-        for i in self.value.index:
-            #get current params
-            for p in self.parents['reg_outcomes']:
-                param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
-            #sample
-            samples = hddm.generate.gen_rts(method=sampling_method,
-                                            size=1, dt=sampling_dt, **param_dict)
-
-            sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
-
-        return sampled_rts
-
-    stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_levy)
-    stoch.random = random
-
-    return stoch
-
-#wfpt_reg_like = generate_wfpt_nn_reg_stochastic_class(sampling_method = 'drift')
-################################################################################################
-
-
-# Defining only the model likelihood at this point !
-def generate_wfpt_nn_ornstein_reg_stochastic_class(wiener_params = None,
-                                                sampling_method = 'cdf',
-                                                cdf_range = (-5, 5), 
-                                                sampling_dt = 1e-4):
-
-    def wiener_multi_like_nn_ornstein(value, v, a, g, z, t, 
+    if model == 'ornstein':
+        def wiener_multi_like_nn_ornstein(value, v, a, g, z, t, 
                                       reg_outcomes, 
                                       p_outlier = 0, 
-                                      w_outlier = 0.1):
-
-        """Log-likelihood for the full DDM using the interpolation method"""
+                                      w_outlier = 0.1,
+                                      **kwargs):
 
         params = {'v': v, 'a': a, 'z': z, 'g': g, 't': t}
         
@@ -298,30 +257,325 @@ def generate_wfpt_nn_ornstein_reg_stochastic_class(wiener_params = None,
         # THIS IS NOT YET FINISHED !
         return hddm.wfpt.wiener_like_multi_nn_ornstein(data,
                                                        p_outlier = p_outlier,
-                                                       w_outlier = w_outlier)
+                                                       w_outlier = w_outlier,
+                                                       **kwargs)
+
+        def random(self):
+            param_dict = deepcopy(self.parents.value)
+            del param_dict['reg_outcomes']
+            sampled_rts = self.value.copy()
+
+            for i in self.value.index:
+                #get current params
+                for p in self.parents['reg_outcomes']:
+                    param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+                #sample
+                samples = hddm.generate.gen_rts(method=sampling_method,
+                                                size=1, dt=sampling_dt, **param_dict)
+
+                sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+            return sampled_rts
+
+        stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ornstein, **kwargs))
+        stoch.random = random
+
+    if model == 'weibull_cdf' or model == 'weibull':
+        def wiener_multi_like_nn_weibull(value, v, a, alpha, beta, z, t, 
+                                         reg_outcomes, 
+                                         p_outlier = 0, 
+                                         w_outlier = 0.1,
+                                         **kwargs):
+
+        params = {'v': v, 'a': a, 'z': z, 't': t, 'alpha': alpha, 'beta': beta}
+        n_params = int(6)
+        size = int(value.shape[0])
+        data = np.zeros((size, 8), dtype = np.float32)
+        data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+
+        cnt = 0
+        for tmp_str in ['v', 'a', 'z', 't', 'alpha', 'beta']:
+
+            if tmp_str in reg_outcomes:
+                data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+            else:
+                data[:, cnt] = params[tmp_str]
+
+            cnt += 1
+
+        # THIS IS NOT YET FINISHED !
+        return hddm.wfpt.wiener_like_multi_nn_weibull(data,
+                                                      p_outlier = p_outlier,
+                                                      w_outlier = w_outlier,
+                                                      **kwargs)
 
 
-    def random(self):
-        param_dict = deepcopy(self.parents.value)
-        del param_dict['reg_outcomes']
-        sampled_rts = self.value.copy()
+        def random(self):
+            param_dict = deepcopy(self.parents.value)
+            del param_dict['reg_outcomes']
+            sampled_rts = self.value.copy()
 
-        for i in self.value.index:
-            #get current params
-            for p in self.parents['reg_outcomes']:
-                param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
-            #sample
-            samples = hddm.generate.gen_rts(method=sampling_method,
-                                            size=1, dt=sampling_dt, **param_dict)
+            for i in self.value.index:
+                #get current params
+                for p in self.parents['reg_outcomes']:
+                    param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+                #sample
+                samples = hddm.generate.gen_rts(method=sampling_method,
+                                                size=1, dt=sampling_dt, **param_dict)
 
-            sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+                sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
 
-        return sampled_rts
+            return sampled_rts
 
-    stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_ornstein)
-    stoch.random = random
+        stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_weibull, **kwargs))
+        stoch.random = random
+
+
 
     return stoch
+
+################################################################################################
+# Defining only the model likelihood at this point !
+# def generate_wfpt_nn_full_ddm_reg_stochastic_class(wiener_params = None,
+#                                                    sampling_method = 'cdf',
+#                                                    cdf_range = (-5, 5), 
+#                                                    sampling_dt = 1e-4):
+
+#     def wiener_multi_like_nn_full_ddm(value, v, sv, a, z, sz, t, st, 
+#                                       reg_outcomes, 
+#                                       p_outlier = 0, 
+#                                       w_outlier = 0.1):
+
+#         """Log-likelihood for the full DDM using the interpolation method"""
+
+#         params = {'v': v, 'a': a, 'z': z, 't': t, 'sz': sz, 'sv': sv, 'st': st}
+
+#         n_params = int(7)
+#         size = int(value.shape[0])
+#         data = np.zeros((size, 9), dtype = np.float32)
+#         data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+
+#         cnt = 0
+#         for tmp_str in ['v', 'a', 'z', 't', 'sz', 'sv', 'st']:
+
+#             if tmp_str in reg_outcomes:
+#                 data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+#             else:
+#                 data[:, cnt] = params[tmp_str]
+
+#             cnt += 1
+
+#         # THIS IS NOT YET FINISHED !
+#         return hddm.wfpt.wiener_like_multi_nn_full_ddm(data,
+#                                                        p_outlier = p_outlier,
+#                                                        w_outlier = w_outlier)
+
+#     def random(self):
+#         param_dict = deepcopy(self.parents.value)
+#         del param_dict['reg_outcomes']
+#         sampled_rts = self.value.copy()
+
+#         for i in self.value.index:
+#             #get current params
+#             for p in self.parents['reg_outcomes']:
+#                 param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+#             #sample
+#             samples = hddm.generate.gen_rts(method=sampling_method,
+#                                             size=1, dt=sampling_dt, **param_dict)
+
+#             sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+#         return sampled_rts
+
+#     stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_full_ddm)
+#     stoch.random = random
+
+#     return stoch
+
+# Defining only the model likelihood at this point !
+# def generate_wfpt_nn_angle_reg_stochastic_class(wiener_params = None,
+#                                                 sampling_method = 'cdf',
+#                                                 cdf_range = (-5, 5), 
+#                                                 sampling_dt = 1e-4):
+
+#     def wiener_multi_like_nn_angle(value, v, a, theta, z, t, 
+#                                    reg_outcomes, 
+#                                    p_outlier = 0, 
+#                                    w_outlier = 0.1):
+
+#         """Log-likelihood for the full DDM using the interpolation method"""
+
+#         params = {'v': v, 'a': a, 'z': z, 't': t, 'theta': theta}
+#         n_params = int(5)
+#         size = int(value.shape[0])
+#         data = np.zeros((size, 7), dtype = np.float32)
+#         data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+
+#         cnt = 0
+#         for tmp_str in ['v', 'a', 'z', 't', 'theta']:
+
+#             if tmp_str in reg_outcomes:
+#                 data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+#             else:
+#                 data[:, cnt] = params[tmp_str]
+
+#             cnt += 1
+
+#         # THIS IS NOT YET FINISHED !
+#         return hddm.wfpt.wiener_like_multi_nn_angle(data,
+#                                                     p_outlier = p_outlier,
+#                                                     w_outlier = w_outlier)
+
+#     def random(self):
+#         param_dict = deepcopy(self.parents.value)
+#         del param_dict['reg_outcomes']
+#         sampled_rts = self.value.copy()
+
+#         for i in self.value.index:
+#             #get current params
+#             for p in self.parents['reg_outcomes']:
+#                 param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+#             #sample
+#             samples = hddm.generate.gen_rts(method=sampling_method,
+#                                             size=1, dt=sampling_dt, **param_dict)
+
+#             sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+#         return sampled_rts
+
+#     stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_angle)
+#     stoch.random = random
+
+#     return stoch
+
+# Defining only the model likelihood at this point !
+# def generate_wfpt_nn_levy_reg_stochastic_class(wiener_params = None,
+#                                                sampling_method = 'cdf',
+#                                                cdf_range = (-5, 5), 
+#                                                sampling_dt = 1e-4):
+
+#     #set wiener_params
+#     if wiener_params is None:
+#         wiener_params = {'err': 1e-4,
+#                          'n_st': 2, 
+#                          'n_sz': 2,
+#                          'use_adaptive': 1,
+#                          'simps_err': 1e-3,
+#                          'w_outlier': 0.1}
+    
+#     wp = wiener_params
+
+#     def wiener_multi_like_nn_levy(value, v, a, alpha, z, t, 
+#                                   reg_outcomes, 
+#                                   p_outlier = 0, 
+#                                   w_outlier = 0.1):
+
+#         """Log-likelihood for the full DDM using the interpolation method"""
+
+#         params = {'v': v, 'a': a, 'z': z, 'alpha': alpha, 't': t}
+#         n_params = int(5)
+#         size = int(value.shape[0])
+#         data = np.zeros((size, 7), dtype = np.float32)
+#         data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+
+#         cnt = 0
+#         for tmp_str in ['v', 'a', 'z', 'alpha', 't']:
+
+#             if tmp_str in reg_outcomes:
+#                 data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+#             else:
+#                 data[:, cnt] = params[tmp_str]
+
+#             cnt += 1
+
+#         # THIS IS NOT YET FINISHED !
+#         return hddm.wfpt.wiener_like_multi_nn_levy(data,
+#                                                    p_outlier = p_outlier,
+#                                                    w_outlier = w_outlier)
+
+#     def random(self):
+#         param_dict = deepcopy(self.parents.value)
+#         del param_dict['reg_outcomes']
+#         sampled_rts = self.value.copy()
+
+#         for i in self.value.index:
+#             #get current params
+#             for p in self.parents['reg_outcomes']:
+#                 param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+#             #sample
+#             samples = hddm.generate.gen_rts(method=sampling_method,
+#                                             size=1, dt=sampling_dt, **param_dict)
+
+#             sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+#         return sampled_rts
+
+#     stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_levy)
+#     stoch.random = random
+
+#     return stoch
+
+#wfpt_reg_like = generate_wfpt_nn_reg_stochastic_class(sampling_method = 'drift')
+################################################################################################
+
+
+# Defining only the model likelihood at this point !
+# def generate_wfpt_nn_ornstein_reg_stochastic_class(wiener_params = None,
+#                                                 sampling_method = 'cdf',
+#                                                 cdf_range = (-5, 5), 
+#                                                 sampling_dt = 1e-4):
+
+#     def wiener_multi_like_nn_ornstein(value, v, a, g, z, t, 
+#                                       reg_outcomes, 
+#                                       p_outlier = 0, 
+#                                       w_outlier = 0.1):
+
+#         """Log-likelihood for the full DDM using the interpolation method"""
+
+#         params = {'v': v, 'a': a, 'z': z, 'g': g, 't': t}
+        
+#         n_params = int(5)
+#         size = int(value.shape[0])
+#         data = np.zeros((size, 7), dtype = np.float32)
+#         data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+
+#         cnt = 0
+#         for tmp_str in ['v', 'a', 'z', 'g', 't']:
+
+#             if tmp_str in reg_outcomes:
+#                 data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+#             else:
+#                 data[:, cnt] = params[tmp_str]
+
+#             cnt += 1
+
+#         # THIS IS NOT YET FINISHED !
+#         return hddm.wfpt.wiener_like_multi_nn_ornstein(data,
+#                                                        p_outlier = p_outlier,
+#                                                        w_outlier = w_outlier)
+
+
+#     def random(self):
+#         param_dict = deepcopy(self.parents.value)
+#         del param_dict['reg_outcomes']
+#         sampled_rts = self.value.copy()
+
+#         for i in self.value.index:
+#             #get current params
+#             for p in self.parents['reg_outcomes']:
+#                 param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+#             #sample
+#             samples = hddm.generate.gen_rts(method=sampling_method,
+#                                             size=1, dt=sampling_dt, **param_dict)
+
+#             sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+#         return sampled_rts
+
+#     stoch = stochastic_from_dist('wfpt_reg', wiener_multi_like_nn_ornstein)
+#     stoch.random = random
+
+#     return stoch
 ################################################################################################
 
 # Defining only the model likelihood at this point !
