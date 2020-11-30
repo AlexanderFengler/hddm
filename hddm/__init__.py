@@ -6,6 +6,7 @@ __version__ = '0.7.5'
 
 from . import likelihoods
 from . import likelihoods_mlp
+from . import likelihoods_cnn
 from . import generate
 from . import utils
 from . import models

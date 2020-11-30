@@ -14,6 +14,8 @@ from kabuki.hierarchical import Knode # LOOK INTO KABUKI TO FIGURE OUT WHAT KNOD
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
 from hddm.keras_models import load_mlp
+from hddm.cnn.wrapper import load_cnn
+
 
 class HDDMnn(HDDM):
     """ HDDM model class that uses neural net likelihoods for
@@ -26,12 +28,19 @@ class HDDMnn(HDDM):
         self.non_centered = kwargs.pop('non_centered', False)
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
         self.model = kwargs.pop('model', 'weibull')
+        self.nbin = kwargs.pop('nbin', 512)
         
         # Load Network and likelihood function
         if self.network_type == 'mlp':
                 self.network = load_mlp(model = self.model)
                 network_dict = {'network': self.network}
                 likelihood_ = hddm.likelihoods_mlp.make_mlp_likelihood(model = self.model)
+
+        if self.network_type == 'cnn':
+                self.network = load_cnn(model = self.model, nbin=self.nbin)
+                network_dict = {'network': self.network}
+                likelihood_ = hddm.likelihoods_cnn.make_cnn_likelihood(model = self.model)
+                #partial(wrapper, specific_forward_pass)
 
         # Make model specific likelihood
         self.wfpt_nn = stochastic_from_dist('Wienernn' + '_' + self.model,
