@@ -15,16 +15,6 @@ from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
 from hddm.keras_models import load_mlp
 
-# from wfpt import wiener_like_nn_weibull
-# from wfpt import wiener_like_nn_angle 
-# from wfpt import wiener_like_nn_ddm
-# from wfpt import wiener_like_nn_ddm_analytic
-# from wfpt import wiener_like_nn_levy
-# from wfpt import wiener_like_nn_ornstein
-# from wfpt import wiener_like_nn_ddm_sdv
-# from wfpt import wiener_like_nn_ddm_sdv_analytic
-# from wfpt import wiener_like_nn_full_ddm
-
 class HDDMnn(HDDM):
     """ HDDM model class that uses neural net likelihoods for
     WEIBULL, ANGLE,  ORNSTEIN, LEVY models.

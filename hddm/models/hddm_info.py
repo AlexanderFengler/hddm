@@ -114,23 +114,26 @@ class HDDM(HDDMBase):
                              'v_std': 1, 
                              'alpha': 1., 
                              'dual_alpha': 1.5, 
-                             'theta':0.1,
+                             'theta': 0.1,
                              'beta': 1.,
                              'g': 0.5}
 
-        self.emcee_dispersions = {'a':1, 't': 0.1, 'a_std': 1, 't_std': 0.15, 'sz': 1.1, 'v': 1.5,
+        self.emcee_dispersions = {'a': 1, 't': 0.1, 'a_std': 1, 't_std': 0.15, 'sz': 1.1, 'v': 1.5,
                                   'st': 0.1, 'sv': 3, 'z_trans': 0.2, 'z': 0.1,
-                                  'p_outlier':1., 'v_std': 1,'alpha':1.5,'dual_alpha':1.5,'theta':0.1}
+                                  'p_outlier': 1., 'v_std': 1,'alpha': 1.5,'dual_alpha': 1.5,'theta': 0.1}
 
         self.is_informative = kwargs.pop('informative', True)
 
         super(HDDM, self).__init__(*args, **kwargs)
+
+        print('Is Neural Net? ', self.nn)
 
     def _create_stochastic_knodes(self, include):
         if self.is_informative:
             return self._create_stochastic_knodes_info(include)
         else:
             return self._create_stochastic_knodes_noninfo(include)
+
 
     def _create_stochastic_knodes_info(self, include):
         knodes = OrderedDict()

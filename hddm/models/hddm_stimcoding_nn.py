@@ -70,30 +70,6 @@ class HDDMnnStimCoding(HDDM):
         self.wfpt_nn = stochastic_from_dist('Wiennernn' + '_' + self.model,
                                             partial(likelihood_, **network_dict))
 
-        # if self.model == 'ddm_sdv':
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv', wienernn_like_ddm_sdv)
-        
-        # if self.model == 'ddm_analytic':
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_analytic', wienernn_like_ddm_analytic)
-
-        # if self.model == 'ddm_sdv_analytic':
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv_analytic', wienernn_like_ddm_sdv_analytic)
-        
-        # if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
-        
-        # if self.model == 'angle':
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_angle', wienernn_like_angle) 
-
-        # if self.model == 'levy':
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_levy', wienernn_like_levy) 
-
-        # if self.model == 'ornstein':
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_ornstein', wienernn_like_ornstein)
-
-        # if self.model == 'full_ddm' or self.model == 'full_ddm2':
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_full_ddm', wienernn_like_full_ddm)
-
         if self.split_param == 'z':
             assert not self.drift_criterion, "Setting drift_criterion requires split_param='v'."
             print("Setting model to be non-informative")
@@ -453,19 +429,6 @@ class HDDMnnStimCoding(HDDM):
         print(knodes)
         return knodes
 
-    # def _create_stochastic_knodes(self, include):
-    #     knodes = super(HDDMStimCoding, self)._create_stochastic_knodes(include)
-        
-    #     if self.drift_criterion:
-    #         # Add drift-criterion parameter
-    #         knodes.update(self._create_family_normal_normal_hnormal('dc',
-    #                                                                 value = 0,
-    #                                                                 g_mu = 0,
-    #                                                                 g_tau = 3**-2,
-    #                                                                 std_std = 2))
-
-    #     return knodes
-
     def _create_wfpt_parents_dict(self, knodes):
         print('passing through parent creator')
         print(knodes)
@@ -506,14 +469,6 @@ class HDDMnnStimCoding(HDDM):
         print('wfpt parents: ')
         print(wfpt_parents)
         return wfpt_parents
-
-    # def _create_wfpt_parents_dict(self, knodes):
-    #     wfpt_parents = super(HDDMStimCoding, self)._create_wfpt_parents_dict(knodes)
-        
-    #     if self.drift_criterion:
-    #         wfpt_parents['dc'] = knodes['dc_bottom']
-        
-    #     return wfpt_parents
 
     def _create_wfpt_knode(self, knodes):
         
