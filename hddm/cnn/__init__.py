@@ -1,1 +1,1 @@
-from .cnn import *
+from . import *
