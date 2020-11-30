@@ -66,7 +66,7 @@ class HDDMnnStimCoding(HDDM):
         if self.network_type == 'mlp':
             self.network = load_mlp(model = self.model)
             network_dict = {'network': self.network}
-            likelihood_ = hddm.likelihoods_mlp.make_mlp_likelihoods(model = self.model)
+            likelihood_ = hddm.likelihoods_mlp.make_mlp_likelihood(model = self.model)
 
         self.wfpt_nn = stochastic_from_dist('Wiennernn' + '_' + self.model,
                                             partial(likelihood_, **network_dict))
