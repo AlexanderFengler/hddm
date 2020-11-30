@@ -852,15 +852,47 @@ class HDDMBase(AccumulatorModel):
 
     def _create_wfpt_parents_dict(self, knodes):
         wfpt_parents = OrderedDict()
-        wfpt_parents['a'] = knodes['a_bottom']
-        wfpt_parents['v'] = knodes['v_bottom']
-        wfpt_parents['t'] = knodes['t_bottom']
+        
+        if self.nn:
+            wfpt_parents['a'] = knodes['a_bottom']
+            wfpt_parents['v'] = knodes['v_bottom']
+            wfpt_parents['t'] = knodes['t_bottom']
+            wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
+            wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
+            wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
 
-        wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else self.default_intervars['sv']
-        wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else self.default_intervars['sz']
-        wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else self.default_intervars['st']
-        wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
-        wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
+            # MODEL SPECIFIC PARAMETERS
+            if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
+                wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 3 
+                wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else 3
+            
+            if self.model == 'ornstein':
+                wfpt_parents['g'] = knodes['g_bottom'] if 'g' in self.include else 0
+            
+            if self.model == 'levy':
+                wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 2
+            
+            if self.model == 'angle':
+                wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else 0
+
+            if self.model == 'full_ddm' or self.model =='full_ddm2':
+                wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else 0 #self.default_intervars['sv']
+                wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else 0 #self.default_intervars['sz']
+                wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else 0 #self.default_intervars['st']
+
+            print('wfpt parents: ')
+            print(wfpt_parents)
+
+        else:
+            wfpt_parents['a'] = knodes['a_bottom']
+            wfpt_parents['v'] = knodes['v_bottom']
+            wfpt_parents['t'] = knodes['t_bottom']
+
+            wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else self.default_intervars['sv']
+            wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else self.default_intervars['sz']
+            wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else self.default_intervars['st']
+            wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
+            wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
         return wfpt_parents
 
     def _create_wfpt_knode(self, knodes):
