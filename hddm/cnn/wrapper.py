@@ -13,7 +13,7 @@ class Infer:
 		self.target = []
 		self.inp = tf.placeholder(tf.float32, self.cfg.test_param_dims)
 		self.initialized = False
-	
+
 		with tf.device('/gpu:0'):
 			with tf.variable_scope("model", reuse=tf.AUTO_REUSE) as scope:
 				self.model = cnn_model_struct()
@@ -31,7 +31,7 @@ class Infer:
 		return getattr(self, item)
 
 	def __contains__(self, item):
- 		return hasattr(self, item)
+		return hasattr(self, item)
 
 	def forward(self, params):
 		pred_hist = self.sess.run(self.model.output, feed_dict={self.inp:params.reshape(self.cfg.test_param_dims)})
@@ -44,13 +44,13 @@ def load_cnn(model, nbin):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str)
-    parser.add_argument('--nbin', type=int)
-    args = parser.parse_args()
-    
-    cfg = config.Config(model=args.model, bins=args.nbin)
-    inference_class = Infer(config=cfg)
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--model', type=str)
+	parser.add_argument('--nbin', type=int)
+	args = parser.parse_args()
 
-    example_params = np.array([0., 1.5, 0.5, 1])
-    print(inference_class.forward(example_params))
+	cfg = config.Config(model=args.model, bins=args.nbin)
+	inference_class = Infer(config=cfg)
+
+	example_params = np.array([0., 1.5, 0.5, 1])
+	print(inference_class.forward(example_params))

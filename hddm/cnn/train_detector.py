@@ -255,7 +255,7 @@ def train_model(config):
                 _, loss, softmax_outputs, tr_data, tr_labels = sess.run([train_step, kl_divergence_loss, y_conv, train_data, train_labels])
                 step+=1
                 if math.isnan(loss):
-                        import ipdb; ipdb.set_trace()
+                    import ipdb; ipdb.set_trace()
                 #import ipdb; ipdb.set_trace()
                 '''
                 # validating the model. main concern is if the weights are shared between
