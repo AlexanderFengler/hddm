@@ -631,12 +631,15 @@ class HDDMnnRegressor(HDDM):
                     param_lookup = param[:param.find('_')]
                     print('param_lookup passed to _create stochastic_knodes')
                     print(param_lookup)
+                    print([param_lookup])
                     #reg_family = self._create_stochastic_knodes_basic([param_lookup])
                     #reg_family = self._create_stochastic_knodes([param_lookup])
                     reg_family = super(HDDMnnRegressor, self)._create_stochastic_knodes([param_lookup])
                     # Rename nodes to avoid collissions
-                    names = list(reg_family.keys())
-                    print(names)
+                    print(reg_family)
+                    type(reg_family)
+                    #names = list(reg_family.keys())
+                    #print(names)
                     for name in names:
                         print('name: ', name)
                         print('names: ', names)
