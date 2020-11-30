@@ -95,7 +95,7 @@ class Config(object):
         self.test_param_dims = [1, 1, 4, 1]
         self.output_hist_dims = [None, 1, nbins, 2]
         self.bounds = [(-2.5, 2.5), (0.5, 2.2), (0.25, 0.75), (0.05, 1.95)]
-    	self.param_names = ['v', 'a', 'w', 'ndt']
+        self.param_names = ['v', 'a', 'w', 'ndt']
 
     def weibull_initialize(self, nbins):
         self.model_name = 'weibull'
