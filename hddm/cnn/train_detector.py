@@ -7,8 +7,8 @@ import sys
 import tempfile
 import os, glob, pickle
 import tensorflow as tf
-import config
-from tf_data_handler import inputs
+import .config
+from .tf_data_handler import inputs
 import numpy as np
 import tqdm, time
 import matplotlib.pyplot as plt

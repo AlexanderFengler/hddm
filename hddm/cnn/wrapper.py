@@ -1,6 +1,6 @@
 import numpy as np
-from train_detector import cnn_model_struct
-import config
+from .train_detector import cnn_model_struct
+import .config
 import tensorflow as tf
 import tqdm, gzip, cProfile, time, argparse, pickle, os
 # just to prevent tensorflow from printing logs
