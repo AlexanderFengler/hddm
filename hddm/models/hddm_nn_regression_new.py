@@ -638,7 +638,7 @@ class HDDMnnRegressor(HDDM):
                     # Rename nodes to avoid collissions
                     print(reg_family)
                     type(reg_family)
-                    #names = list(reg_family.keys())
+                    names = list(reg_family.keys())
                     #print(names)
                     for name in names:
                         print('name: ', name)
