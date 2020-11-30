@@ -598,8 +598,9 @@ class HDDMnnRegressor(HDDM):
         #include = set(include) # TD: Check why here include is not coming in as a set // This worked in hddm_nn.py
         includes_remainder = set(include).difference(self.reg_outcomes)
         print(includes_remainder)
-        #knodes = self._create_stochastic_knodes_basic(includes_remainder)
-        knodes = self._create_stochastic_knodes(includes_remainder)
+        # knodes = self._create_stochastic_knodes_basic(includes_remainder)
+        # knodes = self._create_stochastic_knodes(includes_remainder)
+        knodes = super(HDDMnnRegressor, self)._create_stochastic_knodes(includes_remainder)
 
         print('knodes')
         print(knodes)
@@ -631,8 +632,8 @@ class HDDMnnRegressor(HDDM):
                     print('param_lookup passed to _create stochastic_knodes')
                     print(param_lookup)
                     #reg_family = self._create_stochastic_knodes_basic([param_lookup])
-                    reg_family = self._create_stochastic_knodes([param_lookup])
-
+                    #reg_family = self._create_stochastic_knodes([param_lookup])
+                    reg_family = super(HDDMnnRegressor, self)._create_stochastic_knodes([param_lookup])
                     # Rename nodes to avoid collissions
                     names = list(reg_family.keys())
                     print(names)
