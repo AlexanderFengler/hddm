@@ -38,7 +38,7 @@ class Infer:
 		return pred_hist
 
 def load_cnn(model, nbin):
-	cfg = config.Config(model=model, bins=nbin)
+	cfg = Config(model=model, bins=nbin)
 	inference_class = Infer(config=cfg)
 	return inference_class.forward
 
@@ -49,7 +49,7 @@ if __name__ == '__main__':
 	parser.add_argument('--nbin', type=int)
 	args = parser.parse_args()
 
-	cfg = config.Config(model=args.model, bins=args.nbin)
+	cfg = Config(model=args.model, bins=args.nbin)
 	inference_class = Infer(config=cfg)
 
 	example_params = np.array([0., 1.5, 0.5, 1])
