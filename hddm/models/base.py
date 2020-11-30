@@ -37,7 +37,7 @@ class AccumulatorModel(kabuki.Hierarchical):
         self.nn = kwargs.pop('nn', False)
         if self.nn:
             print('Recognized HDDMnn')
-            data = hddm.utils.flip_errors_nn(data)
+            data = hddm.utils.flip_errors_nn(data, self.network_type)
         else:
             data = hddm.utils.flip_errors(data)
         self.std_depends = kwargs.pop('std_depends', False)

@@ -130,11 +130,14 @@ class HDDMnnRegressor(HDDM):
             and v_C(condition)[T.cond2] for cond1 + cond2.
 
         """
+        # Signify as neural net class for later super() inits
         kwargs['nn'] = True
+
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
         self.network_type = kwargs.pop('network_type', 'mlp')
         self.network = None
         self.keep_regressor_trace = keep_regressor_trace
+        
         if isinstance(models, (str, dict)):
             models = [models]
         
@@ -213,40 +216,6 @@ class HDDMnnRegressor(HDDM):
         for model in d['model_descrs']:
             model['link_func'] = lambda x: x
         super(HDDMnnRegressor, self).__setstate__(d)
-
-    # def _create_wfpt_parents_dict(self, knodes):
-    #     wfpt_parents = OrderedDict()
-
-    #     wfpt_parents['a'] = knodes['a_bottom']
-    #     wfpt_parents['v'] = knodes['v_bottom']
-    #     wfpt_parents['t'] = knodes['t_bottom']
-    #     wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
-    #     wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
-    #     wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
-
-    #     # MODEL SPECIFIC PARAMETERS
-    #     if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
-    #         wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 3 
-    #         wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else 3
-        
-    #     if self.model == 'ornstein':
-    #         wfpt_parents['g'] = knodes['g_bottom'] if 'g' in self.include else 0
-        
-    #     if self.model == 'levy':
-    #         wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 1.5
-        
-    #     if self.model == 'angle':
-    #         wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else 0
-
-    #     if self.model == 'full_ddm' or self.model == 'full_ddm2':
-    #         wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else 0 #self.default_intervars['sv']
-    #         wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else 0 #self.default_intervars['sz']
-    #         wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else 0 #self.default_intervars['st']
-       
-    #     print('wfpt parents: ')
-    #     print(wfpt_parents)
-
-    #     return wfpt_parents
 
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
@@ -351,6 +320,41 @@ class HDDMnnRegressor(HDDM):
 
 
 ######################################################################## -----------------------------
+    # def _create_wfpt_parents_dict(self, knodes):
+    #     wfpt_parents = OrderedDict()
+
+    #     wfpt_parents['a'] = knodes['a_bottom']
+    #     wfpt_parents['v'] = knodes['v_bottom']
+    #     wfpt_parents['t'] = knodes['t_bottom']
+    #     wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
+    #     wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
+    #     wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
+
+    #     # MODEL SPECIFIC PARAMETERS
+    #     if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
+    #         wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 3 
+    #         wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else 3
+        
+    #     if self.model == 'ornstein':
+    #         wfpt_parents['g'] = knodes['g_bottom'] if 'g' in self.include else 0
+        
+    #     if self.model == 'levy':
+    #         wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 1.5
+        
+    #     if self.model == 'angle':
+    #         wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else 0
+
+    #     if self.model == 'full_ddm' or self.model == 'full_ddm2':
+    #         wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else 0 #self.default_intervars['sv']
+    #         wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else 0 #self.default_intervars['sz']
+    #         wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else 0 #self.default_intervars['st']
+       
+    #     print('wfpt parents: ')
+    #     print(wfpt_parents)
+
+    #     return wfpt_parents
+
+
 
 # Defining only the model likelihood at this point !
 # def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,

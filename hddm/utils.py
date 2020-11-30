@@ -36,7 +36,7 @@ def flip_errors(data):
 
     return data
 
-def flip_errors_nn(data):
+def flip_errors_nn(data, network_type = 'cnn'):
     """Flip sign for lower boundary responses in case they were supplied ready for standard hddm.
 
         :Arguments:
@@ -47,36 +47,38 @@ def flip_errors_nn(data):
                 Input array with RTs sign flipped where 'response' < 0
 
     """
-
-    data = pd.DataFrame(data.copy()) # .values.astype(np.float32)
-    
-    data['response'] = data['response'].values.astype(np.float32)
-    data['rt'] = data['rt'].values.astype(np.float32)
-
-    if np.any(data['response'] != 1.0):
-        #print('passed through ')
-        idx = data['response'] < 1.0
-        data.loc[idx, 'response'] = -1.0
-    
-    # Check if data is already flipped
-    if np.any(data['rt'] < 0) != False:
+    if network_type == 'cnn':
         return data
+    if network_type == 'mlp':
+        data = pd.DataFrame(data.copy()) # .values.astype(np.float32)
+        
+        data['response'] = data['response'].values.astype(np.float32)
+        data['rt'] = data['rt'].values.astype(np.float32)
 
-    # Copy data
-    #data = pd.DataFrame(data.copy())
+        if np.any(data['response'] != 1.0):
+            #print('passed through ')
+            idx = data['response'] < 1.0
+            data.loc[idx, 'response'] = -1.0
+        
+        # Check if data is already flipped
+        if np.any(data['rt'] < 0) != False:
+            return data
 
-    # Flip sign for lower boundary response
-    idx = data['rt'] < 0.0
-    data.loc[idx, 'rt'] = - data.loc[idx, 'rt']
-    #data = data.values.astype(np.float32).copy()
+        # Copy data
+        #data = pd.DataFrame(data.copy())
 
-    print('RT')
-    print(np.min(data['rt'].values))
-    print(np.max(data['rt'].values))
+        # Flip sign for lower boundary response
+        idx = data['rt'] < 0.0
+        data.loc[idx, 'rt'] = - data.loc[idx, 'rt']
+        #data = data.values.astype(np.float32).copy()
 
-    print('Response')
-    print(np.unique(data['response']))
-    return data
+        print('RT')
+        print(np.min(data['rt'].values))
+        print(np.max(data['rt'].values))
+
+        print('Response')
+        print(np.unique(data['response']))
+        return data
 
 def check_params_valid(**params):
     a = params.get('a')
