@@ -6,7 +6,7 @@ class Config(object):
 
     def __init__(self, model=None, bins=None, N=None):
         # Directory setup
-        self.base_dir = '/media/data_cifs/projects/prj_approx-bayes/projectABC/'
+        self.base_dir = '/Users/afengler/OneDrive/git_repos/hddm/'
         self.data_dir = 'data'
         self.tfrecord_dir = 'tfrecords'
         self.summary_dir = 'summaries'
@@ -27,14 +27,14 @@ class Config(object):
             self.N = 1024
 
         self.method_options = {'ddm': self.ddm_initialize, 'angle': self.angle_initialize, 'weibull': self.weibull_initialize, 'ornstein': self.ornstein_initialize,
-                        'fullddm': self.full_ddm_initialize, 'race_model_3': self.race_model_3_initialize, 'race_model_4': self.race_model_4_initialize,'race_model_6':self.race_model_6_initialize,
-                        'lca_3': self.lca_3_initialize, 'lca_4': self.lca_4_initialize,
-                        'ddm_seq2': self.ddm_seq2_initialize,
-                        'ddm_par2': self.ddm_par2_initialize,
-                        'ddm_mic2': self.ddm_mic2_initialize,
-                        'levy': self.levy_initialize,
-                        'fullddm2': self.full_ddm2_initialize,
-                        'ddm_sdv': self.ddm_sdv_initialize}
+                               'fullddm': self.full_ddm_initialize, 'race_model_3': self.race_model_3_initialize, 'race_model_4': self.race_model_4_initialize,'race_model_6':self.race_model_6_initialize,
+                               'lca_3': self.lca_3_initialize, 'lca_4': self.lca_4_initialize,
+                               'ddm_seq2': self.ddm_seq2_initialize,
+                               'ddm_par2': self.ddm_par2_initialize,
+                               'ddm_mic2': self.ddm_mic2_initialize,
+                               'levy': self.levy_initialize,
+                               'fullddm2': self.full_ddm2_initialize,
+                               'ddm_sdv': self.ddm_sdv_initialize}
 
         # select model
         self.method_options[model](self.nBins)
@@ -62,8 +62,8 @@ class Config(object):
         # Data configuration
         self.results_dir = '/media/data_cifs/projects/prj_approx-bayes/projectABC/results/'
         self.model_output = os.path.join(self.base_dir,
-                                        'models',
-                                        self.refname)
+                                        'cnn_models',
+                                         self.refname)
         
         self.data_prop = {'train':0.9, 'val':0.05, 'test':0.05}
 
