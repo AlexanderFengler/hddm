@@ -9,6 +9,7 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 
 class Infer:
 	def __init__(self, config):
+		tf.reset_default_graph()
 		self.cfg = config
 		self.target = []
 		self.inp = tf.placeholder(tf.float32, self.cfg.test_param_dims)
