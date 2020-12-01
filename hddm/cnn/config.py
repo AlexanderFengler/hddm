@@ -10,18 +10,18 @@ import hddm
 # all_model_checkpoint_paths: "/Users/afengler/OneDrive/git_repos/hddm/hddm/cnn_models/ddm_training_data_binned_1_nbins_512_n_100000/ddm_210250.ckpt-210250"
 # all_model_checkpoint_paths: "/Users/afengler/OneDrive/git_repos/hddm/hddm/cnn_models/ddm_training_data_binned_1_nbins_512_n_100000/ddm_210500.ckpt-210500"
 
-model_checkpoint_path: "./ddm_210500.ckpt-210500"
-all_model_checkpoint_paths: "./ddm_209500.ckpt-209500"
-all_model_checkpoint_paths: "./ddm_209750.ckpt-209750"
-all_model_checkpoint_paths: "./ddm_210000.ckpt-210000"
-all_model_checkpoint_paths: "./ddm_210250.ckpt-210250"
-all_model_checkpoint_paths: "./ddm_210500.ckpt-210500"
+# model_checkpoint_path: "./ddm_210500.ckpt-210500"
+# all_model_checkpoint_paths: "./ddm_209500.ckpt-209500"
+# all_model_checkpoint_paths: "./ddm_209750.ckpt-209750"
+# all_model_checkpoint_paths: "./ddm_210000.ckpt-210000"
+# all_model_checkpoint_paths: "./ddm_210250.ckpt-210250"
+# all_model_checkpoint_paths: "./ddm_210500.ckpt-210500"
 
 
-ddm_rel_checkpoint_dict = dict('model_checkpoint_path:': "/ddm_210500.ckpt-210500")
+# ddm_rel_checkpoint_dict = dict('model_checkpoint_path:': "/ddm_210500.ckpt-210500")
 
-for key, val in ddm_rel_checkpoint_dict:
-    ddm_rel_checkpint_dict[key] = hddm.__path__[0] + ddm_rel_checkpint_dict[val]
+# for key, val in ddm_rel_checkpoint_dict:
+#     ddm_rel_checkpint_dict[key] = hddm.__path__[0] + ddm_rel_checkpint_dict[val]
 
 class Config(object):
 
