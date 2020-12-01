@@ -10,6 +10,18 @@ import hddm
 # all_model_checkpoint_paths: "/Users/afengler/OneDrive/git_repos/hddm/hddm/cnn_models/ddm_training_data_binned_1_nbins_512_n_100000/ddm_210250.ckpt-210250"
 # all_model_checkpoint_paths: "/Users/afengler/OneDrive/git_repos/hddm/hddm/cnn_models/ddm_training_data_binned_1_nbins_512_n_100000/ddm_210500.ckpt-210500"
 
+model_checkpoint_path: "./ddm_210500.ckpt-210500"
+all_model_checkpoint_paths: "./ddm_209500.ckpt-209500"
+all_model_checkpoint_paths: "./ddm_209750.ckpt-209750"
+all_model_checkpoint_paths: "./ddm_210000.ckpt-210000"
+all_model_checkpoint_paths: "./ddm_210250.ckpt-210250"
+all_model_checkpoint_paths: "./ddm_210500.ckpt-210500"
+
+
+ddm_rel_checkpoint_dict = dict('model_checkpoint_path:': "/ddm_210500.ckpt-210500")
+
+for key, val in ddm_rel_checkpoint_dict:
+    ddm_rel_checkpint_dict[key] = hddm.__path__[0] + ddm_rel_checkpint_dict[val]
 
 class Config(object):
 
@@ -73,9 +85,18 @@ class Config(object):
         self.model_output = os.path.join(self.base_dir,
                                         'cnn_models',
                                          self.refname)
+        
         print(self.model_output)
+        
+        with open(self.model_output + '/checkpoint', 'rb') as f:
+            ckpt_meta = f.readlines()
+        
+        ckpt_meta = [x.strip().split(':')[0] + ' "' + os.path.join(hddm.__path__[0],'cnn_models', self.refname, x.strip().split(':')[-1].split('/')[-1]) + '"' + "\n" for x in ckpt_meta]
+        
+        with open(self.model_output + '/checkpoint','wb') as f:
+            f.writelines(ckpt_meta)
+        
         self.data_prop = {'train':0.9, 'val':0.05, 'test':0.05}
-
         self.min_param_values = np.array([x[0] for x in self.bounds])
         self.param_range = np.array([x[1] - x[0] for x in self.bounds])
 
