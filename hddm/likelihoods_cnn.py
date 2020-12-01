@@ -28,8 +28,8 @@ def make_cnn_likelihood(model):
                               w_outlier = 0,
                               **kwargs): #theta
 
-            return hddm.wfpt.wiener_like_cnn_ddm(x['rt'],
-                                                 x['response'], 
+            return hddm.wfpt.wiener_like_cnn_ddm(x['rt'].values,
+                                                 x['response'].values, 
                                                  np.array([v, a, z, t], dtype = np.float32), 
                                                  p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
                                                  w_outlier = w_outlier,
