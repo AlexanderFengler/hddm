@@ -6004,7 +6004,7 @@ static PyObject *__pyx_pf_4wfpt_6wiener_like_cnn_ddm(CYTHON_UNUSED PyObject *__p
  *     log_p = 0
  *     for i in range(size):             # <<<<<<<<<<<<<<
  *         if response[i] == 0:
- *             log_p += np.log(pred[0, x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
+ *             log_p += np.log(pred[0, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
  */
   __pyx_t_5 = __pyx_v_size;
   __pyx_t_6 = __pyx_t_5;
@@ -6015,7 +6015,7 @@ static PyObject *__pyx_pf_4wfpt_6wiener_like_cnn_ddm(CYTHON_UNUSED PyObject *__p
  *     log_p = 0
  *     for i in range(size):
  *         if response[i] == 0:             # <<<<<<<<<<<<<<
- *             log_p += np.log(pred[0, x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
+ *             log_p += np.log(pred[0, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
  *         else:
  */
     __pyx_t_8 = __pyx_v_i;
@@ -6025,9 +6025,9 @@ static PyObject *__pyx_pf_4wfpt_6wiener_like_cnn_ddm(CYTHON_UNUSED PyObject *__p
       /* "wfpt.pyx":124
  *     for i in range(size):
  *         if response[i] == 0:
- *             log_p += np.log(pred[0, x[i]] * (1 - p_outlier) + w_outlier * p_outlier)             # <<<<<<<<<<<<<<
+ *             log_p += np.log(pred[0, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)             # <<<<<<<<<<<<<<
  *         else:
- *             log_p += np.log(pred[0, x[i] + 512] * (1 - p_outlier) + w_outlier * p_outlier)
+ *             log_p += np.log(pred[0, 2 * x[i] + 1] * (1 - p_outlier) + w_outlier * p_outlier)
  */
       __pyx_t_1 = PyFloat_FromDouble(__pyx_v_log_p); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
@@ -6038,7 +6038,7 @@ static PyObject *__pyx_pf_4wfpt_6wiener_like_cnn_ddm(CYTHON_UNUSED PyObject *__p
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_8 = __pyx_v_i;
       __pyx_t_11 = 0;
-      __pyx_t_12 = (*__Pyx_BufPtrStrided1d(long *, __pyx_pybuffernd_x.rcbuffer->pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_x.diminfo[0].strides));
+      __pyx_t_12 = (2 * (*__Pyx_BufPtrStrided1d(long *, __pyx_pybuffernd_x.rcbuffer->pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_x.diminfo[0].strides)));
       __pyx_t_3 = PyFloat_FromDouble((((*__Pyx_BufPtrStrided2d(float *, __pyx_pybuffernd_pred.rcbuffer->pybuffer.buf, __pyx_t_11, __pyx_pybuffernd_pred.diminfo[0].strides, __pyx_t_12, __pyx_pybuffernd_pred.diminfo[1].strides)) * (1.0 - __pyx_v_p_outlier)) + (__pyx_v_w_outlier * __pyx_v_p_outlier))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 124, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_13 = NULL;
@@ -6069,16 +6069,16 @@ static PyObject *__pyx_pf_4wfpt_6wiener_like_cnn_ddm(CYTHON_UNUSED PyObject *__p
  *     log_p = 0
  *     for i in range(size):
  *         if response[i] == 0:             # <<<<<<<<<<<<<<
- *             log_p += np.log(pred[0, x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
+ *             log_p += np.log(pred[0, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
  *         else:
  */
       goto __pyx_L5;
     }
 
     /* "wfpt.pyx":126
- *             log_p += np.log(pred[0, x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
+ *             log_p += np.log(pred[0, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
  *         else:
- *             log_p += np.log(pred[0, x[i] + 512] * (1 - p_outlier) + w_outlier * p_outlier)             # <<<<<<<<<<<<<<
+ *             log_p += np.log(pred[0, 2 * x[i] + 1] * (1 - p_outlier) + w_outlier * p_outlier)             # <<<<<<<<<<<<<<
  * 
  *     # Call to network:
  */
@@ -6092,7 +6092,7 @@ static PyObject *__pyx_pf_4wfpt_6wiener_like_cnn_ddm(CYTHON_UNUSED PyObject *__p
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_8 = __pyx_v_i;
       __pyx_t_12 = 0;
-      __pyx_t_11 = ((*__Pyx_BufPtrStrided1d(long *, __pyx_pybuffernd_x.rcbuffer->pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_x.diminfo[0].strides)) + 0x200);
+      __pyx_t_11 = ((2 * (*__Pyx_BufPtrStrided1d(long *, __pyx_pybuffernd_x.rcbuffer->pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_x.diminfo[0].strides))) + 1);
       __pyx_t_1 = PyFloat_FromDouble((((*__Pyx_BufPtrStrided2d(float *, __pyx_pybuffernd_pred.rcbuffer->pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_pred.diminfo[0].strides, __pyx_t_11, __pyx_pybuffernd_pred.diminfo[1].strides)) * (1.0 - __pyx_v_p_outlier)) + (__pyx_v_w_outlier * __pyx_v_p_outlier))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_t_13 = NULL;
