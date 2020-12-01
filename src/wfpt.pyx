@@ -39,17 +39,17 @@ include 'integrate.pxi'
 # TODO: Refactor this ?
 #ddm_model = load_mlp(model = 'ddm')
 
-weibull_model = load_mlp(model = 'weibull_cdf') # keras.models.load_model('model_final_weibull.h5', compile = False)
-angle_model = load_mlp(model = 'angle') #keras.models.load_model('model_final_angle.h5', compile = False)
-#model = keras.models.load_model('model_final.h5', compile = False)
-new_weibull_model = load_mlp(model = 'weibull_cdf') # keras.models.load_model('model_final_new.h5', compile = False)
-ddm_model = load_mlp(model = 'ddm') # keras.models.load_model('model_final_ddm.h5', compile = False)
-ddm_analytic_model = load_mlp(model = 'ddm_analytic') #keras.models.load_model('model_final_ddm_analytic.h5', compile = False)
-levy_model = load_mlp(model = 'levy') # keras.models.load_model('model_final_levy.h5', compile = False)
-ornstein_model = load_mlp(model = 'ornstein') # keras.models.load_model('model_final_ornstein.h5', compile = False)
-ddm_sdv_model = load_mlp(model = 'ddm_sdv') # keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
-ddm_sdv_analytic_model = load_mlp(model = 'ddm_sdv_analytic') # keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
-full_ddm_model = load_mlp(model = 'full_ddm') #keras.models.load_model('model_final_full_ddm.h5', compile = False)
+# weibull_model = load_mlp(model = 'weibull_cdf') # keras.models.load_model('model_final_weibull.h5', compile = False)
+# angle_model = load_mlp(model = 'angle') #keras.models.load_model('model_final_angle.h5', compile = False)
+# #model = keras.models.load_model('model_final.h5', compile = False)
+# new_weibull_model = load_mlp(model = 'weibull_cdf') # keras.models.load_model('model_final_new.h5', compile = False)
+# ddm_model = load_mlp(model = 'ddm') # keras.models.load_model('model_final_ddm.h5', compile = False)
+# ddm_analytic_model = load_mlp(model = 'ddm_analytic') #keras.models.load_model('model_final_ddm_analytic.h5', compile = False)
+# levy_model = load_mlp(model = 'levy') # keras.models.load_model('model_final_levy.h5', compile = False)
+# ornstein_model = load_mlp(model = 'ornstein') # keras.models.load_model('model_final_ornstein.h5', compile = False)
+# ddm_sdv_model = load_mlp(model = 'ddm_sdv') # keras.models.load_model('model_final_ddm_sdv.h5', compile = False)
+# ddm_sdv_analytic_model = load_mlp(model = 'ddm_sdv_analytic') # keras.models.load_model('model_final_ddm_sdv_analytic.h5', compile = False)
+# full_ddm_model = load_mlp(model = 'full_ddm') #keras.models.load_model('model_final_full_ddm.h5', compile = False)
 
 ###############
 # Basic Navarro Fuss likelihoods
@@ -111,14 +111,9 @@ def wiener_like_cnn_ddm(np.ndarray[long, ndim = 1] x,
 
     cdef Py_ssize_t size = x.shape[0]
     cdef float log_p
-    #cdef float ll_min = -16.11809
-    #cdef parameters
-    #cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
-    #data[:, :n_params] = np.tile([v, a, z, t, sz, sv, st], (size, 1)).astype(np.float32)
-    #data[]
-    #data[:, n_params:] = np.stack([x, response], axis = 1)
     cdef np.ndarray[float, ndim = 2] pred = kwargs['network'](parameters)
     log_p = 0
+    
     for i in range(size):
         if response[i] == 0:
             log_p += np.log(pred[0, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)

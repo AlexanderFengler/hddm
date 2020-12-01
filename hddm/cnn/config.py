@@ -2,6 +2,15 @@ import os
 import numpy as np
 import glob
 
+
+# model_checkpoint_path: "/Users/afengler/OneDrive/git_repos/hddm/hddm/cnn_models/ddm_training_data_binned_1_nbins_512_n_100000/ddm_210500.ckpt-210500"
+# all_model_checkpoint_paths: "/Users/afengler/OneDrive/git_repos/hddm/hddm/cnn_models/ddm_training_data_binned_1_nbins_512_n_100000/ddm_209500.ckpt-209500"
+# all_model_checkpoint_paths: "/Users/afengler/OneDrive/git_repos/hddm/hddm/cnn_models/ddm_training_data_binned_1_nbins_512_n_100000/ddm_209750.ckpt-209750"
+# all_model_checkpoint_paths: "/Users/afengler/OneDrive/git_repos/hddm/hddm/cnn_models/ddm_training_data_binned_1_nbins_512_n_100000/ddm_210000.ckpt-210000"
+# all_model_checkpoint_paths: "/Users/afengler/OneDrive/git_repos/hddm/hddm/cnn_models/ddm_training_data_binned_1_nbins_512_n_100000/ddm_210250.ckpt-210250"
+# all_model_checkpoint_paths: "/Users/afengler/OneDrive/git_repos/hddm/hddm/cnn_models/ddm_training_data_binned_1_nbins_512_n_100000/ddm_210500.ckpt-210500"
+
+
 class Config(object):
 
     def __init__(self, model=None, bins=None, N=None):
