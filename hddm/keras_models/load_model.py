@@ -7,8 +7,8 @@ def load_mlp(model = 'ddm'):
     if model == 'ddm_analytic':
         return keras.models.load_model(hddm.keras_models.__path__[0] + '/model_final_ddm_analytic.h5', compile = False)
     
-    if model == 'weibull_cdf':
-        return keras.models.load_model(hddm.keras_models.__path__[0] + '/model_final_new.h5', compile = False)
+    # if model == 'weibull_cdf':
+    #     return keras.models.load_model(hddm.keras_models.__path__[0] + '/model_final_new.h5', compile = False)
     
     if model == 'angle':
         return keras.models.load_model(hddm.keras_models.__path__[0] + '/model_final_angle.h5', compile = False)
