@@ -43,14 +43,14 @@ def load_cnn(model, nbin):
 	return inference_class.forward
 
 
-if __name__ == '__main__':
-	parser = argparse.ArgumentParser()
-	parser.add_argument('--model', type=str)
-	parser.add_argument('--nbin', type=int)
-	args = parser.parse_args()
+# if __name__ == '__main__':
+# 	parser = argparse.ArgumentParser()
+# 	parser.add_argument('--model', type=str)
+# 	parser.add_argument('--nbin', type=int)
+# 	args = parser.parse_args()
 
-	cfg = Config(model=args.model, bins=args.nbin)
-	inference_class = Infer(config=cfg)
+# 	cfg = Config(model=args.model, bins=args.nbin)
+# 	inference_class = Infer(config=cfg)
 
-	example_params = np.array([0., 1.5, 0.5, 1])
-	print(inference_class.forward(example_params))
+# 	example_params = np.array([0., 1.5, 0.5, 1])
+# 	print(inference_class.forward(example_params))

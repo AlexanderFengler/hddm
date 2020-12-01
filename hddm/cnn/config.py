@@ -64,7 +64,7 @@ class Config(object):
         self.model_output = os.path.join(self.base_dir,
                                         'cnn_models',
                                          self.refname)
-        
+        print(self.model_output)
         self.data_prop = {'train':0.9, 'val':0.05, 'test':0.05}
 
         self.min_param_values = np.array([x[0] for x in self.bounds])
