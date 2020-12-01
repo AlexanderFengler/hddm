@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import glob
-
+import hddm
 
 # model_checkpoint_path: "/Users/afengler/OneDrive/git_repos/hddm/hddm/cnn_models/ddm_training_data_binned_1_nbins_512_n_100000/ddm_210500.ckpt-210500"
 # all_model_checkpoint_paths: "/Users/afengler/OneDrive/git_repos/hddm/hddm/cnn_models/ddm_training_data_binned_1_nbins_512_n_100000/ddm_209500.ckpt-209500"
@@ -15,7 +15,7 @@ class Config(object):
 
     def __init__(self, model=None, bins=None, N=None):
         # Directory setup
-        self.base_dir = '/Users/afengler/OneDrive/git_repos/hddm/hddm/'
+        self.base_dir = hddm.__path__[0]  #+ '/Users/afengler/OneDrive/git_repos/hddm/hddm/'
         self.data_dir = 'data'
         self.tfrecord_dir = 'tfrecords'
         self.summary_dir = 'summaries'
