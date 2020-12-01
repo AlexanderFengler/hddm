@@ -102,8 +102,8 @@ def wiener_like(np.ndarray[double, ndim=1] x, double v, double sv, double a, dou
 ###########
 # Basic MLP likelihoods
 
-def wiener_like_cnn_ddm(np.ndarray[int, ndim = 1] x, 
-                        np.ndarray[int, ndim = 1] response, 
+def wiener_like_cnn_ddm(np.ndarray[long, ndim = 1] x, 
+                        np.ndarray[long, ndim = 1] response, 
                         np.ndarray[float, ndim = 1] parameters,
                         double p_outlier = 0, 
                         double w_outlier = 0,
@@ -117,7 +117,7 @@ def wiener_like_cnn_ddm(np.ndarray[int, ndim = 1] x,
     #data[:, :n_params] = np.tile([v, a, z, t, sz, sv, st], (size, 1)).astype(np.float32)
     #data[]
     #data[:, n_params:] = np.stack([x, response], axis = 1)
-    pred = kwargs['network'](parameters)
+    np.nadarray[float, ndim 2] pred = kwargs['network'](parameters)
     log_p = 0
     for i in range(size):
         log_p += np.log(pred[x[i], response[i]] * (1 - p_outlier) + w_outlier * p_outlier)
