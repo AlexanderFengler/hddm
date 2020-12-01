@@ -34,6 +34,6 @@ def make_cnn_likelihood(model):
                                                      p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
                                                      w_outlier = w_outlier,
                                                     **kwargs)
-        return wienernn_like_weibull
+        return wienernn_like_ddm
     else: 
         return 'Error model not implemented'
