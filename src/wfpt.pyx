@@ -120,7 +120,11 @@ def wiener_like_cnn_ddm(np.ndarray[long, ndim = 1] x,
     cdef np.ndarray[float, ndim = 2] pred = kwargs['network'](parameters)
     log_p = 0
     for i in range(size):
-        log_p += np.log(pred[x[i], response[i]] * (1 - p_outlier) + w_outlier * p_outlier)
+        if response[i] == 0:
+            log_p += np.log(pred[0, x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
+        else: 
+            log_p += np.log(pred[0, x[i] + 512] * (1 - p_outlier) + w_outlier * p_outlier)
+
     # Call to network:
     return log_p
 
