@@ -14,16 +14,15 @@ class Infer:
 		self.inp = tf.placeholder(tf.float32, self.cfg.test_param_dims)
 		self.initialized = False
 
-		with tf.device('/gpu:0'):
-			with tf.variable_scope("model", reuse=tf.AUTO_REUSE) as scope:
-				self.model = cnn_model_struct()
-				self.model.build(self.inp, self.cfg.test_param_dims[1:], self.cfg.output_hist_dims[1:], train_mode=False, verbose=False)
-				self.gpuconfig = tf.ConfigProto()
-				self.gpuconfig.gpu_options.allow_growth = True
-				self.gpuconfig.allow_soft_placement = True
-				self.saver = tf.train.Saver()
-		
-		self.sess = tf.Session(config=self.gpuconfig)
+		#with tf.device('/gpu:0'):
+		with tf.variable_scope("model", reuse=tf.AUTO_REUSE) as scope:
+			self.model = cnn_model_struct()
+			self.model.build(self.inp, self.cfg.test_param_dims[1:], self.cfg.output_hist_dims[1:], train_mode=False, verbose=False)
+			#	self.gpuconfig = tf.ConfigProto()
+			#	self.gpuconfig.gpu_options.allow_growth = True
+			#	self.gpuconfig.allow_soft_placement = True
+		self.saver = tf.train.Saver()
+		self.sess = tf.Session()
 		print(self.cfg.model_output)
 		ckpts = tf.train.latest_checkpoint(self.cfg.model_output)
 		self.saver.restore(self.sess, ckpts)
