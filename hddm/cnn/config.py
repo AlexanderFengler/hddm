@@ -6,7 +6,7 @@ class Config(object):
 
     def __init__(self, model=None, bins=None, N=None):
         # Directory setup
-        self.base_dir = '/Users/afengler/OneDrive/git_repos/hddm/'
+        self.base_dir = '/Users/afengler/OneDrive/git_repos/hddm/hddm/'
         self.data_dir = 'data'
         self.tfrecord_dir = 'tfrecords'
         self.summary_dir = 'summaries'
