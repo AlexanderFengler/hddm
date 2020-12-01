@@ -88,12 +88,15 @@ class Config(object):
         
         print(self.model_output)
         
-        with open(self.model_output + '/checkpoint', 'r') as f:
+        with open(os.path.join(self.model_output, 'checkpoint'), 'r') as f:
             ckpt_meta = f.readlines()
         
-        ckpt_meta = [x.strip().split(':')[0] + ' "' + os.path.join(hddm.__path__[0],'cnn_models', self.refname, x.strip().split(':')[-1].split('/')[-1]) + '"' + "\n" for x in ckpt_meta]
+        ckpt_meta = [x.strip().split(':')[0] + ': "' + os.path.join(hddm.__path__[0],'cnn_models', self.refname, x.strip().split(':')[-1].split('/')[-1]) + "\n" for x in ckpt_meta]
         
-        with open(self.model_output + '/checkpoint','w') as f:
+        # For simple local check in dev environ
+        # ckpt_meta = [x.strip().split(':')[0] + ': "' + os.path.join('hddm/','cnn_models', 'ddm_training_data_binned_1_nbins_512_n_100000/', x.strip().split(':')[-1].split('/')[-1]) + "\n" for x in ckpt_meta]
+
+        with open(os.path.join(self.model_output, 'checkpoint'), 'w') as f:
             f.writelines(ckpt_meta)
         
         self.data_prop = {'train':0.9, 'val':0.05, 'test':0.05}
