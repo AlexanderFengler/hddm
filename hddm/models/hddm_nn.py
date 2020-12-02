@@ -424,6 +424,12 @@ class HDDMnn(HDDM):
                      col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
                      **wfpt_parents)
 
+
+    def save(self, filename = None):
+        if filename in not None:
+            del self.network
+            pickle.dump(self, open(filename, 'wb'))
+
 # UNUSED -------------------------------------------------------------
         
 # if self.model == 'ddm':

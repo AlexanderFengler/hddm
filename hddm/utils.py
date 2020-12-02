@@ -8,9 +8,21 @@ import kabuki
 import pandas as pd
 import string
 from kabuki.analyze import post_pred_gen, post_pred_compare_stats
+from hddm.keras_models import load_mlp
+from hddm.cnn.wrapper import load_cnn
 
 from scipy.stats import scoreatpercentile
 from scipy.stats.mstats import mquantiles
+
+
+# def load_nn(fname, network_type = 'mlp', model = 'ddm'):
+#     loaded_model = pickle.load(open(fname, 'rb'))
+#     if network_type == 'mlp':
+#         loaded_model.network = 
+#     if network_type == 'cnn':
+#         loaded_model.network = 
+
+#     return loaded_model
 
 def flip_errors(data):
     """Flip sign for lower boundary responses.
