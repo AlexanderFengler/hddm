@@ -8,7 +8,7 @@ import numpy as np
 import pymc
 import wfpt
 import pickle
-import hickle
+#import hickle
 from functools import partial
 
 from kabuki.hierarchical import Knode # LOOK INTO KABUKI TO FIGURE OUT WHAT KNODE EXACTLY DOES
