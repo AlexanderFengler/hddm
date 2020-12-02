@@ -426,10 +426,10 @@ class HDDMnn(HDDM):
                      **wfpt_parents)
 
 
-    def save(self, filename = None):
-        if filename is not None:
-            #del self.network
-            hickle.dump(self, filename, mode = 'w')
+    # def save(self, filename = None):
+    #     if filename is not None:
+    #         #del self.network
+    #         hickle.dump(self, filename, mode = 'w')
 
 # UNUSED -------------------------------------------------------------
         
