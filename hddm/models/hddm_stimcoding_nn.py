@@ -53,7 +53,7 @@ class HDDMnnStimCoding(HDDM):
         self.stim_col = kwargs.pop('stim_col', 'stim')
         self.split_param = kwargs.pop('split_param', 'z')
         self.drift_criterion = kwargs.pop('drift_criterion', False)
-        self.model = kwargs.pop('model', 'weibull')
+        self.model = kwargs.pop('model', 'ddm')
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
 
         print(kwargs['include'])
