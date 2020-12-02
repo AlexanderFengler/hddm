@@ -7,7 +7,7 @@ from copy import copy
 import numpy as np
 import pymc
 import wfpt
-#import pickle
+import pickle
 from functools import partial
 
 from kabuki.hierarchical import Knode # LOOK INTO KABUKI TO FIGURE OUT WHAT KNODE EXACTLY DOES
@@ -426,7 +426,7 @@ class HDDMnn(HDDM):
 
 
     def save(self, filename = None):
-        if filename in not None:
+        if filename is not None:
             del self.network
             pickle.dump(self, open(filename, 'wb'))
 
