@@ -50,6 +50,16 @@ class HDDMnn(HDDM):
         super(HDDMnn, self).__init__(*args, **kwargs)
         print(self.p_outlier)
     
+    def _create_wfpt_knode(self, knodes):
+        wfpt_parents = self._create_wfpt_parents_dict(knodes)
+
+        return Knode(self.wfpt_nn, 
+                     'wfpt', 
+                     observed = True, 
+                     col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
+                     **wfpt_parents)
+
+
     # def _create_stochastic_knodes(self, include):
     #     knodes = OrderedDict()
         
@@ -416,14 +426,6 @@ class HDDMnn(HDDM):
     #     print(wfpt_parents)
     #     return wfpt_parents
 
-    def _create_wfpt_knode(self, knodes):
-        wfpt_parents = self._create_wfpt_parents_dict(knodes)
-
-        return Knode(self.wfpt_nn, 
-                     'wfpt', 
-                     observed = True, 
-                     col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
-                     **wfpt_parents)
 
 
     # def save(self, filename = None):

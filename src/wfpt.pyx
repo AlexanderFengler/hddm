@@ -100,14 +100,14 @@ def wiener_like(np.ndarray[double, ndim=1] x, double v, double sv, double a, dou
     return sum_logp
 
 ###########
-# Basic MLP likelihoods
+# Basic CNN likelihoods
 
-def wiener_like_cnn_ddm(np.ndarray[long, ndim = 1] x, 
-                        np.ndarray[long, ndim = 1] response, 
-                        np.ndarray[float, ndim = 1] parameters,
-                        double p_outlier = 0, 
-                        double w_outlier = 0,
-                        **kwargs):
+def wiener_like_cnn_2(np.ndarray[long, ndim = 1] x, 
+                      np.ndarray[long, ndim = 1] response, 
+                      np.ndarray[float, ndim = 1] parameters,
+                      double p_outlier = 0, 
+                      double w_outlier = 0,
+                      **kwargs):
 
     cdef Py_ssize_t size = x.shape[0]
     cdef float log_p
@@ -123,6 +123,9 @@ def wiener_like_cnn_ddm(np.ndarray[long, ndim = 1] x,
     # Call to network:
     return log_p
 
+
+#############
+# Basic MLP Likelihoods
 def wiener_like_nn_full_ddm(np.ndarray[float, ndim = 1] x, 
                             np.ndarray[float, ndim = 1] response, 
                             double v, 

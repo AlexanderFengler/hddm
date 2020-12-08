@@ -1,6 +1,0 @@
-model_checkpoint_path: "./ddm_210500.ckpt-210500"
-all_model_checkpoint_paths: "./ddm_209500.ckpt-209500"
-all_model_checkpoint_paths: "./ddm_209750.ckpt-209750"
-all_model_checkpoint_paths: "./ddm_210000.ckpt-210000"
-all_model_checkpoint_paths: "./ddm_210250.ckpt-210250"
-all_model_checkpoint_paths: "./ddm_210500.ckpt-210500"
