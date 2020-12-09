@@ -72,6 +72,15 @@ class HDDMnn(HDDM):
         #         del model['link_func']
         return d
 
+    def __setstate__(self, d):
+        if d['network_type'] == 'cnn':
+            d['network'] =  load_cnn(model = d['model'], nbin = d['nbin'])
+        if d['network_type'] == 'mlp':
+            d['network'] = load_mlp(model = d['model'])
+        d['wfpt_nn'] = stochastic_from_dist('Wienernn' + '_' + self.model,
+                                            partial(likelihood_, **network_dict))
+        super(HDDMnn, self).__setstate__(d)
+        
     # def __setstate__(self, d):
     #     d['wfpt_reg_class'] = deepcopy(wfpt_reg_like)
     #     print("WARNING: Custom link functions will not be loaded.")
