@@ -21,7 +21,7 @@ setup(
     author_email='thomas.wiecki@gmail.com',
     url='http://github.com/hddm-devs/hddm',
     packages=['hddm', 'hddm.tests', 'hddm.models', 'hddm.examples', 'hddm.keras_models', 'hddm.cnn', 'hddm.cnn_models'],
-    package_data={'hddm':['examples/*.csv', 'examples/*.conf', 'keras_models/*.h5', 'cnn_models/*']},
+    package_data={'hddm':['examples/*.csv', 'examples/*.conf', 'keras_models/*.h5', 'cnn_models/*/*']},
     scripts=['scripts/hddm_demo.py'],
     description='HDDM is a python module that implements Hierarchical Bayesian estimation of Drift Diffusion Models.',
     install_requires=['NumPy >=1.6.0', 'SciPy >= 0.6.0', 'kabuki >= 0.6.0', 'PyMC>=2.3.3', 'pandas >= 0.12.0', 'patsy'],

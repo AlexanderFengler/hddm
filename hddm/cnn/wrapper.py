@@ -39,8 +39,8 @@ class Infer:
 		return pred_hist
 
 def load_cnn(model, nbin):
-	cfg = Config(model=model, bins=nbin)
-	inference_class = Infer(config=cfg)
+	cfg = Config(model = model, bins = nbin)
+	inference_class = Infer(config = cfg)
 	return inference_class.forward
 
 
