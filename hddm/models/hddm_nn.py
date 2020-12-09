@@ -62,7 +62,10 @@ class HDDMnn(HDDM):
     def __getstate__(self):
         d = super(HDDMnn, self).__getstate__()
         print(d)
-        del d['wfpt_reg_class']
+        del d['network']
+        del d['wfpt_nn']
+        del d['wfpt_class']
+        #del d['wfpt_reg_class']
         # for model in d['model_descrs']:
         #     if 'link_func' in model:
         #         print("WARNING: Will not save custom link functions.")
