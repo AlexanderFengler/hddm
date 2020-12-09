@@ -48,13 +48,13 @@ class Config(object):
             self.N = 1024
 
         self.method_options = {'ddm': self.ddm_initialize, 'angle': self.angle_initialize, 'weibull_cdf': self.weibull_initialize, 'ornstein': self.ornstein_initialize,
-                               'fullddm': self.full_ddm_initialize, 'race_model_3': self.race_model_3_initialize, 'race_model_4': self.race_model_4_initialize,'race_model_6':self.race_model_6_initialize,
+                               'full_ddm': self.full_ddm_initialize, 'race_model_3': self.race_model_3_initialize, 'race_model_4': self.race_model_4_initialize,'race_model_6':self.race_model_6_initialize,
                                'lca_3': self.lca_3_initialize, 'lca_4': self.lca_4_initialize,
                                'ddm_seq2': self.ddm_seq2_initialize,
                                'ddm_par2': self.ddm_par2_initialize,
                                'ddm_mic2': self.ddm_mic2_initialize,
                                'levy': self.levy_initialize,
-                               'fullddm2': self.full_ddm2_initialize,
+                               'full_ddm2': self.full_ddm2_initialize,
                                'ddm_sdv': self.ddm_sdv_initialize}
 
         # select model
