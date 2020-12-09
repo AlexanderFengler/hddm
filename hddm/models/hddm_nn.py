@@ -75,11 +75,11 @@ class HDDMnn(HDDM):
     def __setstate__(self, d):
         if d['network_type'] == 'cnn':
             d['network'] =  load_cnn(model = d['model'], nbin = d['nbin'])
-            likelihood_ = hddm.likelihoods_mlp.make_mlp_likelihood(model = d['model'])
+            likelihood_ = hddm.likelihoods_cnn.make_cnn_likelihood(model = d['model'])
             network_dict = {'network': d['network']}
         if d['network_type'] == 'mlp':
             d['network'] = load_mlp(model = d['model'])
-            likelihood_ = hddm.likelihoods_cnn.make_cnn_likelihood(model = d['model'])
+            likelihood_ = hddm.likelihoods_mlp.make_mlp_likelihood(model = d['model'])
             network_dict = {'network': d['network']}
 
         d['wfpt_nn'] = stochastic_from_dist('Wienernn' + '_' + d['model'],
