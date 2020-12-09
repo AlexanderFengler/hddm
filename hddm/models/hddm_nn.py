@@ -60,7 +60,7 @@ class HDDMnn(HDDM):
                      **wfpt_parents)
 
     def __getstate__(self):
-        d = super(HDDMRegressor, self).__getstate__()
+        d = super(HDDMnn, self).__getstate__()
         print(d)
         del d['wfpt_reg_class']
         # for model in d['model_descrs']:
