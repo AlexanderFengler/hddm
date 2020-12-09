@@ -848,6 +848,7 @@ class HDDMBase(AccumulatorModel):
         return d
 
     def __setstate__(self, d):
+        print(d)
         self.wfpt_class = hddm.likelihoods.generate_wfpt_stochastic_class(d['wiener_params'], cdf_range=d['cdf_range'])
         super(HDDMBase, self).__setstate__(d)
 
