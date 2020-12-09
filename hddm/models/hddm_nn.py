@@ -59,6 +59,24 @@ class HDDMnn(HDDM):
                      col_name = ['response', 'rt'], # TODO: One could preprocess at initialization
                      **wfpt_parents)
 
+    def __getstate__(self):
+        d = super(HDDMRegressor, self).__getstate__()
+        print(d)
+        del d['wfpt_reg_class']
+        # for model in d['model_descrs']:
+        #     if 'link_func' in model:
+        #         print("WARNING: Will not save custom link functions.")
+        #         del model['link_func']
+        return d
+
+    # def __setstate__(self, d):
+    #     d['wfpt_reg_class'] = deepcopy(wfpt_reg_like)
+    #     print("WARNING: Custom link functions will not be loaded.")
+    #     for model in d['model_descrs']:
+    #         model['link_func'] = lambda x: x
+    #     super(HDDMRegressor, self).__setstate__(d)
+
+
 
     # def _create_stochastic_knodes(self, include):
     #     knodes = OrderedDict()
