@@ -64,7 +64,7 @@ class HDDMnn(HDDM):
         print(d)
         del d['network']
         del d['wfpt_nn']
-        del d['wfpt_class']
+        #del d['wfpt_class']
         #del d['wfpt_reg_class']
         # for model in d['model_descrs']:
         #     if 'link_func' in model:

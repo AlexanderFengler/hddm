@@ -843,7 +843,7 @@ class HDDMBase(AccumulatorModel):
 
     def __getstate__(self):
         d = super(HDDMBase, self).__getstate__()
-        print(d)
+        #print(d)
         del d['wfpt_class']
         return d
 
