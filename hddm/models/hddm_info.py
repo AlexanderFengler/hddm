@@ -118,6 +118,7 @@ class HDDM(HDDMBase):
                              'beta': 1.,
                              'g': 0.5}
 
+        # Is this used at all ???
         self.emcee_dispersions = {'a': 1, 't': 0.1, 'a_std': 1, 't_std': 0.15, 'sz': 1.1, 'v': 1.5,
                                   'st': 0.1, 'sv': 3, 'z_trans': 0.2, 'z': 0.1,
                                   'p_outlier': 1., 'v_std': 1,'alpha': 1.5,'dual_alpha': 1.5,'theta': 0.1}

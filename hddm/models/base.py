@@ -813,6 +813,7 @@ class HDDMBase(AccumulatorModel):
         if bias:
             self.include.add('z')
 
+        # AF Todo: Make this model specific ?
         possible_parameters = ('v', 'a', 't', 'z', 'st', 'sz', 'sv', 'p_outlier','dual_alpha','theta','alpha','beta', 'g')
         assert self.include.issubset(possible_parameters), """Received and invalid parameter using the 'include' keyword.
         parameters received: %s
@@ -842,8 +843,8 @@ class HDDMBase(AccumulatorModel):
 
     def __getstate__(self):
         d = super(HDDMBase, self).__getstate__()
+        print(d)
         del d['wfpt_class']
-
         return d
 
     def __setstate__(self, d):
