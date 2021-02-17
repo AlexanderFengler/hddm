@@ -182,7 +182,9 @@ class HDDM(HDDMBase):
                 knodes.update(self._create_family_invlogit('z',
                                                            value = .5,
                                                            g_tau = 10**-2,
-                                                           std_std = 0.5
+                                                           std_std = 0.5,
+                                                           lower = 0.2,
+                                                           upper = 0.8
                                                            )) # should have lower = 0.2, upper = 0.8
             if 'alpha' in include:
                 knodes.update(self._create_family_trunc_normal('alpha',
@@ -269,8 +271,8 @@ class HDDM(HDDMBase):
                                                            value = .5,
                                                            g_tau = 10**-2,
                                                            std_std = 0.5,
-                                                           lower = 0.2,
-                                                           upper = 0.8
+                                                           lower = 0.1,
+                                                           upper = 0.9
                                                            )) # should have lower = 0.1, upper = 0.9
 
             print(knodes.keys())
@@ -302,7 +304,9 @@ class HDDM(HDDMBase):
                 knodes.update(self._create_family_invlogit('z',
                                                            value = .5,
                                                            g_tau = 10**-2,
-                                                           std_std = 0.5
+                                                           std_std = 0.5,
+                                                           lower = 0.1,
+                                                           upper = 0.9
                                                            )) # should have lower = 0.1, upper = 0.9
             if 'sv' in include:
                 knodes.update(self._create_family_trunc_normal('sv', 
@@ -338,7 +342,9 @@ class HDDM(HDDMBase):
                 knodes.update(self._create_family_invlogit('z',
                                                            value = .5,
                                                            g_tau = 10**-2,
-                                                           std_std = 0.5
+                                                           std_std = 0.5,
+                                                           lower = 0.3,
+                                                           upper = 0.7
                                                            )) # should have lower = 0.1, upper = 0.9
 
             if 'sz' in include:
@@ -429,7 +435,9 @@ class HDDM(HDDMBase):
                 knodes.update(self._create_family_invlogit('z',
                                                            value = .5,
                                                            g_tau = 10**-2,
-                                                           std_std = 0.5
+                                                           std_std = 0.5,
+                                                           lower = 0.2,
+                                                           upper = 0.8
                                                            ))
             if 'g' in include:
                 knodes.update(self._create_family_trunc_normal('g',
@@ -465,7 +473,9 @@ class HDDM(HDDMBase):
                 knodes.update(self._create_family_invlogit('z',
                                                            value = .5,
                                                            g_tau = 10**-2,
-                                                           std_std = 0.5
+                                                           std_std = 0.5,
+                                                           lower = 0.1,
+                                                           upper = 0.9,
                                                            ))
             if 'alpha' in include:
                 knodes.update(self._create_family_trunc_normal('alpha',

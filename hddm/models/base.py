@@ -503,12 +503,18 @@ class AccumulatorModel(kabuki.Hierarchical):
             
             # This needs some care, InvLogit should be applied on a transformed value here
             # to properly accomodate the generalized invlogit
-            g = Knode(pm.InvLogit,
-                      name,
-                      ltheta = g_trans,
-                      plot = True,
-                      trace = True
-                      )
+            # g = Knode(pm.InvLogit,
+            #           name,
+            #           ltheta = g_trans,
+            #           plot = True,
+            #           trace = True
+            #           )
+
+            # Using pm.deterministic here, better would be soemthing like pm.InvLogitGeneral
+            g = Knode(pm.Deterministic, name, 
+                      eval = lambda x:  lower + ((upper - lower) * (np.exp(x)) / (1 + np.exp(x))),
+                      x = g_trans, plot = True, trace = True)
+
 
             depends_std = self.depends[name] if self.std_depends else ()
             
@@ -528,13 +534,23 @@ class AccumulatorModel(kabuki.Hierarchical):
 
             # This needs some care, InvLogit should be applied on a transformed value here
             # to properly accomodate the generalized invlogit
-            subj = Knode(pm.InvLogit, 
+            # subj = Knode(pm.InvLogit, 
+            #              '%s_subj'%name,
+            #              ltheta=subj_trans, 
+            #              depends=('subj_idx',),
+            #              plot=self.plot_subjs, 
+            #              trace=True, 
+            #              subj=True)
+
+            subj = Knode(pm.Deterministic,
                          '%s_subj'%name,
-                         ltheta=subj_trans, 
-                         depends=('subj_idx',),
-                         plot=self.plot_subjs, 
-                         trace=True, 
-                         subj=True)
+                         eval = lambda x: lower + ((upper - lower) * (np.exp(x)) / (1 + np.exp(x))),
+                         x = subj_trans,
+                         plot = self.plot_subjs,
+                         trace = True,
+                         subj = True)
+
+            # Again using pm.deterministic because we don't have the option to use pm.InvLogitGeneral
 
             knodes['%s_trans'%name]      = g_trans
             knodes['%s'%name]            = g
