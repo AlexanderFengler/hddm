@@ -547,7 +547,7 @@ class AccumulatorModel(kabuki.Hierarchical):
         else:
             g_trans = Knode(pm.Normal, '%s_trans'%name, mu = g_mu_trans,
                             tau = g_tau, value = value_trans,
-                            depends=self.depends[name], plot=False, hidden=True)
+                            depends=self.depends[name], plot = False, hidden = True)
 
             # This needs some care, InvLogit should be applied on a transformed value here
             # to properly accomodate the generalized invlogit
@@ -556,6 +556,8 @@ class AccumulatorModel(kabuki.Hierarchical):
             g = Knode(pm.Deterministic, '%s'%name, 
                       eval = lambda x:  lower + ((upper - lower) * (np.exp(x)) / (1 + np.exp(x))),
                       x = g_trans, plot = True, trace = True)
+
+            print('passed through invlog node generation with deterministic invlogit')
 
             # Original version
             # g = Knode(pm.InvLogit, '%s'%name, ltheta=g_trans, plot=True,

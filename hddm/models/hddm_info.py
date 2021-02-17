@@ -156,7 +156,7 @@ class HDDM(HDDMBase):
                                                         std_std = 0.5
                                                         ))
 
-        if self.model == 'weibull' or self.model == 'weibull_cdf':
+        if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf2':
             if 'a' in include:
                 knodes.update(self._create_family_trunc_normal('a',
                                                                lower = 0.3,
@@ -225,7 +225,9 @@ class HDDM(HDDMBase):
                 knodes.update(self._create_family_invlogit('z',
                                                            value = .5,
                                                            g_tau = 10**-2,
-                                                           std_std = 0.5
+                                                           std_std = 0.5,
+                                                           lower = 0.2,
+                                                           upper = 0.8
                                                            )) # should have lower = 0.2, upper = 0.8
             if 'alpha' in include:
                 knodes.update(self._create_family_trunc_normal('alpha',
