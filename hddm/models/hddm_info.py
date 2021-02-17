@@ -226,8 +226,6 @@ class HDDM(HDDMBase):
                                                            value = .5,
                                                            g_tau = 10**-2,
                                                            std_std = 0.5,
-                                                           lower = 0.2,
-                                                           upper = 0.8
                                                            )) # should have lower = 0.2, upper = 0.8
             if 'alpha' in include:
                 knodes.update(self._create_family_trunc_normal('alpha',
@@ -270,7 +268,9 @@ class HDDM(HDDMBase):
                 knodes.update(self._create_family_invlogit('z',
                                                            value = .5,
                                                            g_tau = 10**-2,
-                                                           std_std = 0.5
+                                                           std_std = 0.5,
+                                                           lower = 0.2,
+                                                           upper = 0.8
                                                            )) # should have lower = 0.1, upper = 0.9
 
             print(knodes.keys())
@@ -391,7 +391,9 @@ class HDDM(HDDMBase):
                 knodes.update(self._create_family_invlogit('z',
                                                            value = .5,
                                                            g_tau = 10**-2,
-                                                           std_std = 0.5
+                                                           std_std = 0.5,
+                                                           lower = 0.2,
+                                                           upper = 0.8
                                                            ))
             if 'theta' in include:
                 knodes.update(self._create_family_trunc_normal('theta',
