@@ -44,10 +44,8 @@ class AccumulatorModel(kabuki.Hierarchical):
 
         super(AccumulatorModel, self).__init__(data, **kwargs)
 
-
     def _create_an_average_model(self):
         raise NotImplementedError("This method has to be overloaded. See HDDMBase.")
-
 
     def _quantiles_optimization(self, method, quantiles=(.1, .3, .5, .7, .9 ), n_runs=3):
         """
@@ -72,8 +70,10 @@ class AccumulatorModel(kabuki.Hierarchical):
                                                                    n_runs=n_runs, compute_stats=False)
         #run optimization for single subject model
         else:
-            results, bic_info = self._optimization_single(method=method, quantiles=quantiles,
-                                                          n_runs=n_runs, compute_stats=True)
+            results, bic_info = self._optimization_single(method = method, 
+                                                          quantiles = quantiles,
+                                                          n_runs = n_runs, 
+                                                          compute_stats = True)
 
         if bic_info is not None:
             self.bic_info = bic_info
@@ -468,6 +468,7 @@ class AccumulatorModel(kabuki.Hierarchical):
                                 std_value = .1,
                                 lower = 0.0,
                                 upper = 1.0):
+
         """Similar to _create_family_normal_normal_hnormal() but adds a invlogit
         transform knode to the subject and group mean nodes. This is useful
         when the parameter space is restricted from [0, 1].
@@ -502,14 +503,21 @@ class AccumulatorModel(kabuki.Hierarchical):
             
             # This needs some care, InvLogit should be applied on a transformed value here
             # to properly accomodate the generalized invlogit
-            g = Knode(pm.InvLogit, name, ltheta=g_trans, plot=True,
-                      trace=True)
+            g = Knode(pm.InvLogit,
+                      name,
+                      ltheta = g_trans,
+                      plot = True,
+                      trace = True
+                      )
 
             depends_std = self.depends[name] if self.std_depends else ()
-            std = Knode(pm.HalfNormal, '%s_std' % name, tau=std_std**-2,
+            
+            std = Knode(pm.HalfNormal,
+                        '%s_std' % name, tau=std_std**-2,
                         value=std_value, depends=depends_std)
 
-            tau = Knode(pm.Deterministic, '%s_tau'%name, doc='%s_tau'
+            tau = Knode(pm.Deterministic,
+                        '%s_tau'%name, doc='%s_tau'
                         % name, eval=lambda x: x**-2, x=std,
                         plot=False, trace=False, hidden=True)
 
@@ -520,9 +528,13 @@ class AccumulatorModel(kabuki.Hierarchical):
 
             # This needs some care, InvLogit should be applied on a transformed value here
             # to properly accomodate the generalized invlogit
-            subj = Knode(pm.InvLogit, '%s_subj'%name,
-                         ltheta=subj_trans, depends=('subj_idx',),
-                         plot=self.plot_subjs, trace=True, subj=True)
+            subj = Knode(pm.InvLogit, 
+                         '%s_subj'%name,
+                         ltheta=subj_trans, 
+                         depends=('subj_idx',),
+                         plot=self.plot_subjs, 
+                         trace=True, 
+                         subj=True)
 
             knodes['%s_trans'%name]      = g_trans
             knodes['%s'%name]            = g
@@ -533,14 +545,21 @@ class AccumulatorModel(kabuki.Hierarchical):
             knodes['%s_bottom'%name]     = subj
 
         else:
-            g_trans = Knode(pm.Normal, '%s_trans'%name, mu=g_mu_trans,
-                            tau=g_tau, value=value_trans,
+            g_trans = Knode(pm.Normal, '%s_trans'%name, mu = g_mu_trans,
+                            tau = g_tau, value = value_trans,
                             depends=self.depends[name], plot=False, hidden=True)
 
             # This needs some care, InvLogit should be applied on a transformed value here
             # to properly accomodate the generalized invlogit
-            g = Knode(pm.InvLogit, '%s'%name, ltheta=g_trans, plot=True,
-                      trace=True )
+            
+            # Here my manual version
+            g = Knode(pm.Deterministic, '%s'%name, 
+                      eval = lambda x:  lower + ((upper - lower) * (np.exp(x)) / (1 + np.exp(x))),
+                      x = g_trans, plot = True, trace = True)
+
+            # Original version
+            # g = Knode(pm.InvLogit, '%s'%name, ltheta=g_trans, plot=True,
+            #           trace=True )
 
             knodes['%s_trans'%name] = g_trans
             knodes['%s_bottom'%name] = g

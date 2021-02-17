@@ -77,11 +77,11 @@ def main():
             self.axes = self.figure.add_subplot(111)
             self.t = linspace(0, 2*pi, 200)
 	    param = self.test
-	    self.line, = self.axes.plot(sin(self.t)*(1+0.5*cos(self.test*self.t)), cos(self.t)*(1+0.5*cos(11*self.t)))
+	    self.line, = self.axes.plot(sin(self.t) * (1 + 0.5 * cos(self.test * self.t)), cos(self.t) * (1 + 0.5 * cos(11 * self.t)))
 
 	def update_plot(self):
 	    self.figure.axes[0].clear()
-	    self.figure.axes[0].plot(sin(self.t)*(1+0.5*cos(self.test*self.t)), cos(self.t)*(1+0.5*cos(11*self.t)))
+	    self.figure.axes[0].plot(sin(self.t)*(1 + 0.5 * cos(self.test * self.t)), cos(self.t) * (1 + 0.5 * cos(11 * self.t)))
             #self.axes.plot(sin(self.t)*(1+0.5*cos(self.test*self.t)), cos(self.t)*(1+0.5*cos(11*self.t)))
 	    #self.axes.redraw_in_frame()
 	    wx.CallAfter(self.figure.canvas.draw)

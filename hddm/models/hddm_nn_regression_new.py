@@ -200,7 +200,7 @@ class HDDMnnRegressor(HDDM):
         # Sanity checks
         for model_descr in self.model_descrs:
             for param in model_descr['params']:
-                assert len(self.depends[param]) == 0, "When using patsy, you can not use any model parameter in depends_on."
+                assert len(self.depends[param]) == 0, "When using patsy, you can not use any model parameter in depends_on." # TODO: ALEX WHY ?
 
     def __getstate__(self):
         d = super(HDDMnnRegressor, self).__getstate__()
