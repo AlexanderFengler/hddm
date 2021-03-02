@@ -4,22 +4,21 @@ import numpy as np
 import argparse
 import sys
 import pickle
-from cddm_data_simulation import ddm 
-from cddm_data_simulation import ddm_flexbound
-from cddm_data_simulation import levy_flexbound
-from cddm_data_simulation import ornstein_uhlenbeck
-from cddm_data_simulation import full_ddm
-from cddm_data_simulation import ddm_sdv
-from cddm_data_simulation import ddm_flexbound_pre
-from cddm_data_simulation import race_model
-from cddm_data_simulation import lca
-from cddm_data_simulation import ddm_flexbound_seq2
-from cddm_data_simulation import ddm_flexbound_par2
-from cddm_data_simulation import ddm_flexbound_mic2
+from data_simulators import ddm 
+from data_simulators import ddm_flexbound
+from data_simulators import levy_flexbound
+from data_simulators import ornstein_uhlenbeck
+from data_simulators import full_ddm
+from data_simulators import ddm_sdv
+from data_simulators import ddm_flexbound_pre
+from data_simulators import race_model
+from data_simulators import lca
+from data_simulators import ddm_flexbound_seq2
+from data_simulators import ddm_flexbound_par2
+from data_simulators import ddm_flexbound_mic2
 
-import cddm_data_simulation as cds
+import data_simulators as cds
 import boundary_functions as bf
-
 
 def bin_simulator_output(out = None,
                          bin_dt = 0.04,
