@@ -3,6 +3,9 @@
 from scipy.stats import gamma
 import numpy as np
 
+import hddm.simulators
+
+
 # Collection of boundary functions
 
 # Constant: (multiplicative)

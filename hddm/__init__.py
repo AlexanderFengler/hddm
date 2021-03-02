@@ -10,6 +10,7 @@ from . import likelihoods_cnn
 from . import generate
 from . import utils
 from . import models
+from . import simulators
 import cdfdif_wrapper
 
 from .models import *
