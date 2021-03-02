@@ -22,6 +22,39 @@ import hddm.simulators.boundary_functions as bf
 
 import hddm.simulators
 
+
+def bin_simulator_output_pointwise(out = [0, 0],
+                                   bin_dt = 0.04,
+                                   nbins = 0): # ['v', 'a', 'w', 'ndt', 'angle']
+    out_copy = deepcopy(out)
+
+    # Generate bins
+    if nbins == 0:
+        nbins = int(out[2]['max_t'] / bin_dt)
+        bins = np.zeros(nbins + 1)
+        bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
+        bins[nbins] = np.inf
+    else:  
+        bins = np.zeros(nbins + 1)
+        bins[:nbins] = np.linspace(0, out[2]['max_t'], nbins)
+        bins[nbins] = np.inf
+
+    cnt = 0
+    counts = np.zeros( (nbins, len(out[2]['possible_choices']) ) )
+    
+    #data_out = pd.DataFrame(np.zeros(( columns = ['rt', 'response'])
+    out_copy_tmp = deepcopy(out_copy)
+    for i in range(out_copy[0].shape[0]):
+        for j in range(1, bins.shape[0], 1):
+            if out_copy[0][i] > bins[j - 1] and out_copy[0][i] < bins[j]:
+                out_copy_tmp[0][i] = j - 1
+    out_copy = out_copy_tmp
+    #np.array(out_copy[0] / (bins[1] - bins[0])).astype(np.int32)
+    
+    out_copy[1][out_copy[1] == -1] = 0
+    
+    return np.concatenate([out_copy[0], out_copy[1]], axis = -1).astype(np.int32)
+
 def bin_simulator_output(out = None,
                          bin_dt = 0.04,
                          nbins = 0,
@@ -82,13 +115,44 @@ def bin_arbitrary_fptd(out = None,
     return counts
 
 
+model_data = {'ddm': {'params':['v', 'a', 'z', 't'],
+                  'param_bounds': [[-2, 0.5, 0.3, 0.2], [2, 2, 0.7, 1.8]],
+                 },
+              'angle':{'params': ['v', 'a', 'z', 't', 'theta'],
+                    'param_bounds': [[-2, 0.5, 0.3, 0.2, 0.2], [2, 1.8, 0.7, 1.8, np.pi / 2 - 0.5]],
+                    },
+              'weibull_cdf':{'params': ['v', 'a', 'z', 't', 'alpha', 'beta'],
+                            'param_bounds': [[-2, 0.5, 0.3, 0.2, 1.0, 1.0], [2, 2., 0.7, 1.8, 4.0, 6.0]]
+                            },
+              'weibull_cdf_concave':{'params': ['v', 'a', 'z', 't', 'alpha', 'beta'],
+                                    'param_bounds': [[-2, 0.5, 0.3, 0.2, 1.5, 1.0], [2, 1.7, 0.7, 1.8, 4.0, 6.0]]
+                                    },
+              'levy':{'params':['v', 'a', 'z', 'alpha', 't'],
+                    'param_bounds':[[-2, 0.4, 0.3, 1.1, 0.1], [2, 1.7, 0.7, 1.9, 1.9]]
+                    },
+              'full_ddm':{'params':['v', 'a', 'z', 't', 'sz', 'sv', 'st'],
+                        'param_bounds':[[-2, 0.5, 0.35, 0.3, 0.05, 0.0, 0.05], [2, 2.2, 0.65, 1.7, 0.25, 1.7, 0.2]]
+                        },
+              'full_ddm2':{'params':['v', 'a', 'z', 't', 'sz', 'sv', 'st'],
+                        'param_bounds':[[-2, 0.5, 0.35, 0.3, 0.05, 0.0, 0.05], [2, 2.2, 0.65, 1.7, 0.25, 1.7, 0.2]]
+                        },
+              'ornstein':{'params':['v', 'a', 'z', 'g', 't'],
+                        'param_bounds':[[-1.9, 0.4, 0.25, -0.9, 0.1], [1.9, 1.9, 0.75, 0.9, 1.9]]
+                        },
+              'ddm_sdv':{'params':['v', 'a', 'z', 't', 'sv'],
+                        'param_bounds':[[-2.2, 0.5, 0.25, 0.1, 0.3],[ 2.2, 2.2, 0.75, 1.9, 2.2]],
+                        },
+            }
 
 def simulator(theta, 
               model = 'angle', 
               n_samples = 1000, 
               delta_t = 0.001,
               max_t = 20,
-              bin_dim = None): 
+              bin_dim = None,
+              bin_pointwise = True,
+              output = 'pd', # 'pd' for panda dataframe, 'raw' for numpy / straight simulator output
+              ): 
     
     # Useful for sbi
     if type(theta) == list or type(theta) == np.ndarray:
@@ -315,9 +379,13 @@ def simulator(theta,
                                boundary_multiplicative = True,
                                boundary_params = {})
     
-    if bin_dim == 0:
+    if bin_dim == 0 or bin_dim == None:
         return x
-    elif bin_dim > 0:
-        return bin_simulator_output(x, nbins = bin_dim)
+    elif bin_dim > 0 and not bin_pointwise:
+        binned_out = bin_simulator_output(x, nbins = bin_dim).flatten()
+        return binned_out
+    elif bin_dim > 0 and bin_pointwise:
+        binned_out = bin_simulator_output_pointwise(x, nbins = bin_dim)
+        return (np.expand_dims(binned_out[:,0], axis = 1), np.expand_dims(binned_out[:, 1], axis = 1), x[2])
     elif bin_dim == -1:
         return 'invaid bin_dim'
