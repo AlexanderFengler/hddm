@@ -20,6 +20,8 @@ from data_simulators import ddm_flexbound_mic2
 import data_simulators as cds
 import boundary_functions as bf
 
+import hddm.simulators
+
 def bin_simulator_output(out = None,
                          bin_dt = 0.04,
                          nbins = 0,
