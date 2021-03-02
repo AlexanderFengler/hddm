@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import deepcopy
+from copy import deepcopy
 #import re
 import argparse
 import sys
