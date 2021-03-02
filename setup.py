@@ -3,8 +3,10 @@ from setuptools import Extension
 
 try:
     from Cython.Build import cythonize
+    # TODO: AF ADD IN OUR SIMULATORS
     ext_modules = cythonize([Extension('wfpt', ['src/wfpt.pyx'], language='c++'), # uncomment for OSX: , extra_compile_args=['-stdlib=libc++'], extra_link_args=['-stdlib=libc++', "-mmacosx-version-min=10.9"]),
-                             Extension('cdfdif_wrapper', ['src/cdfdif_wrapper.pyx', 'src/cdfdif.c'])
+                             Extension('cdfdif_wrapper', ['src/cdfdif_wrapper.pyx', 'src/cdfdif.c']),
+                             Extension('simulators/cddm_data_simulation.pyx'),
     ], compiler_directives = {"language_level": "3"})
 
 except ImportError:
