@@ -1,2 +1,2 @@
-from . import boundary_functions
-from . import basic_simulator
+from .boundary_functions import *
+from .basic_simulator import *
