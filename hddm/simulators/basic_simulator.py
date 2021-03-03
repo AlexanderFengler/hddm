@@ -384,7 +384,7 @@ def simulator(theta,
         return x
     elif bin_dim > 0 and not bin_pointwise:
         binned_out = bin_simulator_output(x, nbins = bin_dim)
-            return (binned_out, x[2])
+        return (binned_out, x[2])
     elif bin_dim > 0 and bin_pointwise:
         binned_out = bin_simulator_output_pointwise(x, nbins = bin_dim)
         return (np.expand_dims(binned_out[:,0], axis = 1), np.expand_dims(binned_out[:, 1], axis = 1), x[2])
