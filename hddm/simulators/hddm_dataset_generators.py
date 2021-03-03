@@ -18,6 +18,42 @@ def hddm_preprocess(simulator_data = None, subj_id = 'none'):
     df['subj_idx'] = subj_id
     return df
 
+
+def str_to_num(string = '', n_digits = 3):
+    new_str = ''
+    leading = 1
+    for digit in range(n_digits):
+        if string[digit] == '0' and leading and (digit < n_digits - 1):
+            pass
+        else:
+            new_str += string[digit]
+            leading = 0
+    return int(new_str)
+
+def num_to_str(num = 0, n_digits = 3):
+    new_str = ''
+    for i in range(n_digits - 1, -1, -1):
+        if num < np.power(10, i):
+            new_str += '0'
+    if num != 0:
+        new_str += str(num)
+    return new_str
+
+def _pad_subj_id(in_str):
+    # Make subj ids have three digits by prepending 0s if necessary
+    stridx = in_str.find('.') # get index of 'subj.' substring
+    subj_idx_len = len(in_str[(stridx + len('.')):]) # check how many letters remain after 'subj.' is enocuntered
+    out_str = ''
+    prefix_str = ''
+    for i in range(3 - subj_idx_len):
+        prefix_str += '0' # add zeros to pad subject id to have three digits
+
+    out_str = in_str[:stridx + len('.')] + prefix_str + in_str[stridx + len('.'):] #   
+    # print(out_str)
+    return out_str
+
+# -------------------------------------------------------------------------------------
+
 # Dataset generators
 def simulator_single_subject(parameters = [0, 0, 0],
                              model = 'angle',
