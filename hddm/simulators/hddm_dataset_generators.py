@@ -83,17 +83,17 @@ def simulator_stimcoding(model = 'angle',
     # print(param_base.shape)
     return (data_out, gt, param_base)
 
-    def simulator_condition_effects(n_conditions = 4, 
+def simulator_condition_effects(n_conditions = 4, 
                                 n_samples_by_condition = 1000,
                                 condition_effect_on_param = [0], 
                                 model = 'angle',
                                 ):
      
     param_base = np.tile(np.random.uniform(low = model_config[model]['param_bounds'][0],
-                                           high = model_config[model]['param_bounds'][1], 
-                                           size = (1, len(model_config[model]['params']))),
-                                           (n_conditions, 1))
-                         
+                                            high = model_config[model]['param_bounds'][1], 
+                                            size = (1, len(model_config[model]['params']))),
+                                            (n_conditions, 1))
+                        
     #len(model_config[model]['params']                   
     #print(param_base)
     gt = {}
@@ -103,7 +103,7 @@ def simulator_stimcoding(model = 'angle',
             #print(id_tmp)
             #print(model_config[model]['param_bounds'][0])
             param_base[i, id_tmp] = np.random.uniform(low = model_config[model]['param_bounds'][0][id_tmp], 
-                                                      high = model_config[model]['param_bounds'][1][id_tmp])
+                                                    high = model_config[model]['param_bounds'][1][id_tmp])
             gt[c_eff + '(' + str(i) + ')'] = param_base[i, id_tmp]
     
     for param in model_config[model]['params']:
