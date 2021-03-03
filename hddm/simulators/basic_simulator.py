@@ -23,6 +23,7 @@ import hddm.simulators.boundary_functions as bf
 
 import hddm.simulators
 
+# Basic simulators and basic preprocessing
 
 def bin_simulator_output_pointwise(out = [0, 0],
                                    bin_dt = 0.04,
@@ -116,7 +117,7 @@ def bin_arbitrary_fptd(out = None,
     return counts
 
 
-model_data = {'ddm': {'params':['v', 'a', 'z', 't'],
+model_config = {'ddm': {'params':['v', 'a', 'z', 't'],
                   'param_bounds': [[-2, 0.5, 0.3, 0.2], [2, 2, 0.7, 1.8]],
                  },
               'angle':{'params': ['v', 'a', 'z', 't', 'theta'],
@@ -146,14 +147,13 @@ model_data = {'ddm': {'params':['v', 'a', 'z', 't'],
             }
 
 def simulator(theta, 
-              model = 'angle', 
-              n_samples = 1000, 
+              model = 'angle',
+              n_samples = 1000,
               delta_t = 0.001,
               max_t = 20,
               bin_dim = None,
               bin_pointwise = True,
-              output = 'pd', # 'pd' for panda dataframe, 'raw' for numpy / straight simulator output
-              ): 
+              ):
     
     # Useful for sbi
     if type(theta) == list or type(theta) == np.ndarray:
@@ -383,10 +383,13 @@ def simulator(theta,
     if bin_dim == 0 or bin_dim == None:
         return x
     elif bin_dim > 0 and not bin_pointwise:
-        binned_out = bin_simulator_output(x, nbins = bin_dim).flatten()
-        return binned_out
+        binned_out = bin_simulator_output(x, nbins = bin_dim)
+            return (binned_out, x[2])
     elif bin_dim > 0 and bin_pointwise:
         binned_out = bin_simulator_output_pointwise(x, nbins = bin_dim)
         return (np.expand_dims(binned_out[:,0], axis = 1), np.expand_dims(binned_out[:, 1], axis = 1), x[2])
     elif bin_dim == -1:
         return 'invaid bin_dim'
+
+
+    

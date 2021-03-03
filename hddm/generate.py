@@ -419,7 +419,7 @@ def gen_rand_data(params=None, n_fast_outliers=0, n_slow_outliers=0, **kwargs):
 
     return data, subj_params
 
-def gen_rand_rlddm_data(a, t, scaler, alpha, size=1, p_upper=1, p_lower=0, z=0.5, q_init=0.5, pos_alpha=float('nan'), subjs=1, split_by=0, mu_upper=1, mu_lower=0, sd_upper=0.1, sd_lower=0.1, binary_outcome=True, uncertainty=False):
+def gen_rand_rlddm_data(a, t, scaler, alpha, size = 1, p_upper = 1, p_lower = 0, z = 0.5, q_init = 0.5, pos_alpha = float('nan'), subjs = 1, split_by = 0, mu_upper = 1, mu_lower = 0, sd_upper = 0.1, sd_lower = 0.1, binary_outcome = True, uncertainty = False):
     all_data = []
     tg = t
     ag = a
