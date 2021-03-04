@@ -284,9 +284,9 @@ def simulator_covariate(dependent_params = ['v'],
         id_tmp = model_config[model]['params'].index(param)
         
         if param in betas.keys():
-            gt{param + '_beta'} = betas[param]
+            gt[param + '_beta'] = betas[param]
         
-        gt{param} = param_base[0, id_tmp]
+        gt[param] = param_base[0, id_tmp]
     
     return (data, gt)
 
