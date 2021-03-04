@@ -173,10 +173,12 @@ def simulator_condition_effects(n_conditions = 4,
         # If the parameter is not affected by condition     
         else:
             # But prespecified
-            if param in prespecified_params_names:
-                # We assign prespecifided param
-                tmp_param = prespecified_params[param]
-                param_base[:, id_tmp] = tmp_param   
+            if prespecified_params_names is not None:
+                
+                if param in prespecified_params_names:
+                    # We assign prespecifided param
+                    tmp_param = prespecified_params[param]
+                    param_base[:, id_tmp] = tmp_param   
 
             # If it wasn't prespecified we just keep the random assignment that was generated above before the loops
             gt[param] = param_base[0, id_tmp]
