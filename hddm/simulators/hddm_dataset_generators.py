@@ -173,7 +173,7 @@ def simulator_condition_effects(n_conditions = 4,
         # If the parameter is not affected by condition     
         else:
             # But prespecified
-            if prespecified_params_names is not None:
+            if prespecified_params is not None:
                 
                 if param in prespecified_params_names:
                     # We assign prespecifided param
