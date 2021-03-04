@@ -216,10 +216,11 @@ def simulator_covariate(dependent_params = ['v'],
         return
 
     # sanity check that prespecified parameters do not clash with parameters that are supposed to derive from trial-wise regression
-    for param in prespecified_params:
-        if param in covariate_magnitudes.keys() or param in betas.keys():
-            'Parameters that have covariates are Prespecified, this should not be intented'
-            return
+    if prespecified_params is not None:
+        for param in prespecified_params:
+            if param in covariate_magnitudes.keys() or param in betas.keys():
+                'Parameters that have covariates are Prespecified, this should not be intented'
+                return
 
     # Fill parameter matrix
     param_base = np.tile(np.random.uniform(low = model_config[model]['param_bounds'][0],
