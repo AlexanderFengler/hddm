@@ -145,36 +145,42 @@ def simulator_condition_effects(n_conditions = 4,
     
     
          
-
+    # Reassign parameters according to the information in prespecified params and condition_effect_on_param
     gt = {}
+
+    # Loop over valid model parameters
     for param in model_config[model]['params']:
         id_tmp = model_config[model]['params'].index(param)
         
+        # Check if parameter is affected by condition
         if param in condition_effect_on_param:
+            
+            # If parameter is affected by condition we loop over conditions
             for i in range(n_conditions):
+                # Assign randomly
                 param_base[i, id_tmp] = np.random.uniform(low = model_config[model]['param_bounds'][0][id_tmp], 
                                                         high = model_config[model]['param_bounds'][1][id_tmp])
-                if param in prespecified_params_names:
-                    tmp_param = prespecified_params[c_eff][i] 
-                    param_base[i, id_tmp] = tmp_param
                 
+                # But if we actually specified it for each condition
+                if prespecified_params is not None:
+                    if param in prespecified_params_names:
+                        # We assign it from prespecified dictionary
+                        param_base[i, id_tmp] = prespecified_params[param][i] 
+                
+                # Add info to ground truth dictionary
                 gt[param + '(' + str(i) + ')'] = param_base[i, id_tmp]
-                
+        
+        # If the parameter is not affected by condition     
         else:
+            # But prespecified
             if param in prespecified_params_names:
+                # We assign prespecifided param
                 tmp_param = prespecified_params[param]
                 param_base[:, id_tmp] = tmp_param   
-        
-                gt[param] = param_base[0, id_tmp]
-    
-    # for param in model_config[model]['params']:
-    #     if param in condition_effect_on_param:
-    #         pass
-    #     else:
-    #         id_tmp = model_config[model]['params'].index(param)
-    #         gt[param] = param_base[0, id_tmp]
 
-    #print(param_base)
+            # If it wasn't prespecified we just keep the random assignment that was generated above before the loops
+            gt[param] = param_base[0, id_tmp]
+    
     dataframes = []
     for i in range(n_conditions):
         sim_out = simulator(param_base[i, :], 
@@ -185,8 +191,10 @@ def simulator_condition_effects(n_conditions = 4,
         dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i))
     
     data_out = pd.concat(dataframes)
+    
+    # Change 'subj_idx' column name to 'condition' ('subj_idx' is assigned automatically by hddm_preprocess() function)
     data_out = data_out.rename(columns = {'subj_idx': "condition"})
-    # print(param_base.shape)
+
     return (data_out, gt, param_base)
 
 def simulator_covariate(dependent_params = ['v'],
