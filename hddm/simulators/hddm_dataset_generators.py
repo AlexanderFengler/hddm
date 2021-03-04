@@ -13,8 +13,15 @@ from hddm.simulators.basic_simulator import *
 # Helper
 def hddm_preprocess(simulator_data = None, subj_id = 'none'):
     
-    df = pd.DataFrame(simulator_data[0].astype(np.double), columns = ['rt'])
-    df['response'] = simulator_data[1].astype(int)
+    # Define dataframe if simulator output is normal (comes out as list tuple [rts, choices, metadata])
+    if len(simulator_data) == 3:
+        df = pd.DataFrame(simulator_data[0].astype(np.double), columns = ['rt'])
+        df['response'] = simulator_data[1].astype(int)
+    # Define dataframe if simulator output is binned pointwise (comes out as tuple [np.array, metadata])
+    if len(simulator_data) == 2:
+        df = pd.DataFrame(simulator_data[0][:, 0], columns = ['rt'])
+        df['response'] = simulator_data[0][:, 1].astype(int)
+
     df['nn_response'] = df['response']
     df.loc[df['response'] == -1.0, 'response'] = 0.0
     df['subj_idx'] = subj_id
@@ -74,21 +81,30 @@ def simulator_single_subject(parameters = [0, 0, 0],
                   bin_pointwise = bin_pointwise)
     
     return hddm_preprocess(x)
-    
+
+# TD: DIDN'T GO OVER THIS ONE YET !
 def simulator_stimcoding(model = 'angle',
                          split_by = 'v',
                          decision_criterion = 0.0,
-                         n_samples_by_condition = 1000):
+                         n_samples_by_condition = 1000
+                         bin_pointwise = True,
+                         bin_dim = None):
     
     param_base = np.tile(np.random.uniform(low = model_config[model]['param_bounds'][0],
                                            high = model_config[model]['param_bounds'][1], 
                                            size = (1, len(model_config[model]['params']))),
                                            (2, 1))
     
-              
-    #len(model_config[model]['params']                   
-    #print(param_base)
+    
+    if type(split_by) == list:
+        pass
+    elif type(split_by) == str:
+        split_by = [split_by]
+    else:
+        print('Can not recognize data-type of argument: split_by, provided neither a list nor a string')
+        return
     gt = {}
+
     for i in range(2):
         id_tmp = model_config[model]['params'].index(split_by)
         
@@ -97,23 +113,27 @@ def simulator_stimcoding(model = 'angle',
 #                                                       high = model_config[model]['param_bounds'][1][id_tmp])
             gt[split_by] = param_base[i, id_tmp]
             gt['decision_criterion'] = decision_criterion
-            if split_by == 'v':
+
+            if 'v' in split_by:
                 param_base[i, id_tmp] = decision_criterion + param_base[i, id_tmp]
             
         if i == 1:
-            if split_by == 'v':
+            
+            if 'v' in split_by:
                 param_base[i, id_tmp] = decision_criterion - param_base[i, id_tmp]
-            if split_by == 'z':
+            if 'z' in split_by:
                 param_base[i, id_tmp] = 1 - param_base[i, id_tmp]
             
     #print(param_base)
     dataframes = []
     for i in range(2):
+        
         sim_out = simulator(param_base[i, :], 
                             model = model, 
                             n_samples = n_samples_by_condition,
-                            bin_dim = None)
-        
+                            bin_dim = bin_dim,
+                            bin_pointwise = bin_pointwise)
+
         dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i + 1))
     
     data_out = pd.concat(dataframes)
@@ -126,6 +146,8 @@ def simulator_condition_effects(n_conditions = 4,
                                 condition_effect_on_param = [0],
                                 prespecified_params = None,
                                 model = 'angle',
+                                bin_dim = None,
+                                bin_pointwise = True,
                                 ):
 
     # Get list of keys in prespecified_params and return if it is not a dict when it is in fact not None
@@ -185,10 +207,11 @@ def simulator_condition_effects(n_conditions = 4,
     
     dataframes = []
     for i in range(n_conditions):
-        sim_out = simulator(param_base[i, :], 
+        sim_out = simulator(param_base[i, :],
                             model = model, 
                             n_samples = n_samples_by_condition,
-                            bin_dim = None)
+                            bin_dim = bin_dim,
+                            bin_pointwise = bin_pointwise)
         
         dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i))
     
@@ -205,7 +228,9 @@ def simulator_covariate(dependent_params = ['v'],
                         betas = {'v': 0.1},
                         covariate_magnitudes = {'v': 1.0},
                         prespecified_params = None,
-                        subj_id = 'none'):
+                        subj_id = 'none',
+                        bin_dime = None, 
+                        bin_pointwise = True):
     
     if betas == None:
         betas = {}
@@ -259,11 +284,13 @@ def simulator_covariate(dependent_params = ['v'],
     choices = []
 
     # TD: IMPROVE THIS SIMULATOR SO THAT WE CAN PASS MATRICES OF PARAMETERS
+    # WAY TOO SLOW RIGHT NOW
     for i in range(n_samples):
         sim_out = simulator(param_base[i, :],
                             model = model,
                             n_samples = 1,
-                            bin_dim = None)
+                            bin_dim = bin_dim,
+                            bin_pointwise = bin_pointwise)
         
         rts.append(sim_out[0])
         choices.append(sim_out[1])
@@ -283,6 +310,8 @@ def simulator_covariate(dependent_params = ['v'],
     for param in model_config[model]['params']:
         id_tmp = model_config[model]['params'].index(param)
         
+        # If a parameter actually had a covariate attached then we add the beta coefficient as a parameter as well
+        # Now intercept, beta
         if param in betas.keys():
             gt[param + '_beta'] = betas[param]
         
@@ -294,7 +323,9 @@ def simulator_hierarchical(n_subjects = 5,
                            n_samples_by_subject = 10,
                            prespecified_param_means = {'v': 2},
                            prespecified_param_stds = {'v': 0.3},
-                           model = 'angle'):
+                           model = 'angle',
+                           bin_dim = None,
+                           bin_pointwise = True):
 
     param_ranges_half = (np.array(model_config[model]['param_bounds'][1]) - np.array(model_config[model]['param_bounds'][0])) / 2
     # Fill in some global parameter vectors
@@ -342,7 +373,8 @@ def simulator_hierarchical(n_subjects = 5,
         sim_out = simulator(subject_parameters[i, :],
                             model = model,
                             n_samples = n_samples_by_subject,
-                            bin_dim = None)
+                            bin_dim = bin_dim,
+                            bin_pointwise = bin_pointwise)
         
         dataframes.append(hddm_preprocess(simulator_data = sim_out, 
                                           subj_id = subj_id))
