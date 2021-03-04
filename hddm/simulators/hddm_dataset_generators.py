@@ -202,22 +202,52 @@ def simulator_condition_effects(n_conditions = 4,
 def simulator_covariate(dependent_params = ['v'],
                         model = 'angle',
                         n_samples = 1000,
-                        beta = 0.1,
+                        betas = {'v': 0.1},
+                        covariate_magnitudes = {'v': 1.0},
+                        prespecified_params = None,
                         subj_id = 'none'):
     
+    if betas == None:
+        betas = {}
+    if covariate_magnitudes == None:
+        covariate_magnitudes = {}
+    if len(dependent_params) < 1:
+        print('If there are no dependent variables, no need for the simulator which includes covariates')
+        return
+
+    # Fill parameter matrix
     param_base = np.tile(np.random.uniform(low = model_config[model]['param_bounds'][0],
                                            high = model_config[model]['param_bounds'][1], 
                                            size = (1, len(model_config[model]['params']))),
                                            (n_samples, 1))
+
+    if prespecified_params is not None:
+
     
     # TD: Be more clever about covariate magnitude (maybe supply?)
-    tmp_covariate_by_sample = np.random.uniform(low = - 1.0, high = 1.0, size = n_samples)
+    # Parameters that have a
     for covariate in dependent_params:
         id_tmp = model_config[model]['params'].index(covariate)
-        param_base[:, id_tmp] = param_base[:, id_tmp] + (beta * tmp_covariate_by_sample)
+
+        if covariate in covariate_magnitudes.keys():
+            tmp_covariate_by_sample = np.random.uniform(low = - covariate_magnitudes[covariate], 
+                                                        high = covariate_magnitudes[covariate], 
+                                                        size = n_samples)
+        else:
+            tmp_covariate_by_sample = np.random.uniform(low = - 1, 
+                                                        high = 1, 
+                                                        size = n_samples)
+
+        # If the current covariate has a beta parameter attached to it 
+        if covariate in betas.keys():
+            param_base[:, id_tmp] = param_base[:, id_tmp] + (betas[covariate] * tmp_covariate_by_sample)
+        else: 
+            param_base[:, id_tmp] = param_base[:, id_tmp] + (0.1 * tmp_covariate_by_sample)
     
     rts = []
     choices = []
+
+    # TD: IMPROVE THIS SIMULATOR SO THAT WE CAN PASS MATRICES OF PARAMETERS
     for i in range(n_samples):
         sim_out = simulator(param_base[i, :],
                             model = model,
@@ -230,38 +260,57 @@ def simulator_covariate(dependent_params = ['v'],
     rts = np.squeeze(np.stack(rts, axis = 0))
     choices = np.squeeze(np.stack(choices, axis = 0))
     
+    # Preprocess 
     data = hddm_preprocess([rts, choices], subj_id)
+    
+    # Call the covariate BOLD (unnecessary but in style)
     data['BOLD'] = tmp_covariate_by_sample
     
     return (data, param_base, beta)
 
 def simulator_hierarchical(n_subjects = 5,
                            n_samples_by_subject = 10,
+                           prespecified_param_means = {'v': 2},
+                           prespecified_param_stds = {'v': 0.3},
                            model = 'angle'):
 
     param_ranges_half = (np.array(model_config[model]['param_bounds'][1]) - np.array(model_config[model]['param_bounds'][0])) / 2
-    
-    global_stds = np.random.uniform(low = 0.01, 
-                                    high = param_ranges_half / 6,
-                                    size = (1, len(model_config[model]['param_bounds'][0])))
-    
+    # Fill in some global parameter vectors
     global_means = np.random.uniform(low = model_config[model]['param_bounds'][0],
                                      high = model_config[model]['param_bounds'][1],
-                                     size = (1, len(model_config[model]['param_bounds'][0])))
-                                    
+                                     size = (1, len(model_config[model]['param_bounds'][0])))                     
+
+    global_stds = np.random.uniform(low = 0.001, 
+                                    high = np.minimum(abs(global_means - model_config[model]['param_bounds'][0]), 
+                                                      abs(model_config[model]['param_bounds'][1] - global_means)) / 3, # previously param_ranges_half / 6,
+                                    size = (1, len(model_config[model]['param_bounds'][0])))
+    
+    # global_means = np.random.uniform(low = model_config[model]['param_bounds'][0],
+    #                                  high = model_config[model]['param_bounds'][1],
+    #                                  size = (1, len(model_config[model]['param_bounds'][0])))                         
     
     dataframes = []
     subject_parameters = np.zeros((n_subjects, 
                                    len(model_config[model]['param_bounds'][0])))
     gt = {}
     
+    # Update global parameter vectors according to what was pre-specified
     for param in model_config[model]['params']:
         id_tmp = model_config[model]['params'].index(param)
+        
+        if param in prespecified_param_means.keys():
+            global_means[0, id_tmp] = prespecified_param_means[param]
+
+        if param in prespecified_param_stds.keys():
+            global_stds[0, id_tmp] = prespecified_param_means[param]
+        
         gt[param] = global_means[0, id_tmp]
         gt[param + '_std'] = global_stds[0, id_tmp]
     
+    # For each subject get subject level parameters by sampling from a truncated gaussian as speficied by the global parameters above
     for i in range(n_subjects):
         subj_id = num_to_str(i)
+        
         # Get subject parameters
         a = (model_config[model]['param_bounds'][0] - global_means[0, :]) / global_stds[0, :]
         b = (model_config[model]['param_bounds'][1] - global_means[0, :]) / global_stds[0, :]
