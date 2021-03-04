@@ -276,8 +276,19 @@ def simulator_covariate(dependent_params = ['v'],
     
     # Call the covariate BOLD (unnecessary but in style)
     data['BOLD'] = tmp_covariate_by_sample
+
+    # Make ground truth dict
+    gt = {}
     
-    return (data, param_base, beta)
+    for param in model_config[model]['params']:
+        id_tmp = model_config[model]['params'].index(param)
+        
+        if param in betas.keys():
+            gt{param + '_beta'} = betas[param]
+        
+        gt{param} = param_base[0, id_tmp]
+    
+    return (data, gt)
 
 def simulator_hierarchical(n_subjects = 5,
                            n_samples_by_subject = 10,
