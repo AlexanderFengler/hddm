@@ -215,13 +215,23 @@ def simulator_covariate(dependent_params = ['v'],
         print('If there are no dependent variables, no need for the simulator which includes covariates')
         return
 
+    # sanity check that prespecified parameters do not clash with parameters that are supposed to derive from trial-wise regression
+    for param in prespecified_params:
+        if param in covariate_magnitudes.keys() or param in betas.keys():
+            'Parameters that have covariates are Prespecified, this should not be intented'
+            return
+
     # Fill parameter matrix
     param_base = np.tile(np.random.uniform(low = model_config[model]['param_bounds'][0],
                                            high = model_config[model]['param_bounds'][1], 
                                            size = (1, len(model_config[model]['params']))),
                                            (n_samples, 1))
 
+    # Adjust any parameters that where prespecified
     if prespecified_params is not None:
+        for param in prespecified_params.keys():
+            id_tmp = model_config[model]['params'].index(param)
+            param_base[:, id_tmp] = prespecified_params[param]
 
     
     # TD: Be more clever about covariate magnitude (maybe supply?)
