@@ -63,8 +63,8 @@ def make_cnn_likelihood(model):
                                alpha,
                                z,
                                t,
-                               p_outlier = 0.1,
-                               w_outlier = 0.1,
+                               p_outlier = 0,
+                               w_outlier = 0,
                                **kwargs): #theta
 
             return hddm.wfpt.wiener_like_cnn_2(x['rt'].values,

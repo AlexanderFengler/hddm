@@ -86,7 +86,8 @@ def simulator_single_subject(parameters = [0, 0, 0],
 def simulator_stimcoding(model = 'angle',
                          split_by = 'v',
                          decision_criterion = 0.0,
-                         n_samples_by_condition = 1000
+                         n_samples_by_condition = 1000,
+                         prespecified_params = {},
                          bin_pointwise = True,
                          bin_dim = None):
     
@@ -94,6 +95,16 @@ def simulator_stimcoding(model = 'angle',
                                            high = model_config[model]['param_bounds'][1], 
                                            size = (1, len(model_config[model]['params']))),
                                            (2, 1))
+
+    # Fill in prespecified parameters if supplied
+    if prespecified_params is not None:
+        if type(prespecified_paramas) == dict:
+            for param in prespecified_params = {}:
+                
+        else:
+            print('prespecified_params is not supplied as a dictionary, please reformat the input')
+            return
+
     
     
     if type(split_by) == list:
@@ -106,22 +117,24 @@ def simulator_stimcoding(model = 'angle',
     gt = {}
 
     for i in range(2):
-        id_tmp = model_config[model]['params'].index(split_by)
         
         if i == 0:
 #             param_base[i, id_tmp] = np.random.uniform(low = model_config[model]['param_bounds'][0][id_tmp], 
 #                                                       high = model_config[model]['param_bounds'][1][id_tmp])
-            gt[split_by] = param_base[i, id_tmp]
-            gt['decision_criterion'] = decision_criterion
-
             if 'v' in split_by:
+                id_tmp = model_config[model]['params'].index('v')
                 param_base[i, id_tmp] = decision_criterion + param_base[i, id_tmp]
+                gt['v'] = param_base[i, id_tmp]
+                gt['decision_criterion'] = decision_criterion
+
             
         if i == 1:
             
             if 'v' in split_by:
+                id_tmp = model_config[model]['params'].index('v')
                 param_base[i, id_tmp] = decision_criterion - param_base[i, id_tmp]
             if 'z' in split_by:
+                id_tmp = model_config[model]['params'].index('z')
                 param_base[i, id_tmp] = 1 - param_base[i, id_tmp]
             
     #print(param_base)

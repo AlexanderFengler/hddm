@@ -410,12 +410,11 @@ def gen_rand_data(params=None, n_fast_outliers=0, n_slow_outliers=0, **kwargs):
 
     # Create RT data
     data, subj_params = kabuki.generate.gen_rand_data(gen_rts, params,
-                                                      check_valid_func=hddm.utils.check_params_valid,
-                                                      bounds=bounds, **kwargs)
+                                                      check_valid_func = hddm.utils.check_params_valid,
+                                                      bounds = bounds, **kwargs)
     # add outliers
     seed = kwargs.get('seed', None)
-    data = add_outliers(data, n_fast=n_fast_outliers,
-                        n_slow=n_slow_outliers, seed=seed)
+    data = add_outliers(data, n_fast = n_fast_outliers, n_slow = n_slow_outliers, seed = seed)
 
     return data, subj_params
 
@@ -426,6 +425,7 @@ def gen_rand_rlddm_data(a, t, scaler, alpha, size = 1, p_upper = 1, p_lower = 0,
     alphag = alpha
     pos_alphag = pos_alpha
     scalerg = scaler
+    
     for s in range(0, subjs):
         t = np.maximum(0.05, np.random.normal(
             loc=tg, scale=0.05, size=1)) if subjs > 1 else tg
@@ -433,14 +433,13 @@ def gen_rand_rlddm_data(a, t, scaler, alpha, size = 1, p_upper = 1, p_lower = 0,
         a = np.maximum(0.05, np.random.normal(
             loc=ag, scale=0.15, size=1)) if subjs > 1 else ag
         
-        alpha = np.minimum(np.minimum(np.maximum(0.001, np.random.normal(loc=alphag, scale=0.05, size=1)), alphag+alphag),1) if subjs > 1 else alphag
-        scaler = np.random.normal(
-            loc=scalerg, scale=0.25, size=1) if subjs > 1 else scalerg
+        alpha = np.minimum(np.minimum(np.maximum(0.001, np.random.normal(loc=alphag, scale=0.05, size=1)), alphag + alphag), 1) if subjs > 1 else alphag
+        scaler = np.random.normal(loc=scalerg, scale=0.25, size=1) if subjs > 1 else scalerg
         
         if np.isnan(pos_alpha):
             pos_alfa = alpha
         else:
-            pos_alfa = np.maximum(0.001,np.random.normal(loc=pos_alphag, scale=0.05, size=1)) if subjs > 1 else pos_alphag
+            pos_alfa = np.maximum(0.001, np.random.normal(loc = pos_alphag, scale = 0.05, size = 1)) if subjs > 1 else pos_alphag
         
         n = size
         q_up = np.tile([q_init], n)
@@ -466,8 +465,8 @@ def gen_rand_rlddm_data(a, t, scaler, alpha, size = 1, p_upper = 1, p_lower = 0,
                  'response', 'rt', 'feedback', 'subj_idx', 'split_by', 'trial']]
 
         data, params = hddm.generate.gen_rand_data({'a': a, 't': t, 'v': df.loc[0, 'sim_drift'], 'z': z}, 
-                                                   subjs=1, 
-                                                   size=1)
+                                                   subjs = 1, 
+                                                   size = 1)
 
         df.loc[0, 'response'] = data.response[0]
         df.loc[0, 'rt'] = data.rt[0]
@@ -493,8 +492,7 @@ def gen_rand_rlddm_data(a, t, scaler, alpha, size = 1, p_upper = 1, p_lower = 0,
                                                                                            * (df.loc[i - 1, 'q_low'] + (alfa * (df.loc[i - 1, 'rew_low'] - df.loc[i - 1, 'q_low']))))
             df.loc[i, 'sim_drift'] = (df.loc[i, 'q_up'] - df.loc[i, 'q_low']) * (scaler)
             
-            data, params = hddm.generate.gen_rand_data(
-                {'a': a, 't': t, 'v': df.loc[i, 'sim_drift'] , 'z': z}, subjs=1, size=1)
+            data, params = hddm.generate.gen_rand_data({'a': a, 't': t, 'v': df.loc[i, 'sim_drift'] , 'z': z}, subjs = 1, size = 1)
             df.loc[i, 'response'] = data.response[0]
             df.loc[i, 'rt'] = data.rt[0]
             
@@ -619,10 +617,12 @@ def gen_rand_rlddm_onestep_data(a, t, scaler, alpha, data, z=0.5, pos_alpha=floa
     df['q_low'] = df['q_init']
     df['rew_up'] = df['feedback']
     df['rew_low'] = df['feedback']
+
     if np.isnan(pos_alpha):
         pos_alfa = alpha
     else:
         pos_alfa = pos_alpha
+    
     sdata, params = hddm.generate.gen_rand_data(
         {'a': asub, 't': tsub, 'v': df.loc[0, 'sim_drift'], 'z': z}, subjs=1, size=1)
     df.loc[0, 'sim_response'] = sdata.response[0]
