@@ -121,36 +121,59 @@ def simulator_stimcoding(model = 'angle',
     # print(param_base.shape)
     return (data_out, gt, param_base)
 
-def simulator_condition_effects(n_conditions = 4, 
+def simulator_condition_effects(n_conditions = 4,
                                 n_samples_by_condition = 1000,
-                                condition_effect_on_param = [0], 
+                                condition_effect_on_param = [0],
+                                prespecified_params = None,
                                 model = 'angle',
                                 ):
-     
+
+    # Get list of keys in prespecified_params and return if it is not a dict when it is in fact not None
+    if prespecified_params is not None:
+        if type(prespecified_params) == dict:
+            prespecified_params_names = list(prespecified_params.keys())
+        else:
+            print('prespecified_params is not a dictionary')
+            return
+               
+    
+    # Randomly assign values to every parameter and then copy across rows = number of conditions
     param_base = np.tile(np.random.uniform(low = model_config[model]['param_bounds'][0],
                                             high = model_config[model]['param_bounds'][1], 
                                             size = (1, len(model_config[model]['params']))),
                                             (n_conditions, 1))
-                        
-    #len(model_config[model]['params']                   
-    #print(param_base)
-    gt = {}
-    for i in range(n_conditions):
-        for c_eff in condition_effect_on_param:
-            id_tmp = model_config[model]['params'].index(c_eff)
-            #print(id_tmp)
-            #print(model_config[model]['param_bounds'][0])
-            param_base[i, id_tmp] = np.random.uniform(low = model_config[model]['param_bounds'][0][id_tmp], 
-                                                    high = model_config[model]['param_bounds'][1][id_tmp])
-            gt[c_eff + '(' + str(i) + ')'] = param_base[i, id_tmp]
     
+    
+         
+
+    gt = {}
     for param in model_config[model]['params']:
+        id_tmp = model_config[model]['params'].index(param)
+        
         if param in condition_effect_on_param:
-            pass
+            for i in range(n_conditions):
+                param_base[i, id_tmp] = np.random.uniform(low = model_config[model]['param_bounds'][0][id_tmp], 
+                                                        high = model_config[model]['param_bounds'][1][id_tmp])
+                if param in prespecified_params_names:
+                    tmp_param = prespecified_params[c_eff][i] 
+                    param_base[i, id_tmp] = tmp_param
+                
+                gt[param + '(' + str(i) + ')'] = param_base[i, id_tmp]
+                
         else:
-            id_tmp = model_config[model]['params'].index(param)
-            gt[param] = param_base[0, id_tmp]
-            
+            if param in prespecified_params_names:
+                tmp_param = prespecified_params[param]
+                param_base[:, id_tmp] = tmp_param   
+        
+                gt[param] = param_base[0, id_tmp]
+    
+    # for param in model_config[model]['params']:
+    #     if param in condition_effect_on_param:
+    #         pass
+    #     else:
+    #         id_tmp = model_config[model]['params'].index(param)
+    #         gt[param] = param_base[0, id_tmp]
+
     #print(param_base)
     dataframes = []
     for i in range(n_conditions):
