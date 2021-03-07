@@ -69,6 +69,6 @@ def wienerRL_like(x, v, alpha, pos_alpha, sv, a, z, sz, t, st, p_outlier=0):
     q = x['q_init'].iloc[0]
     feedback = x['feedback'].values.astype(float)
     split_by = x['split_by'].values.astype(int)
-    return wiener_like_rlddm(x['rt'].values, response, feedback, split_by, q, alpha, pos_alpha, v, sv, a, z, sz, t, st, p_outlier=p_outlier, **wp)
+    return wiener_like_rlddm(x['rt'].values, response, feedback, split_by, q, alpha, pos_alpha, v, sv, a, z, sz, t, st, p_outlier = p_outlier, **wp)
 
 WienerRL = stochastic_from_dist('wienerRL', wienerRL_like)

@@ -99,8 +99,9 @@ def simulator_stimcoding(model = 'angle',
     # Fill in prespecified parameters if supplied
     if prespecified_params is not None:
         if type(prespecified_paramas) == dict:
-            for param in prespecified_params = {}:
-                
+            for param in prespecified_params:
+                id_tmp = model_config[model]['params'].index(param)
+                param_base[:, id_tmp] = prespecified_params[param]
         else:
             print('prespecified_params is not supplied as a dictionary, please reformat the input')
             return

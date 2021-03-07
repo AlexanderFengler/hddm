@@ -267,9 +267,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
 
             # THIS IS NOT YET FINISHED !
             return hddm.wfpt.wiener_like_multi_nn_ddm(data,
-                                                    p_outlier = p_outlier,
-                                                    w_outlier = w_outlier,
-                                                    **kwargs)
+                                                      p_outlier = p_outlier,
+                                                      w_outlier = w_outlier,
+                                                      **kwargs)
 
         # Need to rewrite these random parts !
         def random(self):
