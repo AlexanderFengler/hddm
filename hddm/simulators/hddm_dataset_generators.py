@@ -107,7 +107,6 @@ def simulator_stimcoding(model = 'angle',
             return
 
     
-    
     if type(split_by) == list:
         pass
     elif type(split_by) == str:

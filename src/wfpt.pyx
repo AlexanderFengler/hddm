@@ -518,7 +518,7 @@ def wiener_like_rlddm(np.ndarray[double, ndim = 1] x,
     cdef np.ndarray[long, ndim=1] unique = np.unique(split_by)
 
     cdef double alfa_up = (2.718281828459**pos_alfa) / (1 + 2.718281828459**pos_alfa)
-    cdef double alfa_down alfa = (2.718281828459**alpha) / (1 + 2.718281828459**alpha)
+    cdef double alfa_down = (2.718281828459**alpha) / (1 + 2.718281828459**alpha)
 
     if not p_outlier_in_range(p_outlier):
         return -np.inf
@@ -602,7 +602,7 @@ def wiener_like_rl(np.ndarray[long, ndim=1] response,
     cdef np.ndarray[long, ndim=1] unique = np.unique(split_by)
 
     cdef double alfa_up = (2.718281828459**pos_alfa) / (1 + 2.718281828459**pos_alfa)
-    cdef double alfa_down alfa = (2.718281828459**alpha) / (1 + 2.718281828459**alpha)
+    cdef double alfa_down = (2.718281828459**alpha) / (1 + 2.718281828459**alpha)
 
 
     if not p_outlier_in_range(p_outlier):
