@@ -11,7 +11,7 @@ from data_simulators import levy_flexbound
 from data_simulators import ornstein_uhlenbeck
 from data_simulators import full_ddm
 from data_simulators import ddm_sdv
-from data_simulators import ddm_flexbound_pre
+#from data_simulators import ddm_flexbound_pre
 from data_simulators import race_model
 from data_simulators import lca
 from data_simulators import ddm_flexbound_seq2
@@ -414,7 +414,7 @@ def simulator(theta,
                                boundary_params = {})
 
     if model == 'ddm_mic2':
-        x = ddm_flexbound_par2(v_h = theta[:, [0]],
+        x = ddm_flexbound_mic2(v_h = theta[:, [0]],
                                v_l_1 = theta[:, [1]],
                                v_l_2 = theta[:, [2]],
                                a = theta[:, [3]],
