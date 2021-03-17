@@ -22,7 +22,7 @@ def run_simulator():
     return simulator([0, 1, 0.5, 0.3, 0.3],
                             model = 'angle',
                             n_samples = 10000,
-                            n_trials = 10,
+                            n_trials = 1,
                             delta_t = 0.001,
                             max_t = 20,
                             cartoon = False,
