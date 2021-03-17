@@ -1,6 +1,6 @@
 
-from hddm.simulators import basic_simulator
-from hddm.simulators import boundary_functions
+import hddm.simulators
+#from hddm.simulators import boundary_functions
 import numpy as np
 import matplotlib.pyplot as plt
 import pymc as pm

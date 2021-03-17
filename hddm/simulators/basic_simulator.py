@@ -144,7 +144,7 @@ model_config = {'ddm': {'params':['v', 'a', 'z', 't'],
               'ddm_sdv':{'params':['v', 'a', 'z', 't', 'sv'],
                         'param_bounds':[[-2.2, 0.5, 0.25, 0.1, 0.3],[ 2.2, 2.2, 0.75, 1.9, 2.2]],
                         },
-            }
+               }
 
 def simulator(theta, 
               model = 'angle', 
