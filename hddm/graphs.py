@@ -1,5 +1,5 @@
 
-import hddm.simulators
+from hddm.simulators import *
 #from hddm.simulators import boundary_functions
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,7 +20,7 @@ from scipy.stats.mstats import mquantiles
 from copy import deepcopy
 
 def run_simulator():
-    return basic_simulator([0, 1, 0.5, 0.3],
+    return basic_simulator([0, 1, 0.5, 0.3, 0.3],
                             model = 'angle',
                             n_samples = 10000,
                             n_trials = 10,
