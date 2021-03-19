@@ -410,7 +410,8 @@ def model_plot(posterior_samples = None,
                         linewidth = hist_linewidth,
                         label = tmp_label)
             
-            ax_tmp.legend(loc = 'lower right')
+            if row_tmp == 0 an col_tmp == 0:
+                ax_tmp.legend(loc = 'lower right')
             
             # else:
             #     ax_tmp.hist(bins[:-1], 
@@ -454,7 +455,9 @@ def model_plot(posterior_samples = None,
                             zorder = -1,
                             linewidth = hist_linewidth,
                             label = tmp_label)
-            ax_tmp.legend(loc = 'lower right')
+            
+            if row_tmp == 0 and col_tmp == 0:
+                ax_tmp.legend(loc = 'lower right')
             # else:
             #     ax_tmp.hist(bins[:-1], 
             #                 bins, 
@@ -552,7 +555,6 @@ def model_plot(posterior_samples = None,
                     if j == (n_posterior_parameters - 1):
                         tmp_label = 'Model Samples'
                 
-
                     if model_fitted == 'weibull_cdf' or model_fitted == 'weibull_cdf2' or model_fitted == 'weibull_cdf_concave':
                         b = tmp_samples[1] * bf.weibull_cdf(t = t_s, 
                                                                              alpha = tmp_samples[4],
@@ -599,7 +601,7 @@ def model_plot(posterior_samples = None,
                             label = tmp_label
                             )
                     
-                    if tmp_label == 'Ground Truth Model':
+                    if tmp_label == 'Ground Truth Model' and row_tmp == 0 and col_tmp == 0:
                         ax_tmp.legend(loc = 'upper right')
 
                     for m in range(len(t_s)):
