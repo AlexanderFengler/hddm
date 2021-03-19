@@ -600,7 +600,7 @@ def model_plot(posterior_samples = None,
                             )
                     
                     if tmp_label == 'Ground Truth Model':
-                        ax[row_tmp, col_tmp].legend(loc = 'upper right')
+                        ax_tmp.legend(loc = 'upper right')
 
                     for m in range(len(t_s)):
                         if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:
