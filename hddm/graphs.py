@@ -251,32 +251,32 @@ def model_plot(posterior_samples = None,
 
 
         # Run simulations and add trajectories
-        if show_trajectories == True:
-            for k in range(n_trajectories):
-                out = simulator(theta = ground_truth_parameters[i, :],
-                                model = model_ground_truth, 
-                                n_samples = 1,
-                                bin_dim = None)
-                #print(out)
-                if rows > 1 and cols > 1:
-                    ax[row_tmp, col_tmp].plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], out[2]['trajectory'][out[2]['trajectory'] > -999], 
-                                              color = color_trajectories, 
-                                              alpha = alpha_trajectories,
-                                              linewidth = linewidth_trajectories)
-                elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-                    ax[i].plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], out[2]['trajectory'][out[2]['trajectory'] > -999], 
-                               color = color_trajectories,
-                               alpha = alpha_trajectories,
-                               linewidth = linewidth_trajectories)
-                else:
-                    ax.plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], out[2]['trajectory'][out[2]['trajectory'] > -999],
-                            color = color_trajectories, 
-                            alpha = alpha_trajectories, 
-                            linewidth = linewidth_trajectories)
+        # if show_trajectories == True:
+        #     for k in range(n_trajectories):
+        #         out = simulator(theta = ground_truth_parameters[i, :],
+        #                         model = model_ground_truth, 
+        #                         n_samples = 1,
+        #                         bin_dim = None)
+        #         #print(out)
+        #         if rows > 1 and cols > 1:
+        #             ax[row_tmp, col_tmp].plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], out[2]['trajectory'][out[2]['trajectory'] > -999], 
+        #                                       color = color_trajectories, 
+        #                                       alpha = alpha_trajectories,
+        #                                       linewidth = linewidth_trajectories)
+        #         elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+        #             ax[i].plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], out[2]['trajectory'][out[2]['trajectory'] > -999], 
+        #                        color = color_trajectories,
+        #                        alpha = alpha_trajectories,
+        #                        linewidth = linewidth_trajectories)
+        #         else:
+        #             ax.plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], out[2]['trajectory'][out[2]['trajectory'] > -999],
+        #                     color = color_trajectories, 
+        #                     alpha = alpha_trajectories, 
+        #                     linewidth = linewidth_trajectories)
                     
-                    # This part here allows for a plot in plot setup (useful for plots like the levy where we might want to show the error distribution as a little cartoon on the right)
-                    #ax_ins = ax.inset_axes([1, 0.5, 0.2, 0.2])
-                    #ax_ins.plot([0, 1, 2, 3])
+        #             # This part here allows for a plot in plot setup (useful for plots like the levy where we might want to show the error distribution as a little cartoon on the right)
+        #             #ax_ins = ax.inset_axes([1, 0.5, 0.2, 0.2])
+        #             #ax_ins.plot([0, 1, 2, 3])
         
 
                 # Run simulations and add trajectories
