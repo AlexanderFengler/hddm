@@ -129,7 +129,9 @@ def model_plot(posterior_samples = None,
                gt_linewidth = 3, # styling
                hist_linewidth = 3, # styling
                bin_size = 0.025, # styling
-               save = False):
+               save = False,
+               scale_x = 1.0,
+               scale_y = 1.0):
     
     if save == True:
         pass
@@ -218,7 +220,7 @@ def model_plot(posterior_samples = None,
             font_scale = 2)
 
     fig, ax = plt.subplots(rows, cols, 
-                           figsize = (20 * n_rows, 20), 
+                           figsize = (20 * rows * scale_y, 20 * scale_x), 
                            sharex = False, 
                            sharey = False)
     
