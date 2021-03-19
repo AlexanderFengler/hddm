@@ -6,6 +6,9 @@ import kabuki.step_methods as steps
 from hddm.models import HDDMBase
 from kabuki.hierarchical import Knode
 
+# Import the simulators (mostly for benefit of having the model_config --> maybe this should be moved to a separate place)
+from hddm.simulators.basic_simulator import *
+
 class HDDM(HDDMBase):
     """Create hierarchical drift-diffusion model in which each subject
     has a set of parameters that are constrained by a group distribution.
@@ -142,11 +145,13 @@ class HDDM(HDDMBase):
             else:
                 return self._create_stochastic_knodes_noninfo(include)
 
+    # AF TODO: CREATE STOCHASTIC NODES FOR NN INFORMATIVE
 
     def _create_stochastic_knodes_nn_noninfo(self, include):
         knodes = OrderedDict()
         
         # SPLIT BY MODEL TO ACCOMMODATE TRAINED PARAMETER BOUNDS BY MODEL
+        # AF TODO: The knoweds lower, upper parameters should be fed by the 'model_config' dictionary (right now just mirrored)
 
         # PARAMETERS COMMON TO ALL MODELS
         if 'p_outlier' in include:
@@ -155,7 +160,6 @@ class HDDM(HDDMBase):
                                                         g_tau = 10**-2,
                                                         std_std = 0.5
                                                         ))
-
         if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf2':
             if 'a' in include:
                 knodes.update(self._create_family_trunc_normal('a',
@@ -201,48 +205,48 @@ class HDDM(HDDMBase):
                                                                std_upper = 2
                                                                ))
 
-        if self.model == 'weibull_cdf_concave':
-            if 'a' in include:
-                knodes.update(self._create_family_trunc_normal('a',
-                                                               lower = 0.3,
-                                                               upper = 2.5,
-                                                               value = 1,
-                                                               std_upper = 1 # added AF
-                                                               ))
-            if 'v' in include:
-                knodes.update(self._create_family_trunc_normal('v', 
-                                                               lower = - 2.5,
-                                                               upper = 2.5,
-                                                               value = 0,
-                                                               std_upper = 1.5
-                                                               ))
-            if 't' in include:
-                knodes.update(self._create_family_trunc_normal('t', 
-                                                               lower = 1e-3,
-                                                               upper = 2, 
-                                                               value = .01,
-                                                               std_upper = 1 # added AF
-                                                               ))
-            if 'z' in include:
-                knodes.update(self._create_family_invlogit('z',
-                                                           value = .5,
-                                                           g_tau = 10**-2,
-                                                           std_std = 0.5,
-                                                           )) # should have lower = 0.2, upper = 0.8
-            if 'alpha' in include:
-                knodes.update(self._create_family_trunc_normal('alpha',
-                                                               lower = 1.00, # this guarantees initial concavity of the likelihood
-                                                               upper = 4.99, 
-                                                               value = 2.34,
-                                                               std_upper = 2
-                                                               ))
-            if 'beta' in include:
-                knodes.update(self._create_family_trunc_normal('beta', 
-                                                               lower = 0.31, 
-                                                               upper = 6.99, 
-                                                               value = 3.34,
-                                                               std_upper = 2
-                                                               ))
+        # if self.model == 'weibull_cdf_concave':
+        #     if 'a' in include:
+        #         knodes.update(self._create_family_trunc_normal('a',
+        #                                                        lower = 0.3,
+        #                                                        upper = 2.5,
+        #                                                        value = 1,
+        #                                                        std_upper = 1 # added AF
+        #                                                        ))
+        #     if 'v' in include:
+        #         knodes.update(self._create_family_trunc_normal('v', 
+        #                                                        lower = - 2.5,
+        #                                                        upper = 2.5,
+        #                                                        value = 0,
+        #                                                        std_upper = 1.5
+        #                                                        ))
+        #     if 't' in include:
+        #         knodes.update(self._create_family_trunc_normal('t', 
+        #                                                        lower = 1e-3,
+        #                                                        upper = 2, 
+        #                                                        value = .01,
+        #                                                        std_upper = 1 # added AF
+        #                                                        ))
+        #     if 'z' in include:
+        #         knodes.update(self._create_family_invlogit('z',
+        #                                                    value = .5,
+        #                                                    g_tau = 10**-2,
+        #                                                    std_std = 0.5,
+        #                                                    )) # should have lower = 0.2, upper = 0.8
+        #     if 'alpha' in include:
+        #         knodes.update(self._create_family_trunc_normal('alpha',
+        #                                                        lower = 1.00, # this guarantees initial concavity of the likelihood
+        #                                                        upper = 4.99, 
+        #                                                        value = 2.34,
+        #                                                        std_upper = 2
+        #                                                        ))
+        #     if 'beta' in include:
+        #         knodes.update(self._create_family_trunc_normal('beta', 
+        #                                                        lower = 0.31, 
+        #                                                        upper = 6.99, 
+        #                                                        value = 3.34,
+        #                                                        std_upper = 2
+        #                                                        ))
 
         if self.model == 'ddm' or self.model == 'ddm_analytic':
             if 'a' in include:
@@ -541,7 +545,6 @@ class HDDM(HDDMBase):
                                                beta = 15, 
                                                value = 0.01, 
                                                depends = self.depends['p_outlier'])
-
         return knodes
 
     def _create_stochastic_knodes_noninfo(self, include):

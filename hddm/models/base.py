@@ -29,8 +29,6 @@ try:
 except ImportError:
     pass
 
-
-
 class AccumulatorModel(kabuki.Hierarchical):
     def __init__(self, data, **kwargs):
         # Flip sign for lower boundary RTs

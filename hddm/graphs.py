@@ -278,6 +278,29 @@ def model_plot(posterior_samples = None,
                     #ax_ins = ax.inset_axes([1, 0.5, 0.2, 0.2])
                     #ax_ins.plot([0, 1, 2, 3])
         
+
+                # Run simulations and add trajectories
+        if show_trajectories == True:
+            if rows > 1 and cols > 1:
+                ax_tmp = ax[row_tmp, col_tmp]
+            elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+                ax_tmp = ax[i]
+            else:
+                ax_tmp = ax
+            
+            for k in range(n_trajectories):
+                out = simulator(theta = ground_truth_parameters[i, :],
+                                model = model_ground_truth, 
+                                n_samples = 1,
+                                bin_dim = None)
+
+                ax_tmp.plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], out[2]['trajectory'][out[2]['trajectory'] > -999], 
+                                            color = color_trajectories, 
+                                            alpha = alpha_trajectories,
+                                            linewidth = linewidth_trajectories)
+
+                    
+
         # Run simulations and add histograms
         # True params
         if model_ground_truth is not None and ground_truth_data is None:
@@ -347,9 +370,6 @@ def model_plot(posterior_samples = None,
                             zorder = -1)
                         
         if model_ground_truth is not None and ground_truth_data is None:
-#             counts, bins = np.histogram(tmp_true[tmp_true[:, 1] == 1, 0],
-#                                     bins = np.linspace(0, max_t, 100))
-
             counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == 1, 0],
                                           bins = np.linspace(0, max_t, nbins),
                                           density = True)
@@ -378,7 +398,7 @@ def model_plot(posterior_samples = None,
                         linewidth = hist_linewidth)
         
         if ground_truth_data is not None:
-            # This splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
+            # These splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
             # Wiser because either way we can have varying numbers of trials for each subject !
             if datatype == 'hierarchical' or datatype == 'condition' or datatype == 'single_subject':
                 counts_2, bins = np.histogram(ground_truth_data[i][ground_truth_data[i][:, 1] == 1, 0],
@@ -393,8 +413,10 @@ def model_plot(posterior_samples = None,
 
                 choice_p_up_true_dat = np.sum(ground_truth_data[i, :, 1] == 1) / ground_truth_data[i].shape[0]
 
-            
             if row_tmp == 0 and col_tmp == 0:
+                tmp_label = 'Dataset'
+            else:
+                tmp_label = None
                 ax_tmp.hist(bins[:-1], 
                             bins, 
                             weights = choice_p_up_true_dat * counts_2,
@@ -404,18 +426,18 @@ def model_plot(posterior_samples = None,
                             edgecolor = 'blue',
                             zorder = -1,
                             linewidth = hist_linewidth,
-                            label = 'Dataset')
+                            label = tmp_label)
                 ax_tmp.legend(loc = 'lower right')
-            else:
-                ax_tmp.hist(bins[:-1], 
-                        bins, 
-                        weights = choice_p_up_true_dat * counts_2,
-                        histtype = 'step',
-                        alpha = 0.5, 
-                        color = 'blue',
-                        edgecolor = 'blue',
-                        linewidth = hist_linewidth,
-                        zorder = -1)
+            # else:
+            #     ax_tmp.hist(bins[:-1], 
+            #                 bins, 
+            #                 weights = choice_p_up_true_dat * counts_2,
+            #                 histtype = 'step',
+            #                 alpha = 0.5, 
+            #                 color = 'blue',
+            #                 edgecolor = 'blue',
+            #                 linewidth = hist_linewidth,
+            #                 zorder = -1)
             
              
         #ax.invert_xaxis()
@@ -430,9 +452,6 @@ def model_plot(posterior_samples = None,
         ax_tmp.set_yticks([])
         
         if posterior_samples is not None:
-#             counts, bins = np.histogram(tmp_post[tmp_post[:, 1] == -1, 0],
-#                             bins = np.linspace(0, max_t, 100))
-
             counts_2, bins = np.histogram(tmp_post[tmp_post[:, 1] == -1, 0],
                                           bins = np.linspace(0, max_t, nbins),
                                           density = True)
@@ -447,9 +466,6 @@ def model_plot(posterior_samples = None,
                         zorder = -1)
             
         if model_ground_truth is not None and ground_truth_data is None:
-#             counts, bins = np.histogram(tmp_true[tmp_true[:, 1] == -1, 0],
-#                                     bins = np.linspace(0, max_t, 100))
-
             counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == -1, 0],
                                           bins = np.linspace(0, max_t, nbins),
                                           density = True)
@@ -571,7 +587,7 @@ def model_plot(posterior_samples = None,
                     elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
                         ax[i].plot(t_s[:maxid] + tmp_samples[3],
                                    start_point_tmp + slope_tmp * t_s[:maxid], 
-                                   'black', 
+                                   c = tmp_color, 
                                    alpha = tmp_alpha,
                                    zorder = 1000 + j,
                                    linewidth = posterior_linewidth,
@@ -589,7 +605,7 @@ def model_plot(posterior_samples = None,
                     else:
                         ax.plot(t_s[:maxid] + tmp_samples[3],
                                 start_point_tmp + slope_tmp * t_s[:maxid], 
-                                'black', 
+                                c = tmp_color, 
                                 alpha = tmp_alpha,
                                 linewidth = posterior_linewidth,
                                 zorder = 1000 + j,
@@ -625,7 +641,7 @@ def model_plot(posterior_samples = None,
                         ax.axvline(x = tmp_samples[3], 
                                    ymin = -2, 
                                    ymax = 2, 
-                                   c = 'black', 
+                                   c = tmp_color, 
                                    linestyle = '--',
                                    linewidth = posterior_linewidth,
                                    alpha = tmp_alpha)
