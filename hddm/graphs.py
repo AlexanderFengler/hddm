@@ -7,6 +7,7 @@ import hddm
 import sys
 import kabuki
 import pandas as pd
+import seaborn
 import string
 import argparse
 from kabuki.analyze import post_pred_gen, post_pred_compare_stats
@@ -228,7 +229,6 @@ def model_plot(posterior_samples = None,
         my_suptitle = fig.suptitle(title.replace(':', ''), fontsize = 40)
         
     sns.despine(right = True)
-    
 
     t_s = np.arange(0, max_t, 0.01)
     nbins = int((max_t) / bin_size)
