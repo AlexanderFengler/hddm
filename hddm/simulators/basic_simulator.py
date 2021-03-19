@@ -120,31 +120,31 @@ def bin_arbitrary_fptd(out = None,
 model_config = {'ddm': {'params':['v', 'a', 'z', 't'],
                   'param_bounds': [[-2, 0.5, 0.3, 0.2], [2, 2, 0.7, 1.8]],
                  },
-              'angle':{'params': ['v', 'a', 'z', 't', 'theta'],
+                'angle':{'params': ['v', 'a', 'z', 't', 'theta'],
                     'param_bounds': [[-2, 0.5, 0.3, 0.2, 0.2], [2, 1.8, 0.7, 1.8, np.pi / 2 - 0.5]],
                     },
-              'weibull_cdf':{'params': ['v', 'a', 'z', 't', 'alpha', 'beta'],
+                'weibull_cdf':{'params': ['v', 'a', 'z', 't', 'alpha', 'beta'],
                             'param_bounds': [[-2, 0.5, 0.3, 0.2, 1.0, 1.0], [2, 2., 0.7, 1.8, 4.0, 6.0]]
                             },
-              'weibull_cdf_concave':{'params': ['v', 'a', 'z', 't', 'alpha', 'beta'],
+                'weibull_cdf_concave':{'params': ['v', 'a', 'z', 't', 'alpha', 'beta'],
                                     'param_bounds': [[-2, 0.5, 0.3, 0.2, 1.5, 1.0], [2, 1.7, 0.7, 1.8, 4.0, 6.0]]
                                     },
-              'levy':{'params':['v', 'a', 'z', 'alpha', 't'],
+                'levy':{'params':['v', 'a', 'z', 'alpha', 't'],
                     'param_bounds':[[-2, 0.4, 0.3, 1.1, 0.1], [2, 1.7, 0.7, 1.9, 1.9]]
                     },
-              'full_ddm':{'params':['v', 'a', 'z', 't', 'sz', 'sv', 'st'],
+                'full_ddm':{'params':['v', 'a', 'z', 't', 'sz', 'sv', 'st'],
                         'param_bounds':[[-2, 0.5, 0.35, 0.3, 0.05, 0.0, 0.05], [2, 2.2, 0.65, 1.7, 0.25, 1.7, 0.2]]
                         },
-              'full_ddm2':{'params':['v', 'a', 'z', 't', 'sz', 'sv', 'st'],
+                'full_ddm2':{'params':['v', 'a', 'z', 't', 'sz', 'sv', 'st'],
                         'param_bounds':[[-2, 0.5, 0.35, 0.3, 0.05, 0.0, 0.05], [2, 2.2, 0.65, 1.7, 0.25, 1.7, 0.2]]
                         },
-              'ornstein':{'params':['v', 'a', 'z', 'g', 't'],
+                'ornstein':{'params':['v', 'a', 'z', 'g', 't'],
                         'param_bounds':[[-1.9, 0.4, 0.25, -0.9, 0.1], [1.9, 1.9, 0.75, 0.9, 1.9]]
                         },
-              'ddm_sdv':{'params':['v', 'a', 'z', 't', 'sv'],
+                'ddm_sdv':{'params':['v', 'a', 'z', 't', 'sv'],
                         'param_bounds':[[-2.2, 0.5, 0.25, 0.1, 0.3],[ 2.2, 2.2, 0.75, 1.9, 2.2]],
                         },
-               }
+                }
 
 def simulator(theta, 
               model = 'angle', 

@@ -29,6 +29,79 @@ def run_simulator():
                             bin_dim = None, 
                             bin_pointwise = False)
 
+
+# Plot preprocessing functions
+def _make_trace_plotready_single_subject(hddm_trace = None, model = ''):
+    
+    posterior_samples = np.zeros(hddm_trace.shape)
+    
+    cnt = 0
+    for param in model_config[model]['params']:
+        if param == 'z':
+            posterior_samples[:, cnt] = model_config[model]['param_bounds'][0][model_config[model]['params'].index('z')] + \
+                (  model_config[model]['param_bounds'][1][model_config[model]['params'].index('z')] - model_config[model]['param_bounds'][0][model_config[model]['params'].index('z')] ) * (1 / (1 + np.exp( - hddm_trace['z_trans'])))
+            # posterior_samples[:, cnt] = 1 / (1 + np.exp( - hddm_trace['z_trans']))
+        else:
+            posterior_samples[:, cnt] = hddm_trace[param]
+        cnt += 1
+    
+    return posterior_samples
+
+def _make_trace_plotready_hierarchical(hddm_trace = None, model = ''):
+    
+    subj_l = []
+    for key in hddm_trace.keys():
+        if '_subj' in key:
+            new_key = _pad_subj_id(key)
+            #print(new_key)
+            #new_key = key
+            subj_l.append(str_to_num(new_key[-3:]))
+            #subj_l.append(int(float(key[-3:])))
+
+    dat = np.zeros((max((subj_l)) + 1, hddm_trace.shape[0], len(model_config[model]['params'])))
+    for key in hddm_trace.keys():
+        if '_subj' in key:
+            new_key = _pad_subj_id(key)
+            
+            id_tmp = str_to_num(new_key[-3:]) #int(float(key[-3:])) # convert padded key from string to a number
+            if '_trans' in key:
+                val_tmp = 1 / ( 1 + np.exp(- hddm_trace[key]))
+            else:
+                val_tmp = hddm_trace[key]
+            dat[id_tmp, : , model_config[model]['params'].index(key[:key.find('_')])] = val_tmp   
+            
+    return dat 
+
+def _make_trace_plotready_condition(hddm_trace = None, model = ''):
+    
+    cond_l = []
+    for key in hddm_trace.keys():
+        if '(' in key:
+            cond_l.append(int(float(key[-2])))
+    
+    dat = np.zeros((max(cond_l) + 1, hddm_trace.shape[0], len(model_config[model]['params'])))
+                   
+    for key in hddm_trace.keys():
+        if '(' in key:
+            id_tmp = int(float(key[-2]))
+            if '_trans' in key:
+                val_tmp = 1 / ( 1 + np.exp(- hddm_trace[key]))
+                dat[id_tmp, : , model_config[model]['params'].index(key[:key.find('_trans')])] = val_tmp
+            else:
+                val_tmp = hddm_trace[key]
+                dat[id_tmp, : , model_config[model]['params'].index(key[:key.find('(')])] = val_tmp   
+        else:
+            if '_trans' in key:
+                val_tmp = 1 / ( 1 + np.exp(- hddm_trace[key]))
+                key = key[:key.find('_trans')]
+            else:
+                val_tmp = hddm_trace[key]
+                   
+            dat[:, :, model_config[model]['params'].index(key)] = val_tmp
+            
+    return dat
+# --------------------------------------------------------------------------------------------
+
 # Plot bound
 # Mean posterior predictives
 def model_plot(posterior_samples = None,
@@ -108,7 +181,7 @@ def model_plot(posterior_samples = None,
     title = 'Model Plot: '
     
     if model_ground_truth is not None:
-        ax_titles = config[model_ground_truth]['params']
+        ax_titles = [model_ground_truth]['params']
     else: 
         ax_titles = ''
         
