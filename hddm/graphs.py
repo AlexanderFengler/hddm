@@ -270,15 +270,27 @@ def model_plot(posterior_samples = None,
             ax.set_xlim(0, max_t)
             ax.set_ylim(-ylimit, ylimit)
 
+        if rows > 1 and cols > 1:
+            ax_tmp = ax[row_tmp, col_tmp]
+            ax_tmp_twin_up = ax[row_tmp, col_tmp].twinx()
+            ax_tmp_twin_down = ax[row_tmp, col_tmp].twinx()
+        elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+            ax_tmp = ax[i]
+            ax_tmp_twin_up = ax[i].twinx()
+            ax_tmp_twin_down = ax[i].twinx()
+        else:
+            ax_tmp = ax
+            ax_tmp_twin_up = ax.twinx()
+            ax_tmp_twin_down = ax.twinx()
+        
+        ax_tmp_twin_up.set_ylim(-ylimit, ylimit)
+        ax_tmp_twin_up.set_yticks([])
+
+        ax_tmp_twin_down.set_ylim(ylimit, -ylimit)
+        ax_tmp_twin_down.set_yticks([])
+            
         # Run simulations and add trajectories
         if show_trajectories == True:
-            if rows > 1 and cols > 1:
-                ax_tmp = ax[row_tmp, col_tmp]
-            elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-                ax_tmp = ax[i]
-            else:
-                ax_tmp = ax
-            
             for k in range(n_trajectories):
                 out = simulator(theta = ground_truth_parameters[i, :],
                                 model = model_ground_truth, 
@@ -317,15 +329,15 @@ def model_plot(posterior_samples = None,
                 tmp_post[(n_simulations_per_parameter * j):(n_simulations_per_parameter * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
         
          #ax.set_ylim(-4, 2)
-        if rows > 1 and cols > 1:
-            ax_tmp = ax[row_tmp, col_tmp].twinx()
-        elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-            ax_tmp = ax[i].twinx()
-        else:
-            ax_tmp = ax.twinx()
+        # if rows > 1 and cols > 1:
+        #     ax_tmp = ax[row_tmp, col_tmp].twinx()
+        # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+        #     ax_tmp = ax[i].twinx()
+        # else:
+        #     ax_tmp = ax.twinx()
         
-        ax_tmp.set_ylim(-ylimit, ylimit)
-        ax_tmp.set_yticks([])
+        # ax_tmp.set_ylim(-ylimit, ylimit)
+        # ax_tmp.set_yticks([])
         
         if posterior_samples is not None:
             choice_p_up_post = np.sum(tmp_post[:, 1] == 1) / tmp_post.shape[0]
@@ -339,7 +351,7 @@ def model_plot(posterior_samples = None,
             else:
                 tmp_label = None
 
-            ax_tmp.hist(bins[:-1], 
+            ax_tmp_twin_up.hist(bins[:-1], 
                         bins, 
                         weights = choice_p_up_post * counts_2,
                         histtype = 'step',
@@ -360,7 +372,7 @@ def model_plot(posterior_samples = None,
             else: 
                 tmp_label = None
             
-            ax_tmp.hist(bins[:-1], 
+            ax_tmp_twin_up.hist(bins[:-1], 
                         bins, 
                         weights = choice_p_up_true * counts_2,
                         histtype = 'step',
@@ -372,7 +384,7 @@ def model_plot(posterior_samples = None,
                         label = tmp_label)
             
             if row_tmp == 0 and col_tmp == 0:
-                ax_tmp.legend(loc = 'lower right')
+                ax_tmp_twin_up.legend(loc = 'lower right')
             
         if ground_truth_data is not None:
             # These splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
@@ -395,7 +407,7 @@ def model_plot(posterior_samples = None,
             else:
                 tmp_label = None
             
-            ax_tmp.hist(bins[:-1], 
+            ax_tmp_twin_up.hist(bins[:-1], 
                             bins, 
                             weights = choice_p_up_true_dat * counts_2,
                             histtype = 'step',
@@ -407,24 +419,24 @@ def model_plot(posterior_samples = None,
                             label = tmp_label)
             
             if row_tmp == 0 and col_tmp == 0:
-                ax_tmp.legend(loc = 'lower right')
+                ax_tmp_twin_up.legend(loc = 'lower right')
   
         #ax.invert_xaxis()
-        if rows > 1 and cols > 1:
-            ax_tmp = ax[row_tmp, col_tmp].twinx()
-        elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-            ax_tmp = ax[i].twinx()
-        else:
-            ax_tmp = ax.twinx()
+        # if rows > 1 and cols > 1:
+        #     ax_tmp = ax[row_tmp, col_tmp].twinx()
+        # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+        #     ax_tmp = ax[i].twinx()
+        # else:
+        #     ax_tmp = ax.twinx()
             
-        ax_tmp.set_ylim(ylimit, -ylimit)
-        ax_tmp.set_yticks([])
+        # ax_tmp.set_ylim(ylimit, -ylimit)
+        # ax_tmp.set_yticks([])
         
         if posterior_samples is not None:
             counts_2, bins = np.histogram(tmp_post[tmp_post[:, 1] == -1, 0],
                                           bins = np.linspace(0, max_t, nbins),
                                           density = True)
-            ax_tmp.hist(bins[:-1], 
+            ax_tmp_twin_down.hist(bins[:-1], 
                         bins, 
                         weights = (1 - choice_p_up_post) * counts_2,
                         histtype = 'step',
@@ -438,7 +450,7 @@ def model_plot(posterior_samples = None,
             counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == -1, 0],
                                           bins = np.linspace(0, max_t, nbins),
                                           density = True)
-            ax_tmp.hist(bins[:-1], 
+            ax_tmp_twin_down.hist(bins[:-1], 
                         bins, 
                         weights = (1 - choice_p_up_true) * counts_2,
                         histtype = 'step',
@@ -460,7 +472,7 @@ def model_plot(posterior_samples = None,
             
             #choice_p_up_true_dat = np.sum(ground_truth_data[i, :, 1] == 1) / ground_truth_data[i].shape[0]
 
-            ax_tmp.hist(bins[:-1], 
+            ax_tmp_twin_down.hist(bins[:-1], 
                         bins, 
                         weights = (1 - choice_p_up_true_dat) * counts_2,
                         histtype = 'step',
@@ -470,7 +482,7 @@ def model_plot(posterior_samples = None,
                         linewidth = hist_linewidth,
                         zorder = -1)
 
-        # Plot posterior samples of bounds and slopes (model)
+        # POSTERIOR SAMPLES: BOUNDS AND SLOPES (model)
         if show_model:
             if posterior_samples is not None:
                 for j in range(n_posterior_parameters + 1):
@@ -509,14 +521,14 @@ def model_plot(posterior_samples = None,
 
                     slope_tmp = tmp_samples[0]
 
-                    if rows > 1 and cols > 1:
-                        ax_tmp = ax[row_tmp, col_tmp]
+                    # if rows > 1 and cols > 1:
+                    #     ax_tmp = ax[row_tmp, col_tmp]
                     
-                    elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-                        ax_tmp = ax[i]
+                    # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+                    #     ax_tmp = ax[i]
                     
-                    else:
-                        ax_tmp = ax
+                    # else:
+                    #     ax_tmp = ax
 
                     ax_tmp.plot(t_s + tmp_samples[3], b, tmp_color,
                                 t_s + tmp_samples[3], - b, tmp_color, 
@@ -568,7 +580,7 @@ def model_plot(posterior_samples = None,
                 title_tmp += str(round(ground_truth_parameters[i, k], 2)) + ', '
 
 
-        if row_tmp == rows:
+        if row_tmp == (rows - 1):
             ax_tmp.set_xlabel('rt', 
                                                 fontsize = 20);
         ax_tmp.set_ylabel('', 
@@ -586,64 +598,6 @@ def model_plot(posterior_samples = None,
                 ax_tmp.axvline(x = ground_truth_parameters[i, 3], ymin = -2, ymax = 2, c = tmp_color, linestyle = '--')
             ax_tmp.axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
         
-
-        # if rows > 1 and cols > 1:
-        #     if row_tmp == rows:
-        #         ax[row_tmp, col_tmp].set_xlabel('rt', 
-        #                                          fontsize = 20);
-        #     ax[row_tmp, col_tmp].set_ylabel('', 
-        #                                     fontsize = 20);
-
-
-        #     ax[row_tmp, col_tmp].set_title(title_tmp,
-        #                                    fontsize = 24)
-        #     ax[row_tmp, col_tmp].tick_params(axis = 'y', size = 20)
-        #     ax[row_tmp, col_tmp].tick_params(axis = 'x', size = 20)
-
-        #     # Some extra styling:
-        #     if model_ground_truth is not None:
-        #         if show_model:
-        #             ax[row_tmp, col_tmp].axvline(x = ground_truth_parameters[i, 3], ymin = -2, ymax = 2, c = tmp_color, linestyle = '--')
-        #         ax[row_tmp, col_tmp].axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
-        
-        # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-        #     if row_tmp == rows:
-        #         ax[i].set_xlabel('rt', 
-        #                          fontsize = 20);
-        #     ax[i].set_ylabel('', 
-        #                      fontsize = 20);
-
-        #     ax[i].set_title(title_tmp,
-        #                     fontsize = 24)
-            
-        #     ax[i].tick_params(axis = 'y', size = 20)
-        #     ax[i].tick_params(axis = 'x', size = 20)
-
-        #     # Some extra styling:
-        #     if model_ground_truth is not None:
-        #         if show_model:
-        #             ax[i].axvline(x = ground_truth_parameters[i, 3], ymin = -2, ymax = 2, c = tmp_color, linestyle = '--')
-        #         ax[i].axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
-        
-        # else:
-        #     if row_tmp == rows:
-        #         ax.set_xlabel('rt', 
-        #                       fontsize = 20);
-        #     ax.set_ylabel('', 
-        #                   fontsize = 20);
-
-        #     ax.set_title(title_tmp,
-        #                  fontsize = 24)
-
-        #     ax.tick_params(axis = 'y', size = 20)
-        #     ax.tick_params(axis = 'x', size = 20)
-
-        #     # Some extra styling:
-        #     if model_ground_truth is not None:
-        #         if show_model:
-        #             ax.axvline(x = ground_truth_parameters[i, 3], ymin = -2, ymax = 2, c = tmp_color, linestyle = '--')
-        #         ax.axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
-
     if rows > 1 and cols > 1:
         for i in range(n_plots, rows * cols, 1):
             row_tmp = int(np.floor(i / cols))
