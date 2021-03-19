@@ -53,7 +53,7 @@ def _make_trace_plotready_hierarchical(hddm_trace = None, model = ''):
     subj_l = []
     for key in hddm_trace.keys():
         if '_subj' in key:
-            new_key = _pad_subj_id(key)
+            new_key = pad_subj_id(key)
             #print(new_key)
             #new_key = key
             subj_l.append(str_to_num(new_key[-3:]))
@@ -62,7 +62,7 @@ def _make_trace_plotready_hierarchical(hddm_trace = None, model = ''):
     dat = np.zeros((max((subj_l)) + 1, hddm_trace.shape[0], len(model_config[model]['params'])))
     for key in hddm_trace.keys():
         if '_subj' in key:
-            new_key = _pad_subj_id(key)
+            new_key = pad_subj_id(key)
             
             id_tmp = str_to_num(new_key[-3:]) #int(float(key[-3:])) # convert padded key from string to a number
             if '_trans' in key:
@@ -279,7 +279,7 @@ def model_plot(posterior_samples = None,
         #             #ax_ins.plot([0, 1, 2, 3])
         
 
-                # Run simulations and add trajectories
+            # Run simulations and add trajectories
         if show_trajectories == True:
             if rows > 1 and cols > 1:
                 ax_tmp = ax[row_tmp, col_tmp]
@@ -339,35 +339,36 @@ def model_plot(posterior_samples = None,
         if posterior_samples is not None:
             choice_p_up_post = np.sum(tmp_post[:, 1] == 1) / tmp_post.shape[0]
 
-#             counts, bins = np.histogram(tmp_post[tmp_post[:, 1] == 1, 0],
-#                                         bins = np.linspace(0, max_t, 100))
-
             counts_2, bins = np.histogram(tmp_post[tmp_post[:, 1] == 1, 0],
                                           bins = np.linspace(0, max_t, nbins),
                                           density = True)
             
             if j == (n_posterior_parameters - 1) and row_tmp == 0 and col_tmp == 0:
-                ax_tmp.hist(bins[:-1], 
-                            bins, 
-                            weights = choice_p_up_post * counts_2,
-                            histtype = 'step',
-                            alpha = 0.5, 
-                            color = 'black',
-                            edgecolor = 'black',
-                            zorder = -1,
-                            label = 'Posterior Predictive',
-                            linewidth = hist_linewidth)
-                
+                tmp_label = 'Posterior Predictive'
             else:
-                ax_tmp.hist(bins[:-1], 
-                            bins, 
-                            weights = choice_p_up_post * counts_2,
-                            histtype = 'step',
-                            alpha = 0.5, 
-                            color = 'black',
-                            edgecolor = 'black',
-                            linewidth = hist_linewidth,
-                            zorder = -1)
+                tmp_label = None
+
+            ax_tmp.hist(bins[:-1], 
+                        bins, 
+                        weights = choice_p_up_post * counts_2,
+                        histtype = 'step',
+                        alpha = 0.5, 
+                        color = 'black',
+                        edgecolor = 'black',
+                        zorder = -1,
+                        label = tmp_label,
+                        linewidth = hist_linewidth)
+                
+            # else:
+            #     ax_tmp.hist(bins[:-1], 
+            #                 bins, 
+            #                 weights = choice_p_up_post * counts_2,
+            #                 histtype = 'step',
+            #                 alpha = 0.5, 
+            #                 color = 'black',
+            #                 edgecolor = 'black',
+            #                 linewidth = hist_linewidth,
+            #                 zorder = -1)
                         
         if model_ground_truth is not None and ground_truth_data is None:
             counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == 1, 0],
@@ -375,19 +376,11 @@ def model_plot(posterior_samples = None,
                                           density = True)
 
             if row_tmp == 0 and col_tmp == 0:
-                ax_tmp.hist(bins[:-1], 
-                            bins, 
-                            weights = choice_p_up_true * counts_2,
-                            histtype = 'step',
-                            alpha = 0.5, 
-                            color = 'red',
-                            edgecolor = 'red',
-                            zorder = -1,
-                            linewidth = hist_linewidth,
-                            label = 'Ground Truth Data')
-                ax_tmp.legend(loc = 'lower right')
-            else:
-                ax_tmp.hist(bins[:-1], 
+                tmp_label = 'Ground Truth Data'
+            else: 
+                tmp_label = None
+            
+            ax_tmp.hist(bins[:-1], 
                         bins, 
                         weights = choice_p_up_true * counts_2,
                         histtype = 'step',
@@ -395,7 +388,21 @@ def model_plot(posterior_samples = None,
                         color = 'red',
                         edgecolor = 'red',
                         zorder = -1,
-                        linewidth = hist_linewidth)
+                        linewidth = hist_linewidth,
+                        label = tmp_label)
+            
+            ax_tmp.legend(loc = 'lower right')
+            
+            # else:
+            #     ax_tmp.hist(bins[:-1], 
+            #             bins, 
+            #             weights = choice_p_up_true * counts_2,
+            #             histtype = 'step',
+            #             alpha = 0.5, 
+            #             color = 'red',
+            #             edgecolor = 'red',
+            #             zorder = -1,
+            #             linewidth = hist_linewidth)
         
         if ground_truth_data is not None:
             # These splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
