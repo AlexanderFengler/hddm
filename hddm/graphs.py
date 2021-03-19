@@ -254,6 +254,7 @@ def model_plot(posterior_samples = None,
     nbins = int((max_t) / bin_size)
 
     for i in range(n_plots):
+        
         row_tmp = int(np.floor(i / cols))
         col_tmp = i - (cols * row_tmp)
         
@@ -516,15 +517,19 @@ def model_plot(posterior_samples = None,
                         ax_tmp = ax
 
                     ax_tmp.plot(t_s + tmp_samples[3], b, tmp_color,
-                            t_s + tmp_samples[3], - b, tmp_color, 
-                            alpha = tmp_alpha,
-                            zorder = 1000 + j,
-                            linewidth = posterior_linewidth,
-                            label = tmp_label
-                            )
+                                t_s + tmp_samples[3], - b, tmp_color, 
+                                alpha = tmp_alpha,
+                                zorder = 1000 + j,
+                                linewidth = posterior_linewidth,
+                                label = tmp_label,
+                                )
                     
                     if tmp_label == 'Ground Truth Model' and row_tmp == 0 and col_tmp == 0:
                         ax_tmp.legend(loc = 'upper right')
+                        print('generated upper right label')
+                        print('row: ', row_tmp)
+                        print('col: ', col_tmp)
+                        print('j: ', j)
 
                     for m in range(len(t_s)):
                         if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:
@@ -534,12 +539,11 @@ def model_plot(posterior_samples = None,
 
                     #if rows > 1 and cols > 1:
                     ax_tmp.plot(t_s[:maxid] + tmp_samples[3],
-                                                start_point_tmp + slope_tmp * t_s[:maxid], 
-                                                c = tmp_color, 
-                                                alpha = tmp_alpha,
-                                                zorder = 1000 + j,
-                                                linewidth = posterior_linewidth,
-                                                label = tmp_label)
+                                start_point_tmp + slope_tmp * t_s[:maxid], 
+                                c = tmp_color, 
+                                alpha = tmp_alpha,
+                                zorder = 1000 + j,
+                                linewidth = posterior_linewidth) # TOOK AWAY LABEL
 
                         # if j == (n_posterior_parameters - 1):
                         #     ax[row_tmp, col_tmp].plot(t_s[:maxid] + tmp_samples[3],
