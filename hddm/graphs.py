@@ -570,23 +570,37 @@ def model_plot(posterior_samples = None,
                     slope_tmp = tmp_samples[0]
 
                     if rows > 1 and cols > 1:
-                        ax[row_tmp, col_tmp].plot(t_s + tmp_samples[3], b, tmp_color,
-                                                  t_s + tmp_samples[3], - b, tmp_color, 
-                                                  alpha = tmp_alpha,
-                                                  zorder = 1000 + j,
-                                                  linewidth = posterior_linewidth)
+                        ax_tmp = ax[row_tmp, col_tmp]
+                        # ax[row_tmp, col_tmp].plot(t_s + tmp_samples[3], b, tmp_color,
+                        #                           t_s + tmp_samples[3], - b, tmp_color, 
+                        #                           alpha = tmp_alpha,
+                        #                           zorder = 1000 + j,
+                        #                           linewidth = posterior_linewidth)
                     elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-                        ax[i].plot(t_s + tmp_samples[3], b, tmp_color,
-                                   t_s + tmp_samples[3], - b, tmp_color, 
-                                   alpha = tmp_alpha,
-                                   zorder = 1000 + j,
-                                   linewidth = posterior_linewidth,)
+                        ax_tmp = ax[i]
+                        # ax[i].plot(t_s + tmp_samples[3], b, tmp_color,
+                        #            t_s + tmp_samples[3], - b, tmp_color, 
+                        #            alpha = tmp_alpha,
+                        #            zorder = 1000 + j,
+                        #            linewidth = posterior_linewidth,)
                     else:
-                        ax.plot(t_s + tmp_samples[3], b, tmp_color,
-                                t_s + tmp_samples[3], - b, tmp_color, 
-                                alpha = tmp_alpha,
-                                zorder = 1000 + j,
-                                linewidth = posterior_linewidth)
+                        ax_tmp = ax
+                        # ax.plot(t_s + tmp_samples[3], b, tmp_color,
+                        #         t_s + tmp_samples[3], - b, tmp_color, 
+                        #         alpha = tmp_alpha,
+                        #         zorder = 1000 + j,
+                        #         linewidth = posterior_linewidth)
+
+                    ax.plot(t_s + tmp_samples[3], b, tmp_color,
+                            t_s + tmp_samples[3], - b, tmp_color, 
+                            alpha = tmp_alpha,
+                            zorder = 1000 + j,
+                            linewidth = posterior_linewidth,
+                            label = tmp_label
+                            )
+                    
+                    if tmp_label == 'Ground Truth Model':
+                        ax[row_tmp, col_tmp].legend(loc = 'upper right')
 
                     for m in range(len(t_s)):
                         if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:

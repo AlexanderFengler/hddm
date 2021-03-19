@@ -849,7 +849,7 @@ class HDDMBase(AccumulatorModel):
             self.include.add('z')
 
         # AF Todo: Make this model specific ?
-        possible_parameters = ('v', 'a', 't', 'z', 'st', 'sz', 'sv', 'p_outlier','dual_alpha','theta','alpha','beta', 'g')
+        possible_parameters = ('v', 'a', 't', 'z', 'st', 'sz', 'sv', 'p_outlier','dual_alpha','theta','alpha','beta', 'g', 'alpha_diff')
         assert self.include.issubset(possible_parameters), """Received and invalid parameter using the 'include' keyword.
         parameters received: %s
         parameters allowed: %s """ % (tuple(self.include), possible_parameters)
@@ -938,7 +938,7 @@ class HDDMBase(AccumulatorModel):
         return Knode(self.wfpt_class, 'wfpt', observed = True, col_name = 'rt', **wfpt_parents)
 
     def create_knodes(self):
-        knodes = self._create_stochastic_knodes(self.include)
+        knodes = self._create_stochastic_knodes(self.include) # AF TODO CHECK 
         knodes['wfpt'] = self._create_wfpt_knode(knodes)
 
         return list(knodes.values())
