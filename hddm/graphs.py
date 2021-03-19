@@ -66,11 +66,15 @@ def _make_trace_plotready_hierarchical(hddm_trace = None, model = ''):
             
             id_tmp = str_to_num(new_key[-3:]) #int(float(key[-3:])) # convert padded key from string to a number
             if '_trans' in key:
-                val_tmp = 1 / ( 1 + np.exp(- hddm_trace[key]))
+                # isolate parameter name
+                key_param_only = key.split('_')[0]
+                lower_lim = model_config[model]['param_bounds'][0][model_config[model]['params'].index(key_param_only)]
+                upper_lim = model_config[model]['param_bounds'][1][model_config[model]['params'].index(key_param_only)]
+                val_tmp = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- hddm_trace[key])))
             else:
                 val_tmp = hddm_trace[key]
-            dat[id_tmp, : , model_config[model]['params'].index(key[:key.find('_')])] = val_tmp   
             
+            dat[id_tmp, : , model_config[model]['params'].index(key[:key.find('_')])] = val_tmp     
     return dat 
 
 def _make_trace_plotready_condition(hddm_trace = None, model = ''):
@@ -86,14 +90,22 @@ def _make_trace_plotready_condition(hddm_trace = None, model = ''):
         if '(' in key:
             id_tmp = int(float(key[-2]))
             if '_trans' in key:
-                val_tmp = 1 / ( 1 + np.exp(- hddm_trace[key]))
+                key_param_only = key.split('_')[0]
+                lower_lim = model_config[model]['param_bounds'][0][model_config[model]['params'].index(key_param_only)]
+                upper_lim = model_config[model]['param_bounds'][1][model_config[model]['params'].index(key_param_only)]
+                val_tmp = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- hddm_trace[key])))
+                #val_tmp = 1 / ( 1 + np.exp(- hddm_trace[key]))
                 dat[id_tmp, : , model_config[model]['params'].index(key[:key.find('_trans')])] = val_tmp
             else:
                 val_tmp = hddm_trace[key]
                 dat[id_tmp, : , model_config[model]['params'].index(key[:key.find('(')])] = val_tmp   
         else:
             if '_trans' in key:
-                val_tmp = 1 / ( 1 + np.exp(- hddm_trace[key]))
+                key_param_only = key.split('_')[0]
+                lower_lim = model_config[model]['param_bounds'][0][model_config[model]['params'].index(key_param_only)]
+                upper_lim = model_config[model]['param_bounds'][1][model_config[model]['params'].index(key_param_only)]
+                val_tmp = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- hddm_trace[key])))
+                #val_tmp = 1 / ( 1 + np.exp(- hddm_trace[key]))
                 key = key[:key.find('_trans')]
             else:
                 val_tmp = hddm_trace[key]
