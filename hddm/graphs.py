@@ -7,7 +7,7 @@ import hddm
 import sys
 import kabuki
 import pandas as pd
-import seaborn
+import seaborn as sns
 import string
 import argparse
 from kabuki.analyze import post_pred_gen, post_pred_compare_stats
