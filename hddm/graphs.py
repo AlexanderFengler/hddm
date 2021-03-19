@@ -181,7 +181,7 @@ def model_plot(posterior_samples = None,
     title = 'Model Plot: '
     
     if model_ground_truth is not None:
-        ax_titles = [model_ground_truth]['params']
+        ax_titles = model_config[model_ground_truth]['params']
     else: 
         ax_titles = ''
         
