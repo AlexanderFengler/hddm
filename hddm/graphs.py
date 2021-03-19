@@ -197,7 +197,8 @@ def model_plot(posterior_samples = None,
             gt_dat_dict[i] = gt_dat_dict[i].values
         ground_truth_data = gt_dat_dict
         
-        
+    
+    # AF TODO: Generalize to arbitrary response coding !
     if ground_truth_data is not None and datatype == 'hierarchical':
         gt_dat_dict = dict()
         
@@ -206,9 +207,9 @@ def model_plot(posterior_samples = None,
             gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
             gt_dat_dict[i] = gt_dat_dict[i].values
         
-        ground_truth_data = gt_dat_dict
         sorted_keys = np.sort(np.unique(ground_truth_data['subj_idx']))
-
+        ground_truth_data = gt_dat_dict
+        
         print(sorted_keys)
         print(ground_truth_data.keys())
         # print('Supplying ground truth data not yet implemented for hierarchical datasets')
