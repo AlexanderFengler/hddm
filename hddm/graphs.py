@@ -200,13 +200,17 @@ def model_plot(posterior_samples = None,
         
     if ground_truth_data is not None and datatype == 'hierarchical':
         gt_dat_dict = dict()
+        
         for i in np.sort(np.unique(ground_truth_data['subj_idx'])):
             gt_dat_dict[i] = ground_truth_data.loc[ground_truth_data['subj_idx'] == i][['rt', 'response']]
             gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
             gt_dat_dict[i] = gt_dat_dict[i].values
+        
         ground_truth_data = gt_dat_dict
+        sorted_keys = np.sort(np.unique(ground_truth_data['subj_idx']))
 
-        print(ground_truth_data)
+        print(sorted_keys)
+        print(ground_truth_data.keys())
         # print('Supplying ground truth data not yet implemented for hierarchical datasets')
 
     # Define number of rows we need for display
@@ -410,11 +414,11 @@ def model_plot(posterior_samples = None,
             # These splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
             # Wiser because either way we can have varying numbers of trials for each subject !
             if datatype == 'hierarchical' or datatype == 'condition' or datatype == 'single_subject':
-                counts_2, bins = np.histogram(ground_truth_data[i][ground_truth_data[i][:, 1] == 1, 0],
+                counts_2, bins = np.histogram(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == 1, 0],
                                               bins = np.linspace(0, max_t, nbins),
                                               density = True)
 
-                choice_p_up_true_dat = np.sum(ground_truth_data[i][:, 1] == 1) / ground_truth_data[i].shape[0]
+                choice_p_up_true_dat = np.sum(ground_truth_data[sorted_keys[i]][:, 1] == 1) / ground_truth_data[sorted_keys[i]].shape[0]
             else:
                 counts_2, bins = np.histogram(ground_truth_data[i, ground_truth_data[i, :, 1] == 1, 0],
                                               bins = np.linspace(0, max_t, nbins),
@@ -426,7 +430,8 @@ def model_plot(posterior_samples = None,
                 tmp_label = 'Dataset'
             else:
                 tmp_label = None
-                ax_tmp.hist(bins[:-1], 
+            
+            ax_tmp.hist(bins[:-1], 
                             bins, 
                             weights = choice_p_up_true_dat * counts_2,
                             histtype = 'step',
@@ -436,7 +441,7 @@ def model_plot(posterior_samples = None,
                             zorder = -1,
                             linewidth = hist_linewidth,
                             label = tmp_label)
-                ax_tmp.legend(loc = 'lower right')
+            ax_tmp.legend(loc = 'lower right')
             # else:
             #     ax_tmp.hist(bins[:-1], 
             #                 bins, 
@@ -490,7 +495,7 @@ def model_plot(posterior_samples = None,
  
         if ground_truth_data is not None:
             if datatype == 'hierarchical' or datatype == 'condition' or datatype == 'single_subject':
-                counts_2, bins = np.histogram(ground_truth_data[i][ground_truth_data[i][:, 1] == - 1, 0],
+                counts_2, bins = np.histogram(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == - 1, 0],
                                               bins = np.linspace(0, max_t, nbins),
                                               density = True)
             else:
