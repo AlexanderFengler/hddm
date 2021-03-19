@@ -346,18 +346,7 @@ def model_plot(posterior_samples = None,
                         zorder = -1,
                         label = tmp_label,
                         linewidth = hist_linewidth)
-                
-            # else:
-            #     ax_tmp.hist(bins[:-1], 
-            #                 bins, 
-            #                 weights = choice_p_up_post * counts_2,
-            #                 histtype = 'step',
-            #                 alpha = 0.5, 
-            #                 color = 'black',
-            #                 edgecolor = 'black',
-            #                 linewidth = hist_linewidth,
-            #                 zorder = -1)
-                        
+                       
         if model_ground_truth is not None and ground_truth_data is None:
             counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == 1, 0],
                                           bins = np.linspace(0, max_t, nbins),
@@ -382,17 +371,6 @@ def model_plot(posterior_samples = None,
             if row_tmp == 0 and col_tmp == 0:
                 ax_tmp.legend(loc = 'lower right')
             
-            # else:
-            #     ax_tmp.hist(bins[:-1], 
-            #             bins, 
-            #             weights = choice_p_up_true * counts_2,
-            #             histtype = 'step',
-            #             alpha = 0.5, 
-            #             color = 'red',
-            #             edgecolor = 'red',
-            #             zorder = -1,
-            #             linewidth = hist_linewidth)
-        
         if ground_truth_data is not None:
             # These splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
             # Wiser because either way we can have varying numbers of trials for each subject !
@@ -427,18 +405,7 @@ def model_plot(posterior_samples = None,
             
             if row_tmp == 0 and col_tmp == 0:
                 ax_tmp.legend(loc = 'lower right')
-            # else:
-            #     ax_tmp.hist(bins[:-1], 
-            #                 bins, 
-            #                 weights = choice_p_up_true_dat * counts_2,
-            #                 histtype = 'step',
-            #                 alpha = 0.5, 
-            #                 color = 'blue',
-            #                 edgecolor = 'blue',
-            #                 linewidth = hist_linewidth,
-            #                 zorder = -1)
-            
-             
+  
         #ax.invert_xaxis()
         if rows > 1 and cols > 1:
             ax_tmp = ax[row_tmp, col_tmp].twinx()
@@ -500,7 +467,6 @@ def model_plot(posterior_samples = None,
                         linewidth = hist_linewidth,
                         zorder = -1)
 
-        
         # Plot posterior samples of bounds and slopes (model)
         if show_model:
             if posterior_samples is not None:
@@ -542,25 +508,12 @@ def model_plot(posterior_samples = None,
 
                     if rows > 1 and cols > 1:
                         ax_tmp = ax[row_tmp, col_tmp]
-                        # ax[row_tmp, col_tmp].plot(t_s + tmp_samples[3], b, tmp_color,
-                        #                           t_s + tmp_samples[3], - b, tmp_color, 
-                        #                           alpha = tmp_alpha,
-                        #                           zorder = 1000 + j,
-                        #                           linewidth = posterior_linewidth)
+                    
                     elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
                         ax_tmp = ax[i]
-                        # ax[i].plot(t_s + tmp_samples[3], b, tmp_color,
-                        #            t_s + tmp_samples[3], - b, tmp_color, 
-                        #            alpha = tmp_alpha,
-                        #            zorder = 1000 + j,
-                        #            linewidth = posterior_linewidth,)
+                    
                     else:
                         ax_tmp = ax
-                        # ax.plot(t_s + tmp_samples[3], b, tmp_color,
-                        #         t_s + tmp_samples[3], - b, tmp_color, 
-                        #         alpha = tmp_alpha,
-                        #         zorder = 1000 + j,
-                        #         linewidth = posterior_linewidth)
 
                     ax_tmp.plot(t_s + tmp_samples[3], b, tmp_color,
                             t_s + tmp_samples[3], - b, tmp_color, 
@@ -579,14 +532,15 @@ def model_plot(posterior_samples = None,
                             break
                         maxid = m
 
-                    if rows > 1 and cols > 1:
-                        ax[row_tmp, col_tmp].plot(t_s[:maxid] + tmp_samples[3],
-                                                  start_point_tmp + slope_tmp * t_s[:maxid], 
-                                                  c = tmp_color, 
-                                                  alpha = tmp_alpha,
-                                                  zorder = 1000 + j,
-                                                  linewidth = posterior_linewidth,
-                                                  label = tmp_label)
+                    #if rows > 1 and cols > 1:
+                    ax_tmp.plot(t_s[:maxid] + tmp_samples[3],
+                                                start_point_tmp + slope_tmp * t_s[:maxid], 
+                                                c = tmp_color, 
+                                                alpha = tmp_alpha,
+                                                zorder = 1000 + j,
+                                                linewidth = posterior_linewidth,
+                                                label = tmp_label)
+
                         # if j == (n_posterior_parameters - 1):
                         #     ax[row_tmp, col_tmp].plot(t_s[:maxid] + tmp_samples[3],
                         #                               start_point_tmp + slope_tmp * t_s[:maxid], 
@@ -596,14 +550,14 @@ def model_plot(posterior_samples = None,
                         #                               linewidth = posterior_linewidth,
                         #                               label = 'Model Samples')
                             
-                    elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-                        ax[i].plot(t_s[:maxid] + tmp_samples[3],
-                                   start_point_tmp + slope_tmp * t_s[:maxid], 
-                                   c = tmp_color, 
-                                   alpha = tmp_alpha,
-                                   zorder = 1000 + j,
-                                   linewidth = posterior_linewidth,
-                                   label = tmp_label)
+                    # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+                    #     ax[i].plot(t_s[:maxid] + tmp_samples[3],
+                    #                start_point_tmp + slope_tmp * t_s[:maxid], 
+                    #                c = tmp_color, 
+                    #                alpha = tmp_alpha,
+                    #                zorder = 1000 + j,
+                    #                linewidth = posterior_linewidth,
+                    #                label = tmp_label)
                         
                         # if j == (n_posterior_parameters - 1):
                         #     ax[i].plot(t_s[:maxid] + tmp_samples[3],
@@ -614,14 +568,14 @@ def model_plot(posterior_samples = None,
                         #                zorder = 1000 + j,
                         #                label = 'Model Samples')
 
-                    else:
-                        ax.plot(t_s[:maxid] + tmp_samples[3],
-                                start_point_tmp + slope_tmp * t_s[:maxid], 
-                                c = tmp_color, 
-                                alpha = tmp_alpha,
-                                linewidth = posterior_linewidth,
-                                zorder = 1000 + j,
-                                label = tmp_label)
+                    # else:
+                    #     ax.plot(t_s[:maxid] + tmp_samples[3],
+                    #             start_point_tmp + slope_tmp * t_s[:maxid], 
+                    #             c = tmp_color, 
+                    #             alpha = tmp_alpha,
+                    #             linewidth = posterior_linewidth,
+                    #             zorder = 1000 + j,
+                    #             label = tmp_label)
                         # if j == (n_posterior_parameters - 1):
                         #     ax.plot(t_s[:maxid] + tmp_samples[3],
                         #             start_point_tmp + slope_tmp * t_s[:maxid], 
@@ -632,32 +586,32 @@ def model_plot(posterior_samples = None,
                         #             label = 'Model Samples')
                                    
                     
-                    if rows > 1 and cols > 1:
-                        ax[row_tmp, col_tmp].axvline(x = tmp_samples[3], 
-                                                     ymin = - 2, 
-                                                     ymax = 2, 
-                                                     c = tmp_color, 
-                                                     linestyle = '--',
-                                                     linewidth = posterior_linewidth,
-                                                     alpha = tmp_alpha)
+                    # if rows > 1 and cols > 1:
+                    ax_tmp.axvline(x = tmp_samples[3], 
+                                                    ymin = - 2, 
+                                                    ymax = 2, 
+                                                    c = tmp_color, 
+                                                    linestyle = '--',
+                                                    linewidth = posterior_linewidth,
+                                                    alpha = tmp_alpha)
                         
-                    elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-                        ax[i].axvline(x = tmp_samples[3],
-                                                            ymin = - 2,
-                                                            ymax = 2,
-                                                            c = tmp_color,
-                                                            linestyle = '--',
-                                                            linewidth = posterior_linewidth,
-                                                            alpha = tmp_alpha)
-                    else:
-                        ax.axvline(x = tmp_samples[3], 
-                                   ymin = -2, 
-                                   ymax = 2, 
-                                   c = tmp_color, 
-                                   linestyle = '--',
-                                   linewidth = posterior_linewidth,
-                                   alpha = tmp_alpha)
-                    
+                    # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+                    #     ax[i].axvline(x = tmp_samples[3],
+                    #                                         ymin = - 2,
+                    #                                         ymax = 2,
+                    #                                         c = tmp_color,
+                    #                                         linestyle = '--',
+                    #                                         linewidth = posterior_linewidth,
+                    #                                         alpha = tmp_alpha)
+                    # else:
+                    #     ax.axvline(x = tmp_samples[3], 
+                    #                ymin = -2, 
+                    #                ymax = 2, 
+                    #                c = tmp_color, 
+                    #                linestyle = '--',
+                    #                linewidth = posterior_linewidth,
+                    #                alpha = tmp_alpha)
+                    if row_tmp == 0 and col_tmp == 0:
                         ax.patch.set_visible(False)
                
                         
