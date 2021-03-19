@@ -205,6 +205,8 @@ def model_plot(posterior_samples = None,
             gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
             gt_dat_dict[i] = gt_dat_dict[i].values
         ground_truth_data = gt_dat_dict
+
+        print(ground_truth_data)
         # print('Supplying ground truth data not yet implemented for hierarchical datasets')
 
     # Define number of rows we need for display
