@@ -591,7 +591,7 @@ def model_plot(posterior_samples = None,
                         #         zorder = 1000 + j,
                         #         linewidth = posterior_linewidth)
 
-                    ax.plot(t_s + tmp_samples[3], b, tmp_color,
+                    ax_tmp.plot(t_s + tmp_samples[3], b, tmp_color,
                             t_s + tmp_samples[3], - b, tmp_color, 
                             alpha = tmp_alpha,
                             zorder = 1000 + j,
