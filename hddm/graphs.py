@@ -159,6 +159,8 @@ def model_plot(posterior_samples = None,
                 z_cnt += 1
         if z_cnt < 1:
             posterior_samples['z_trans'] = 0.0
+
+        print('z not part of fitted parameters --> Figures assume it was set to 0.5')
             
     # Inputs are hddm_traces --> make plot ready
     if input_is_hddm_trace and posterior_samples is not None:
@@ -545,51 +547,6 @@ def model_plot(posterior_samples = None,
                                 zorder = 1000 + j,
                                 linewidth = posterior_linewidth) # TOOK AWAY LABEL
 
-                        # if j == (n_posterior_parameters - 1):
-                        #     ax[row_tmp, col_tmp].plot(t_s[:maxid] + tmp_samples[3],
-                        #                               start_point_tmp + slope_tmp * t_s[:maxid], 
-                        #                               c = 'black', 
-                        #                               alpha = tmp_alpha,
-                        #                               zorder = 1000 + j,
-                        #                               linewidth = posterior_linewidth,
-                        #                               label = 'Model Samples')
-                            
-                    # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-                    #     ax[i].plot(t_s[:maxid] + tmp_samples[3],
-                    #                start_point_tmp + slope_tmp * t_s[:maxid], 
-                    #                c = tmp_color, 
-                    #                alpha = tmp_alpha,
-                    #                zorder = 1000 + j,
-                    #                linewidth = posterior_linewidth,
-                    #                label = tmp_label)
-                        
-                        # if j == (n_posterior_parameters - 1):
-                        #     ax[i].plot(t_s[:maxid] + tmp_samples[3],
-                        #                start_point_tmp + slope_tmp * t_s[:maxid], 
-                        #                c = 'black', 
-                        #                alpha = tmp_alpha,
-                        #                linewidth = posterior_linewidth,
-                        #                zorder = 1000 + j,
-                        #                label = 'Model Samples')
-
-                    # else:
-                    #     ax.plot(t_s[:maxid] + tmp_samples[3],
-                    #             start_point_tmp + slope_tmp * t_s[:maxid], 
-                    #             c = tmp_color, 
-                    #             alpha = tmp_alpha,
-                    #             linewidth = posterior_linewidth,
-                    #             zorder = 1000 + j,
-                    #             label = tmp_label)
-                        # if j == (n_posterior_parameters - 1):
-                        #     ax.plot(t_s[:maxid] + tmp_samples[3],
-                        #             start_point_tmp + slope_tmp * t_s[:maxid], 
-                        #             'black', 
-                        #             alpha = tmp_alpha,
-                        #             linewidth = posterior_linewidth,
-                        #             zorder = 1000 + j,
-                        #             label = 'Model Samples')
-                                   
-                    
                     # if rows > 1 and cols > 1:
                     ax_tmp.axvline(x = tmp_samples[3], 
                                                     ymin = - 2, 
@@ -598,141 +555,10 @@ def model_plot(posterior_samples = None,
                                                     linestyle = '--',
                                                     linewidth = posterior_linewidth,
                                                     alpha = tmp_alpha)
-                        
-                    # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-                    #     ax[i].axvline(x = tmp_samples[3],
-                    #                                         ymin = - 2,
-                    #                                         ymax = 2,
-                    #                                         c = tmp_color,
-                    #                                         linestyle = '--',
-                    #                                         linewidth = posterior_linewidth,
-                    #                                         alpha = tmp_alpha)
-                    # else:
-                    #     ax.axvline(x = tmp_samples[3], 
-                    #                ymin = -2, 
-                    #                ymax = 2, 
-                    #                c = tmp_color, 
-                    #                linestyle = '--',
-                    #                linewidth = posterior_linewidth,
-                    #                alpha = tmp_alpha)
+
                     if rows == 1 and cols == 1:
                         ax.patch.set_visible(False)
-               
-                        
-        # # If we supplied ground truth data --> make ground truth model blue, otherwise red
-        # tmp_colors = ['red', 'blue']
-        # tmp_bool = ground_truth_data is not None
-        # tmp_color = tmp_colors[int(tmp_bool)]
-                            
-        # # Plot ground_truths bounds
-        # if show_model and model_ground_truth is not None:
-            
-        #     if model_ground_truth == 'weibull_cdf' or model_ground_truth == 'weibull_cdf2' or model_ground_truth == 'weibull_cdf_concave':
-        #         b = ground_truth_parameters[i, 1] * bf.weibull_cdf(t = t_s,
-        #                                                  alpha = ground_truth_parameters[i, 4],
-        #                                                  beta = ground_truth_parameters[i, 5])
-
-        #     if model_ground_truth == 'angle' or model_ground_truth == 'angle2':
-        #         b = np.maximum(ground_truth_parameters[i, 1] + bf.angle(t = t_s, theta = ground_truth_parameters[i, 4]), 0)
-
-        #     if model_ground_truth == 'ddm':
-        #         b = ground_truth_parameters[i, 1] * np.ones(t_s.shape[0])
-
-        #     start_point_tmp = - ground_truth_parameters[i, 1] + \
-        #                       (2 * ground_truth_parameters[i, 1] * ground_truth_parameters[i, 2])
-        #     slope_tmp = ground_truth_parameters[i, 0]
-
-        #     if rows > 1 and cols > 1:
-        #         if row_tmp == 0 and col_tmp == 0:
-        #             ax[row_tmp, col_tmp].plot(t_s + ground_truth_parameters[i, 3], b, tmp_color, 
-        #                                       alpha = 1, 
-        #                                       linewidth = gt_linewidth, 
-        #                                       zorder = 1000)
-        #             ax[row_tmp, col_tmp].plot(t_s + ground_truth_parameters[i, 3], -b, tmp_color, 
-        #                                       alpha = 1,
-        #                                       linewidth = 3,
-        #                                       zorder = 1000, 
-        #                                       label = 'Ground Truth Model')
-        #             ax[row_tmp, col_tmp].legend(loc = 'upper right')
-        #         else:
-        #             ax[row_tmp, col_tmp].plot(t_s + ground_truth_parameters[i, 3], b, tmp_color, 
-        #                       t_s + ground_truth_parameters[i, 3], -b, tmp_color, 
-        #                       alpha = 1,
-        #                       linewidth = gt_linewidth,
-        #                       zorder = 1000)
                     
-        #     elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-        #         if row_tmp == 0 and col_tmp == 0:
-        #             ax[i].plot(t_s + ground_truth_parameters[i, 3], b, tmp_color, 
-        #                                       alpha = 1, 
-        #                                       linewidth = gt_linewidth, 
-        #                                       zorder = 1000)
-        #             ax[i].plot(t_s + ground_truth_parameters[i, 3], -b, tmp_color, 
-        #                                       alpha = 1,
-        #                                       linewidth = gt_linewidth,
-        #                                       zorder = 1000, 
-        #                                       label = 'Ground Truth Model')
-        #             ax[i].legend(loc = 'upper right')
-        #         else:
-        #             ax[i].plot(t_s + ground_truth_parameters[i, 3], b, tmp_color, 
-        #                       t_s + ground_truth_parameters[i, 3], -b, tmp_color, 
-        #                       alpha = 1,
-        #                       linewidth = gt_linewidth,
-        #                       zorder = 1000)
-        #     else:
-        #         ax.plot(t_s + ground_truth_parameters[i, 3], b, tmp_color, 
-        #                 alpha = 1, 
-        #                 linewidth = gt_linewidth, 
-        #                 zorder = 1000)
-        #         ax.plot(t_s + ground_truth_parameters[i, 3], -b, tmp_color, 
-        #                 alpha = 1,
-        #                 linewidth = gt_linewidth,
-        #                 zorder = 1000,
-        #                 label = 'Ground Truth Model')
-        #         #print('passed through legend part')
-        #         #print(row_tmp)
-        #         #print(col_tmp)
-        #         ax.legend(loc = 'upper right')
-
-        #     # Ground truth slope:
-        #     for m in range(len(t_s)):
-        #         if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:
-        #             maxid = m
-        #             break
-        #         maxid = m
-
-        #     # print('maxid', maxid)
-        #     if rows > 1 and cols > 1:
-        #         ax[row_tmp, col_tmp].plot(t_s[:maxid] + ground_truth_parameters[i, 3], 
-        #                                   start_point_tmp + slope_tmp * t_s[:maxid], 
-        #                                   tmp_color, 
-        #                                   alpha = 1, 
-        #                                   linewidth = gt_linewidth, 
-        #                                   zorder = 1000)
-
-        #         ax[row_tmp, col_tmp].set_zorder(ax_tmp.get_zorder() + 1)
-        #         ax[row_tmp, col_tmp].patch.set_visible(False)
-        #     elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-        #         ax[i].plot(t_s[:maxid] + ground_truth_parameters[i, 3], 
-        #                                   start_point_tmp + slope_tmp * t_s[:maxid], 
-        #                                   tmp_color, 
-        #                                   alpha = 1, 
-        #                                   linewidth = gt_linewidth, 
-        #                                   zorder = 1000)
-
-        #         ax[i].set_zorder(ax_tmp.get_zorder() + 1)
-        #         ax[i].patch.set_visible(False)
-        #     else:
-        #         ax.plot(t_s[:maxid] + ground_truth_parameters[i, 3], 
-        #                 start_point_tmp + slope_tmp * t_s[:maxid], 
-        #                 tmp_color, 
-        #                 alpha = 1, 
-        #                 linewidth = gt_linewidth, 
-        #                 zorder = 1000)
-
-        #         ax.set_zorder(ax_tmp.get_zorder() + 1)
-        #         ax.patch.set_visible(False)
-               
         # Set plot title
         title_tmp = ''
         
@@ -741,62 +567,82 @@ def model_plot(posterior_samples = None,
                 title_tmp += ax_titles[k] + ': '
                 title_tmp += str(round(ground_truth_parameters[i, k], 2)) + ', '
 
-        if rows > 1 and cols > 1:
-            if row_tmp == rows:
-                ax[row_tmp, col_tmp].set_xlabel('rt', 
-                                                 fontsize = 20);
-            ax[row_tmp, col_tmp].set_ylabel('', 
-                                            fontsize = 20);
+
+        if row_tmp == rows:
+            ax_tmp.set_xlabel('rt', 
+                                                fontsize = 20);
+        ax_tmp.set_ylabel('', 
+                                        fontsize = 20);
 
 
-            ax[row_tmp, col_tmp].set_title(title_tmp,
-                                           fontsize = 24)
-            ax[row_tmp, col_tmp].tick_params(axis = 'y', size = 20)
-            ax[row_tmp, col_tmp].tick_params(axis = 'x', size = 20)
+        ax_tmp.set_title(title_tmp,
+                                        fontsize = 24)
+        ax_tmp.tick_params(axis = 'y', size = 20)
+        ax_tmp.tick_params(axis = 'x', size = 20)
 
-            # Some extra styling:
-            if model_ground_truth is not None:
-                if show_model:
-                    ax[row_tmp, col_tmp].axvline(x = ground_truth_parameters[i, 3], ymin = -2, ymax = 2, c = tmp_color, linestyle = '--')
-                ax[row_tmp, col_tmp].axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
+        # Some extra styling:
+        if model_ground_truth is not None:
+            if show_model:
+                ax_tmp.axvline(x = ground_truth_parameters[i, 3], ymin = -2, ymax = 2, c = tmp_color, linestyle = '--')
+            ax_tmp.axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
         
-        elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-            if row_tmp == rows:
-                ax[i].set_xlabel('rt', 
-                                 fontsize = 20);
-            ax[i].set_ylabel('', 
-                             fontsize = 20);
 
-            ax[i].set_title(title_tmp,
-                            fontsize = 24)
+        # if rows > 1 and cols > 1:
+        #     if row_tmp == rows:
+        #         ax[row_tmp, col_tmp].set_xlabel('rt', 
+        #                                          fontsize = 20);
+        #     ax[row_tmp, col_tmp].set_ylabel('', 
+        #                                     fontsize = 20);
+
+
+        #     ax[row_tmp, col_tmp].set_title(title_tmp,
+        #                                    fontsize = 24)
+        #     ax[row_tmp, col_tmp].tick_params(axis = 'y', size = 20)
+        #     ax[row_tmp, col_tmp].tick_params(axis = 'x', size = 20)
+
+        #     # Some extra styling:
+        #     if model_ground_truth is not None:
+        #         if show_model:
+        #             ax[row_tmp, col_tmp].axvline(x = ground_truth_parameters[i, 3], ymin = -2, ymax = 2, c = tmp_color, linestyle = '--')
+        #         ax[row_tmp, col_tmp].axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
+        
+        # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+        #     if row_tmp == rows:
+        #         ax[i].set_xlabel('rt', 
+        #                          fontsize = 20);
+        #     ax[i].set_ylabel('', 
+        #                      fontsize = 20);
+
+        #     ax[i].set_title(title_tmp,
+        #                     fontsize = 24)
             
-            ax[i].tick_params(axis = 'y', size = 20)
-            ax[i].tick_params(axis = 'x', size = 20)
+        #     ax[i].tick_params(axis = 'y', size = 20)
+        #     ax[i].tick_params(axis = 'x', size = 20)
 
-            # Some extra styling:
-            if model_ground_truth is not None:
-                if show_model:
-                    ax[i].axvline(x = ground_truth_parameters[i, 3], ymin = -2, ymax = 2, c = tmp_color, linestyle = '--')
-                ax[i].axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
+        #     # Some extra styling:
+        #     if model_ground_truth is not None:
+        #         if show_model:
+        #             ax[i].axvline(x = ground_truth_parameters[i, 3], ymin = -2, ymax = 2, c = tmp_color, linestyle = '--')
+        #         ax[i].axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
         
-        else:
-            if row_tmp == rows:
-                ax.set_xlabel('rt', 
-                              fontsize = 20);
-            ax.set_ylabel('', 
-                          fontsize = 20);
+        # else:
+        #     if row_tmp == rows:
+        #         ax.set_xlabel('rt', 
+        #                       fontsize = 20);
+        #     ax.set_ylabel('', 
+        #                   fontsize = 20);
 
-            ax.set_title(title_tmp,
-                         fontsize = 24)
+        #     ax.set_title(title_tmp,
+        #                  fontsize = 24)
 
-            ax.tick_params(axis = 'y', size = 20)
-            ax.tick_params(axis = 'x', size = 20)
+        #     ax.tick_params(axis = 'y', size = 20)
+        #     ax.tick_params(axis = 'x', size = 20)
 
-            # Some extra styling:
-            if model_ground_truth is not None:
-                if show_model:
-                    ax.axvline(x = ground_truth_parameters[i, 3], ymin = -2, ymax = 2, c = tmp_color, linestyle = '--')
-                ax.axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
+        #     # Some extra styling:
+        #     if model_ground_truth is not None:
+        #         if show_model:
+        #             ax.axvline(x = ground_truth_parameters[i, 3], ymin = -2, ymax = 2, c = tmp_color, linestyle = '--')
+        #         ax.axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
 
     if rows > 1 and cols > 1:
         for i in range(n_plots, rows * cols, 1):
