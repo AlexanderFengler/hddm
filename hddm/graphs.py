@@ -611,7 +611,7 @@ def model_plot(posterior_samples = None,
                     #                linestyle = '--',
                     #                linewidth = posterior_linewidth,
                     #                alpha = tmp_alpha)
-                    if row_tmp == 0 and col_tmp == 0:
+                    if rows == 1 and cols == 1:
                         ax.patch.set_visible(False)
                
                         
