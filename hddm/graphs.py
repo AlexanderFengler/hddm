@@ -300,11 +300,6 @@ def model_plot(posterior_samples = None,
                                 model = model_ground_truth, 
                                 n_samples = 1,
                                 bin_dim = None)
-                # ax_tmp.plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], 
-                #             out[2]['trajectory'][out[2]['trajectory'] > -999], 
-                #             color = color_trajectories, 
-                #             alpha = alpha_trajectories,
-                #             linewidth = linewidth_trajectories)
                 ax_tmp.plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], 
                             out[2]['trajectory'][out[2]['trajectory'] > -999], 
                             color = color_trajectories, 
@@ -457,58 +452,16 @@ def model_plot(posterior_samples = None,
             
             if row_tmp == 0 and col_tmp == 0:
                 ax_tmp_twin_up.legend(loc = 'lower right')
-  
-        # if posterior_samples is not None:
-        #     counts_2, bins = np.histogram(tmp_post[tmp_post[:, 1] == -1, 0],
-        #                                   bins = np.linspace(0, max_t, nbins),
-        #                                   density = True)
-        #     ax_tmp_twin_down.hist(bins[:-1], 
-        #                 bins, 
-        #                 weights = (1 - choice_p_up_post) * counts_2,
-        #                 histtype = 'step',
-        #                 alpha = 0.5, 
-        #                 color = 'black',
-        #                 edgecolor = 'black',
-        #                 linewidth = hist_linewidth,
-        #                 zorder = -1)
-            
-        # if model_ground_truth is not None and ground_truth_data is None:
-        #     counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == -1, 0],
-        #                                   bins = np.linspace(0, max_t, nbins),
-        #                                   density = True)
-        #     ax_tmp_twin_down.hist(bins[:-1], 
-        #                 bins, 
-        #                 weights = (1 - choice_p_up_true) * counts_2,
-        #                 histtype = 'step',
-        #                 alpha = 0.5, 
-        #                 color = 'red',
-        #                 edgecolor = 'red',
-        #                 linewidth = hist_linewidth,
-        #                 zorder = -1)
- 
-        # if ground_truth_data is not None:
-        #     counts_2, bins = np.histogram(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == - 1, 0],
-        #                                     bins = np.linspace(0, max_t, nbins),
-        #                                     density = True)
-
-        #     #choice_p_up_true_dat = np.sum(ground_truth_data[i, :, 1] == 1) / ground_truth_data[i].shape[0]
-
-        #     ax_tmp_twin_down.hist(bins[:-1], 
-        #                 bins, 
-        #                 weights = (1 - choice_p_up_true_dat) * counts_2,
-        #                 histtype = 'step',
-        #                 alpha = 0.5, 
-        #                 color = 'blue',
-        #                 edgecolor = 'blue',
-        #                 linewidth = hist_linewidth,
-        #                 zorder = -1)
 
         # POSTERIOR SAMPLES: BOUNDS AND SLOPES (model)
         if show_model:
             if posterior_samples is not None:
                 for j in range(n_posterior_parameters + 1):
                     
-                    if j == n_posterior_parameters and model_ground_truth is not None:
+                    if j == (n_posterior_parameters - 1):
+                        tmp_label = 'Model Samples'
+                    
+                    elif j == n_posterior_parameters and model_ground_truth is not None:
                         tmp_samples = ground_truth_parameters[i, :]
                         tmp_model = model_ground_truth
                         
@@ -518,20 +471,23 @@ def model_plot(posterior_samples = None,
                         tmp_color = tmp_colors[int(tmp_bool)]
                         tmp_alpha = 1
                         tmp_label = 'Ground Truth Model'
+                    elif j == n_posterior_parameters and model_ground_truth == None:
+                        break
                     else:
                         tmp_model = model_fitted
                         tmp_samples = posterior_samples[i, idx[j], :]
                         tmp_alpha = 0.05
                         tmp_color = 'black'
                         tmp_label = None
+
+                    print(tmp_label)
                     
-                    if j == (n_posterior_parameters - 1):
-                        tmp_label = 'Model Samples'
-                
+
+                    # MAKE BOUNDS (FROM MODEL CONFIG) !
                     if tmp_model == 'weibull_cdf' or tmp_model == 'weibull_cdf2' or tmp_model == 'weibull_cdf_concave' or tmp_model == 'weibull':
                         b = np.maximum(tmp_samples[1] * model_config[tmp_model]['boundary'](t = t_s, 
-                                                                                    alpha = tmp_samples[4],
-                                                                                    beta = tmp_samples[5]), 0)
+                                                                                            alpha = tmp_samples[4],
+                                                                                            beta = tmp_samples[5]), 0)
 
                     if tmp_model == 'angle' or tmp_model == 'angle2':
                         b = np.maximum(tmp_samples[1] + model_config[tmp_model]['boundary'](t = t_s, theta = tmp_samples[4]), 0)
@@ -540,7 +496,7 @@ def model_plot(posterior_samples = None,
                         b = tmp_samples[1] * model_config[tmp_model]['boundary'](t = t_s)                   
 
 
-                    # Now the slope part !
+                    # MAKESLOPES (VIA TRAJECTORIES) !
                     out = simulator(theta = tmp_samples,
                                     model = tmp_model, 
                                     n_samples = 1,
@@ -549,11 +505,7 @@ def model_plot(posterior_samples = None,
                                     bin_dim = None)
                     
                     tmp_traj = out[2]['trajectory']
-
-                    # start_point_tmp = - tmp_samples[1] + \
-                    #                   (2 * tmp_samples[1] * tmp_samples[2])
-
-                    # slope_tmp = tmp_samples[0]
+                    maxid = np.argmax(np.where(tmp_traj > - 999))
 
                     ax_tmp.plot(t_s + tmp_samples[3], b, tmp_color,
                                 t_s + tmp_samples[3], -b, tmp_color, 
@@ -570,27 +522,6 @@ def model_plot(posterior_samples = None,
                         print('col: ', col_tmp)
                         print('j: ', j)
 
-                    # for m in range(len(t_s)):
-                    #     if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:
-                    #         maxid = m
-                    #         break
-                    #     maxid = m
-
-                    maxid = np.argmax(np.where(tmp_traj > - 999))
-
-                    # for m in range(len(t_s)):
-                    #     if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:
-                    #         maxid = m
-                    #         break
-                    #     maxid = m
-
-                    #if rows > 1 and cols > 1:
-                    # ax_tmp.plot(t_s[:maxid] + tmp_samples[3],
-                    #             start_point_tmp + slope_tmp * t_s[:maxid], 
-                    #             c = tmp_color, 
-                    #             alpha = tmp_alpha,
-                    #             zorder = 1000 + j,
-                    #             linewidth = posterior_linewidth) # TOOK AWAY LABEL
                     ax_tmp.plot(t_s[:maxid] + tmp_samples[3],
                                 tmp_traj[:maxid],
                                 c = tmp_color, 
@@ -598,7 +529,6 @@ def model_plot(posterior_samples = None,
                                 zorder = 1000 + j,
                                 linewidth = posterior_linewidth) # TOOK AWAY LABEL
 
-                    # if rows > 1 and cols > 1:
                     ax_tmp.axvline(x = tmp_samples[3], # this should identify the index of ndt directly via model config !
                                    ymin = - ylimit, 
                                    ymax = ylimit, 
@@ -617,13 +547,11 @@ def model_plot(posterior_samples = None,
                 title_tmp += ax_titles[k] + ': '
                 title_tmp += str(round(ground_truth_parameters[i, k], 2)) + ', '
 
-
         if row_tmp == (rows - 1):
             ax_tmp.set_xlabel('rt', 
                               fontsize = 20);
         ax_tmp.set_ylabel('', 
                           fontsize = 20);
-
 
         ax_tmp.set_title(title_tmp,
                          fontsize = 24)
@@ -652,7 +580,6 @@ def model_plot(posterior_samples = None,
         plt.close()
     
     return plt.show()
-
 
 # STRUCTURE
 # EXPECT A HDDM MODEL
