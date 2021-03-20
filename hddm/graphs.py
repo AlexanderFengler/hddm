@@ -299,8 +299,6 @@ def model_plot(posterior_samples = None,
                                 model = model_ground_truth, 
                                 n_samples = 1,
                                 bin_dim = None)
-                tmp_traj = out[2]['trajectory']
-                maxid = np.argmax(np.where(tmp_traj > 0))
                 # ax_tmp.plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], 
                 #             out[2]['trajectory'][out[2]['trajectory'] > -999], 
                 #             color = color_trajectories, 
