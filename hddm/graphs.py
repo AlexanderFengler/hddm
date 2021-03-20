@@ -510,7 +510,7 @@ def model_plot(posterior_samples = None,
                                     bin_dim = None)
                     
                     tmp_traj = out[2]['trajectory']
-                    maxid = np.argmax(np.where(tmp_traj > - 999))
+                    maxid = np.minimum(np.argmax(np.where(tmp_traj > - 999)), t_s.shape[0])
 
                     ax_tmp.plot(t_s + tmp_samples[model_config[tmp_model]['params'].index('t')], b, tmp_color,
                                 alpha = tmp_alpha,
