@@ -212,7 +212,7 @@ def model_plot(posterior_samples = None,
         
     
     # AF TODO: Generalize to arbitrary response coding !
-    if ground_truth_data is not None and datatype == 'hierarchical':
+    elif ground_truth_data is not None and datatype == 'hierarchical':
         gt_dat_dict = dict()
         
         for i in np.sort(np.unique(ground_truth_data['subj_idx'])):
@@ -226,6 +226,9 @@ def model_plot(posterior_samples = None,
         print(sorted_keys)
         print(ground_truth_data.keys())
         # print('Supplying ground truth data not yet implemented for hierarchical datasets')
+
+    elif ground_truth_data is not None and datatype == 'dict':
+        sorted_keys = np.sort(list(ground_truth_data.keys()))
 
     # Define number of rows we need for display
     if n_plots > 1:
@@ -289,7 +292,7 @@ def model_plot(posterior_samples = None,
         ax_tmp_twin_down.set_ylim(ylimit, -ylimit)
         ax_tmp_twin_down.set_yticks([])
             
-        # Run simulations and add trajectories
+        # ADD TRAJECTORIESS
         if show_trajectories == True:
             for k in range(n_trajectories):
                 out = simulator(theta = ground_truth_parameters[i, :],
@@ -297,16 +300,16 @@ def model_plot(posterior_samples = None,
                                 n_samples = 1,
                                 bin_dim = None)
 
-                ax_tmp.plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], out[2]['trajectory'][out[2]['trajectory'] > -999], 
-                                            color = color_trajectories, 
-                                            alpha = alpha_trajectories,
-                                            linewidth = linewidth_trajectories)
+                ax_tmp.plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], 
+                            out[2]['trajectory'][out[2]['trajectory'] > -999], 
+                            color = color_trajectories, 
+                            alpha = alpha_trajectories,
+                            linewidth = linewidth_trajectories)
+ 
+        # ADD HISTOGRAMS
 
-                    
-
-        # Run simulations and add histograms
-        # True params
-        if model_ground_truth is not None and ground_truth_data is None:
+        # RUN SIMULATIONS: GROUND TRUTH PARAMETERS
+        if model_ground_truth is not None and ground_truth_data is None: # If ground truth model is supplied but not corresponding dataset --> we simulate one
             out = simulator(theta = ground_truth_parameters[i, :],
                             model = model_ground_truth, 
                             n_samples = 20000,
@@ -315,7 +318,9 @@ def model_plot(posterior_samples = None,
             tmp_true = np.concatenate([out[0], out[1]], axis = 1)
             choice_p_up_true = np.sum(tmp_true[:, 1] == 1) / tmp_true.shape[0]
         
+        # RUN SIMULATIONS: POSTERIOR SAMPLES
         if posterior_samples is not None:
+            
             # Run Model simulations for posterior samples
             tmp_post = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
             idx = np.random.choice(posterior_samples.shape[1], size = n_posterior_parameters, replace = False)
@@ -327,22 +332,16 @@ def model_plot(posterior_samples = None,
                                 bin_dim = None)
                                 
                 tmp_post[(n_simulations_per_parameter * j):(n_simulations_per_parameter * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
-        
-         #ax.set_ylim(-4, 2)
-        # if rows > 1 and cols > 1:
-        #     ax_tmp = ax[row_tmp, col_tmp].twinx()
-        # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-        #     ax_tmp = ax[i].twinx()
-        # else:
-        #     ax_tmp = ax.twinx()
-        
-        # ax_tmp.set_ylim(-ylimit, ylimit)
-        # ax_tmp.set_yticks([])
-        
+
+        # DRAW DATA HISTOGRAMS
         if posterior_samples is not None:
             choice_p_up_post = np.sum(tmp_post[:, 1] == 1) / tmp_post.shape[0]
 
-            counts_2, bins = np.histogram(tmp_post[tmp_post[:, 1] == 1, 0],
+            counts_2_up, bins = np.histogram(tmp_post[tmp_post[:, 1] == 1, 0],
+                                          bins = np.linspace(0, max_t, nbins),
+                                          density = True)
+
+            counts_2_down, _ = np.histogram(tmp_post[tmp_post[:, 1] == -1, 0],
                                           bins = np.linspace(0, max_t, nbins),
                                           density = True)
             
@@ -352,20 +351,35 @@ def model_plot(posterior_samples = None,
                 tmp_label = None
 
             ax_tmp_twin_up.hist(bins[:-1], 
+                                bins, 
+                                weights = choice_p_up_post * counts_2_up,
+                                histtype = 'step',
+                                alpha = 0.5, 
+                                color = 'black',
+                                edgecolor = 'black',
+                                zorder = -1,
+                                label = tmp_label,
+                                linewidth = hist_linewidth)
+
+            ax_tmp_twin_down.hist(bins[:-1], 
                         bins, 
-                        weights = choice_p_up_post * counts_2,
+                        weights = (1 - choice_p_up_post) * counts_2_down,
                         histtype = 'step',
                         alpha = 0.5, 
                         color = 'black',
                         edgecolor = 'black',
-                        zorder = -1,
-                        label = tmp_label,
-                        linewidth = hist_linewidth)
+                        linewidth = hist_linewidth,
+                        zorder = -1)
+            
                        
         if model_ground_truth is not None and ground_truth_data is None:
-            counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == 1, 0],
-                                          bins = np.linspace(0, max_t, nbins),
-                                          density = True)
+            counts_2_up, bins = np.histogram(tmp_true[tmp_true[:, 1] == 1, 0],
+                                             bins = np.linspace(0, max_t, nbins),
+                                             density = True)
+
+            counts_2_down, _ = np.histogram(tmp_true[tmp_true[:, 1] == - 1, 0],
+                                            bins = np.linspace(0, max_t, nbins),
+                                            density = True)
 
             if row_tmp == 0 and col_tmp == 0:
                 tmp_label = 'Ground Truth Data'
@@ -373,34 +387,42 @@ def model_plot(posterior_samples = None,
                 tmp_label = None
             
             ax_tmp_twin_up.hist(bins[:-1], 
-                        bins, 
-                        weights = choice_p_up_true * counts_2,
-                        histtype = 'step',
-                        alpha = 0.5, 
-                        color = 'red',
-                        edgecolor = 'red',
-                        zorder = -1,
-                        linewidth = hist_linewidth,
-                        label = tmp_label)
-            
+                                bins, 
+                                weights = choice_p_up_true * counts_2_up,
+                                histtype = 'step',
+                                alpha = 0.5, 
+                                color = 'red',
+                                edgecolor = 'red',
+                                zorder = -1,
+                                linewidth = hist_linewidth,
+                                label = tmp_label)
+
+            ax_tmp_twin_down.hist(bins[:-1], 
+                                  bins, 
+                                  weights = (1 - choice_p_up_true) * counts_2_down,
+                                  histtype = 'step',
+                                  alpha = 0.5, 
+                                  color = 'red',
+                                  edgecolor = 'red',
+                                  linewidth = hist_linewidth,
+                                  zorder = -1)
+ 
             if row_tmp == 0 and col_tmp == 0:
                 ax_tmp_twin_up.legend(loc = 'lower right')
             
         if ground_truth_data is not None:
             # These splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
             # Wiser because either way we can have varying numbers of trials for each subject !
-            if datatype == 'hierarchical' or datatype == 'condition' or datatype == 'single_subject':
-                counts_2, bins = np.histogram(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == 1, 0],
-                                              bins = np.linspace(0, max_t, nbins),
-                                              density = True)
+            
+            counts_2_up, bins = np.histogram(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == 1, 0],
+                                            bins = np.linspace(0, max_t, nbins),
+                                            density = True)
 
-                choice_p_up_true_dat = np.sum(ground_truth_data[sorted_keys[i]][:, 1] == 1) / ground_truth_data[sorted_keys[i]].shape[0]
-            else:
-                counts_2, bins = np.histogram(ground_truth_data[i, ground_truth_data[i, :, 1] == 1, 0],
-                                              bins = np.linspace(0, max_t, nbins),
-                                              density = True)
+            counts_2_down, _ = np.histogram(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == - 1, 0],
+                                            bins = np.linspace(0, max_t, nbins),
+                                            density = True)
 
-                choice_p_up_true_dat = np.sum(ground_truth_data[i, :, 1] == 1) / ground_truth_data[i].shape[0]
+            choice_p_up_true_dat = np.sum(ground_truth_data[sorted_keys[i]][:, 1] == 1) / ground_truth_data[sorted_keys[i]].shape[0]
 
             if row_tmp == 0 and col_tmp == 0:
                 tmp_label = 'Dataset'
@@ -409,7 +431,7 @@ def model_plot(posterior_samples = None,
             
             ax_tmp_twin_up.hist(bins[:-1], 
                             bins, 
-                            weights = choice_p_up_true_dat * counts_2,
+                            weights = choice_p_up_true_dat * counts_2_up,
                             histtype = 'step',
                             alpha = 0.5, 
                             color = 'blue',
@@ -417,70 +439,64 @@ def model_plot(posterior_samples = None,
                             zorder = -1,
                             linewidth = hist_linewidth,
                             label = tmp_label)
-            
-            if row_tmp == 0 and col_tmp == 0:
-                ax_tmp_twin_up.legend(loc = 'lower right')
-  
-        #ax.invert_xaxis()
-        # if rows > 1 and cols > 1:
-        #     ax_tmp = ax[row_tmp, col_tmp].twinx()
-        # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-        #     ax_tmp = ax[i].twinx()
-        # else:
-        #     ax_tmp = ax.twinx()
-            
-        # ax_tmp.set_ylim(ylimit, -ylimit)
-        # ax_tmp.set_yticks([])
-        
-        if posterior_samples is not None:
-            counts_2, bins = np.histogram(tmp_post[tmp_post[:, 1] == -1, 0],
-                                          bins = np.linspace(0, max_t, nbins),
-                                          density = True)
-            ax_tmp_twin_down.hist(bins[:-1], 
-                        bins, 
-                        weights = (1 - choice_p_up_post) * counts_2,
-                        histtype = 'step',
-                        alpha = 0.5, 
-                        color = 'black',
-                        edgecolor = 'black',
-                        linewidth = hist_linewidth,
-                        zorder = -1)
-            
-        if model_ground_truth is not None and ground_truth_data is None:
-            counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == -1, 0],
-                                          bins = np.linspace(0, max_t, nbins),
-                                          density = True)
-            ax_tmp_twin_down.hist(bins[:-1], 
-                        bins, 
-                        weights = (1 - choice_p_up_true) * counts_2,
-                        histtype = 'step',
-                        alpha = 0.5, 
-                        color = 'red',
-                        edgecolor = 'red',
-                        linewidth = hist_linewidth,
-                        zorder = -1)
- 
-        if ground_truth_data is not None:
-            if datatype == 'hierarchical' or datatype == 'condition' or datatype == 'single_subject':
-                counts_2, bins = np.histogram(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == - 1, 0],
-                                              bins = np.linspace(0, max_t, nbins),
-                                              density = True)
-            else:
-                counts_2, bins = np.histogram(ground_truth_data[i, ground_truth_data[i, :, 1] == - 1, 0],
-                                              bins = np.linspace(0, max_t, nbins),
-                                              density = True)
-            
-            #choice_p_up_true_dat = np.sum(ground_truth_data[i, :, 1] == 1) / ground_truth_data[i].shape[0]
 
             ax_tmp_twin_down.hist(bins[:-1], 
                         bins, 
-                        weights = (1 - choice_p_up_true_dat) * counts_2,
+                        weights = (1 - choice_p_up_true_dat) * counts_2_down,
                         histtype = 'step',
                         alpha = 0.5, 
                         color = 'blue',
                         edgecolor = 'blue',
                         linewidth = hist_linewidth,
                         zorder = -1)
+            
+            if row_tmp == 0 and col_tmp == 0:
+                ax_tmp_twin_up.legend(loc = 'lower right')
+  
+        # if posterior_samples is not None:
+        #     counts_2, bins = np.histogram(tmp_post[tmp_post[:, 1] == -1, 0],
+        #                                   bins = np.linspace(0, max_t, nbins),
+        #                                   density = True)
+        #     ax_tmp_twin_down.hist(bins[:-1], 
+        #                 bins, 
+        #                 weights = (1 - choice_p_up_post) * counts_2,
+        #                 histtype = 'step',
+        #                 alpha = 0.5, 
+        #                 color = 'black',
+        #                 edgecolor = 'black',
+        #                 linewidth = hist_linewidth,
+        #                 zorder = -1)
+            
+        # if model_ground_truth is not None and ground_truth_data is None:
+        #     counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == -1, 0],
+        #                                   bins = np.linspace(0, max_t, nbins),
+        #                                   density = True)
+        #     ax_tmp_twin_down.hist(bins[:-1], 
+        #                 bins, 
+        #                 weights = (1 - choice_p_up_true) * counts_2,
+        #                 histtype = 'step',
+        #                 alpha = 0.5, 
+        #                 color = 'red',
+        #                 edgecolor = 'red',
+        #                 linewidth = hist_linewidth,
+        #                 zorder = -1)
+ 
+        # if ground_truth_data is not None:
+        #     counts_2, bins = np.histogram(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == - 1, 0],
+        #                                     bins = np.linspace(0, max_t, nbins),
+        #                                     density = True)
+
+        #     #choice_p_up_true_dat = np.sum(ground_truth_data[i, :, 1] == 1) / ground_truth_data[i].shape[0]
+
+        #     ax_tmp_twin_down.hist(bins[:-1], 
+        #                 bins, 
+        #                 weights = (1 - choice_p_up_true_dat) * counts_2,
+        #                 histtype = 'step',
+        #                 alpha = 0.5, 
+        #                 color = 'blue',
+        #                 edgecolor = 'blue',
+        #                 linewidth = hist_linewidth,
+        #                 zorder = -1)
 
         # POSTERIOR SAMPLES: BOUNDS AND SLOPES (model)
         if show_model:
@@ -507,28 +523,20 @@ def model_plot(posterior_samples = None,
                 
                     if model_fitted == 'weibull_cdf' or model_fitted == 'weibull_cdf2' or model_fitted == 'weibull_cdf_concave':
                         b = tmp_samples[1] * bf.weibull_cdf(t = t_s, 
-                                                                             alpha = tmp_samples[4],
-                                                                             beta = tmp_samples[5])
+                                                            alpha = tmp_samples[4],
+                                                            beta = tmp_samples[5])
+                    
                     if model_fitted == 'angle' or model_fitted == 'angle2':
                         b = np.maximum(tmp_samples[1] + bf.angle(t = t_s, 
-                                                                                  theta = tmp_samples[4]), 0)
+                                                                 theta = tmp_samples[4]), 0)
+                    
                     if model_fitted == 'ddm':
                         b = tmp_samples[1] * np.ones(t_s.shape[0])
-
 
                     start_point_tmp = - tmp_samples[1] + \
                                       (2 * tmp_samples[1] * tmp_samples[2])
 
                     slope_tmp = tmp_samples[0]
-
-                    # if rows > 1 and cols > 1:
-                    #     ax_tmp = ax[row_tmp, col_tmp]
-                    
-                    # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-                    #     ax_tmp = ax[i]
-                    
-                    # else:
-                    #     ax_tmp = ax
 
                     ax_tmp.plot(t_s + tmp_samples[3], b, tmp_color,
                                 t_s + tmp_samples[3], - b, tmp_color, 
@@ -561,19 +569,18 @@ def model_plot(posterior_samples = None,
 
                     # if rows > 1 and cols > 1:
                     ax_tmp.axvline(x = tmp_samples[3], 
-                                                    ymin = - 2, 
-                                                    ymax = 2, 
-                                                    c = tmp_color, 
-                                                    linestyle = '--',
-                                                    linewidth = posterior_linewidth,
-                                                    alpha = tmp_alpha)
+                                   ymin = - ylimit, 
+                                   ymax = ylimit, 
+                                   c = tmp_color, 
+                                   linestyle = '--',
+                                   linewidth = posterior_linewidth,
+                                   alpha = tmp_alpha)
 
                     if rows == 1 and cols == 1:
                         ax.patch.set_visible(False)
                     
         # Set plot title
         title_tmp = ''
-        
         if model_ground_truth is not None:
             for k in range(len(ax_titles)):
                 title_tmp += ax_titles[k] + ': '
@@ -582,20 +589,20 @@ def model_plot(posterior_samples = None,
 
         if row_tmp == (rows - 1):
             ax_tmp.set_xlabel('rt', 
-                                                fontsize = 20);
+                              fontsize = 20);
         ax_tmp.set_ylabel('', 
-                                        fontsize = 20);
+                          fontsize = 20);
 
 
         ax_tmp.set_title(title_tmp,
-                                        fontsize = 24)
+                         fontsize = 24)
         ax_tmp.tick_params(axis = 'y', size = 20)
         ax_tmp.tick_params(axis = 'x', size = 20)
 
         # Some extra styling:
         if model_ground_truth is not None:
             if show_model:
-                ax_tmp.axvline(x = ground_truth_parameters[i, 3], ymin = -2, ymax = 2, c = tmp_color, linestyle = '--')
+                ax_tmp.axvline(x = ground_truth_parameters[i, 3], ymin = - 2, ymax = 2, c = tmp_color, linestyle = '--')
             ax_tmp.axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
         
     if rows > 1 and cols > 1:
