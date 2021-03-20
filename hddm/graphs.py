@@ -143,7 +143,8 @@ def model_plot(posterior_samples = None,
                bin_size = 0.025, # styling
                save = False,
                scale_x = 1.0,
-               scale_y = 1.0):
+               scale_y = 1.0,
+               delta_t_graph = 0.01):
     
     if save == True:
         pass
@@ -243,7 +244,7 @@ def model_plot(posterior_samples = None,
             font_scale = 2)
 
     fig, ax = plt.subplots(rows, cols, 
-                           figsize = (20 * rows * scale_y, 20 * scale_x), 
+                           figsize = (20 * scale_x, 20 * rows * scale_y), 
                            sharex = False, 
                            sharey = False)
     
@@ -255,7 +256,7 @@ def model_plot(posterior_samples = None,
         
     sns.despine(right = True)
 
-    t_s = np.arange(0, max_t, 0.01)
+    t_s = np.arange(0, max_t, delta_t_graph)
     nbins = int((max_t) / bin_size)
 
     for i in range(n_plots):
@@ -544,6 +545,7 @@ def model_plot(posterior_samples = None,
                                     model = tmp_model, 
                                     n_samples = 1,
                                     cartoon = True,
+                                    delta_t = delta_t_graph,
                                     bin_dim = None)
                     
                     tmp_traj = out[2]['trajectory']
