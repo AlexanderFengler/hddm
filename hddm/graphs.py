@@ -491,7 +491,7 @@ def model_plot(posterior_samples = None,
                         b = np.maximum(tmp_samples[1] + model_config[tmp_model]['boundary'](t = t_s, theta = tmp_samples[4]), 0)
                     
                     if tmp_model == 'ddm' or tmp_model == 'ornstein' or tmp_model == 'levy' or tmp_model == 'full_ddm':
-                        b = tmp_samples[1] * model_config[tmp_model]['boundary'](t = t_s)                   
+                        b = tmp_samples[1] * np.ones(t_s.shape[0]) #model_config[tmp_model]['boundary'](t = t_s)                   
 
 
                     # MAKESLOPES (VIA TRAJECTORIES) !
