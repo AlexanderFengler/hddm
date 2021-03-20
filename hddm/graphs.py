@@ -576,7 +576,8 @@ def model_plot(posterior_samples = None,
                     #         break
                     #     maxid = m
 
-                    maxid = np.argmax(np.where(np.abs(tmp_traj) > 0))
+                    maxid = np.argmax(np.where(tmp_traj > - 999))
+
                     # for m in range(len(t_s)):
                     #     if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:
                     #         maxid = m
