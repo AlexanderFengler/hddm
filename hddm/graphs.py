@@ -299,7 +299,13 @@ def model_plot(posterior_samples = None,
                                 model = model_ground_truth, 
                                 n_samples = 1,
                                 bin_dim = None)
-
+                tmp_traj = out[2]['trajectory']
+                maxid = np.argmax(np.where(tmp_traj > 0))
+                # ax_tmp.plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], 
+                #             out[2]['trajectory'][out[2]['trajectory'] > -999], 
+                #             color = color_trajectories, 
+                #             alpha = alpha_trajectories,
+                #             linewidth = linewidth_trajectories)
                 ax_tmp.plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], 
                             out[2]['trajectory'][out[2]['trajectory'] > -999], 
                             color = color_trajectories, 
@@ -542,12 +548,12 @@ def model_plot(posterior_samples = None,
                                     cartoon = True,
                                     bin_dim = None)
                     
-                    tmp_traj = np.maximum(out[2]['trajectory'], 0)
+                    tmp_traj = out[2]['trajectory']
 
-                    start_point_tmp = - tmp_samples[1] + \
-                                      (2 * tmp_samples[1] * tmp_samples[2])
+                    # start_point_tmp = - tmp_samples[1] + \
+                    #                   (2 * tmp_samples[1] * tmp_samples[2])
 
-                    slope_tmp = tmp_samples[0]
+                    # slope_tmp = tmp_samples[0]
 
                     ax_tmp.plot(t_s + tmp_samples[3], b, tmp_color,
                                 t_s + tmp_samples[3], -b, tmp_color, 
@@ -570,7 +576,7 @@ def model_plot(posterior_samples = None,
                     #         break
                     #     maxid = m
 
-                    maxid = np.argmax(np.where(tmp_traj > 0))
+                    maxid = np.argmax(np.where(np.abs(tmp_traj) > 0))
                     # for m in range(len(t_s)):
                     #     if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:
                     #         maxid = m
