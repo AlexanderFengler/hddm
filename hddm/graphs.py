@@ -305,6 +305,9 @@ def model_plot(posterior_samples = None,
                             color = color_trajectories, 
                             alpha = alpha_trajectories,
                             linewidth = linewidth_trajectories)
+
+                #ax_ins = ax.inset_axes([1, 0.5, 0.2, 0.2]) --> important for levy ! AF TODO
+                #ax_ins.plot([0, 1, 2, 3])
  
         # ADD HISTOGRAMS
 
@@ -460,6 +463,10 @@ def model_plot(posterior_samples = None,
                     tmp_label = ""
                     if j == (n_posterior_parameters - 1):
                         tmp_label = 'Model Samples'
+                        tmp_model = model_fitted
+                        tmp_samples = posterior_samples[i, idx[j], :]
+                        tmp_alpha = 0.5
+                        tmp_color = 'black'
                     elif j == n_posterior_parameters and model_ground_truth is not None:
                         tmp_samples = ground_truth_parameters[i, :]
                         tmp_model = model_ground_truth
@@ -477,7 +484,7 @@ def model_plot(posterior_samples = None,
                         tmp_samples = posterior_samples[i, idx[j], :]
                         tmp_alpha = 0.05
                         tmp_color = 'black'
-                        tmp_label = ""
+                        tmp_label = None
 
                     print(tmp_label)
                     
@@ -505,27 +512,27 @@ def model_plot(posterior_samples = None,
                     tmp_traj = out[2]['trajectory']
                     maxid = np.argmax(np.where(tmp_traj > - 999))
 
-                    ax_tmp.plot(t_s + tmp_samples[3], b, tmp_color,
+                    ax_tmp.plot(t_s + tmp_samples[model_config[tmp_model]['params'].index('t')], b, tmp_color,
                                 alpha = tmp_alpha,
                                 zorder = 1000 + j,
                                 linewidth = posterior_linewidth,
                                 label = tmp_label,
                                 )
 
-                    ax_tmp.plot(t_s + tmp_samples[3], -b, tmp_color, 
+                    ax_tmp.plot(t_s + tmp_samples[model_config[tmp_model]['params'].index('t')], -b, tmp_color, 
                                 alpha = tmp_alpha,
                                 zorder = 1000 + j,
                                 linewidth = posterior_linewidth,
                                 )
 
-                    ax_tmp.plot(t_s[:maxid] + tmp_samples[3],
+                    ax_tmp.plot(t_s[:maxid] + tmp_samples[model_config[tmp_model]['params'].index('t')],
                                 tmp_traj[:maxid],
                                 c = tmp_color, 
                                 alpha = tmp_alpha,
                                 zorder = 1000 + j,
                                 linewidth = posterior_linewidth) # TOOK AWAY LABEL
 
-                    ax_tmp.axvline(x = tmp_samples[3], # this should identify the index of ndt directly via model config !
+                    ax_tmp.axvline(x = tmp_samples[model_config[tmp_model]['params'].index('t')], # this should identify the index of ndt directly via model config !
                                    ymin = - ylimit, 
                                    ymax = ylimit, 
                                    c = tmp_color, 
