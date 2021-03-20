@@ -539,7 +539,7 @@ def model_plot(posterior_samples = None,
                     out = simulator(theta = tmp_samples,
                                     model = tmp_model, 
                                     n_samples = 1,
-                                    cartoon = True
+                                    cartoon = True,
                                     bin_dim = None)
                     
                     tmp_traj = np.maximum(out[2]['trajectory'], 0)
