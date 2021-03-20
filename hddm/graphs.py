@@ -505,7 +505,7 @@ def model_plot(posterior_samples = None,
                     
                     if j == n_posterior_parameters and model_ground_truth is not None:
                         tmp_samples = ground_truth_parameters[i, :]
-                        tmp_model = model_ground_truhth
+                        tmp_model = model_ground_truth
                         
                         # If we supplied ground truth data --> make ground truth model blue, otherwise red
                         tmp_colors = ['red', 'blue']
