@@ -571,8 +571,8 @@ def model_plot(posterior_samples = None,
         # Some extra styling:
         if model_ground_truth is not None:
             if show_model:
-                ax_tmp.axvline(x = ground_truth_parameters[i, 3], ymin = - 2, ymax = 2, c = tmp_color, linestyle = '--')
-            ax_tmp.axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, 3] / max_t, c = tmp_color,  linestyle = '--')
+                ax_tmp.axvline(x = ground_truth_parameters[i, model_config[model_ground_truth]['params'].index('t')], ymin = - 2, ymax = 2, c = tmp_color, linestyle = '--')
+            ax_tmp.axhline(y = 0, xmin = 0, xmax = ground_truth_parameters[i, model_config[model_ground_truth]['params'].index('t')] / max_t, c = tmp_color,  linestyle = '--')
         
     if rows > 1 and cols > 1:
         for i in range(n_plots, rows * cols, 1):
