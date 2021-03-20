@@ -460,7 +460,6 @@ def model_plot(posterior_samples = None,
                     
                     if j == (n_posterior_parameters - 1):
                         tmp_label = 'Model Samples'
-                    
                     elif j == n_posterior_parameters and model_ground_truth is not None:
                         tmp_samples = ground_truth_parameters[i, :]
                         tmp_model = model_ground_truth
@@ -478,11 +477,10 @@ def model_plot(posterior_samples = None,
                         tmp_samples = posterior_samples[i, idx[j], :]
                         tmp_alpha = 0.05
                         tmp_color = 'black'
-                        tmp_label = None
+                        tmp_label = ""
 
                     print(tmp_label)
                     
-
                     # MAKE BOUNDS (FROM MODEL CONFIG) !
                     if tmp_model == 'weibull_cdf' or tmp_model == 'weibull_cdf2' or tmp_model == 'weibull_cdf_concave' or tmp_model == 'weibull':
                         b = np.maximum(tmp_samples[1] * model_config[tmp_model]['boundary'](t = t_s, 
@@ -514,13 +512,6 @@ def model_plot(posterior_samples = None,
                                 linewidth = posterior_linewidth,
                                 label = tmp_label,
                                 )
-                    
-                    if tmp_label == 'Ground Truth Model' and row_tmp == 0 and col_tmp == 0:
-                        ax_tmp.legend(loc = 'upper right')
-                        print('generated upper right label')
-                        print('row: ', row_tmp)
-                        print('col: ', col_tmp)
-                        print('j: ', j)
 
                     ax_tmp.plot(t_s[:maxid] + tmp_samples[3],
                                 tmp_traj[:maxid],
@@ -537,6 +528,13 @@ def model_plot(posterior_samples = None,
                                    linewidth = posterior_linewidth,
                                    alpha = tmp_alpha)
 
+                    if tmp_label == 'Ground Truth Model' and row_tmp == 0 and col_tmp == 0:
+                        ax_tmp.legend(loc = 'upper right')
+                        print('generated upper right label')
+                        print('row: ', row_tmp)
+                        print('col: ', col_tmp)
+                        print('j: ', j)
+                        
                     if rows == 1 and cols == 1:
                         ax.patch.set_visible(False)
                     
