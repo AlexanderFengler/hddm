@@ -194,8 +194,6 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
         #              (w_outlier * p_outlier))))
     return log_p
 
-    
-
 def wiener_like_nn_ddm_analytic(np.ndarray[float, ndim = 1] x, 
                                 np.ndarray[float, ndim = 1] response, 
                                 double v, 

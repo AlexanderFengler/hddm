@@ -117,26 +117,26 @@ def bin_arbitrary_fptd(out = None,
     return counts
 
 model_config = {'ddm': {'params':['v', 'a', 'z', 't'],
-                  'param_bounds': [[-3.0, 0.3, 0.1, 1e-3], [3.0, 2.5, 0.9, 2.0]],
-                 },
+                        'param_bounds': [[-3.0, 0.3, 0.1, 1e-3], [3.0, 2.5, 0.9, 2.0]],
+                        'boundary': bf.constant},
                 'angle':{'params': ['v', 'a', 'z', 't', 'theta'],
-                    'param_bounds': [[-3.0, 0.3, 0.2, 1e-3, -0.1], [3.0, 2.0, 0.8, 2.0, 1.45]],
-                    },
+                         'param_bounds': [[-3.0, 0.3, 0.2, 1e-3, -0.1], [3.0, 2.0, 0.8, 2.0, 1.45]],
+                        'boundary': bf.angle},
                 'weibull':{'params': ['v', 'a', 'z', 't', 'alpha', 'beta'],
                            'param_bounds': [[-2.5, 0.3, 0.2, 1e-3, 0.31, 0.31], [2.5, 2.5, 0.8, 2.0, 4.99, 6.99]]
-                          },
+                          'boundary': bf.weibull_cdf},
                 'levy':{'params':['v', 'a', 'z', 'alpha', 't'],
-                    'param_bounds':[[-3.0, 0.3, 0.1, 1.0, 1e-3], [3.0, 2.0, 0.9, 2.0, 2]]
-                    },
+                        'param_bounds':[[-3.0, 0.3, 0.1, 1.0, 1e-3], [3.0, 2.0, 0.9, 2.0, 2]]
+                        'boundary': bf.constant},
                 'full_ddm':{'params':['v', 'a', 'z', 't', 'sz', 'sv', 'st'],
-                        'param_bounds':[[-3.0, 0.3, 0.3, 0.25, 1e-3, 1e-3, 1e-3], [3.0, 2.5, 0.7, 2.25, 0.2, 2.0, 0.25]]
-                        },
+                            'param_bounds':[[-3.0, 0.3, 0.3, 0.25, 1e-3, 1e-3, 1e-3], [3.0, 2.5, 0.7, 2.25, 0.2, 2.0, 0.25]]
+                            'boundary': bf.constant},
                 'ornstein':{'params':['v', 'a', 'z', 'g', 't'],
-                        'param_bounds':[[-2.0, 0.3, 0.2, -1.0, 1e-3], [2.0, 2.0, 0.8, 1.0, 2]]
-                        },
+                            'param_bounds':[[-2.0, 0.3, 0.2, -1.0, 1e-3], [2.0, 2.0, 0.8, 1.0, 2]]
+                            'boundary': bf.constant},
                 'ddm_sdv':{'params':['v', 'a', 'z', 't', 'sv'],
-                        'param_bounds':[[-3.0, 0.3, 0.1, 1e-3, 1e-3],[ 3.0, 2.5, 0.9, 2.0, 2.5]],
-                        },
+                           'param_bounds':[[-3.0, 0.3, 0.1, 1e-3, 1e-3],[ 3.0, 2.5, 0.9, 2.0, 2.5]],
+                           'boundary': bf.constant},
                 }
 
 def simulator(theta, 

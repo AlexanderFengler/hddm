@@ -505,6 +505,7 @@ def model_plot(posterior_samples = None,
                     
                     if j == n_posterior_parameters and model_ground_truth is not None:
                         tmp_samples = ground_truth_parameters[i, :]
+                        tmp_model = model_ground_truhth
                         
                         # If we supplied ground truth data --> make ground truth model blue, otherwise red
                         tmp_colors = ['red', 'blue']
@@ -513,6 +514,7 @@ def model_plot(posterior_samples = None,
                         tmp_alpha = 1
                         tmp_label = 'Ground Truth Model'
                     else:
+                        tmp_model = model_fitted
                         tmp_samples = posterior_samples[i, idx[j], :]
                         tmp_alpha = 0.05
                         tmp_color = 'black'
@@ -521,17 +523,26 @@ def model_plot(posterior_samples = None,
                     if j == (n_posterior_parameters - 1):
                         tmp_label = 'Model Samples'
                 
-                    if model_fitted == 'weibull_cdf' or model_fitted == 'weibull_cdf2' or model_fitted == 'weibull_cdf_concave':
-                        b = tmp_samples[1] * bf.weibull_cdf(t = t_s, 
-                                                            alpha = tmp_samples[4],
-                                                            beta = tmp_samples[5])
+                    if tmp_model == 'weibull_cdf' or tmp_model == 'weibull_cdf2' or tmp_model == 'weibull_cdf_concave' or tmp_model == 'weibull':
+                        b = np.maximum(tmp_samples[1] * model_config[tmp_model]['boundary'](t = t_s, 
+                                                                                    alpha = tmp_samples[4],
+                                                                                    beta = tmp_samples[5]), 0)
+
+                    if tmp_model == 'angle' or tmp_model == 'angle2':
+                        b = np.maximum(tmp_samples[1] + model_config[tmp_model]['boundary'](t = t_s, theta = tmp_samples[4]), 0)
                     
-                    if model_fitted == 'angle' or model_fitted == 'angle2':
-                        b = np.maximum(tmp_samples[1] + bf.angle(t = t_s, 
-                                                                 theta = tmp_samples[4]), 0)
+                    if tmp_model == 'ddm' or tmp_model == 'ornstein' or tmp_model == 'levy' or tmp_model == 'full_ddm':
+                        b = tmp_samples[1] * model_config[tmp_model]['boundary'](t = t_s)                   
+
+
+                    # Now the slope part !
+                    out = simulator(theta = tmp_samples,
+                                    model = tmp_model, 
+                                    n_samples = 1,
+                                    cartoon = True
+                                    bin_dim = None)
                     
-                    if model_fitted == 'ddm':
-                        b = tmp_samples[1] * np.ones(t_s.shape[0])
+                    tmp_traj = np.maximum(out[2]['trajectory'], 0)
 
                     start_point_tmp = - tmp_samples[1] + \
                                       (2 * tmp_samples[1] * tmp_samples[2])
@@ -539,7 +550,7 @@ def model_plot(posterior_samples = None,
                     slope_tmp = tmp_samples[0]
 
                     ax_tmp.plot(t_s + tmp_samples[3], b, tmp_color,
-                                t_s + tmp_samples[3], - b, tmp_color, 
+                                t_s + tmp_samples[3], -b, tmp_color, 
                                 alpha = tmp_alpha,
                                 zorder = 1000 + j,
                                 linewidth = posterior_linewidth,
@@ -553,22 +564,35 @@ def model_plot(posterior_samples = None,
                         print('col: ', col_tmp)
                         print('j: ', j)
 
-                    for m in range(len(t_s)):
-                        if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:
-                            maxid = m
-                            break
-                        maxid = m
+                    # for m in range(len(t_s)):
+                    #     if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:
+                    #         maxid = m
+                    #         break
+                    #     maxid = m
+
+                    maxid = np.argmax(np.where(tmp_traj > 0))
+                    # for m in range(len(t_s)):
+                    #     if (start_point_tmp + (slope_tmp * t_s[m])) > b[m] or (start_point_tmp + (slope_tmp * t_s[m])) < -b[m]:
+                    #         maxid = m
+                    #         break
+                    #     maxid = m
 
                     #if rows > 1 and cols > 1:
+                    # ax_tmp.plot(t_s[:maxid] + tmp_samples[3],
+                    #             start_point_tmp + slope_tmp * t_s[:maxid], 
+                    #             c = tmp_color, 
+                    #             alpha = tmp_alpha,
+                    #             zorder = 1000 + j,
+                    #             linewidth = posterior_linewidth) # TOOK AWAY LABEL
                     ax_tmp.plot(t_s[:maxid] + tmp_samples[3],
-                                start_point_tmp + slope_tmp * t_s[:maxid], 
+                                tmp_traj[:maxid],
                                 c = tmp_color, 
                                 alpha = tmp_alpha,
                                 zorder = 1000 + j,
                                 linewidth = posterior_linewidth) # TOOK AWAY LABEL
 
                     # if rows > 1 and cols > 1:
-                    ax_tmp.axvline(x = tmp_samples[3], 
+                    ax_tmp.axvline(x = tmp_samples[3], # this should identify the index of ndt directly via model config !
                                    ymin = - ylimit, 
                                    ymax = ylimit, 
                                    c = tmp_color, 
