@@ -457,7 +457,7 @@ def model_plot(posterior_samples = None,
         if show_model:
             if posterior_samples is not None:
                 for j in range(n_posterior_parameters + 1):
-                    
+                    tmp_label = ""
                     if j == (n_posterior_parameters - 1):
                         tmp_label = 'Model Samples'
                     elif j == n_posterior_parameters and model_ground_truth is not None:
@@ -506,11 +506,16 @@ def model_plot(posterior_samples = None,
                     maxid = np.argmax(np.where(tmp_traj > - 999))
 
                     ax_tmp.plot(t_s + tmp_samples[3], b, tmp_color,
-                                t_s + tmp_samples[3], -b, tmp_color, 
                                 alpha = tmp_alpha,
                                 zorder = 1000 + j,
                                 linewidth = posterior_linewidth,
                                 label = tmp_label,
+                                )
+
+                    ax_tmp.plot(t_s + tmp_samples[3], -b, tmp_color, 
+                                alpha = tmp_alpha,
+                                zorder = 1000 + j,
+                                linewidth = posterior_linewidth,
                                 )
 
                     ax_tmp.plot(t_s[:maxid] + tmp_samples[3],
@@ -534,9 +539,9 @@ def model_plot(posterior_samples = None,
                         print('row: ', row_tmp)
                         print('col: ', col_tmp)
                         print('j: ', j)
-                        
+
                     if rows == 1 and cols == 1:
-                        ax.patch.set_visible(False)
+                        ax_tmp.patch.set_visible(False)
                     
         # Set plot title
         title_tmp = ''
