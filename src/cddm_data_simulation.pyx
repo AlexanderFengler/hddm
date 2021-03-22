@@ -525,7 +525,7 @@ def levy_flexbound(np.ndarray[float, ndim = 1] v,
                    np.ndarray[float, ndim = 1] w,
                    np.ndarray[float, ndim = 1] alpha_diff,
                    np.ndarray[float, ndim = 1] ndt,
-                   float s = 1,
+                   float s = 1, # strictly speaking this is a variance multiplier here, not THE variance !
                    float delta_t = 0.001,
                    float max_t = 20,
                    int n_samples = 20000,
@@ -570,10 +570,10 @@ def levy_flexbound(np.ndarray[float, ndim = 1] v,
     cdef Py_ssize_t m = 0
     #cdef int n, ix
     #cdef int m = 0
-    cdef float[:] gaussian_values = draw_random_stable(num_draws, alpha_diff_view[0])
+    cdef float[:] alpha_stable_values = draw_random_stable(num_draws, alpha_diff_view[0])
 
     for k in range(n_trials):
-        delta_t_alpha = pow(delta_t, 1.0 / alpha_diff_view[k])
+        delta_t_alpha = s * pow(delta_t, 1.0 / alpha_diff_view[k])
         boundary_params_tmp = {key: boundary_params[key][k] for key in boundary_params.keys()}
 
         # Precompute boundary evaluations
@@ -595,7 +595,7 @@ def levy_flexbound(np.ndarray[float, ndim = 1] v,
 
             # Random walker
             while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
-                y += (v_view[k] * delta_t) + (delta_t_alpha * gaussian_values[m])
+                y += (v_view[k] * delta_t) + (delta_t_alpha * alpha_stable_values[m])
                 t += delta_t
                 ix += 1
                 m += 1
@@ -603,7 +603,7 @@ def levy_flexbound(np.ndarray[float, ndim = 1] v,
                     if k == 0:
                         traj_view[ix, 0] = y
                 if m == num_draws:
-                    gaussian_values = draw_random_stable(num_draws, alpha_diff_view[k])
+                    alpha_stable_values = draw_random_stable(num_draws, alpha_diff_view[k])
                     m = 0
 
             rts_view[n, k, 0] = t + ndt_view[k] # Store rt

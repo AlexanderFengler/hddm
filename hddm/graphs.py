@@ -552,10 +552,15 @@ def model_plot(posterior_samples = None,
                     
         # Set plot title
         title_tmp = ''
+        if n_plots > 1:
+            title_tmp += 'S ' + str(i) + ' '
         if model_ground_truth is not None:
             for k in range(len(ax_titles)):
                 title_tmp += ax_titles[k] + ': '
-                title_tmp += str(round(ground_truth_parameters[i, k], 2)) + ', '
+                if k == (len(ax_titles)  - 1):
+                    title_tmp += str(round(ground_truth_parameters[i, k], 2))
+                else:
+                    title_tmp += str(round(ground_truth_parameters[i, k], 2)) + ', '
 
         if row_tmp == (rows - 1):
             ax_tmp.set_xlabel('rt', 
@@ -589,6 +594,345 @@ def model_plot(posterior_samples = None,
                     frameon = False)
         plt.close()
     
+    return plt.show()
+
+    # def model_plot(posterior_samples = None,
+    #            ground_truth_parameters = None,
+    #            ground_truth_data = None,
+    #            model_ground_truth = 'weibull_cdf',
+    #            model_fitted = 'angle',
+    #            input_is_hddm_trace = False,
+    #            datatype = 'single_subject', # 'hierarchical', 'single_subject', 'condition' # data structure
+    #            condition_column = 'condition', # data structure
+    #            n_plots = 4, 
+    #            n_posterior_parameters = 500,
+    #            n_simulations_per_parameter = 10,
+    #            cols = 3, # styling
+    #            max_t = 5, # styling
+    #            show_model = True, # styling
+    #            show_trajectories = False, # styling
+    #            n_trajectories = 10,
+    #            color_trajectories = 'blue',
+    #            alpha_trajectories = 0.2,
+    #            linewidth_trajectories = 1.0,
+    #            ylimit = 2, # styling
+    #            posterior_linewidth = 3, # styling
+    #            gt_linewidth = 3, # styling
+    #            hist_linewidth = 3, # styling
+    #            bin_size = 0.025, # styling
+    #            save = False,
+    #            scale_x = 1.0,
+    #            scale_y = 1.0,
+    #            delta_t_graph = 0.01):
+
+def posterior_predictive_plot(posterior_samples = None,
+                              ground_truth_parameters = None,
+                              ground_truth_data = None,
+                              n_plots = 9,
+                              cols = 3,
+                              model_fitted = 'angle',
+                              model_ground_truth = 'angle',
+                              datatype = 'single_subject',
+                              condition_column = 'condition',
+                              input_is_hddm_trace = True,
+                              n_posterior_parameters = 100,
+                              max_t = 20,
+                              n_simulations_per_parameter = 10,
+                              xlimit = 10,
+                              bin_size = 0.025,
+                              hist_linewidth = 3,
+                              scale_x = 0.5,
+                              scale_y = 0.5,
+                              save = False):
+    
+    
+#                 counts_2, bins = np.histogram(tmp_true[tmp_true[:, 1] == -1, 0],
+#                                           bins = np.linspace(0, max_t, 100),
+#                                           density = True)
+
+    if save == True:
+        #matplotlib.rcParams['text.usetex'] = True
+        #matplotlib.rcParams['pdf.fonttype'] = 42
+        #matplotlib.rcParams['svg.fonttype'] = 'none'
+    
+    if model_ground_truth is None and ground_truth_data is None and posterior_samples is None:
+        return 'No ground truth model was supplied, no dataset was supplied and no posterior sample was supplied. Nothin to plot' 
+    
+    # Take care of ground_truth_data
+    if ground_truth_data is not None and datatype == 'hierarchical':
+        gt_dat_dict = dict()
+        for i in np.sort(np.unique(ground_truth_data['subj_idx'])):
+            gt_dat_dict[i] = ground_truth_data.loc[ground_truth_data['subj_idx'] == i][['rt', 'response']]
+            gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
+            gt_dat_dict[i] = gt_dat_dict[i].values
+        ground_truth_data = gt_dat_dict
+        # print('Supplying ground truth data not yet implemented for hierarchical datasets')
+        
+    if ground_truth_data is not None and datatype == 'condition':
+        gt_dat_dict = dict()
+        for i in np.sort(np.unique(ground_truth_data[condition_column])):
+            gt_dat_dict[i] = ground_truth_data.loc[ground_truth_data[condition_column] == i][['rt', 'response']]
+            gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
+            gt_dat_dict[i] = gt_dat_dict[i].values
+        ground_truth_data = gt_dat_dict
+
+    # Inputs are hddm_traces --> make plot ready
+    if input_is_hddm_trace and posterior_samples is not None:
+        if datatype == 'hierarchical':
+            posterior_samples = _make_trace_plotready_hierarchical(posterior_samples, 
+                                                                   model = model_fitted)
+            n_plots = posterior_samples.shape[0]
+#             print(posterior_samples)
+            
+        if datatype == 'single_subject':
+            posterior_samples = _make_trace_plotready_single_subject(posterior_samples, 
+                                                                     model = model_fitted)
+        if datatype == 'condition':
+            posterior_samples = _make_trace_plotready_condition(posterior_samples, 
+                                                                model = model_fitted)
+            n_plots = posterior_samples.shape[0]
+            #print(posterior_samples)
+            #n_plots = posterior_samples.shape[0]
+            
+    if n_plots == 1:
+        rows = 1
+        cols = 1
+    
+    nbins = int((2 * max_t) / bin_size)
+        # Taking care of special case with 1 plot
+    if n_plots == 1:
+        if model_ground_truth is not None:
+            ground_truth_parameters = np.expand_dims(ground_truth_parameters, 0)
+        if posterior_samples is not None:
+            posterior_samples = np.expand_dims(posterior_samples, 0)
+        if ground_truth_data is not None:
+            ground_truth_data = np.expand_dims(ground_truth_data, 0)
+         
+    
+#     matplotlib.rcParams['text.usetex'] = True
+#     #matplotlib.rcParams['pdf.fonttype'] = 42
+#     matplotlib.rcParams['svg.fonttype'] = 'none'
+    
+    rows = int(np.ceil(n_plots / cols))
+    sns.set(style = "white", 
+            palette = "muted", 
+            color_codes = True,
+            font_scale = 2)
+
+    # fig, ax = plt.subplots(rows, cols, 
+    #                        figsize = (20 * scale_x, 20 * rows * scale_y), 
+    #                        sharex = False, 
+    #                        sharey = False)
+    
+
+    fig, ax = plt.subplots(rows, cols, 
+                           figsize = (20 * scale_x, 20 * rows * scale_y), 
+                           sharex = False, 
+                           sharey = False)
+    
+    fig.suptitle('Posterior Predictive: ' + model_fitted.upper(),
+                 fontsize = 24)
+    
+    sns.despine(right = True)
+#     tmp_simulator = simulator(model = model, 
+#                               n_samples = 20000,
+#                               bin_dim = None)
+    
+    for i in range(n_plots):
+        row_tmp = int(np.floor(i / cols))
+        col_tmp = i - (cols * row_tmp)
+        
+        post_tmp = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
+        idx = np.random.choice(posterior_samples.shape[1], 
+                               size = n_posterior_parameters, 
+                               replace = False)
+
+        # Run Model simulations for posterior samples
+        for j in range(n_posterior_parameters):
+            out = simulator(theta = posterior_samples[i, idx[j], :], 
+                            model = model_fitted,
+                            n_samples = n_simulations_per_parameter,
+                            bin_dim = None)
+          
+            post_tmp[(n_simulations_per_parameter * j):(n_simulations_per_parameter * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
+        
+        # Run Model simulations for true parameters
+        # Supply data too !
+        if model_ground_truth is not None:
+            out = simulator(theta = ground_truth_parameters[i, :],
+                            model = model_ground_truth,
+                            n_samples = 20000,
+                            bin_dim = None)
+  
+            gt_tmp = np.concatenate([out[0], out[1]], axis = 1)
+            gt_color = 'red'
+            #print('passed through')
+        else:
+            gt_tmp = ground_truth_data[i]
+            gt_color = 'blue'
+
+        if rows > 1 and cols > 1:
+            ax_tmp = ax[row_tmp, col_tmp]
+        
+        elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+            ax_tmp = ax[i]
+        
+        else:
+            ax_tmp = ax
+        
+        # ACTUAL PLOTTING
+        # if rows > 1 and cols > 1:
+        ax[row_tmp, col_tmp].hist(post_tmp[:, 0] * post_tmp[:, 1], 
+                                  bins = np.linspace(- max_t, max_t, nbins), #50, # kde = False, # rug = False, 
+                                  alpha =  1, 
+                                  color = 'black',
+                                  histtype = 'step', 
+                                  density = 1, 
+                                  edgecolor = 'black',
+                                  linewidth = hist_linewidth
+                                  )
+        
+#             sns.histplot(post_tmp[:, 0] * post_tmp[:, 1], 
+#                          bins = np.linspace(-max_t, max_t, nbins), #50, 
+#                          kde = False, # rug = False, 
+#                          hist_kws = {'alpha': 1, 
+#                                      'color': 'black',
+#                                      'histtype': 'step', 
+#                                      'density': 1, 
+#                                      'edgecolor': 'black',
+#                                      'linewidth': hist_linewidth},
+#                          ax = ax[row_tmp, col_tmp]);
+
+        ax[row_tmp, col_tmp].hist(gt_tmp[:, 0] * gt_tmp[:, 1], 
+                                  alpha = 0.5, 
+                                  color = gt_color, 
+                                  density = 1, 
+                                  edgecolor = gt_color,  
+                                  histtype = 'step',
+                                  linewidth = hist_linewidth, 
+                                  bins = np.linspace(-max_t, max_t, nbins), #50, 
+                                  # kde = False, #rug = False,
+                                  )
+        
+        # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+            
+        #     ax[i].hist(post_tmp[:, 0] * post_tmp[:, 1], 
+        #                bins = np.linspace(-max_t, max_t, nbins), #50, # kde = False, #rug = False, 
+        #                alpha = 1, 
+        #                color = 'black',
+        #                histtype = 'step', 
+        #                density = 1, 
+        #                edgecolor = 'black',
+        #                linewidth = hist_linewidth
+        #                )
+
+        #     ax[i].hist(gt_tmp[:, 0] * gt_tmp[:, 1], 
+        #                alpha = 0.5, 
+        #                color = gt_color, 
+        #                density = 1, 
+        #                edgecolor = gt_color, 
+        #                histtype = 'step',
+        #                linewidth = hist_linewidth, 
+        #                bins = np.linspace(-max_t, max_t, nbins), #50, # kde = False, #rug = False,
+        #                )
+            
+        # else:
+            
+        #     ax.hist(post_tmp[:, 0] * post_tmp[:, 1], 
+        #             bins = np.linspace(-max_t, max_t, nbins), #50, # kde = False, #rug = False,
+        #             alpha = 1, 
+        #             color = 'black', 
+        #             histtype = 'step', 
+        #             density = 1, 
+        #             edgecolor = 'black',
+        #             linewidth = hist_linewidth,
+        #             );
+            
+        #     ax.hist(gt_tmp[:, 0] * gt_tmp[:, 1], 
+        #             alpha = 0.5, 
+        #             color = gt_color, 
+        #             density = 1,
+        #             edgecolor = gt_color,  
+        #             histtype = 'step',
+        #             linewidth = hist_linewidth, 
+        #             bins = np.linspace(-max_t, max_t, nbins), #50, # kde = False, #rug = False,
+        #             )
+        
+#         if rows > 1 and cols > 1:
+#             ax[row_tmp, col_tmp].set_xlim(0, max_t)
+#             ax[row_tmp, col_tmp].set_ylim(-ylimit, ylimit)
+#         elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+#             ax[i].set_xlim(0, max_t)
+#             ax[i].set_ylim(-ylimit, ylimit)
+#         else:
+#             ax.set_xlim(0, max_t)
+#             ax.set_ylim(-ylimit, ylimit)
+        
+        # if rows > 1 and cols > 1:
+        #     ax_tmp = ax[row_tmp, col_tmp]
+        # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+        #     ax_tmp = ax[i]
+        # else:
+        #     ax_tmp = ax
+
+        # EXTRA STYLING    
+        ax_tmp.set_xlim(- xlimit, xlimit)
+            
+        if row_tmp == 0 and col_tmp == 0:
+            if model_ground_truth is not None:
+                label_0 = 'GROUND TRUTH'
+            else:
+                label_0 = 'DATA'
+            ax_tmp.legend(labels = ['POSTERIOR PREDICTIVE', label_0], 
+                          fontsize = 12, 
+                          loc = 'upper right')
+            
+#             ax[row_tmp, col_tmp].legend(labels = [model_fitted, 'posterior'], 
+#                                         fontsize = 12, loc = 'upper right')
+        
+        if row_tmp == (rows - 1):
+            ax_tmp.set_xlabel('RT', 
+                              fontsize = 24)
+#             ax[row_tmp, col_tmp].set_xlabel('RT', 
+#                                             fontsize = 14);
+        
+        if col_tmp == 0:
+            ax_tmp.set_ylabel('', 
+                              fontsize = 24)
+#             ax[row_tmp, col_tmp].set_ylabel('Density', 
+#                                             fontsize = 14);
+        
+#         ax[row_tmp, col_tmp].set_title(ax_titles[i],
+#                                        fontsize = 16)
+
+        ax_tmp.tick_params(axis = 'y', size = 22)
+        ax_tmp.tick_params(axis = 'x', size = 22)
+        
+#         ax[row_tmp, col_tmp].tick_params(axis = 'y', size = 12)
+#         ax[row_tmp, col_tmp].tick_params(axis = 'x', size = 12)
+        
+        # THIS MAY NOT BE NECESSARY ?
+        # if rows > 1 and cols > 1:
+        #     ax[row_tmp, col_tmp] = ax_tmp
+        # elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+        #     ax[i] = ax_tmp
+        # else:
+        #     ax = ax_tmp
+        
+    if rows > 1 and cols > 1:
+        for i in range(n_plots, rows * cols, 1):
+            row_tmp = int(np.floor(i / cols))
+            col_tmp = i - (cols * row_tmp)
+            ax[row_tmp, col_tmp].axis('off')
+            
+            
+    if save == True:
+        plt.savefig('figures/' + 'posterior_predictive_plot_' + model_ground_truth + '_' + datatype + '.svg',
+                    format = 'svg', 
+                    transparent = True,
+                    frameon = False)
+        plt.close()
+
     return plt.show()
 
 # STRUCTURE
