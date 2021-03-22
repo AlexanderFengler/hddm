@@ -596,35 +596,6 @@ def model_plot(posterior_samples = None,
     
     return plt.show()
 
-    # def model_plot(posterior_samples = None,
-    #            ground_truth_parameters = None,
-    #            ground_truth_data = None,
-    #            model_ground_truth = 'weibull_cdf',
-    #            model_fitted = 'angle',
-    #            input_is_hddm_trace = False,
-    #            datatype = 'single_subject', # 'hierarchical', 'single_subject', 'condition' # data structure
-    #            condition_column = 'condition', # data structure
-    #            n_plots = 4, 
-    #            n_posterior_parameters = 500,
-    #            n_simulations_per_parameter = 10,
-    #            cols = 3, # styling
-    #            max_t = 5, # styling
-    #            show_model = True, # styling
-    #            show_trajectories = False, # styling
-    #            n_trajectories = 10,
-    #            color_trajectories = 'blue',
-    #            alpha_trajectories = 0.2,
-    #            linewidth_trajectories = 1.0,
-    #            ylimit = 2, # styling
-    #            posterior_linewidth = 3, # styling
-    #            gt_linewidth = 3, # styling
-    #            hist_linewidth = 3, # styling
-    #            bin_size = 0.025, # styling
-    #            save = False,
-    #            scale_x = 1.0,
-    #            scale_y = 1.0,
-    #            delta_t_graph = 0.01):
-
 def posterior_predictive_plot(posterior_samples = None,
                               ground_truth_parameters = None,
                               ground_truth_data = None,
@@ -652,7 +623,35 @@ def posterior_predictive_plot(posterior_samples = None,
         #matplotlib.rcParams['svg.fonttype'] = 'none'
     
     if model_ground_truth is None and ground_truth_data is None and posterior_samples is None:
-        return 'No ground truth model was supplied, no dataset was supplied and no posterior sample was supplied. Nothin to plot' 
+        return 'No ground truth model was supplied, no dataset was supplied and no posterior sample was supplied. Nothing to plot' 
+
+    # Inputs are hddm_traces --> make plot ready
+    if input_is_hddm_trace and posterior_samples is not None:
+        if datatype == 'hierarchical':
+            posterior_samples = _make_trace_plotready_hierarchical(posterior_samples, 
+                                                                   model = model_fitted)
+            n_plots = posterior_samples.shape[0]
+#             print(posterior_samples)
+            
+        if datatype == 'single_subject':
+            posterior_samples = _make_trace_plotready_single_subject(posterior_samples, 
+                                                                     model = model_fitted)
+        if datatype == 'condition':
+            posterior_samples = _make_trace_plotready_condition(posterior_samples, 
+                                                                model = model_fitted)
+            n_plots = posterior_samples.shape[0]
+
+    # Taking care of special case with 1 plot
+    if n_plots == 1:
+        if model_ground_truth is not None:
+            ground_truth_parameters = np.expand_dims(ground_truth_parameters, 0)
+        if posterior_samples is not None:
+            posterior_samples = np.expand_dims(posterior_samples, 0)
+        if ground_truth_data is not None:
+            gt_dat_dict = dict()
+            gt_dat_dict[0] = ground_truth_data
+            ground_truth_data = gt_dat_dict
+            #ground_truth_data = np.expand_dims(ground_truth_data, 0)     
     
     # Take care of ground_truth_data
     if ground_truth_data is not None and datatype == 'hierarchical':
@@ -671,28 +670,12 @@ def posterior_predictive_plot(posterior_samples = None,
             gt_dat_dict[i] = gt_dat_dict[i].values
         ground_truth_data = gt_dat_dict
 
-    # Inputs are hddm_traces --> make plot ready
-    if input_is_hddm_trace and posterior_samples is not None:
-        if datatype == 'hierarchical':
-            posterior_samples = _make_trace_plotready_hierarchical(posterior_samples, 
-                                                                   model = model_fitted)
-            n_plots = posterior_samples.shape[0]
-#             print(posterior_samples)
-            
-        if datatype == 'single_subject':
-            posterior_samples = _make_trace_plotready_single_subject(posterior_samples, 
-                                                                     model = model_fitted)
-        if datatype == 'condition':
-            posterior_samples = _make_trace_plotready_condition(posterior_samples, 
-                                                                model = model_fitted)
-            n_plots = posterior_samples.shape[0]
-    
+
+    # Taking care of special case with 1 plot
     if n_plots == 1:
         rows = 1
         cols = 1
     
-    nbins = int((2 * max_t) / bin_size)
-        # Taking care of special case with 1 plot
     if n_plots == 1:
         if model_ground_truth is not None:
             ground_truth_parameters = np.expand_dims(ground_truth_parameters, 0)
@@ -700,7 +683,9 @@ def posterior_predictive_plot(posterior_samples = None,
             posterior_samples = np.expand_dims(posterior_samples, 0)
         if ground_truth_data is not None:
             ground_truth_data = np.expand_dims(ground_truth_data, 0)
-         
+ 
+    # General plot parameters
+    nbins = int((2 * max_t) / bin_size)     
     rows = int(np.ceil(n_plots / cols))
     sns.set(style = "white", 
             palette = "muted", 
@@ -717,6 +702,7 @@ def posterior_predictive_plot(posterior_samples = None,
     
     sns.despine(right = True)
 
+    # Cycle through plots
     for i in range(n_plots):
         row_tmp = int(np.floor(i / cols))
         col_tmp = i - (cols * row_tmp)
@@ -727,6 +713,7 @@ def posterior_predictive_plot(posterior_samples = None,
                                replace = False)
 
         # Run Model simulations for posterior samples
+        print('Simulations for plot: ', i)
         for j in range(n_posterior_parameters):
             out = simulator(theta = posterior_samples[i, idx[j], :], 
                             model = model_fitted,
@@ -816,6 +803,123 @@ def posterior_predictive_plot(posterior_samples = None,
                     transparent = True,
                     frameon = False)
         plt.close()
+
+    return plt.show()
+
+def caterpillar_plot(posterior_samples = [],
+                     ground_truths = None,
+                     model_fitted = 'angle',
+                     datatype = 'hierarchical', # 'hierarchical', 'single_subject', 'condition'
+                     drop_sd = True,
+                     keep_key = 'sd',
+                     x_lims = [-2, 2],
+                     aspect_ratio = 2,
+                     save = False,
+                     tick_label_size_x = 22,
+                     tick_label_size_y = 14):
+    
+    if save == True:
+        pass
+        #matplotlib.rcParams['text.usetex'] = True
+        #matplotlib.rcParams['pdf.fonttype'] = 42
+        #matplotlib.rcParams['svg.fonttype'] = 'none'
+    
+    sns.set(style = "white", 
+        palette = "muted", 
+        color_codes = True,
+        font_scale = 2)
+    
+    fig, ax = plt.subplots(1, 1, 
+                           figsize = (10, aspect_ratio * 10), 
+                           sharex = False, 
+                           sharey = False)
+    
+    my_suptitle = fig.suptitle('Caterpillar plot: ' + model_fitted.upper().replace('_', '-'), fontsize = 40)
+    sns.despine(right = True)
+    
+    trace = posterior_samples.copy()
+    
+    # In case ground truth parameters were supplied --> this is mostly of interest for parameter recovery studies etc.
+    if ground_truths is not None:
+        cnt = 0
+        gt_dict = {}
+        
+        if datatype == 'single_subject':
+            for v in config[model_fitted]['params']:
+                gt_dict[v] = ground_truths[cnt]
+                cnt += 1
+
+        if datatype == 'hierarchical':
+            gt_dict = ground_truths
+
+        if datatype == 'condition':
+            gt_dict = ground_truths
+             
+    ecdfs = {}
+    plot_vals = {} # [0.01, 0.9], [0.01, 0.99], [mean]
+    
+    for k in trace.keys():
+        # If we want to keep only a specific parameter we skip all traces which don't include it in 
+        # their names !
+        if keep_key is not None and keep_key in k:
+            pass
+        else: 
+            continue
+
+            # Deal with 
+        if 'std' in k and drop_sd:
+            pass
+        
+        else:
+            # Deal with _transformed parameters
+            if '_trans' in k:
+                label_tmp = k.replace('_trans', '')
+
+                key_param_only = k.split('_')[0]
+                lower_lim = model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(key_param_only)]
+                upper_lim = model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(key_param_only)]
+                trace[label_tmp] = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- hddm_trace[k])))
+
+                trace[label_tmp] = 1 / (1 + np.exp(- trace[k]))
+                k = label_tmp
+
+            ok_ = 1
+            k_old = k # keep original key around for indexing
+            k = k.replace('_', '-') # assign new prettier key for plotting
+            
+            if drop_sd == True:
+                if 'sd' in k:
+                    ok_ = 0
+            if ok_:
+                ecdfs[k] = ECDF(trace[k_old])
+                tmp_sorted = sorted(trace[k_old])
+                _p01 =  tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.01) - 1]
+                _p99 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.99) - 1]
+                _p1 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.1) - 1]
+                _p9 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.9) - 1]
+                _pmean = trace[k_old].mean()
+                plot_vals[k] = [[_p01, _p99], [_p1, _p9], _pmean]
+    
+    x = [plot_vals[k][2] for k in plot_vals.keys()]
+    ax.scatter(x, plot_vals.keys(), c = 'black', marker = 's', alpha = 0)
+    
+    for k in plot_vals.keys():
+        k = k.replace('_', '-')
+        ax.plot(plot_vals[k][1], [k, k], c = 'grey', zorder = - 1, linewidth = 5)
+        ax.plot(plot_vals[k][0] , [k, k], c = 'black', zorder = - 1)
+        
+        if ground_truths is not None:
+            ax.scatter(gt_dict[k.replace('-', '_')], k,  c = 'red', marker = "|")
+        
+    ax.set_xlim(x_lims[0], x_lims[1])
+    ax_tmp.tick_params(axis = 'y', size = tick_label_size_y)
+    ax_tmp.tick_params(axis = 'x', size = tick_label_size_x)
+        
+    if save == True:
+        plt.savefig('figures/' + 'caterpillar_plot_' + model + '_' + datatype + '.svg',
+                    format = 'svg', 
+                    transparent = True,
+                    frameon = False)
 
     return plt.show()
 
