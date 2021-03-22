@@ -887,10 +887,12 @@ def caterpillar_plot(posterior_samples = [],
                 label_tmp = k.replace('_trans', '')
 
                 key_param_only = k.split('_')[0]
+                print(key_param_only)
+                print(k)
                 lower_lim = model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(key_param_only)]
                 upper_lim = model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(key_param_only)]
                 trace[label_tmp] = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- trace[k])))
-
+                
                 #trace[label_tmp] = 1 / (1 + np.exp(- trace[k]))
                 k = label_tmp
 
@@ -933,6 +935,96 @@ def caterpillar_plot(posterior_samples = [],
                     frameon = False)
 
     return plt.show()
+
+# Posterior Pair Plot
+def posterior_pair_plot(posterior_samples = [],
+                        axes_limits = 'model', # 'model', 'samples'
+                        height = 10,
+                        aspect = 1,
+                        n_subsample = 1000,
+                        ground_truths = [],
+                        model = None,
+                        save = False):
+    
+    if save == True:
+        pass
+        #matplotlib.rcParams['text.usetex'] = True
+        #matplotlib.rcParams['pdf.fonttype'] = 42
+        #matplotlib.rcParams['svg.fonttype'] = 'none'
+    
+    # some preprocessing
+    #posterior_samples = posterior_samples.get_traces().copy()
+    # Adjust this to be correct adjustment of z !!!! AF TODO
+    posterior_samples['z'] = 1 / ( 1 + np.exp(- posterior_samples['z_trans']))
+    posterior_samples = posterior_samples.drop('z_trans', axis = 1)
+
+    g = sns.PairGrid(posterior_samples.sample(n_subsample), 
+                     height = height / len(list(posterior_samples.keys())),
+                     aspect = 1,
+                     diag_sharey = False)
+    g = g.map_diag(sns.kdeplot, color = 'black', shade = False) # shade = True, 
+    g = g.map_lower(sns.kdeplot, 
+                    thresh = 0.01,
+                    n_levels = 50,
+                    shade = False,
+                    cmap = 'Purples_d') # 'Greys'
+    
+    for i, j in zip(*np.triu_indices_from(g.axes, 1)):
+        g.axes[i, j].set_visible(False)
+    
+    
+    if axes_limits == 'model':
+        xlabels, ylabels = [], []
+
+        for ax in g.axes[-1, :]:
+            xlabel = ax.xaxis.get_label_text()
+            xlabels.append(xlabel)
+
+        for ax in g.axes[:, 0]:
+            ylabel = ax.yaxis.get_label_text()
+            ylabels.append(ylabel)
+
+        for i in range(len(xlabels)):
+            for j in range(len(ylabels)):
+                g.axes[j,i].set_xlim(config[model]['param_bounds'][0][config[model]['params'].index(xlabels[i])], 
+                                     config[model]['param_bounds'][1][config[model]['params'].index(xlabels[i])])
+                g.axes[j,i].set_ylim(config[model]['param_bounds'][0][config[model]['params'].index(ylabels[j])], 
+                                     config[model]['param_bounds'][1][config[model]['params'].index(ylabels[j])])
+
+    
+    for ax in g.axes.flat:
+        plt.setp(ax.get_xticklabels(), rotation = 45)
+
+    my_suptitle = g.fig.suptitle(model.upper(), 
+                                 y = 1.03, 
+                                 fontsize = 24)
+    
+    # If ground truth is available add it in:
+    if ground_truths is not None:
+        for i in range(g.axes.shape[0]):
+            for j in range(i + 1, g.axes.shape[0], 1):
+                g.axes[j,i].plot(ground_truths[config[model]['params'].index(xlabels[i])], 
+                                 ground_truths[config[model]['params'].index(ylabels[j])], 
+                                 '.', 
+                                 color = 'red',
+                                 markersize = 10)
+
+        for i in range(g.axes.shape[0]):
+            g.axes[i,i].plot(ground_truths[config[model]['params'].index(xlabels[i])],
+                             g.axes[i,i].get_ylim()[0], 
+                             '.', 
+                             color = 'red',
+                             markersize = 10)
+            
+    if save == True:
+        plt.savefig('figures/' + 'pair_plot_' + model + '_' + datatype + '.svg',
+                    format = 'svg', 
+                    transparent = True,
+                    frameon = False)
+        plt.close()
+            
+    # Show
+    return plt.show(block = False)
 
 # STRUCTURE
 # EXPECT A HDDM MODEL
