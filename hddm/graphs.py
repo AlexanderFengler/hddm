@@ -651,6 +651,7 @@ def posterior_predictive_plot(posterior_samples = None,
 #                                           density = True)
 
     if save == True:
+        pass
         #matplotlib.rcParams['text.usetex'] = True
         #matplotlib.rcParams['pdf.fonttype'] = 42
         #matplotlib.rcParams['svg.fonttype'] = 'none'
