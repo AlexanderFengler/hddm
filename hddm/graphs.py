@@ -847,7 +847,7 @@ def caterpillar_plot(posterior_samples = [],
                            sharex = False, 
                            sharey = False)
     
-    my_suptitle = fig.suptitle('Caterpillar plot: ' + model_fitted.upper().replace('_', '-'), fontsize = 40)
+    fig.suptitle('Caterpillar plot: ' + model_fitted.upper().replace('_', '-'), fontsize = 40)
     sns.despine(right = True)
     
     trace = posterior_samples.copy()
@@ -889,9 +889,9 @@ def caterpillar_plot(posterior_samples = [],
                 key_param_only = k.split('_')[0]
                 lower_lim = model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(key_param_only)]
                 upper_lim = model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(key_param_only)]
-                trace[label_tmp] = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- hddm_trace[k])))
+                trace[label_tmp] = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- trace[k])))
 
-                trace[label_tmp] = 1 / (1 + np.exp(- trace[k]))
+                #trace[label_tmp] = 1 / (1 + np.exp(- trace[k]))
                 k = label_tmp
 
             ok_ = 1
