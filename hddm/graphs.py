@@ -654,22 +654,34 @@ def posterior_predictive_plot(posterior_samples = None,
             #ground_truth_data = np.expand_dims(ground_truth_data, 0)     
     
     # Take care of ground_truth_data
+    label_idx = list()
     if ground_truth_data is not None and datatype == 'hierarchical':
+        # initialize ground truth data dictionary
         gt_dat_dict = dict()
+        
+        # Collect and keep relevant labels for later use
+        label_idx = list()
+        
         for i in np.sort(np.unique(ground_truth_data['subj_idx'])):
+            label_idx.append(i)
             gt_dat_dict[i] = ground_truth_data.loc[ground_truth_data['subj_idx'] == i][['rt', 'response']]
             gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
             gt_dat_dict[i] = gt_dat_dict[i].values
         ground_truth_data = gt_dat_dict
      
     if ground_truth_data is not None and datatype == 'condition':
+        # initialize ground truth data dictionary
         gt_dat_dict = dict()
+        
+        # Collect and keep relevant labels for later use
+        label_idx = list()
+
         for i in np.sort(np.unique(ground_truth_data[condition_column])):
+            label_idx.append(i)
             gt_dat_dict[i] = ground_truth_data.loc[ground_truth_data[condition_column] == i][['rt', 'response']]
             gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
             gt_dat_dict[i] = gt_dat_dict[i].values
         ground_truth_data = gt_dat_dict
-
 
     # Taking care of special case with 1 plot
     if n_plots == 1:
@@ -734,8 +746,7 @@ def posterior_predictive_plot(posterior_samples = None,
             gt_color = 'red'
             #print('passed through')
         elif ground_truth_data is not None:
-            print(ground_truth_data)
-            gt_tmp = ground_truth_data[i]
+            gt_tmp = ground_truth_data[label_idx[i]] # using the relevant label here instead of the plot number 
             gt_color = 'blue'
 
         if rows > 1 and cols > 1:
@@ -914,8 +925,8 @@ def caterpillar_plot(posterior_samples = [],
             ax.scatter(gt_dict[k.replace('-', '_')], k,  c = 'red', marker = "|")
         
     ax.set_xlim(x_lims[0], x_lims[1])
-    ax_tmp.tick_params(axis = 'y', size = tick_label_size_y)
-    ax_tmp.tick_params(axis = 'x', size = tick_label_size_x)
+    ax.tick_params(axis = 'y', size = tick_label_size_y)
+    ax.tick_params(axis = 'x', size = tick_label_size_x)
         
     if save == True:
         plt.savefig('figures/' + 'caterpillar_plot_' + model + '_' + datatype + '.svg',
