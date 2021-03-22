@@ -874,12 +874,10 @@ def caterpillar_plot(posterior_samples = [],
     for k in trace.keys():
         # If we want to keep only a specific parameter we skip all traces which don't include it in 
         # their names !
-        if keep_key is not None and keep_key in k:
-            pass
-        else: 
+        if keep_key is not None and keep_key not in k: 
             continue
 
-            # Deal with 
+        # Deal with 
         if 'std' in k and drop_sd:
             pass
         
