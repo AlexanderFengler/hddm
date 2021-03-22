@@ -737,7 +737,7 @@ def posterior_predictive_plot(posterior_samples = None,
         
         # Run Model simulations for true parameters
         # Supply data too !
-        if model_ground_truth is not None:
+        if model_ground_truth is not None and ground_truth_data is None:
             out = simulator(theta = ground_truth_parameters[i, :],
                             model = model_ground_truth,
                             n_samples = 20000,
