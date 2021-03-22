@@ -733,7 +733,8 @@ def posterior_predictive_plot(posterior_samples = None,
             gt_tmp = np.concatenate([out[0], out[1]], axis = 1)
             gt_color = 'red'
             #print('passed through')
-        else:
+        elif ground_truth_data is not None:
+            print(ground_truth_data)
             gt_tmp = ground_truth_data[i]
             gt_color = 'blue'
 
@@ -756,17 +757,17 @@ def posterior_predictive_plot(posterior_samples = None,
                                   edgecolor = 'black',
                                   linewidth = hist_linewidth
                                   )
-        
-        ax_tmp.hist(gt_tmp[:, 0] * gt_tmp[:, 1], 
-                                  alpha = 0.5, 
-                                  color = gt_color, 
-                                  density = 1, 
-                                  edgecolor = gt_color,  
-                                  histtype = 'step',
-                                  linewidth = hist_linewidth, 
-                                  bins = np.linspace(-max_t, max_t, nbins), #50, 
-                                  # kde = False, #rug = False,
-                                  )
+        if ground_truth_data is not None:
+            ax_tmp.hist(gt_tmp[:, 0] * gt_tmp[:, 1], 
+                                    alpha = 0.5, 
+                                    color = gt_color, 
+                                    density = 1, 
+                                    edgecolor = gt_color,  
+                                    histtype = 'step',
+                                    linewidth = hist_linewidth, 
+                                    bins = np.linspace(-max_t, max_t, nbins), #50, 
+                                    # kde = False, #rug = False,
+                                    )
         
         # EXTRA STYLING    
         ax_tmp.set_xlim(- xlimit, xlimit)
@@ -807,13 +808,14 @@ def posterior_predictive_plot(posterior_samples = None,
     return plt.show()
 
 def caterpillar_plot(posterior_samples = [],
-                     ground_truths = None,
+                     ground_truth_parameters = None,
                      model_fitted = 'angle',
                      datatype = 'hierarchical', # 'hierarchical', 'single_subject', 'condition'
                      drop_sd = True,
-                     keep_key = 'sd',
+                     keep_key = None,
                      x_lims = [-2, 2],
                      aspect_ratio = 2,
+                     figure_scale = 1.0,
                      save = False,
                      tick_label_size_x = 22,
                      tick_label_size_y = 14):
@@ -830,7 +832,7 @@ def caterpillar_plot(posterior_samples = [],
         font_scale = 2)
     
     fig, ax = plt.subplots(1, 1, 
-                           figsize = (10, aspect_ratio * 10), 
+                           figsize = (10 * figure_scale, aspect_ratio * 10 * figure_scale), 
                            sharex = False, 
                            sharey = False)
     
@@ -840,20 +842,20 @@ def caterpillar_plot(posterior_samples = [],
     trace = posterior_samples.copy()
     
     # In case ground truth parameters were supplied --> this is mostly of interest for parameter recovery studies etc.
-    if ground_truths is not None:
+    if ground_truth_parameters is not None:
         cnt = 0
         gt_dict = {}
         
         if datatype == 'single_subject':
             for v in config[model_fitted]['params']:
-                gt_dict[v] = ground_truths[cnt]
+                gt_dict[v] = ground_truth_parameters[cnt]
                 cnt += 1
 
         if datatype == 'hierarchical':
-            gt_dict = ground_truths
+            gt_dict = ground_truth_parameters
 
         if datatype == 'condition':
-            gt_dict = ground_truths
+            gt_dict = ground_truth_parameters
              
     ecdfs = {}
     plot_vals = {} # [0.01, 0.9], [0.01, 0.99], [mean]
@@ -908,7 +910,7 @@ def caterpillar_plot(posterior_samples = [],
         ax.plot(plot_vals[k][1], [k, k], c = 'grey', zorder = - 1, linewidth = 5)
         ax.plot(plot_vals[k][0] , [k, k], c = 'black', zorder = - 1)
         
-        if ground_truths is not None:
+        if ground_truth_parameters is not None:
             ax.scatter(gt_dict[k.replace('-', '_')], k,  c = 'red', marker = "|")
         
     ax.set_xlim(x_lims[0], x_lims[1])
