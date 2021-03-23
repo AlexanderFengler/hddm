@@ -958,7 +958,7 @@ def posterior_pair_plot(posterior_samples = [], # Here expects single subject's 
     # some preprocessing
     #posterior_samples = posterior_samples.get_traces().copy()
     # Adjust this to be correct adjustment of z !!!! AF TODO
-    if k in posterior_samples.keys():
+    for k in posterior_samples.keys():
         if '_trans' in k:
             label_tmp = k.replace('_trans', '')
             key_param_only = k.split('_')[0]
