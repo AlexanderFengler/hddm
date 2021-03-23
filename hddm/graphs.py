@@ -858,9 +858,12 @@ def caterpillar_plot(posterior_samples = [],
         gt_dict = {}
         
         if datatype == 'single_subject':
-            for v in config[model_fitted]['params']:
-                gt_dict[v] = ground_truth_parameters[cnt]
-                cnt += 1
+            if type(ground_truth_parameters) is not dict:
+                for v in config[model_fitted]['params']:
+                    gt_dict[v] = ground_truth_parameters[cnt]
+                    cnt += 1
+            else:
+                gt_dict = ground_truth_parameters
 
         if datatype == 'hierarchical':
             gt_dict = ground_truth_parameters
@@ -938,7 +941,7 @@ def caterpillar_plot(posterior_samples = [],
 
 # Posterior Pair Plot
 def posterior_pair_plot(posterior_samples = [], # Here expects single subject's posterior samples as panda dataframe (dictionary may work)
-                        axes_limits = 'model', # 'model', 'samples' or dict({'parameter_name': [lower bound, upper bound]})
+                        axes_limits = 'samples', # 'samples' or dict({'parameter_name': [lower bound, upper bound]})
                         height = 10,
                         aspect_ratio = 1,
                         n_subsample = 1000,
@@ -982,25 +985,41 @@ def posterior_pair_plot(posterior_samples = [], # Here expects single subject's 
     
     for i, j in zip(*np.triu_indices_from(g.axes, 1)):
         g.axes[i, j].set_visible(False)
+
+    # Get x and y labels of graph as determined by the posterior_samples panda
+    xlabels, ylabels = [], []
+
+    for ax in g.axes[-1, :]:
+        xlabel = ax.xaxis.get_label_text()
+        xlabels.append(xlabel)
+
+    for ax in g.axes[:, 0]:
+        ylabel = ax.yaxis.get_label_text()
+        ylabels.append(ylabel)
     
     if axes_limits == 'model':
-        xlabels, ylabels = [], []
-
-        for ax in g.axes[-1, :]:
-            xlabel = ax.xaxis.get_label_text()
-            xlabels.append(xlabel)
-
-        for ax in g.axes[:, 0]:
-            ylabel = ax.yaxis.get_label_text()
-            ylabels.append(ylabel)
-
         for i in range(len(xlabels)):
             for j in range(len(ylabels)):
-                g.axes[j,i].set_xlim(model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(xlabels[i])], 
-                                     model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(xlabels[i])])
-                g.axes[j,i].set_ylim(model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(ylabels[j])], 
-                                     model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(ylabels[j])])
-
+                try:
+                    g.axes[j,i].set_xlim(model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(xlabels[i])], 
+                                        model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(xlabels[i])])
+                    g.axes[j,i].set_ylim(model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(ylabels[j])], 
+                                        model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(ylabels[j])])
+                except:
+                    print('ERROR: It looks like you are trying to make axis limits dependend on model specific parameters, but the column-names of your posterior traces do not align with the requested model\'s parameters')
+    
+    elif type(axes_limits) == dict:
+        for i in range(len(xlabels)):
+            for j in range(len(ylabels)):
+                try:
+                    g.axes[j,i].set_xlim(axes_limits[xlabels[i]][0], 
+                                         axes_limits[xlabels[i]][1])
+                    g.axes[j,i].set_ylim(axes_limits[ylabels[j]][0], 
+                                         axes_limits[ylabels[j]][1])
+                except:
+                    print('ERROR: Does your axes_limits dictionary match the column names of your posterior_samples DataFrame?')
+                    return
+    
     for ax in g.axes.flat:
         plt.setp(ax.get_xticklabels(), rotation = 45)
 
@@ -1008,18 +1027,30 @@ def posterior_pair_plot(posterior_samples = [], # Here expects single subject's 
                    y = 1.03, 
                    fontsize = 24)
     
+    posterior_samples_key_set = np.sort(posterior_samples.keys())
     # If ground truth is available add it in:
     if ground_truths is not None:
         for i in range(g.axes.shape[0]):
             for j in range(i + 1, g.axes.shape[0], 1):
-                g.axes[j,i].plot(ground_truths[model_config[model_fitted]['params'].index(xlabels[i])], 
-                                 ground_truths[model_config[model_fitted]['params'].index(ylabels[j])], 
+                g.axes[j,i].plot(ground_truths[xlabels[i]], 
+                                 ground_truths[ylabels[j]], #posterior_samples_key_set[j]], 
                                  '.', 
                                  color = 'red',
                                  markersize = 10)
+                # g.axes[j,i].plot(ground_truths[model_config[model_fitted]['params'].index(xlabels[i])], 
+                #                  ground_truths[model_config[model_fitted]['params'].index(ylabels[j])], 
+                #                  '.', 
+                #                  color = 'red',
+                #                  markersize = 10)
 
         for i in range(g.axes.shape[0]):
-            g.axes[i,i].plot(ground_truths[model_config[model_fitted]['params'].index(xlabels[i])],
+            # g.axes[i,i].plot(ground_truths[model_config[model_fitted]['params'].index(xlabels[i])],
+            #                  g.axes[i,i].get_ylim()[0], 
+            #                  '.', 
+            #                  color = 'red',
+            #                  markersize = 10)
+
+            g.axes[i,i].plot(ground_truths[xlabels[i]],
                              g.axes[i,i].get_ylim()[0], 
                              '.', 
                              color = 'red',
