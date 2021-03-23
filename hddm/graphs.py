@@ -965,9 +965,8 @@ def posterior_pair_plot(posterior_samples = [], # Here expects single subject's 
             lower_lim = model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(key_param_only)]
             upper_lim = model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(key_param_only)]
             posterior_samples[label_tmp] = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- posterior_samples[k])))
-            posterior_samples = posterior_samples.drop('z_trans', axis = 1)
+            posterior_samples = posterior_samples.drop(k, axis = 1)
             #trace[label_tmp] = 1 / (1 + np.exp(- trace[k]))
-            k = label_tmp
 
     #posterior_samples['z'] = 1 / ( 1 + np.exp(- posterior_samples['z_trans']))
     #posterior_samples = posterior_samples.drop('z_trans', axis = 1)
