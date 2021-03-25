@@ -203,7 +203,7 @@ def wiener_like_nn_ddm_pdf(np.ndarray[float, ndim = 1] x,
                            double p_outlier = 0.0, 
                            double w_outlier = 0.0,
                            bint logp = 0,
-                           network):
+                           network = None):
 
     # double err = 1e-4, 
     # int n_st = 10, 
