@@ -51,9 +51,11 @@ def make_mlp_likelihood_complete(model, **kwargs):
                 print(self.parents['a'].value)
                 print(kwargs)
                 print(self.parents['a'].value)
-                x = np.array(x, dtype = np.float32)
-
-                out = hddm.wfpt.wiener_like_nn_ddm_pdf(x, **self.parents)# **kwargs) # This may still be buggy !
+                rt = np.array(x, dtype = np.float32)
+                response = rt / np.abs(rt)
+                # response = 
+                pdf_fun = partial(hddm.wfpt.wiener_like_nn_ddm_pdf, **kwargs)
+                out = pdf_fun(rt, response, **self.parents)# **kwargs) # This may still be buggy !
                 return out
             def cdf(self, x):
                 # TODO: Implement the CDF method for neural networks
