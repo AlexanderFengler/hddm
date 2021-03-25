@@ -46,7 +46,7 @@ class HDDMnn(HDDM):
 
         # Make model specific likelihood
         #self.wfpt_nn = stochastic_from_dist('Wienernn' + '_' + self.model,
-                                            partial(likelihood_, **network_dict))
+        #                                    partial(likelihood_, **network_dict))
         # Initialize super class
         super(HDDMnn, self).__init__(*args, **kwargs)
         print(self.p_outlier)
