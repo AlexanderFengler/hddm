@@ -43,7 +43,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
                 return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
 
             def pdf(self, x):
-                return hddm.wfpt.wiener_like_ddm_pdf(x, **self.parents, **kwargs) # This may still be buggy !
+                return hddm.wfpt.wiener_like_nn_ddm_pdf(x, **self.parents, **kwargs) # This may still be buggy !
 
             def cdf(self, x):
                 # TODO: Implement the CDF method for neural networks
