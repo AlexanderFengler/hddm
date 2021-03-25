@@ -43,6 +43,8 @@ def make_mlp_likelihood_complete(model, **kwargs):
                 return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
 
             def pdf(self, x):
+                print('type of x')
+                print(type(x))
                 print(x)
                 print(self.parents)
                 #print(**self.parents)
@@ -53,6 +55,10 @@ def make_mlp_likelihood_complete(model, **kwargs):
                 print(self.parents['a'].value)
                 rt = np.array(x, dtype = np.float32)
                 response = rt / np.abs(rt)
+                rt = np.abs(rt)
+                print(rt)
+                print(response)
+                print(response.shape)
                 print(rt.shape)
                 # response = 
                 pdf_fun = partial(hddm.wfpt.wiener_like_nn_ddm_pdf, **kwargs)
