@@ -194,7 +194,8 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
         #              (w_outlier * p_outlier))))
     return log_p
 
-def wiener_like_nn_ddm_pdf(np.ndarray[float, ndim = 1] x, #np.ndarray[float, ndim = 1] response, 
+def wiener_like_nn_ddm_pdf(np.ndarray[float, ndim = 1] x,
+                           np.ndarray[float, ndim = 1] response, 
                            double v, # double sv,
                            double a, 
                            double z, # double sz,
@@ -202,7 +203,7 @@ def wiener_like_nn_ddm_pdf(np.ndarray[float, ndim = 1] x, #np.ndarray[float, ndi
                            double p_outlier = 0.0, 
                            double w_outlier = 0.0,
                            bint logp = 0):
-                           # **kwargs):
+                           **kwargs):
 
     # double err = 1e-4, 
     # int n_st = 10, 
@@ -211,7 +212,7 @@ def wiener_like_nn_ddm_pdf(np.ndarray[float, ndim = 1] x, #np.ndarray[float, ndi
     # double simps_err = 1e-8,
     cdef Py_ssize_t size = x.shape[0]
     #cdef np.ndarray[float, ndim = 1] y = np.empty(size, dtype = np.float32)
-    cdef np.ndarray[float, ndim = 1] response = np.ones(size, dtype = np.float32)
+    #cdef np.ndarray[float, ndim = 1] response = np.ones(size, dtype = np.float32)
     cdef np.ndarray[float, ndim = 1] log_p = np.zeros(size, dtype = np.float32)
     cdef int n_params = 4
     cdef float ll_min = -16.11809
@@ -225,9 +226,9 @@ def wiener_like_nn_ddm_pdf(np.ndarray[float, ndim = 1] x, #np.ndarray[float, ndi
     
     # Call to network:
     if p_outlier == 0: # ddm_model
-        pass #log_p = np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min)
+        log_p = np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min)
     else: # ddm_model
-        pass #log_p = np.log(np.exp(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier))
+        log_p = np.log(np.exp(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier))
         #log_p = np.sum(np.log(np.add(np.multiply(np.exp(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min)), 
         #                    (1.0 - p_outlier)), 
         #              (w_outlier * p_outlier))))
