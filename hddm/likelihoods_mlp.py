@@ -13,8 +13,52 @@ import numpy as np
 import hddm
 from functools import partial
 from kabuki.utils import stochastic_from_dist
+from hddm.simulators import *
+
 
 #import wfpt
+
+def make_mlp_likelihood_complete(model, **kwargs):
+    if model == 'ddm':
+            def wienernn_like_ddm(x, 
+                                  v,  
+                                  a, 
+                                  z,  
+                                  t, 
+                                  p_outlier = 0,
+                                  w_outlier = 0.1,
+                                  **kwargs):
+
+                return hddm.wfpt.wiener_like_nn_ddm(x['rt'].values,
+                                                    x['response'].values,  
+                                                    v, # sv,
+                                                    a, 
+                                                    z, # sz,
+                                                    t, # st,
+                                                    p_outlier = p_outlier,
+                                                    w_outlier = w_outlier,
+                                                    **kwargs)
+
+            def random(self):
+                return partial(simulator, model = model, n_samples = self.shape, max_t = 20)
+
+            def pdf(self, x):
+                return hddm.wfpt.wiener_like_ddm_pdf(x, **self.parents)
+
+            def cdf(self, x):
+                # TODO: Implement the CDF method for neural networks
+                return 'Not yet implemented'
+
+            # Create wfpt class
+            wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_ddm, **kwargs))
+
+            wfpt_nn.pdf = pdf
+            wfpt_nn.cdf_vec = None
+            wfpt_nn.cdf = cdf
+            wfpt_nn.random = random
+            return wfpt_nn
+    if model != 'ddm':
+        return 'Not yet implemented for models other than the DDM'
 
 # Defining the likelihood functions
 def make_mlp_likelihood(model):

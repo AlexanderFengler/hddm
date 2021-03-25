@@ -35,7 +35,7 @@ def generate_wfpt_stochastic_class(wiener_params=None, sampling_method='cdf', cd
         sampling_method <string> - an argument used by hddm.generate.gen_rts
         cdf_range <sequence> -  an argument used by hddm.generate.gen_rts
         sampling_dt <float> - an argument used by hddm.generate.gen_rts
-    Ouput:
+    Output:
         wfpt <class> - the wfpt stochastic
     """
 
