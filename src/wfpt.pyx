@@ -195,14 +195,13 @@ def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x,
     return log_p
 
 
-def wiener_like_nn_ddm_pdf(np.ndarray[float, ndim = 1] x, 
-                           np.ndarray[float, ndim = 1] response, 
+def wiener_like_nn_ddm_pdf(np.ndarray[float, ndim = 1] x, #np.ndarray[float, ndim = 1] response, 
                            double v, # double sv,
                            double a, 
                            double z, # double sz,
                            double t, #  double st,
-                           double p_outlier = 0, 
-                           double w_outlier = 0,
+                           double p_outlier = 0.0, 
+                           double w_outlier = 0.0,
                            bint logp = 0):
                            # **kwargs):
 
