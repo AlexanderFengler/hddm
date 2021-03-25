@@ -44,8 +44,8 @@ def make_mlp_likelihood_complete(model, **kwargs):
 
             def pdf(self, x):
                 print('type of x')
-                print(type(x))
-                print(x)
+                #print(type(x))
+                #print(x)
                 print(self.parents)
                 #print(**self.parents)
                 print(self.parents['a'])
@@ -56,10 +56,10 @@ def make_mlp_likelihood_complete(model, **kwargs):
                 rt = np.array(x, dtype = np.float32)
                 response = rt / np.abs(rt)
                 rt = np.abs(rt)
-                print(rt)
-                print(response)
-                print(response.shape)
-                print(rt.shape)
+                #print(rt)
+                #print(response)
+                #print(response.shape)
+                #print(rt.shape)
                 # response = 
                 pdf_fun = hddm.wfpt.wiener_like_nn_ddm_pdf
                 out = pdf_fun(x = rt, response = response, network = kwargs['network'], **self.parents)# **kwargs) # This may still be buggy !
