@@ -45,6 +45,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
             def pdf(self, x):
                 print(x)
                 print(self.parents)
+                print(**self.parents)
                 print(kwargs)
                 out = hddm.wfpt.wiener_like_nn_ddm_pdf(x, **self.parents, **kwargs) # This may still be buggy !
                 return out
