@@ -33,16 +33,16 @@ class HDDMnn(HDDM):
         
         # Load Network and likelihood function
         if self.network_type == 'mlp':
-                self.network = load_mlp(model = self.model)
-                network_dict = {'network': self.network}
-                #likelihood_ = hddm.likelihoods_mlp.make_mlp_likelihood(model = self.model)
-                self.wfpt_nn = hddm.likelihoods_mlp.make_mlp_likelihood_complete(model = self.model, **network_dict)
+            self.network = load_mlp(model = self.model)
+            network_dict = {'network': self.network}
+            #likelihood_ = hddm.likelihoods_mlp.make_mlp_likelihood(model = self.model)
+            self.wfpt_nn = hddm.likelihoods_mlp.make_mlp_likelihood_complete(model = self.model, **network_dict)
 
         if self.network_type == 'cnn':
-                self.network = load_cnn(model = self.model, nbin=self.nbin)
-                network_dict = {'network': self.network}
-                likelihood_ = hddm.likelihoods_cnn.make_cnn_likelihood(model = self.model)
-                #partial(wrapper, specific_forward_pass)
+            self.network = load_cnn(model = self.model, nbin=self.nbin)
+            network_dict = {'network': self.network}
+            likelihood_ = hddm.likelihoods_cnn.make_cnn_likelihood(model = self.model)
+            #partial(wrapper, specific_forward_pass)
 
         # Make model specific likelihood
         #self.wfpt_nn = stochastic_from_dist('Wienernn' + '_' + self.model,
