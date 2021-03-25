@@ -83,6 +83,9 @@ def generate_wfpt_stochastic_class(wiener_params=None, sampling_method='cdf', cd
 
     #create pdf function
     def pdf(self, x):
+        print(x)
+        print(self.parents)
+        print(**self.parents)
         out = hddm.wfpt.pdf_array(x, **self.parents)
         return out
 
