@@ -53,6 +53,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
                 print(self.parents['a'].value)
                 rt = np.array(x, dtype = np.float32)
                 response = rt / np.abs(rt)
+                print(rt.shape)
                 # response = 
                 pdf_fun = partial(hddm.wfpt.wiener_like_nn_ddm_pdf, **kwargs)
                 out = pdf_fun(rt, response, **self.parents)# **kwargs) # This may still be buggy !
