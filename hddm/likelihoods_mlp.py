@@ -45,7 +45,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
             def pdf(self, x):
                 print(x)
                 print(self.parents)
-                print(**self.parents)
+                #print(**self.parents)
                 print(self.parents['a'])
                 print(self.parents['a'].value)
                 print(kwargs)
