@@ -210,9 +210,9 @@ def wiener_like_nn_ddm_pdf(np.ndarray[float, ndim = 1] x, #np.ndarray[float, ndi
     # int n_sz = 10, 
     # bint use_adaptive = 1,
     # double simps_err = 1e-8,
-    cdef np.ndarray[float, ndim = 1] y = np.empty(size, dtype = np.float32)
-    cdef np.ndarray[float, ndim = 1] response = np.ones(size, dtype = np.float32)
     cdef Py_ssize_t size = x.shape[0]
+    #cdef np.ndarray[float, ndim = 1] y = np.empty(size, dtype = np.float32)
+    cdef np.ndarray[float, ndim = 1] response = np.ones(size, dtype = np.float32)
     cdef np.ndarray[float, ndim = 1] log_p = np.zeros(size, dtype = np.float32)
     cdef int n_params = 4
     cdef float ll_min = -16.11809
