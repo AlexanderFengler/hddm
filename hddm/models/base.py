@@ -872,6 +872,7 @@ class HDDMBase(AccumulatorModel):
         self.cdf_range = (-cdf_bound, cdf_bound)
 
         #set wfpt class
+        # Note that this wfpt also allows for a 'sampling_dt' arguments which goes unused here !
         self.wfpt_class = hddm.likelihoods.generate_wfpt_stochastic_class(wp, cdf_range=self.cdf_range)
 
         super(HDDMBase, self).__init__(data, **kwargs)
