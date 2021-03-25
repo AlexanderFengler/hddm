@@ -226,10 +226,10 @@ def wiener_like_nn_ddm_pdf(np.ndarray[float, ndim = 1] x,
     
     # Call to network:
     if p_outlier == 0: # ddm_model
-        print(np.squeeze(np.core.umath.maximum(network.predict_on_batch(data), ll_min)).shape)
+        #print(np.squeeze(np.core.umath.maximum(network.predict_on_batch(data), ll_min)).shape)
         log_p = np.squeeze(np.core.umath.maximum(network.predict_on_batch(data), ll_min))
     else: # ddm_model
-        print(np.squeeze(np.log(np.exp(np.core.umath.maximum(network.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier))).shape)
+        #print(np.squeeze(np.log(np.exp(np.core.umath.maximum(network.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier))).shape)
         log_p = np.squeeze(np.log(np.exp(np.core.umath.maximum(network.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
         #log_p = np.sum(np.log(np.add(np.multiply(np.exp(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min)), 
         #                    (1.0 - p_outlier)), 
