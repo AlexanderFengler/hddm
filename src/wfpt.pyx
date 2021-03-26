@@ -606,7 +606,7 @@ def wiener_like_nn_ddm_sdv_analytic(np.ndarray[float, ndim = 1] x,
                                     double t,
                                     double p_outlier = 0,
                                     double w_outlier = 0,
-                                    network = None):
+                                    **kwargs):
 
     cdef Py_ssize_t size = x.shape[0]
     cdef float log_p
