@@ -155,6 +155,38 @@ def wiener_like_nn_full_ddm(np.ndarray[float, ndim = 1] x,
 
     return log_p
 
+
+def wiener_like_nn_full_ddm_pdf(np.ndarray[float, ndim = 1] x, 
+                                np.ndarray[float, ndim = 1] response, 
+                                double v, 
+                                double sv, 
+                                double a, 
+                                double z, 
+                                double sz, 
+                                double t, 
+                                double st, 
+                                double p_outlier = 0, 
+                                double w_outlier = 0,
+                                bint logp = 0,
+                                network = None):
+
+    cdef Py_ssize_t size = x.shape[0]
+    cdef np.ndarray[float, ndim = 1] log_p = np.zeros(size, dtype = np.float32)
+    cdef int n_params = 7
+    cdef float ll_min = -16.11809
+    cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
+    data[:, :n_params] = np.tile([v, a, z, t, sz, sv, st], (size, 1)).astype(np.float32)
+    data[:, n_params:] = np.stack([x, response], axis = 1)
+   
+    # Call to network:
+    if p_outlier == 0: # ddm_model
+        log_p = np.squeeze(np.core.umath.maximum(network.predict_on_batch(data), ll_min))
+    else: # ddm_model
+        log_p = np.squeeze(np.log(np.exp(np.core.umath.maximum(network.predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
+    if logp == 0:
+        log_p = np.exp(log_p) # shouldn't be called log_p anymore but no need for an extra array here
+    return log_p
+
 def wiener_like_nn_ddm(np.ndarray[float, ndim = 1] x, 
                        np.ndarray[float, ndim = 1] response, 
                        double v, # double sv,
