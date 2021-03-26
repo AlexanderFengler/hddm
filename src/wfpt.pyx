@@ -458,7 +458,7 @@ def wiener_like_nn_ornstein_pdf(np.ndarray[float, ndim = 1] x,
                                 double t, 
                                 double p_outlier = 0,
                                 double w_outlier = 0,
-                                bint logp = 0
+                                bint logp = 0,
                                 network = None):
     
     cdef Py_ssize_t size = x.shape[0]
