@@ -409,7 +409,8 @@ def make_mlp_likelihood_complete(model, **kwargs):
         #return wienernn_like_angle
     else:
         return 'Not implemented errror: Failed to load likelihood because the model specified is not implemented'
-
+    print('printing wfpt_nn')
+    print(wfpt_nn)
     return wfpt_nn
 
     # if model != 'ddm':
