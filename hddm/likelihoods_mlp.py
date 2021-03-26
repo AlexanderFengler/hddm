@@ -80,341 +80,342 @@ def make_mlp_likelihood_complete(model, **kwargs):
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_ddm
         wfpt_nn.random = random_ddm
+        return wfpt_nn
 
-    if model == 'weibull_cdf' or model == 'weibull':
-        def wienernn_like_weibull(x, 
-                                  v,
-                                  a, 
-                                  alpha,
-                                  beta,
-                                  z,
-                                  t,
-                                  p_outlier = 0,
-                                  w_outlier = 0,
-                                  **kwargs): #theta
+    # if model == 'weibull_cdf' or model == 'weibull':
+    #     def wienernn_like_weibull(x, 
+    #                               v,
+    #                               a, 
+    #                               alpha,
+    #                               beta,
+    #                               z,
+    #                               t,
+    #                               p_outlier = 0,
+    #                               w_outlier = 0,
+    #                               **kwargs): #theta
 
-            return hddm.wfpt.wiener_like_nn_weibull(x['rt'].values,
-                                                    x['response'].values, 
-                                                    v, 
-                                                    a, 
-                                                    alpha, 
-                                                    beta,
-                                                    z, 
-                                                    t, 
-                                                    p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-                                                    w_outlier = w_outlier,
-                                                    **kwargs)
+    #         return hddm.wfpt.wiener_like_nn_weibull(x['rt'].values,
+    #                                                 x['response'].values, 
+    #                                                 v, 
+    #                                                 a, 
+    #                                                 alpha, 
+    #                                                 beta,
+    #                                                 z, 
+    #                                                 t, 
+    #                                                 p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+    #                                                 w_outlier = w_outlier,
+    #                                                 **kwargs)
 
-        def random_weibull(self):
-            return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
+    #     def random_weibull(self):
+    #         return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
 
-        def pdf_weibull(self, x):
-            rt = np.array(x, dtype = np.float32)
-            response = rt / np.abs(rt)
-            rt = np.abs(rt)
-            out = hddm.wfpt.wiener_like_nn_weibull_pdf(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
-            return out
+    #     def pdf_weibull(self, x):
+    #         rt = np.array(x, dtype = np.float32)
+    #         response = rt / np.abs(rt)
+    #         rt = np.abs(rt)
+    #         out = hddm.wfpt.wiener_like_nn_weibull_pdf(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
+    #         return out
 
-        def cdf_weibull(self, x):
-            # TODO: Implement the CDF method for neural networks
-            return 'Not yet implemented'
+    #     def cdf_weibull(self, x):
+    #         # TODO: Implement the CDF method for neural networks
+    #         return 'Not yet implemented'
 
-        # Create wfpt class
-        wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_weibull, **kwargs))
+    #     # Create wfpt class
+    #     wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_weibull, **kwargs))
 
-        wfpt_nn.pdf = pdf_weibull
-        wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
-        wfpt_nn.cdf = cdf_weibull
-        wfpt_nn.random = random_weibull
+    #     wfpt_nn.pdf = pdf_weibull
+    #     wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
+    #     wfpt_nn.cdf = cdf_weibull
+    #     wfpt_nn.random = random_weibull
         
-    if model == 'ddm_sdv':
-        def wienernn_like_ddm_sdv(x, 
-                          v,
-                          sv,
-                          a, 
-                          z, 
-                          t,
-                          p_outlier = 0,
-                          w_outlier = 0,
-                          **kwargs):
+    # if model == 'ddm_sdv':
+    #     def wienernn_like_ddm_sdv(x, 
+    #                       v,
+    #                       sv,
+    #                       a, 
+    #                       z, 
+    #                       t,
+    #                       p_outlier = 0,
+    #                       w_outlier = 0,
+    #                       **kwargs):
 
-            return hddm.wfpt.wiener_like_nn_ddm_sdv(x['rt'].values,
-                                                    x['response'].values,  
-                                                    v,
-                                                    sv,
-                                                    a,
-                                                    z, 
-                                                    t, 
-                                                    p_outlier = p_outlier,
-                                                    w_outlier = w_outlier,
-                                                    **kwargs)
+    #         return hddm.wfpt.wiener_like_nn_ddm_sdv(x['rt'].values,
+    #                                                 x['response'].values,  
+    #                                                 v,
+    #                                                 sv,
+    #                                                 a,
+    #                                                 z, 
+    #                                                 t, 
+    #                                                 p_outlier = p_outlier,
+    #                                                 w_outlier = w_outlier,
+    #                                                 **kwargs)
 
-        def random_ddm_sdv(self):
-            return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
+    #     def random_ddm_sdv(self):
+    #         return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
 
-        def pdf_ddm_sdv(self, x):
-            rt = np.array(x, dtype = np.float32)
-            response = rt / np.abs(rt)
-            rt = np.abs(rt)
-            out = hddm.wfpt.wiener_like_nn_ddm_sdv_pdf(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
-            return out
+    #     def pdf_ddm_sdv(self, x):
+    #         rt = np.array(x, dtype = np.float32)
+    #         response = rt / np.abs(rt)
+    #         rt = np.abs(rt)
+    #         out = hddm.wfpt.wiener_like_nn_ddm_sdv_pdf(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
+    #         return out
 
-        def cdf_ddm_sdv(self, x):
-            # TODO: Implement the CDF method for neural networks
-            return 'Not yet implemented'
+    #     def cdf_ddm_sdv(self, x):
+    #         # TODO: Implement the CDF method for neural networks
+    #         return 'Not yet implemented'
 
-        # Create wfpt class
-        wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_ddm_sdv, **kwargs))
+    #     # Create wfpt class
+    #     wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_ddm_sdv, **kwargs))
 
-        wfpt_nn.pdf = pdf_ddm_sdv
-        wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
-        wfpt_nn.cdf = cdf_ddm_sdv
-        wfpt_nn.random = random_ddm_sdv
+    #     wfpt_nn.pdf = pdf_ddm_sdv
+    #     wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
+    #     wfpt_nn.cdf = cdf_ddm_sdv
+    #     wfpt_nn.random = random_ddm_sdv
     
-    if model == 'ddm_sdv_analytic':
-        def wienernn_like_ddm_sdv_analytic(x, 
-                                           v, 
-                                           sv,
-                                           a, 
-                                           z, 
-                                           t, 
-                                           p_outlier = 0,
-                                           w_outlier = 0,
-                                           **kwargs):
+    # if model == 'ddm_sdv_analytic':
+    #     def wienernn_like_ddm_sdv_analytic(x, 
+    #                                        v, 
+    #                                        sv,
+    #                                        a, 
+    #                                        z, 
+    #                                        t, 
+    #                                        p_outlier = 0,
+    #                                        w_outlier = 0,
+    #                                        **kwargs):
 
-            return hddm.wfpt.wiener_like_nn_ddm_sdv_analytic(x['rt'].values,
-                                                             x['response'].values,  
-                                                             v, 
-                                                             sv, 
-                                                             a, 
-                                                             z, 
-                                                             t,
-                                                             p_outlier = p_outlier,
-                                                             w_outlier = w_outlier,
-                                                             **kwargs)
+    #         return hddm.wfpt.wiener_like_nn_ddm_sdv_analytic(x['rt'].values,
+    #                                                          x['response'].values,  
+    #                                                          v, 
+    #                                                          sv, 
+    #                                                          a, 
+    #                                                          z, 
+    #                                                          t,
+    #                                                          p_outlier = p_outlier,
+    #                                                          w_outlier = w_outlier,
+    #                                                          **kwargs)
 
-        def random_ddm_sdv_analytic(self):
-            return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
+    #     def random_ddm_sdv_analytic(self):
+    #         return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
 
-        def pdf_ddm_sdv_analytic(self, x):
-            rt = np.array(x, dtype = np.float32)
-            response = rt / np.abs(rt)
-            rt = np.abs(rt)
-            out = hddm.wfpt.wiener_like_nn_ddm_sdv_analytic_pdf(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
-            return out
+    #     def pdf_ddm_sdv_analytic(self, x):
+    #         rt = np.array(x, dtype = np.float32)
+    #         response = rt / np.abs(rt)
+    #         rt = np.abs(rt)
+    #         out = hddm.wfpt.wiener_like_nn_ddm_sdv_analytic_pdf(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
+    #         return out
 
-        def cdf_ddm_sdv_analytic(self, x):
-            # TODO: Implement the CDF method for neural networks
-            return 'Not yet implemented'
+    #     def cdf_ddm_sdv_analytic(self, x):
+    #         # TODO: Implement the CDF method for neural networks
+    #         return 'Not yet implemented'
 
-        # Create wfpt class
-        wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_ddm_sdv_analytic, **kwargs))
+    #     # Create wfpt class
+    #     wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_ddm_sdv_analytic, **kwargs))
 
-        wfpt_nn.pdf = pdf_ddm_sdv_analytic
-        wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
-        wfpt_nn.cdf = cdf_ddm_sdv_analytic
-        wfpt_nn.random = random_ddm_sdv_analytic
-        #return wienernn_like_ddm_sdv_analytic
+    #     wfpt_nn.pdf = pdf_ddm_sdv_analytic
+    #     wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
+    #     wfpt_nn.cdf = cdf_ddm_sdv_analytic
+    #     wfpt_nn.random = random_ddm_sdv_analytic
+    #     #return wienernn_like_ddm_sdv_analytic
 
-    if model == 'levy':
-        def wienernn_like_levy(x, 
-                               v, 
-                               a, 
-                               alpha,
-                               z,
-                               t,
-                               p_outlier = 0.1,
-                               w_outlier = 0.1,
-                               **kwargs): #theta
+    # if model == 'levy':
+    #     def wienernn_like_levy(x, 
+    #                            v, 
+    #                            a, 
+    #                            alpha,
+    #                            z,
+    #                            t,
+    #                            p_outlier = 0.1,
+    #                            w_outlier = 0.1,
+    #                            **kwargs): #theta
 
-            return hddm.wfpt.wiener_like_nn_levy(x['rt'].values,
-                                    x['response'].values, 
-                                    v,
-                                    a, 
-                                    alpha, 
-                                    z,
-                                    t, 
-                                    p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-                                    w_outlier = w_outlier,
-                                    **kwargs)
+    #         return hddm.wfpt.wiener_like_nn_levy(x['rt'].values,
+    #                                 x['response'].values, 
+    #                                 v,
+    #                                 a, 
+    #                                 alpha, 
+    #                                 z,
+    #                                 t, 
+    #                                 p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+    #                                 w_outlier = w_outlier,
+    #                                 **kwargs)
 
-        def random_levy(self):
-            return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
+    #     def random_levy(self):
+    #         return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
 
-        def pdf_levy(self, x):
-            rt = np.array(x, dtype = np.float32)
-            response = rt / np.abs(rt)
-            rt = np.abs(rt)
-            out = hddm.wfpt.wiener_like_nn_levy(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
-            return out
+    #     def pdf_levy(self, x):
+    #         rt = np.array(x, dtype = np.float32)
+    #         response = rt / np.abs(rt)
+    #         rt = np.abs(rt)
+    #         out = hddm.wfpt.wiener_like_nn_levy(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
+    #         return out
 
-        def cdf_levy(self, x):
-            # TODO: Implement the CDF method for neural networks
-            return 'Not yet implemented'
+    #     def cdf_levy(self, x):
+    #         # TODO: Implement the CDF method for neural networks
+    #         return 'Not yet implemented'
 
-        # Create wfpt class
-        wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_levy, **kwargs))
+    #     # Create wfpt class
+    #     wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_levy, **kwargs))
 
-        wfpt_nn.pdf = pdf_levy
-        wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
-        wfpt_nn.cdf = cdf_levy
-        wfpt_nn.random = random_levy
-        #return wienernn_like_ddm_sdv_analytic
+    #     wfpt_nn.pdf = pdf_levy
+    #     wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
+    #     wfpt_nn.cdf = cdf_levy
+    #     wfpt_nn.random = random_levy
+    #     #return wienernn_like_ddm_sdv_analytic
 
-    if model == 'ornstein':
-        def wienernn_like_ornstein(x,
-                                   v, 
-                                   a, 
-                                   g,
-                                   z, 
-                                   t,
-                                   p_outlier = 0,
-                                   w_outlier = 0,
-                                   **kwargs): #theta
+    # if model == 'ornstein':
+    #     def wienernn_like_ornstein(x,
+    #                                v, 
+    #                                a, 
+    #                                g,
+    #                                z, 
+    #                                t,
+    #                                p_outlier = 0,
+    #                                w_outlier = 0,
+    #                                **kwargs): #theta
     
-            return hddm.wfpt.wiener_like_nn_ornstein(x['rt'].values,
-                                                     x['response'].values, 
-                                                     v, 
-                                                     a, 
-                                                     g, 
-                                                     z, 
-                                                     t, 
-                                                     p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-                                                     w_outlier = w_outlier,
-                                                     **kwargs)
-        #return wienernn_like_ornstein
+    #         return hddm.wfpt.wiener_like_nn_ornstein(x['rt'].values,
+    #                                                  x['response'].values, 
+    #                                                  v, 
+    #                                                  a, 
+    #                                                  g, 
+    #                                                  z, 
+    #                                                  t, 
+    #                                                  p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+    #                                                  w_outlier = w_outlier,
+    #                                                  **kwargs)
+    #     #return wienernn_like_ornstein
 
-        def random_ornstein(self):
-            return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
+    #     def random_ornstein(self):
+    #         return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
 
-        def pdf_ornstein(self, x):
-            rt = np.array(x, dtype = np.float32)
-            response = rt / np.abs(rt)
-            rt = np.abs(rt)
-            out = hddm.wfpt.wiener_like_nn_ornstein(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
-            return out
+    #     def pdf_ornstein(self, x):
+    #         rt = np.array(x, dtype = np.float32)
+    #         response = rt / np.abs(rt)
+    #         rt = np.abs(rt)
+    #         out = hddm.wfpt.wiener_like_nn_ornstein(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
+    #         return out
 
-        def cdf_ornstein(self, x):
-            # TODO: Implement the CDF method for neural networks
-            return 'Not yet implemented'
+    #     def cdf_ornstein(self, x):
+    #         # TODO: Implement the CDF method for neural networks
+    #         return 'Not yet implemented'
 
-        # Create wfpt class
-        wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_ornstein, **kwargs))
+    #     # Create wfpt class
+    #     wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_ornstein, **kwargs))
 
-        wfpt_nn.pdf = pdf_ornstein
-        wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
-        wfpt_nn.cdf = cdf_ornstein
-        wfpt_nn.random = random_ornstein
-        #return wienernn_like_ddm_sdv_analytic
-        #return wienernn_like_ornstein
+    #     wfpt_nn.pdf = pdf_ornstein
+    #     wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
+    #     wfpt_nn.cdf = cdf_ornstein
+    #     wfpt_nn.random = random_ornstein
+    #     #return wienernn_like_ddm_sdv_analytic
+    #     #return wienernn_like_ornstein
 
-    if model == 'full_ddm' or model == 'full_ddm2':
-        def wienernn_like_full_ddm(x, 
-                                   v, 
-                                   sv, 
-                                   a, 
-                                   z, 
-                                   sz, 
-                                   t, 
-                                   st, 
-                                   p_outlier = 0,
-                                   w_outlier = 0,
-                                   **kwargs):
+    # if model == 'full_ddm' or model == 'full_ddm2':
+    #     def wienernn_like_full_ddm(x, 
+    #                                v, 
+    #                                sv, 
+    #                                a, 
+    #                                z, 
+    #                                sz, 
+    #                                t, 
+    #                                st, 
+    #                                p_outlier = 0,
+    #                                w_outlier = 0,
+    #                                **kwargs):
 
-            return hddm.wfpt.wiener_like_nn_full_ddm(x['rt'].values,
-                                                     x['response'].values,
-                                                     v,
-                                                     sv,
-                                                     a,
-                                                     z, 
-                                                     sz, 
-                                                     t,
-                                                     st,
-                                                     p_outlier = p_outlier,
-                                                     w_outlier = w_outlier,
-                                                     **kwargs)
+    #         return hddm.wfpt.wiener_like_nn_full_ddm(x['rt'].values,
+    #                                                  x['response'].values,
+    #                                                  v,
+    #                                                  sv,
+    #                                                  a,
+    #                                                  z, 
+    #                                                  sz, 
+    #                                                  t,
+    #                                                  st,
+    #                                                  p_outlier = p_outlier,
+    #                                                  w_outlier = w_outlier,
+    #                                                  **kwargs)
 
-        #return wienernn_like_full_ddm
-        def random_full_ddm(self):
-            return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
+    #     #return wienernn_like_full_ddm
+    #     def random_full_ddm(self):
+    #         return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
 
-        def pdf_full_ddm(self, x):
-            rt = np.array(x, dtype = np.float32)
-            response = rt / np.abs(rt)
-            rt = np.abs(rt)
-            out = hddm.wfpt.wiener_like_nn_full_ddm(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
-            return out
+    #     def pdf_full_ddm(self, x):
+    #         rt = np.array(x, dtype = np.float32)
+    #         response = rt / np.abs(rt)
+    #         rt = np.abs(rt)
+    #         out = hddm.wfpt.wiener_like_nn_full_ddm(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
+    #         return out
 
-        def cdf_full_ddm(self, x):
-            # TODO: Implement the CDF method for neural networks
-            return 'Not yet implemented'
+    #     def cdf_full_ddm(self, x):
+    #         # TODO: Implement the CDF method for neural networks
+    #         return 'Not yet implemented'
 
-        # Create wfpt class
-        wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_full_ddm, **kwargs))
+    #     # Create wfpt class
+    #     wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_full_ddm, **kwargs))
 
-        wfpt_nn.pdf = pdf_full_ddm
-        wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
-        wfpt_nn.cdf = cdf_full_ddm
-        wfpt_nn.random = random_full_ddm
-        #return wienernn_like_ddm_sdv_analytic
-        #return wienernn_like_ornstein
+    #     wfpt_nn.pdf = pdf_full_ddm
+    #     wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
+    #     wfpt_nn.cdf = cdf_full_ddm
+    #     wfpt_nn.random = random_full_ddm
+    #     #return wienernn_like_ddm_sdv_analytic
+    #     #return wienernn_like_ornstein
 
-    if model == 'angle':
-        def wienernn_like_angle(x, 
-                                v, 
-                                a,
-                                theta,
-                                z,
-                                t,
-                                p_outlier = 0,
-                                w_outlier = 0,
-                                **kwargs):
+    # if model == 'angle':
+    #     def wienernn_like_angle(x, 
+    #                             v, 
+    #                             a,
+    #                             theta,
+    #                             z,
+    #                             t,
+    #                             p_outlier = 0,
+    #                             w_outlier = 0,
+    #                             **kwargs):
 
-            return hddm.wfpt.wiener_like_nn_angle(x['rt'].values,
-                                                  x['response'].values,  
-                                                  v,
-                                                  a, 
-                                                  theta,
-                                                  z,
-                                                  t,
-                                                  p_outlier = p_outlier,
-                                                  w_outlier = w_outlier,
-                                                  **kwargs)
+    #         return hddm.wfpt.wiener_like_nn_angle(x['rt'].values,
+    #                                               x['response'].values,  
+    #                                               v,
+    #                                               a, 
+    #                                               theta,
+    #                                               z,
+    #                                               t,
+    #                                               p_outlier = p_outlier,
+    #                                               w_outlier = w_outlier,
+    #                                               **kwargs)
             
-        #return wienernn_like_full_ddm
-        def random_angle(self):
-            return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
+    #     #return wienernn_like_full_ddm
+    #     def random_angle(self):
+    #         return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
 
-        def pdf_angle(self, x):
-            rt = np.array(x, dtype = np.float32)
-            response = rt / np.abs(rt)
-            rt = np.abs(rt)
-            out = hddm.wfpt.wiener_like_nn_angle(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
-            return out
+    #     def pdf_angle(self, x):
+    #         rt = np.array(x, dtype = np.float32)
+    #         response = rt / np.abs(rt)
+    #         rt = np.abs(rt)
+    #         out = hddm.wfpt.wiener_like_nn_angle(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
+    #         return out
 
-        def cdf_angle(self, x):
-            # TODO: Implement the CDF method for neural networks
-            return 'Not yet implemented'
+    #     def cdf_angle(self, x):
+    #         # TODO: Implement the CDF method for neural networks
+    #         return 'Not yet implemented'
 
-        # Create wfpt class
-        wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_angle, **kwargs))
+    #     # Create wfpt class
+    #     wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_angle, **kwargs))
 
-        wfpt_nn.pdf = pdf_angle
-        wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
-        wfpt_nn.cdf = cdf_angle
-        wfpt_nn.random = random_angle
-        #return wienernn_like_ddm_sdv_analytic
-        #return wienernn_like_ornstein
+    #     wfpt_nn.pdf = pdf_angle
+    #     wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
+    #     wfpt_nn.cdf = cdf_angle
+    #     wfpt_nn.random = random_angle
+    #     #return wienernn_like_ddm_sdv_analytic
+    #     #return wienernn_like_ornstein
         
-        #return wienernn_like_angle
-    else:
-        return 'Not implemented errror: Failed to load likelihood because the model specified is not implemented'
-    print('printing wfpt_nn')
-    print(wfpt_nn)
-    return wfpt_nn
+    #     #return wienernn_like_angle
+    # else:
+    #     return 'Not implemented errror: Failed to load likelihood because the model specified is not implemented'
+    # print('printing wfpt_nn')
+    # print(wfpt_nn)
+    # return wfpt_nn
 
-    # if model != 'ddm':
-    #     return 'Not yet implemented for models other than the DDM'
+    # # if model != 'ddm':
+    # #     return 'Not yet implemented for models other than the DDM'
 
 # Defining the likelihood functions
 def make_mlp_likelihood(model):
