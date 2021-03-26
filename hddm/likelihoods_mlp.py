@@ -260,7 +260,6 @@ def make_mlp_likelihood_complete(model, **kwargs):
         wfpt_nn.cdf = cdf_levy
         wfpt_nn.random = random_levy
         #return wienernn_like_ddm_sdv_analytic
-        return wienernn_like_levy
 
     if model == 'ornstein':
         def wienernn_like_ornstein(x,
@@ -407,7 +406,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
         #return wienernn_like_ddm_sdv_analytic
         #return wienernn_like_ornstein
         
-        return wienernn_like_angle
+        #return wienernn_like_angle
     else:
         return 'Not implemented errror: Failed to load likelihood because the model specified is not implemented'
 
