@@ -249,7 +249,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
             rt = np.array(x, dtype = np.float32)
             response = rt / np.abs(rt)
             rt = np.abs(rt)
-            out = hddm.wfpt.wiener_like_nn_levy(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
+            out = hddm.wfpt.wiener_like_nn_levy_pdf(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
             return out
 
         def cdf_levy(self, x):
@@ -296,7 +296,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
             rt = np.array(x, dtype = np.float32)
             response = rt / np.abs(rt)
             rt = np.abs(rt)
-            out = hddm.wfpt.wiener_like_nn_ornstein(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
+            out = hddm.wfpt.wiener_like_nn_ornstein_pdf(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
             return out
 
         def cdf_ornstein(self, x):
@@ -348,7 +348,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
             rt = np.array(x, dtype = np.float32)
             response = rt / np.abs(rt)
             rt = np.abs(rt)
-            out = hddm.wfpt.wiener_like_nn_full_ddm(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
+            out = hddm.wfpt.wiener_like_nn_full_ddm_pdf(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
             return out
 
         def cdf_full_ddm(self, x):
@@ -396,7 +396,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
             rt = np.array(x, dtype = np.float32)
             response = rt / np.abs(rt)
             rt = np.abs(rt)
-            out = hddm.wfpt.wiener_like_nn_angle(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
+            out = hddm.wfpt.wiener_like_nn_angle_pdf(x = rt, response = response, network = kwargs['network'], **self.parents) # **kwargs) # This may still be buggy !
             return out
 
         def cdf_angle(self, x):
