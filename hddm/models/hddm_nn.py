@@ -85,7 +85,6 @@ class HDDMnn(HDDM):
 
         d['wfpt_nn'] = stochastic_from_dist('Wienernn' + '_' + d['model'],
                                             partial(likelihood_, **network_dict))
-
         super(HDDMnn, self).__setstate__(d)
         
     # def __setstate__(self, d):

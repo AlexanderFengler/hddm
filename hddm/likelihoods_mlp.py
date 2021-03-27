@@ -14,7 +14,7 @@ import hddm
 from functools import partial
 from kabuki.utils import stochastic_from_dist
 from hddm.simulators import *
-
+import data_simulators
 
 #import wfpt
 
@@ -51,7 +51,23 @@ def make_mlp_likelihood_complete(model, **kwargs):
             print(dict(self.parents.value))
             print('tying to pring the values part of parents')
             print(self.parents.values)
-            return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
+
+            # this can be simplified so that we pass parameters directly to the simulator ...
+            theta = np.array(model_config[model]['params'], dtype = np.float32)
+            keys_tmp = self.parents.value.keys()
+            cnt = 0
+            
+            for i in model_config[model]['params']:
+                if i in keys_tmp:
+                    theta[cnt] = np.array(self.parents.value.i).astype(np.float32)
+                cnt += 1
+            
+            print('print theta from random function in wfpt_nn')
+            print(theta)
+
+            new_func = partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
+            
+            return new_func
 
         def pdf_ddm(self, x):
             #print('type of x')
@@ -77,6 +93,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
             #print(rt.shape)
             # response = 
             #pdf_fun = hddm.wfpt.wiener_like_nn_ddm_pdf
+            model_config[] # TODO FILL THIS IN SO THAT WE CREATE THE APPROPRIATE ARRAY AS INPUT TO THE SIMULATOR
             out = hddm.wfpt.wiener_like_nn_ddm_pdf(x = rt, response = response, network = kwargs['network'], **self.parents)# **kwargs) # This may still be buggy !
             return out
 
