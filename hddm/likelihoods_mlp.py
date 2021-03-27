@@ -53,13 +53,13 @@ def make_mlp_likelihood_complete(model, **kwargs):
             # print(self.parents.values)
 
             # this can be simplified so that we pass parameters directly to the simulator ...
-            theta = np.array(model_config[model]['params'], dtype = np.float32)
+            theta = np.array(model_config[model]['default_params'], dtype = np.float32)
             keys_tmp = self.parents.value.keys()
             cnt = 0
             
-            for i in model_config[model]['params']:
-                if i in keys_tmp:
-                    theta[cnt] = np.array(self.parents.value[i]).astype(np.float32)
+            for param in model_config[model]['params']:
+                if param in keys_tmp:
+                    theta[cnt] = np.array(self.parents.value[param]).astype(np.float32)
                 cnt += 1
             
             print('print theta from random function in wfpt_nn')
