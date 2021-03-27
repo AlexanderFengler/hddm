@@ -65,9 +65,8 @@ def make_mlp_likelihood_complete(model, **kwargs):
             print('print theta from random function in wfpt_nn')
             print(theta)
 
-            new_func = partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
-            
-            return new_func
+            #new_func = partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
+            return simulator(theta = theta, model = model, n_samples = self.shape, max_t = 20)
 
         def pdf_ddm(self, x):
             #print('type of x')
