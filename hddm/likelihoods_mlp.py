@@ -43,7 +43,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
             print(self.parents)
             print('printing dir of the v variable')
             print(dir(self.parents['v']))
-            print(dir(self.parents['v'].value))
+            print(self.parents['v'].value)
             print(self.parents.value)
             print('trying to print the value part of parents')
             print(dict(self.parents.value))
