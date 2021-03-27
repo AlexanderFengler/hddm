@@ -40,15 +40,15 @@ def make_mlp_likelihood_complete(model, **kwargs):
                                                 **kwargs)
 
         def random_ddm(self):
-            print(self.parents)
-            print('printing the dir of self.parents directly')
-            print(dir(self.parents))
-            print('printing dir of the v variable')
-            print(dir(self.parents['v']))
-            print(self.parents['v'].value)
-            print(self.parents.value)
-            print('trying to print the value part of parents')
-            print(dict(self.parents.value))
+            # print(self.parents)
+            # print('printing the dir of self.parents directly')
+            # print(dir(self.parents))
+            # print('printing dir of the v variable')
+            # print(dir(self.parents['v']))
+            # print(self.parents['v'].value)
+            # print(self.parents.value)
+            # print('trying to print the value part of parents')
+            # print(dict(self.parents.value))
             # print('tying to pring the values part of parents')
             # print(self.parents.values)
 
@@ -66,6 +66,8 @@ def make_mlp_likelihood_complete(model, **kwargs):
             print(theta)
 
             #new_func = partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
+            print('self shape: ')
+            print(self.shape)
             return simulator(theta = theta, model = model, n_samples = self.shape, max_t = 20)
 
         def pdf_ddm(self, x):
