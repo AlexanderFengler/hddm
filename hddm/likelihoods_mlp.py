@@ -92,7 +92,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
             #print(rt.shape)
             # response = 
             #pdf_fun = hddm.wfpt.wiener_like_nn_ddm_pdf
-            model_config[] # TODO FILL THIS IN SO THAT WE CREATE THE APPROPRIATE ARRAY AS INPUT TO THE SIMULATOR
+            # model_config[] # TODO FILL THIS IN SO THAT WE CREATE THE APPROPRIATE ARRAY AS INPUT TO THE SIMULATOR
             out = hddm.wfpt.wiener_like_nn_ddm_pdf(x = rt, response = response, network = kwargs['network'], **self.parents)# **kwargs) # This may still be buggy !
             return out
 
