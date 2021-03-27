@@ -49,8 +49,8 @@ def make_mlp_likelihood_complete(model, **kwargs):
             print(self.parents.value)
             print('trying to print the value part of parents')
             print(dict(self.parents.value))
-            print('tying to pring the values part of parents')
-            print(self.parents.values)
+            # print('tying to pring the values part of parents')
+            # print(self.parents.values)
 
             # this can be simplified so that we pass parameters directly to the simulator ...
             theta = np.array(model_config[model]['params'], dtype = np.float32)
@@ -59,7 +59,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
             
             for i in model_config[model]['params']:
                 if i in keys_tmp:
-                    theta[cnt] = np.array(self.parents.value.i).astype(np.float32)
+                    theta[cnt] = np.array(self.parents.value[i]).astype(np.float32)
                 cnt += 1
             
             print('print theta from random function in wfpt_nn')
