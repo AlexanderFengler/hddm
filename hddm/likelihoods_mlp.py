@@ -40,6 +40,8 @@ def make_mlp_likelihood_complete(model, **kwargs):
                                                 **kwargs)
 
         def random_ddm(self):
+            print(self.parents)
+            print(dict(self.parents.value))
             return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
 
         def pdf_ddm(self, x):
