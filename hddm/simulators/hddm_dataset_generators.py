@@ -232,6 +232,8 @@ def simulator_condition_effects(n_conditions = 4,
     
     # Change 'subj_idx' column name to 'condition' ('subj_idx' is assigned automatically by hddm_preprocess() function)
     data_out = data_out.rename(columns = {'subj_idx': "condition"})
+    data_out['subj_idx'] = 0
+    data_out.reset_index(drop = True, inplace = True)
 
     return (data_out, gt, param_base)
 
