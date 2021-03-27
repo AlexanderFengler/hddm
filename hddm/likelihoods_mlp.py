@@ -41,6 +41,10 @@ def make_mlp_likelihood_complete(model, **kwargs):
 
         def random_ddm(self):
             print(self.parents)
+            print('printing dir of the v variable')
+            print(dir(self.parents['v']))
+            print(dir(self.parents['v'].value))
+            print(self.parents.value)
             print('trying to print the value part of parents')
             print(dict(self.parents.value))
             return partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
