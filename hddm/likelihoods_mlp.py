@@ -41,6 +41,8 @@ def make_mlp_likelihood_complete(model, **kwargs):
 
         def random_ddm(self):
             print(self.parents)
+            print('printing the dir of self.parents directly')
+            print(dir(self.parents))
             print('printing dir of the v variable')
             print(dir(self.parents['v']))
             print(self.parents['v'].value)
