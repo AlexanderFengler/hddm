@@ -68,7 +68,8 @@ def make_mlp_likelihood_complete(model, **kwargs):
             #new_func = partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
             print('self shape: ')
             print(self.shape)
-            return simulator(theta = theta, model = model, n_samples = self.shape[0], max_t = 20)
+            sim_out = simulator(theta = theta, model = model, n_samples = self.shape[0], max_t = 20)
+            return hddm_preprocess(sim_out)
 
         def pdf_ddm(self, x):
             #print('type of x')
