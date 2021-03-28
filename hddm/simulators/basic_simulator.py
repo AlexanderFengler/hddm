@@ -119,30 +119,42 @@ def bin_arbitrary_fptd(out = None,
 model_config = {'ddm': {'params':['v', 'a', 'z', 't'],
                         'param_bounds': [[-3.0, 0.3, 0.1, 1e-3], [3.0, 2.5, 0.9, 2.0]],
                         'boundary': bf.constant,
-                        'n_params': 5,
+                        'n_params': 4,
                         'default_params': [0.0, 1.0, 0.5, 0.0]},
                 'angle':{'params': ['v', 'a', 'z', 't', 'theta'],
                          'param_bounds': [[-3.0, 0.3, 0.2, 1e-3, -0.1], [3.0, 2.0, 0.8, 2.0, 1.45]],
-                        'boundary': bf.angle},
+                        'boundary': bf.angle,
+                        'n_params': 5,
+                        'default_params': [0.0, 1.0, 0.5, 0.0, 0.0]},
                 'weibull':{'params': ['v', 'a', 'z', 't', 'alpha', 'beta'],
                            'param_bounds': [[-2.5, 0.3, 0.2, 1e-3, 0.31, 0.31], [2.5, 2.5, 0.8, 2.0, 4.99, 6.99]],
-                          'boundary': bf.weibull_cdf},
-                'weibull_cdf':{'params': ['v', 'a', 'z', 't', 'alpha', 'beta'],
-                               'param_bounds': [[-2.5, 0.3, 0.2, 1e-3, 0.31, 0.31], [2.5, 2.5, 0.8, 2.0, 4.99, 6.99]],
-                               'boundary': bf.weibull_cdf},
+                          'boundary': bf.weibull_cdf,
+                          'n_params': 6,
+                          'default_params': [0.0, 1.0, 0.5, 0.0, 3.0, 3.0]},
                 'levy':{'params':['v', 'a', 'z', 'alpha', 't'],
                         'param_bounds':[[-3.0, 0.3, 0.1, 1.0, 1e-3], [3.0, 2.0, 0.9, 2.0, 2]],
-                        'boundary': bf.constant},
+                        'boundary': bf.constant,
+                        'n_params': 5,
+                         'default_params': [0.0, 1.0, 0.5, 1.5, 0.0]},
                 'full_ddm':{'params':['v', 'a', 'z', 't', 'sz', 'sv', 'st'],
                             'param_bounds':[[-3.0, 0.3, 0.3, 0.25, 1e-3, 1e-3, 1e-3], [3.0, 2.5, 0.7, 2.25, 0.2, 2.0, 0.25]],
-                            'boundary': bf.constant},
+                            'boundary': bf.constant,
+                            'n_params': 7,
+                            'default_params': [0.0, 1.0, 0.5, 0.0, 0.0, 0.0, 0.0]},
                 'ornstein':{'params':['v', 'a', 'z', 'g', 't'],
                             'param_bounds':[[-2.0, 0.3, 0.2, -1.0, 1e-3], [2.0, 2.0, 0.8, 1.0, 2]],
-                            'boundary': bf.constant},
+                            'boundary': bf.constant,
+                            'n_params': 5,
+                            'default_params': [0.0, 1.0, 0.5, 0.0, 0.0]},
                 'ddm_sdv':{'params':['v', 'a', 'z', 't', 'sv'],
                            'param_bounds':[[-3.0, 0.3, 0.1, 1e-3, 1e-3],[ 3.0, 2.5, 0.9, 2.0, 2.5]],
-                           'boundary': bf.constant},
+                           'boundary': bf.constant,
+                           'n_params': 5,
+                           'default_params': [0.0, 1.0, 0.5, 0.0, 0.0, 0.0]},
                 }
+
+model_config['weibull_cdf'] = model_config['weibull'].copy()
+model_config['full_ddm2'] = model_config['full_ddm'].copy()
 
 def simulator(theta, 
               model = 'angle', 
@@ -292,7 +304,6 @@ def simulator(theta,
                                n_samples = n_samples,
                                n_trials = n_trials,
                                max_t = max_t)
-
 
     # 3 Choice models
     if cartoon:
@@ -445,6 +456,4 @@ def simulator(theta,
         return 'currently binned outputs not implemented for multi-trial simulators'
     elif bin_dim == -1:
         return 'invalid bin_dim'
-
-
     

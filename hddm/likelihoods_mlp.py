@@ -19,6 +19,39 @@ import data_simulators
 #import wfpt
 
 def make_mlp_likelihood_complete(model, **kwargs):
+    def random(self):
+        # print(self.parents)
+        # print('printing the dir of self.parents directly')
+        # print(dir(self.parents))
+        # print('printing dir of the v variable')
+        # print(dir(self.parents['v']))
+        # print(self.parents['v'].value)
+        # print(self.parents.value)
+        # print('trying to print the value part of parents')
+        # print(dict(self.parents.value))
+        # print('tying to pring the values part of parents')
+        # print(self.parents.values)
+
+        # this can be simplified so that we pass parameters directly to the simulator ...
+        theta = np.array(model_config[model]['default_params'], dtype = np.float32)
+        keys_tmp = self.parents.value.keys()
+        cnt = 0
+        
+        for param in model_config[model]['params']:
+            if param in keys_tmp:
+                theta[cnt] = np.array(self.parents.value[param]).astype(np.float32)
+            cnt += 1
+        
+        print('print theta from random function in wfpt_nn')
+        print(theta)
+
+        #new_func = partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
+        print('self shape: ')
+        print(self.shape)
+        sim_out = simulator(theta = theta, model = model, n_samples = self.shape[0], max_t = 20)
+        return hddm_preprocess(sim_out)
+
+
     if model == 'ddm':
         def wienernn_like_ddm(x, 
                                 v,  
@@ -39,37 +72,6 @@ def make_mlp_likelihood_complete(model, **kwargs):
                                                 w_outlier = w_outlier,
                                                 **kwargs)
 
-        def random_ddm(self):
-            # print(self.parents)
-            # print('printing the dir of self.parents directly')
-            # print(dir(self.parents))
-            # print('printing dir of the v variable')
-            # print(dir(self.parents['v']))
-            # print(self.parents['v'].value)
-            # print(self.parents.value)
-            # print('trying to print the value part of parents')
-            # print(dict(self.parents.value))
-            # print('tying to pring the values part of parents')
-            # print(self.parents.values)
-
-            # this can be simplified so that we pass parameters directly to the simulator ...
-            theta = np.array(model_config[model]['default_params'], dtype = np.float32)
-            keys_tmp = self.parents.value.keys()
-            cnt = 0
-            
-            for param in model_config[model]['params']:
-                if param in keys_tmp:
-                    theta[cnt] = np.array(self.parents.value[param]).astype(np.float32)
-                cnt += 1
-            
-            print('print theta from random function in wfpt_nn')
-            print(theta)
-
-            #new_func = partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
-            print('self shape: ')
-            print(self.shape)
-            sim_out = simulator(theta = theta, model = model, n_samples = self.shape[0], max_t = 20)
-            return hddm_preprocess(sim_out)
 
         def pdf_ddm(self, x):
             #print('type of x')
@@ -109,7 +111,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
         wfpt_nn.pdf = pdf_ddm
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_ddm
-        wfpt_nn.random = random_ddm
+        wfpt_nn.random = random
         return wfpt_nn
 
     if model == 'weibull_cdf' or model == 'weibull':
@@ -156,7 +158,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
         wfpt_nn.pdf = pdf_weibull
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_weibull
-        wfpt_nn.random = random_weibull
+        wfpt_nn.random = random
         return wfpt_nn
     
     if model == 'ddm_sdv':
@@ -201,7 +203,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
         wfpt_nn.pdf = pdf_ddm_sdv
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_ddm_sdv
-        wfpt_nn.random = random_ddm_sdv
+        wfpt_nn.random = random
         return wfpt_nn
     
     if model == 'ddm_sdv_analytic':
@@ -246,7 +248,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
         wfpt_nn.pdf = pdf_ddm_sdv_analytic
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_ddm_sdv_analytic
-        wfpt_nn.random = random_ddm_sdv_analytic
+        wfpt_nn.random = random
         #return wienernn_like_ddm_sdv_analytic
         return wfpt_nn
 
@@ -292,7 +294,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
         wfpt_nn.pdf = pdf_levy
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_levy
-        wfpt_nn.random = random_levy
+        wfpt_nn.random = random
         #return wienernn_like_ddm_sdv_analytic
         return wfpt_nn
 
@@ -339,7 +341,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
         wfpt_nn.pdf = pdf_ornstein
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_ornstein
-        wfpt_nn.random = random_ornstein
+        wfpt_nn.random = random
         #return wienernn_like_ddm_sdv_analytic
         #return wienernn_like_ornstein
         return wfpt_nn
@@ -391,7 +393,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
         wfpt_nn.pdf = pdf_full_ddm
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_full_ddm
-        wfpt_nn.random = random_full_ddm
+        wfpt_nn.random = random
         #return wienernn_like_ddm_sdv_analytic
         #return wienernn_like_ornstein
         return wfpt_nn
@@ -439,7 +441,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
         wfpt_nn.pdf = pdf_angle
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_angle
-        wfpt_nn.random = random_angle
+        wfpt_nn.random = random
         #return wienernn_like_ddm_sdv_analytic
         #return wienernn_like_ornstein
         
