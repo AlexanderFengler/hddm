@@ -30,6 +30,11 @@ class HDDMnn(HDDM):
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
         self.model = kwargs.pop('model', 'ddm')
         self.nbin = kwargs.pop('nbin', 512)
+
+        if self.nbin == 512:
+            self.cnn_pdf_multiplier = 51.2
+        elif self.nbin == 256:
+            self.cnn_pdf_multiplier = 25.6
         
         # Load Network and likelihood function
         if self.network_type == 'mlp':
@@ -41,7 +46,8 @@ class HDDMnn(HDDM):
         if self.network_type == 'cnn':
             self.network = load_cnn(model = self.model, nbin=self.nbin)
             network_dict = {'network': self.network}
-            likelihood_ = hddm.likelihoods_cnn.make_cnn_likelihood(model = self.model)
+            self.wfpt_nn = hddm.likelihoods_cnn.make_cnn_likelihood(model = self.model, pdf_multiplier = self.cnn_pdf_multiplier, **network_dict)
+            #likelihood_ = hddm.likelihoods_cnn.make_cnn_likelihood(model = self.model)
             #partial(wrapper, specific_forward_pass)
 
         # Make model specific likelihood
