@@ -236,9 +236,9 @@ def simulator_condition_effects(n_conditions = 4,
     data_out.reset_index(drop = True, inplace = True)
 
     if bin_pointwise:
-        data_out['rt'] = data_out['rt'].astype(np.int64)
-        data_out['response'] = data_out['response'].astype(np.int64)
-        data_out['nn_response'] = data_out['nn_response'].astype(np.int64)
+        data_out['rt'] = data_out['rt'].astype(np.int_)
+        data_out['response'] = data_out['response'].astype(np.int_)
+        data_out['nn_response'] = data_out['nn_response'].astype(np.int_)
 
     return (data_out, gt, param_base)
 
