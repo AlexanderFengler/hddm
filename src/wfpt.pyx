@@ -125,7 +125,7 @@ def wiener_like_cnn_2(np.ndarray[long, ndim = 1] x,
     return log_p
 
 def wiener_pdf_cnn_2(np.ndarray[long, ndim = 1] x, 
-                      np.ndarray[long, ndim = 1] response, 
+                     np.ndarray[long, ndim = 1] response, 
                       np.ndarray[float, ndim = 1] parameters,
                       double p_outlier = 0, 
                       double w_outlier = 0,

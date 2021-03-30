@@ -51,7 +51,6 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
         sim_out = simulator(theta = theta, model = model, n_samples = self.shape[0], max_t = 20)
         return hddm_preprocess(sim_out)
 
-
     if model == 'ddm': # or model == 'weibull':
         def wienernn_like_ddm(x, 
                               v,
