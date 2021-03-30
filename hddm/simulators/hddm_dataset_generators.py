@@ -235,6 +235,11 @@ def simulator_condition_effects(n_conditions = 4,
     data_out['subj_idx'] = 0
     data_out.reset_index(drop = True, inplace = True)
 
+    if bin_pointwise:
+        data_out['rt'] = data_out['rt'].astype(np.int32)
+        data_out['response'] = data_out['response'].astype(np.int32)
+        data_out['nn_response'] = data_out['nn_response'].astype(np.int32)
+
     return (data_out, gt, param_base)
 
 def simulator_covariate(dependent_params = ['v'],
