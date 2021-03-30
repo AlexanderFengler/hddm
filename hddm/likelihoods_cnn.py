@@ -18,7 +18,7 @@ from kabuki.utils import stochastic_from_dist
 
 
 # Defining the likelihood functions
-def make_cnn_likelihood(model):
+def make_cnn_likelihood(model, **kwargs):
     def random(self):
         # print(self.parents)
         # print('printing the dir of self.parents directly')
