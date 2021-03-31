@@ -147,7 +147,7 @@ def simulator_stimcoding(model = 'angle',
                             n_samples = n_samples_by_condition,
                             bin_dim = bin_dim,
                             bin_pointwise = bin_pointwise,
-                            max_t = 20.0)
+                            max_t = max_t)
 
         dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i + 1))
     
@@ -163,7 +163,7 @@ def simulator_condition_effects(n_conditions = 4,
                                 model = 'angle',
                                 bin_dim = None,
                                 bin_pointwise = True,
-                                max_t = 20,
+                                max_t = 20.0,
                                 ):
 
     # Get list of keys in prespecified_params and return if it is not a dict when it is in fact not None
@@ -228,7 +228,7 @@ def simulator_condition_effects(n_conditions = 4,
                             n_samples = n_samples_by_condition,
                             bin_dim = bin_dim,
                             bin_pointwise = bin_pointwise,
-                            max_t = 20.0)
+                            max_t = max_t)
         
         dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i))
     
@@ -316,7 +316,7 @@ def simulator_covariate(dependent_params = ['v'],
                             n_samples = 1,
                             bin_dim = bin_dim,
                             bin_pointwise = bin_pointwise,
-                            max_t = 20.0)
+                            max_t = max_t)
         
         rts.append(sim_out[0])
         choices.append(sim_out[1])
