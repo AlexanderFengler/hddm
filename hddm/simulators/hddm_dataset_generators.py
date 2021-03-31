@@ -162,7 +162,7 @@ def simulator_condition_effects(n_conditions = 4,
                                 prespecified_params = None,
                                 model = 'angle',
                                 bin_dim = None,
-                                bin_pointwise = True,
+                                bin_pointwise = False,
                                 max_t = 20.0,
                                 ):
 

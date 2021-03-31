@@ -16,9 +16,7 @@ from kabuki.utils import stochastic_from_dist
 from hddm.simulators import *
 import data_simulators
 
-
 #import wfpt
-
 
 # Defining the likelihood functions
 def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
@@ -51,8 +49,61 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
         #new_func = partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
         #print('self shape: ')
         #print(self.shape)
-        sim_out = simulator(theta = theta, model = model, n_samples = self.shape[0], max_t = 20)
+        sim_out = simulator(theta = theta, model = model, n_samples = self.shape[0], max_t = 20.0)
         return hddm_preprocess(sim_out)
+
+    def pdf(self, x):
+        #print('type of x')
+        #print(type(x))
+        #print(x)
+        #print(self.parents)
+        #print(**self.parents)
+        #print(self.parents['a'])
+        #print(dir(self.parents['a']))
+        #print(self.parents['a'].value)
+        #print(kwargs)
+        #print(self.parents['a'].value)
+        # Note as per kabuki it seems that x tends to come in as a 'value_range', which is essetially a 1d ndarray
+        # We could change this ...
+
+        #rt = np.array()
+        print('rt')
+        rt = np.array(x, dtype = np.int_)
+        print(rt)
+        response = rt.copy()
+        response[rt < 0] = 0
+        response[rt > 0] = 1
+        response = response.astype(np.int_)
+        rt = np.abs(rt)
+        print(rt)
+        print(response)
+        #response = rt / np.abs(rt)
+        #rt = np.abs(rt)
+        
+        # this can be simplified so that we pass parameters directly to the simulator ...
+        theta = np.array(model_config[model]['default_params'], dtype = np.float32)
+        keys_tmp = self.parents.value.keys()
+        cnt = 0
+        
+        for param in model_config[model]['params']:
+            if param in keys_tmp:
+                theta[cnt] = np.array(self.parents.value[param]).astype(np.float32)
+            cnt += 1
+
+        #print(rt)
+        #print(response)
+        #print(response.shape)
+        #print(rt.shape)
+        # response = 
+        #pdf_fun = hddm.wfpt.wiener_like_nn_ddm_pdf
+        # model_config[] # TODO FILL THIS IN SO THAT WE CREATE THE APPROPRIATE ARRAY AS INPUT TO THE SIMULATOR
+        #out = pdf_multiplier * hddm.wfpt.wiener_pdf_cnn_2(x = rt, response = response, network = kwargs['network'], parameters = theta)# **kwargs) # This may still be buggy !
+        out = hddm.wfpt.wiener_pdf_cnn_2(x = rt, response = response, network = kwargs['network'], parameters = theta)# **kwargs) # This may still be buggy !
+        return out
+
+    def cdf(self, x):
+        # TODO: Implement the CDF method for neural networks
+        return 'Not yet implemented'
 
     if model == 'ddm': # or model == 'weibull':
         def wienernn_like_ddm(x, 
@@ -71,66 +122,13 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
                                                w_outlier = w_outlier,
                                                **kwargs)
 
-        def pdf_ddm(self, x):
-            #print('type of x')
-            #print(type(x))
-            #print(x)
-            #print(self.parents)
-            #print(**self.parents)
-            #print(self.parents['a'])
-            #print(dir(self.parents['a']))
-            #print(self.parents['a'].value)
-            #print(kwargs)
-            #print(self.parents['a'].value)
-            # Note as per kabuki it seems that x tends to come in as a 'value_range', which is essetially a 1d ndarray
-            # We could change this ...
-
-            #rt = np.array()
-            print('rt')
-            rt = np.array(x, dtype = np.int_)
-            print(rt)
-            response = rt.copy()
-            response[rt < 0] = 0
-            response[rt > 0] = 1
-            response = response.astype(np.int_)
-            rt = np.abs(rt)
-            print(rt)
-            print(response)
-            #response = rt / np.abs(rt)
-            #rt = np.abs(rt)
-           
-            # this can be simplified so that we pass parameters directly to the simulator ...
-            theta = np.array(model_config[model]['default_params'], dtype = np.float32)
-            keys_tmp = self.parents.value.keys()
-            cnt = 0
-            
-            for param in model_config[model]['params']:
-                if param in keys_tmp:
-                    theta[cnt] = np.array(self.parents.value[param]).astype(np.float32)
-                cnt += 1
-
-            #print(rt)
-            #print(response)
-            #print(response.shape)
-            #print(rt.shape)
-            # response = 
-            #pdf_fun = hddm.wfpt.wiener_like_nn_ddm_pdf
-            # model_config[] # TODO FILL THIS IN SO THAT WE CREATE THE APPROPRIATE ARRAY AS INPUT TO THE SIMULATOR
-            out = pdf_multiplier * hddm.wfpt.wiener_pdf_cnn_2(x = rt, response = response, network = kwargs['network'], parameters = theta)# **kwargs) # This may still be buggy !
-            #out = hddm.wfpt.wiener_pdf_cnn_2(x = rt, response = response, network = kwargs['network'], parameters = theta)# **kwargs) # This may still be buggy !
-            return out
-
-        
-        def cdf_ddm(self, x):
-            # TODO: Implement the CDF method for neural networks
-            return 'Not yet implemented'
 
         # Create wfpt class
         wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_ddm, **kwargs))
 
-        wfpt_nn.pdf = pdf_ddm
+        wfpt_nn.pdf = pdf
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
-        wfpt_nn.cdf = cdf_ddm
+        wfpt_nn.cdf = cdf
         wfpt_nn.random = random
         return wfpt_nn
 
@@ -152,7 +150,14 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
                                                p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
                                                w_outlier = w_outlier,
                                                **kwargs)
-        return wienernn_like_weibull
+        # Create wfpt class
+        wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_weibull, **kwargs))
+
+        wfpt_nn.pdf = pdf
+        wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
+        wfpt_nn.cdf = cdf
+        wfpt_nn.random = random
+        return wfpt_nn
 
     if model == 'levy':
         def wienernn_like_levy(x, 
@@ -171,7 +176,15 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
                                                p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
                                                w_outlier = w_outlier,
                                                **kwargs)
-        return wienernn_like_levy
+        
+        # Create wfpt class
+        wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_levy, **kwargs))
+
+        wfpt_nn.pdf = pdf
+        wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
+        wfpt_nn.cdf = cdf
+        wfpt_nn.random = random
+        return wfpt_nn
 
     if model == 'ornstein':
         def wienernn_like_ornstein(x, 
@@ -190,7 +203,14 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
                                                p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
                                                w_outlier = w_outlier,
                                                **kwargs)
-        return wienernn_like_ornstein
+        # Create wfpt class
+        wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_ornstein, **kwargs))
+
+        wfpt_nn.pdf = pdf
+        wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
+        wfpt_nn.cdf = cdf
+        wfpt_nn.random = random
+        return wfpt_nn
 
     if model == 'full_ddm' or model == 'full_ddm2':
         def wienernn_like_full_ddm(x, 
@@ -212,7 +232,14 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
                                                w_outlier = w_outlier,
                                                **kwargs)
 
-        return wienernn_like_full_ddm
+        # Create wfpt class
+        wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_full_ddm, **kwargs))
+
+        wfpt_nn.pdf = pdf
+        wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
+        wfpt_nn.cdf = cdf
+        wfpt_nn.random = random
+        return wfpt_nn
 
     if model == 'angle':
         def wienernn_like_angle(x, 
@@ -232,7 +259,14 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
                                                w_outlier = w_outlier,
                                                **kwargs)
 
-        return wienernn_like_angle
+        # Create wfpt class
+        wfpt_nn = stochastic_from_dist('Wienernn_' + model, partial(wienernn_like_angle, **kwargs))
+
+        wfpt_nn.pdf = pdf
+        wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
+        wfpt_nn.cdf = cdf
+        wfpt_nn.random = random
+        return wfpt_nn
     else:
         return 'Not implemented errror: Failed to load likelihood because the model specified is not implemented'
 
