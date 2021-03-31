@@ -89,11 +89,13 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
             print('rt')
             rt = np.array(x, dtype = np.int_)
             print(rt)
-            response = rt
+            response = rt.copy()
             response[rt < 0] = 0
             response[rt > 0] = 1
             response = response.astype(np.int_)
             rt = np.abs(rt)
+            print(rt)
+            print(response)
             #response = rt / np.abs(rt)
             #rt = np.abs(rt)
            
