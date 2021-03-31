@@ -85,11 +85,16 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
             # Note as per kabuki it seems that x tends to come in as a 'value_range', which is essetially a 1d ndarray
             # We could change this ...
 
-            rt = np.array(x, dtype = np.float32)
-            response = rt / np.abs(rt)
-            rt = np.abs(rt)
+            #rt = np.array()
+            rt = np.array(x, dtype = np.int_)
+            response = rt
+            response[rt < 0] = 0
+            response[rt > 0] = 1
             response = response.astype(np.int_)
 
+            #response = rt / np.abs(rt)
+            #rt = np.abs(rt)
+           
             # this can be simplified so that we pass parameters directly to the simulator ...
             theta = np.array(model_config[model]['default_params'], dtype = np.float32)
             keys_tmp = self.parents.value.keys()
