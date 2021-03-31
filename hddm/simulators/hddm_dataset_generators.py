@@ -89,7 +89,8 @@ def simulator_stimcoding(model = 'angle',
                          n_samples_by_condition = 1000,
                          prespecified_params = {},
                          bin_pointwise = True,
-                         bin_dim = None):
+                         bin_dim = None,
+                         max_t = 20.0):
     
     param_base = np.tile(np.random.uniform(low = model_config[model]['param_bounds'][0],
                                            high = model_config[model]['param_bounds'][1], 
@@ -145,7 +146,8 @@ def simulator_stimcoding(model = 'angle',
                             model = model, 
                             n_samples = n_samples_by_condition,
                             bin_dim = bin_dim,
-                            bin_pointwise = bin_pointwise)
+                            bin_pointwise = bin_pointwise,
+                            max_t = 20.0)
 
         dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i + 1))
     
@@ -161,6 +163,7 @@ def simulator_condition_effects(n_conditions = 4,
                                 model = 'angle',
                                 bin_dim = None,
                                 bin_pointwise = True,
+                                max_t = 20,
                                 ):
 
     # Get list of keys in prespecified_params and return if it is not a dict when it is in fact not None
@@ -224,7 +227,8 @@ def simulator_condition_effects(n_conditions = 4,
                             model = model, 
                             n_samples = n_samples_by_condition,
                             bin_dim = bin_dim,
-                            bin_pointwise = bin_pointwise)
+                            bin_pointwise = bin_pointwise,
+                            max_t = 20.0)
         
         dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i))
     
@@ -249,8 +253,9 @@ def simulator_covariate(dependent_params = ['v'],
                         covariate_magnitudes = {'v': 1.0},
                         prespecified_params = None,
                         subj_id = 'none',
-                        bin_dime = None, 
-                        bin_pointwise = True):
+                        bin_dim = None, 
+                        bin_pointwise = True,
+                        max_t = 20.0):
     
     if betas == None:
         betas = {}
@@ -310,7 +315,8 @@ def simulator_covariate(dependent_params = ['v'],
                             model = model,
                             n_samples = 1,
                             bin_dim = bin_dim,
-                            bin_pointwise = bin_pointwise)
+                            bin_pointwise = bin_pointwise,
+                            max_t = 20.0)
         
         rts.append(sim_out[0])
         choices.append(sim_out[1])
@@ -345,7 +351,8 @@ def simulator_hierarchical(n_subjects = 5,
                            prespecified_param_stds = {'v': 0.3},
                            model = 'angle',
                            bin_dim = None,
-                           bin_pointwise = True):
+                           bin_pointwise = True,
+                           max_t = 20.0):
 
     param_ranges_half = (np.array(model_config[model]['param_bounds'][1]) - np.array(model_config[model]['param_bounds'][0])) / 2
     # Fill in some global parameter vectors
@@ -394,7 +401,8 @@ def simulator_hierarchical(n_subjects = 5,
                             model = model,
                             n_samples = n_samples_by_subject,
                             bin_dim = bin_dim,
-                            bin_pointwise = bin_pointwise)
+                            bin_pointwise = bin_pointwise,
+                            max_t = max_t)
         
         dataframes.append(hddm_preprocess(simulator_data = sim_out, 
                                           subj_id = subj_id))
