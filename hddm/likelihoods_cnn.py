@@ -88,6 +88,7 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
             rt = np.array(x, dtype = np.float32)
             response = rt / np.abs(rt)
             rt = np.abs(rt)
+            response = response.astype(np.int_)
 
             # this can be simplified so that we pass parameters directly to the simulator ...
             theta = np.array(model_config[model]['default_params'], dtype = np.float32)
