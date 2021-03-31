@@ -116,7 +116,8 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
             # response = 
             #pdf_fun = hddm.wfpt.wiener_like_nn_ddm_pdf
             # model_config[] # TODO FILL THIS IN SO THAT WE CREATE THE APPROPRIATE ARRAY AS INPUT TO THE SIMULATOR
-            out = pdf_multiplier * hddm.wfpt.wiener_pdf_cnn_2(x = rt, response = response, network = kwargs['network'], parameters = theta)# **kwargs) # This may still be buggy !
+            #out = pdf_multiplier * hddm.wfpt.wiener_pdf_cnn_2(x = rt, response = response, network = kwargs['network'], parameters = theta)# **kwargs) # This may still be buggy !
+            out = hddm.wfpt.wiener_pdf_cnn_2(x = rt, response = response, network = kwargs['network'], parameters = theta)# **kwargs) # This may still be buggy !
             return out
 
         
