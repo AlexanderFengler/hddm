@@ -86,6 +86,7 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
             # We could change this ...
 
             #rt = np.array()
+            print('rt')
             rt = np.array(x, dtype = np.int_)
             response = rt
             response[rt < 0] = 0
