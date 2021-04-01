@@ -22,7 +22,7 @@ def hddm_preprocess(simulator_data = None, subj_id = 'none'):
         df = pd.DataFrame(simulator_data[0][:, 0], columns = ['rt'])
         df['response'] = simulator_data[0][:, 1].astype(int)
 
-    df['nn_response'] = df['response']
+    #df['nn_response'] = df['response']
     df.loc[df['response'] == -1.0, 'response'] = 0.0
     df['subj_idx'] = subj_id
     return df
@@ -242,7 +242,7 @@ def simulator_condition_effects(n_conditions = 4,
     if bin_pointwise:
         data_out['rt'] = data_out['rt'].astype(np.int_)
         data_out['response'] = data_out['response'].astype(np.int_)
-        data_out['nn_response'] = data_out['nn_response'].astype(np.int_)
+        #data_out['nn_response'] = data_out['nn_response'].astype(np.int_)
 
     return (data_out, gt, param_base)
 
