@@ -497,7 +497,6 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               value = 1,
                                                                std_upper = 1 # added AF
                                                                ))
             if 'v' in include:
