@@ -296,7 +296,6 @@ class HDDM(HDDMBase):
                                                            upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                            value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
                                                            )) # should have lower = 0.1, upper = 0.9
-
             print(knodes.keys())
 
         
@@ -538,9 +537,7 @@ class HDDM(HDDMBase):
                       
         print('knodes')
         print(knodes)
-
         return knodes
-
 
     def _create_stochastic_knodes_info(self, include):
         knodes = OrderedDict()
