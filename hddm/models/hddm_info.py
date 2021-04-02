@@ -162,9 +162,9 @@ class HDDM(HDDMBase):
             param_bnd_str = 'param_bounds_cnn'
 
         # PARAMETERS COMMON TO ALL MODELS
-
+        print('printing include: ')
         print(include)
-        
+
 
         if 'p_outlier' in include:
             knodes.update(self._create_family_invlogit('p_outlier',
