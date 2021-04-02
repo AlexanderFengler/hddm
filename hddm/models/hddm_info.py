@@ -162,6 +162,10 @@ class HDDM(HDDMBase):
             param_bnd_str = 'param_bounds_cnn'
 
         # PARAMETERS COMMON TO ALL MODELS
+
+        print(include)
+        
+
         if 'p_outlier' in include:
             knodes.update(self._create_family_invlogit('p_outlier',
                                                         value = 0.2,
@@ -218,49 +222,6 @@ class HDDM(HDDMBase):
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
                                                                std_upper = 2
                                                                ))
-
-        # if self.model == 'weibull_cdf_concave':
-        #     if 'a' in include:
-        #         knodes.update(self._create_family_trunc_normal('a',
-        #                                                        lower = 0.3,
-        #                                                        upper = 2.5,
-        #                                                        value = 1,
-        #                                                        std_upper = 1 # added AF
-        #                                                        ))
-        #     if 'v' in include:
-        #         knodes.update(self._create_family_trunc_normal('v', 
-        #                                                        lower = - 2.5,
-        #                                                        upper = 2.5,
-        #                                                        value = 0,
-        #                                                        std_upper = 1.5
-        #                                                        ))
-        #     if 't' in include:
-        #         knodes.update(self._create_family_trunc_normal('t', 
-        #                                                        lower = 1e-3,
-        #                                                        upper = 2, 
-        #                                                        value = .01,
-        #                                                        std_upper = 1 # added AF
-        #                                                        ))
-        #     if 'z' in include:
-        #         knodes.update(self._create_family_invlogit('z',
-        #                                                    value = .5,
-        #                                                    g_tau = 10**-2,
-        #                                                    std_std = 0.5,
-        #                                                    )) # should have lower = 0.2, upper = 0.8
-        #     if 'alpha' in include:
-        #         knodes.update(self._create_family_trunc_normal('alpha',
-        #                                                        lower = 1.00, # this guarantees initial concavity of the likelihood
-        #                                                        upper = 4.99, 
-        #                                                        value = 2.34,
-        #                                                        std_upper = 2
-        #                                                        ))
-        #     if 'beta' in include:
-        #         knodes.update(self._create_family_trunc_normal('beta', 
-        #                                                        lower = 0.31, 
-        #                                                        upper = 6.99, 
-        #                                                        value = 3.34,
-        #                                                        std_upper = 2
-        #                                                        ))
 
         if self.model == 'ddm' or self.model == 'ddm_analytic':
             if 'a' in include:
