@@ -28,7 +28,23 @@ import hddm.simulators
 def bin_simulator_output_pointwise(out = [0, 0],
                                    bin_dt = 0.04,
                                    nbins = 0): # ['v', 'a', 'w', 'ndt', 'angle']
-    out_copy = deepcopy(out)
+    """Turns RT part of simulator output into bin-identifier by trial
+
+    :Arguments:
+        out: tuple 
+            Output of the 'simulator' function
+        bin_dt: float
+            If nbins is 0, this determines the desired bin size which in turn automatically 
+            determines the resulting number of bins.
+        nbins: int
+            Number of bins to bin reaction time data into. If supplied as 0, bin_dt instead determines the number of 
+            bins automatically.   
+
+    :Returns: 
+        2d array. The first columns collects bin-identifiers by trial, the second column lists the corresponding choices.
+    """
+    
+    # out_copy = deepcopy(out)
 
     # Generate bins
     if nbins == 0:
@@ -62,6 +78,27 @@ def bin_simulator_output(out = None,
                          nbins = 0,
                          max_t = -1,
                          freq_cnt = False): # ['v', 'a', 'w', 'ndt', 'angle']
+    """Turns RT part of simulator output into bin-identifier by trial
+
+    :Arguments:
+        out : tuple 
+            Output of the 'simulator' function
+        bin_dt : float
+            If nbins is 0, this determines the desired bin size which in turn automatically 
+            determines the resulting number of bins.
+        nbins : int
+            Number of bins to bin reaction time data into. If supplied as 0, bin_dt instead determines the number of 
+            bins automatically.   
+        max_t : int <default=-1>
+            Override the 'max_t' metadata as part of the simulator output. Sometimes useful, but usually
+            default will do the job.
+        freq_cnt : bool <default=False>
+            Decide whether to return proportions (default) or counts in bins.
+
+    :Returns:
+        A histogram of counts or proportions.
+
+    """
 
     if max_t == -1:
         max_t = out[2]['max_t']
@@ -95,6 +132,27 @@ def bin_arbitrary_fptd(out = None,
                        nchoices = 2,
                        choice_codes = [-1.0, 1.0],
                        max_t = 10.0): # ['v', 'a', 'w', 'ndt', 'angle']
+
+    """Takes in simulator output and returns a histogram of bin counts
+    :Arguments:
+        out: tuple
+            Output of the 'simulator' function
+        bin_dt : float
+            If nbins is 0, this determines the desired bin size which in turn automatically 
+            determines the resulting number of bins.
+        nbins : int
+            Number of bins to bin reaction time data into. If supplied as 0, bin_dt instead determines the number of 
+            bins automatically.
+        nchoices: int <default=2>
+            Number of choices allowed by the simulator.
+        choice_codes = list <default=[-1.0, 1.0]
+            Choice labels to be used.
+        max_t: float
+            Maximum RT to consider.
+
+    Returns:
+        2d array (nbins, nchoices): A histogram of bin counts
+    """
 
     # Generate bins
     if nbins == 0:
@@ -170,10 +228,41 @@ def simulator(theta,
               n_trials = 1,
               delta_t = 0.001,
               max_t = 20,
-              cartoon = False,
+              no_noise = False,
               bin_dim = None,
-              bin_pointwise = False): 
+              bin_pointwise = False):
+    """Basic data simulator for the models included in HDDM. 
+
+
+    :Arguments:
+        theta : list or numpy.array
+            Parameters of the simulator. If 2d array, each row is treated as a 'trial' 
+            and the function runs n_sample * n_trials simulations.
+        model: str <default='angle'>
+            Determines the model that will be simulated.
+        n_samples: int <default=1000>
+            Number of simulation runs (for each trial if supplied n_trials > 1)
+        n_trials: int <default=1>
+            Number of trials in a simulations run (this specifically addresses trial by trial parameterizations)
+        delta_t: float
+            Size fo timesteps in simulator (conceptually measured in seconds)
+        max_t: float
+            Maximum reaction the simulator can reach
+        no_noise: bool <default=False>
+            Turn noise of (useful for plotting purposes mostly)
+        bin_dim: int <default=None>
+            Number of bins to use (in case the simulator output is supposed to come out as a count histogram)
+        bin_pointwise: bool <default=False>
+            Wheter or not to bin the output data pointwise. If true the 'RT' part of the data is now specifies the
+            'bin-number' of a given trial instead of the 'RT' directly. You need to specify bin_dim as some number for this to work.
     
+    :Return: tuple 
+        can be (rts, responses, metadata)
+        or     (rt-response histogram, metadata)
+        or     (rts binned pointwise, responses, metadata)
+
+    """
+
     # Useful for sbi
     if type(theta) == list:
         print('theta is supplied as list --> simulator assumes n_trials = 1')
@@ -190,7 +279,7 @@ def simulator(theta,
         return
 
     # 2 choice models 
-    if cartoon:
+    if no_noise:
         s = 0.0
     else: 
         s = 1.0
@@ -216,7 +305,7 @@ def simulator(theta,
                           ndt = theta[:, 3],
                           s = s,
                           n_samples = n_samples,
-                          n_trials = 1,
+                          n_trials = n_trials,
                           delta_t = delta_t,
                           boundary_params = {},
                           boundary_fun = bf.constant,
@@ -314,7 +403,7 @@ def simulator(theta,
                                max_t = max_t)
 
     # 3 Choice models
-    if cartoon:
+    if no_noise:
         s = np.tile(np.array([0.0, 0.0, 0.0], dtype = np.float32), (n_trials, 1))
     else:
         s = np.tile(np.array([1.0, 1.0, 1.0], dtype = np.float32), (n_trials, 1))
@@ -352,7 +441,7 @@ def simulator(theta,
 
     # 4 Choice models
 
-    if cartoon:
+    if no_noise:
         s = np.tile(np.array([0.0, 0.0, 0.0, 0.0], dtype = np.float32), (n_trials, 1))
     else:
         s = np.tile(np.array([1.0, 1.0, 1.0, 0.0], dtype = np.float32), (n_trials, 1))
@@ -388,7 +477,7 @@ def simulator(theta,
                 max_t = max_t)
 
     # Seq / Parallel models (4 choice)
-    if cartoon:
+    if no_noise:
         s = 0.0
     else: 
         s = 1.0

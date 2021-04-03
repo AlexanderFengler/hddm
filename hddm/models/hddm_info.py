@@ -151,11 +151,7 @@ class HDDM(HDDMBase):
     def _create_stochastic_knodes_nn_noninfo(self, include):
         knodes = OrderedDict()
         
-        # SPLIT BY MODEL TO ACCOMMODATE TRAINED PARAMETER BOUNDS BY MODEL
-        # AF TODO: The knoweds lower, upper parameters should be fed by the 'model_config' dictionary (right now just mirrored)
-        # model_config[self.model]['param_bounds'][0][model_config[self.model]['params'].index(tmp_param)]
-        # model_config[self.model]['param_bounds'][1][model_config[self.model]['params'].index(tmp_param)]
-
+        # Parameter bounds might be different depending on whether we use the MLP or the CNN
         if self.network_type == 'mlp':
             param_bnd_str = 'param_bounds'
         elif self.network_type == 'cnn':
@@ -165,13 +161,13 @@ class HDDM(HDDMBase):
         print('printing include: ')
         print(include)
 
-
         if 'p_outlier' in include:
             knodes.update(self._create_family_invlogit('p_outlier',
                                                         value = 0.2,
                                                         g_tau = 10**-2,
                                                         std_std = 0.5
                                                         ))
+
         if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf2':
             if 'a' in include:
                 tmp_param = 'a'
@@ -257,7 +253,6 @@ class HDDM(HDDMBase):
                                                            upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                            value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
                                                            )) # should have lower = 0.1, upper = 0.9
-            print(knodes.keys())
 
         
         if self.model == 'ddm_sdv' or self.model == 'ddm_sdv_analytic':

@@ -11,13 +11,15 @@ from scipy.stats import truncnorm
 from hddm.simulators.basic_simulator import *
 
 # Helper
-def hddm_preprocess(simulator_data = None, subj_id = 'none'):
+def _hddm_preprocess(simulator_data = None, subj_id = 'none'):
     
     # Define dataframe if simulator output is normal (comes out as list tuple [rts, choices, metadata])
     if len(simulator_data) == 3:
         df = pd.DataFrame(simulator_data[0].astype(np.double), columns = ['rt'])
         df['response'] = simulator_data[1].astype(int)
     # Define dataframe if simulator output is binned pointwise (comes out as tuple [np.array, metadata])
+    
+    # I think this part is never called !
     if len(simulator_data) == 2:
         df = pd.DataFrame(simulator_data[0][:, 0], columns = ['rt'])
         df['response'] = simulator_data[0][:, 1].astype(int)
@@ -28,7 +30,7 @@ def hddm_preprocess(simulator_data = None, subj_id = 'none'):
     return df
 
 
-def str_to_num(string = '', n_digits = 3):
+def _str_to_num(string = '', n_digits = 3):
     new_str = ''
     leading = 1
     for digit in range(n_digits):
@@ -39,7 +41,7 @@ def str_to_num(string = '', n_digits = 3):
             leading = 0
     return int(new_str)
 
-def num_to_str(num = 0, n_digits = 3):
+def _num_to_str(num = 0, n_digits = 3):
     new_str = ''
     for i in range(n_digits - 1, -1, -1):
         if num < np.power(10, i):
@@ -48,7 +50,7 @@ def num_to_str(num = 0, n_digits = 3):
         new_str += str(num)
     return new_str
 
-def pad_subj_id(in_str):
+def _pad_subj_id(in_str):
     # Make subj ids have three digits by prepending 0s if necessary
     stridx = in_str.find('.') # get index of 'subj.' substring
     subj_idx_len = len(in_str[(stridx + len('.')):]) # check how many letters remain after 'subj.' is enocuntered
@@ -71,6 +73,30 @@ def simulator_single_subject(parameters = [0, 0, 0],
                              max_t = 20,
                              bin_dim = None,
                              bin_pointwise = False):
+    """Generate a hddm-ready dataset from a single set of parameters
+
+    :Arguments:
+        parameters: list or numpy array
+            Model parameters with which to simulate.
+        model: str <default='angle'>
+            String that specifies the model to be simulated. 
+            Current options include, 'angle', 'ornstein', 'levy', 'weibull', 'full_ddm'
+        n_samples: int <default=1000>
+            Number of samples to simulate.
+        delta_t: float <default=0.001>
+            Size fo timesteps in simulator (conceptually measured in seconds)
+        max_t: float <default=20>
+            Maximum reaction the simulator can reach
+        bin_dim: int <default=None>
+            If simulator output should be binned, this specifies the number of bins to use
+        bin_pointwise: bool <default=False>
+            Determines whether to bin simulator output pointwise. Pointwise here is in contrast to producing binned output
+            in the form of a histogram. Binning pointwise gives each trial's RT and index which is the respective bin-number. 
+            This is expected when you are using the 'cnn' network to fit the dataset later. If pointwise is not chosen,
+            then the takes the form of a histogram, with bin-wise frequencies.
+
+    Return: panda.DataFrame holding a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
+    """
     
     x = simulator(theta = parameters,
                   model = model,
@@ -80,17 +106,51 @@ def simulator_single_subject(parameters = [0, 0, 0],
                   bin_dim = bin_dim,
                   bin_pointwise = bin_pointwise)
     
-    return hddm_preprocess(x)
+    return _hddm_preprocess(x)
 
 # TD: DIDN'T GO OVER THIS ONE YET !
 def simulator_stimcoding(model = 'angle',
                          split_by = 'v',
                          decision_criterion = 0.0,
                          n_samples_by_condition = 1000,
+                         delta_t = 0.001,
                          prespecified_params = {},
                          bin_pointwise = True,
                          bin_dim = None,
                          max_t = 20.0):
+
+    """Generate a dataset as expected by Hddmstimcoding. Essentially it is a specific way to parameterize two condition data.
+
+    :Arguments:
+        parameters: list or numpy array
+            Model parameters with which to simulate.
+        model: str <default='angle'>
+            String that specifies the model to be simulated. 
+            Current options include, 'angle', 'ornstein', 'levy', 'weibull', 'full_ddm'
+        split_by: str <default='v'>
+            You can split by 'v' or 'z'. If splitting by 'v' one condition's v_0 = decision_criterion + 'v', the other 
+            condition's v_1 = decision_criterion - 'v'.
+            Respectively for 'z', 'z_0' = 'z' and 'z_1' = 1 - 'z'.
+        decision_criterion: float <default=0.0>
+            Parameter that can be treated as the 'bias part' of the slope, in case we split_by 'v'.
+        n_samples_by_condition: int <default=1000>
+            Number of samples to simulate per condition (here 2 condition by design).
+        delta_t: float <default=0.001>
+            Size fo timesteps in simulator (conceptually measured in seconds)
+        prespecified_params: dict <default = {}>
+            A dictionary with parameter names keys. Values are list of either length 1, or length equal to the number of conditions (here 2).
+        max_t: float <default=20>
+            Maximum reaction the simulator can reach
+        bin_dim: int <default=None>
+            If simulator output should be binned, this specifies the number of bins to use
+        bin_pointwise: bool <default=False>
+            Determines whether to bin simulator output pointwise. Pointwise here is in contrast to producing binned output
+            in the form of a histogram. Binning pointwise gives each trial's RT and index which is the respective bin-number. 
+            This is expected when you are using the 'cnn' network to fit the dataset later. If pointwise is not chosen,
+            then the takes the form of a histogram, with bin-wise frequencies.
+
+    Return: panda.DataFrame holding a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
+    """
     
     param_base = np.tile(np.random.uniform(low = model_config[model]['param_bounds'][0],
                                            high = model_config[model]['param_bounds'][1], 
@@ -99,7 +159,7 @@ def simulator_stimcoding(model = 'angle',
 
     # Fill in prespecified parameters if supplied
     if prespecified_params is not None:
-        if type(prespecified_paramas) == dict:
+        if type(prespecified_params) == dict:
             for param in prespecified_params:
                 id_tmp = model_config[model]['params'].index(param)
                 param_base[:, id_tmp] = prespecified_params[param]
@@ -127,8 +187,7 @@ def simulator_stimcoding(model = 'angle',
                 param_base[i, id_tmp] = decision_criterion + param_base[i, id_tmp]
                 gt['v'] = param_base[i, id_tmp]
                 gt['decision_criterion'] = decision_criterion
-
-            
+   
         if i == 1:
             
             if 'v' in split_by:
@@ -149,7 +208,7 @@ def simulator_stimcoding(model = 'angle',
                             bin_pointwise = bin_pointwise,
                             max_t = max_t)
 
-        dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i + 1))
+        dataframes.append(_hddm_preprocess(simulator_data = sim_out, subj_id = i + 1))
     
     data_out = pd.concat(dataframes)
     data_out = data_out.rename(columns = {'subj_idx': "stim"})
@@ -158,13 +217,47 @@ def simulator_stimcoding(model = 'angle',
 
 def simulator_condition_effects(n_conditions = 4,
                                 n_samples_by_condition = 1000,
-                                condition_effect_on_param = [0],
+                                condition_effect_on_param = None,
                                 prespecified_params = None,
                                 model = 'angle',
                                 bin_dim = None,
                                 bin_pointwise = False,
                                 max_t = 20.0,
+                                delta_t = delta_t,
                                 ):
+
+   """Generate a dataset with multiple conditions.
+
+    :Arguments:
+        n_conditions: int <default=4>
+
+
+        parameters: list or numpy array
+            Model parameters with which to simulate.
+        model: str <default='angle'>
+            String that specifies the model to be simulated. 
+            Current options include, 'angle', 'ornstein', 'levy', 'weibull', 'full_ddm'
+        n_samples_by_condition: int <default=1000>
+            Number of samples to simulate per condition (here 2 condition by design).
+        condition_effect_on_param: list of strings <default=None>
+            List containing the parameters which will be affected by the condition.
+        delta_t: float <default=0.001>
+            Size fo timesteps in simulator (conceptually measured in seconds)
+        prespecified_params: dict <default = {}>
+            A dictionary with parameter names keys. Values are list of either length 1, or length equal to the number of conditions.
+        max_t: float <default=20>
+            Maximum reaction the simulator can reach
+        bin_dim: int <default=None>
+            If simulator output should be binned, this specifies the number of bins to use
+        bin_pointwise: bool <default=False>
+            Determines whether to bin simulator output pointwise. Pointwise here is in contrast to producing binned output
+            in the form of a histogram. Binning pointwise gives each trial's RT and index which is the respective bin-number. 
+            This is expected when you are using the 'cnn' network to fit the dataset later. If pointwise is not chosen,
+            then the takes the form of a histogram, with bin-wise frequencies.
+
+    Returns: 
+        panda.DataFrame: Holds a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
+    """
 
     # Get list of keys in prespecified_params and return if it is not a dict when it is in fact not None
     if prespecified_params is not None:
@@ -230,11 +323,11 @@ def simulator_condition_effects(n_conditions = 4,
                             bin_pointwise = bin_pointwise,
                             max_t = max_t)
         
-        dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i))
+        dataframes.append(_hddm_preprocess(simulator_data = sim_out, subj_id = i))
     
     data_out = pd.concat(dataframes)
     
-    # Change 'subj_idx' column name to 'condition' ('subj_idx' is assigned automatically by hddm_preprocess() function)
+    # Change 'subj_idx' column name to 'condition' ('subj_idx' is assigned automatically by _hddm_preprocess() function)
     data_out = data_out.rename(columns = {'subj_idx': "condition"})
     data_out['subj_idx'] = 0
     data_out.reset_index(drop = True, inplace = True)
@@ -255,8 +348,46 @@ def simulator_covariate(dependent_params = ['v'],
                         subj_id = 'none',
                         bin_dim = None, 
                         bin_pointwise = True,
-                        max_t = 20.0):
-    
+                        max_t = 20.0,
+                        delta_t = 0.001):
+
+   """Generate a dataset which includes covariates. Some parameters are now a function (regression) covariates.
+
+    :Arguments:
+        dependent_params: list of strings <default=['v']>
+            Parameters which will be treated as a deterministic function of a covariate
+        prespecified_params: list or numpy array
+            A list or numpy array of parameters to prespecify. These parameters are not functions of covariates.
+        model: str <default='angle'>
+            String that specifies the model to be simulated. 
+            Current options include, 'angle', 'ornstein', 'levy', 'weibull', 'full_ddm'
+        betas: dict <default={'v': 0.1}>
+            Ground truth regression betas for the parameters which are functions of covariates.
+        covariates_magnitudes: dict <default={'v': 1.0}>
+            A dict which holds magnitudes of the covariate vectors (value), by for each parameters (key).
+        n_samples_by_condition: int <default=1000>
+            Number of samples to simulate per condition (here 2 condition by design).
+        condition_effect_on_param: list of strings <default=None>
+            List containing the parameters which will be affected by the condition.
+        subj_id: str <default='none'>
+            Hddm expects a subject column in the dataset. This supplies a specific label if so desired.
+        delta_t: float <default=0.001>
+            Size fo timesteps in simulator (conceptually measured in seconds)
+        max_t: float <default=20>
+            Maximum reaction the simulator can reach
+        bin_dim: int <default=None>
+            If simulator output should be binned, this specifies the number of bins to use
+        bin_pointwise: bool <default=False>
+            Determines whether to bin simulator output pointwise. Pointwise here is in contrast to producing binned output
+            in the form of a histogram. Binning pointwise gives each trial's RT and index which is the respective bin-number. 
+            This is expected when you are using the 'cnn' network to fit the dataset later. If pointwise is not chosen,
+            then the takes the form of a histogram, with bin-wise frequencies.
+
+    Returns: 
+        (panda.DataFrame, dict): The Dataframe holds a 'reaction time' column, a 'response' column and a 'BOLD' column (for the covariate). The dictionary holds the groundtruth parameter (values) and parameter names (keys).
+                                 Ready to be fit with hddm.
+    """
+
     if betas == None:
         betas = {}
     if covariate_magnitudes == None:
@@ -316,7 +447,8 @@ def simulator_covariate(dependent_params = ['v'],
                             n_samples = 1,
                             bin_dim = bin_dim,
                             bin_pointwise = bin_pointwise,
-                            max_t = max_t)
+                            max_t = max_t,
+                            delta_t = delta_t)
         
         rts.append(sim_out[0])
         choices.append(sim_out[1])
@@ -325,7 +457,7 @@ def simulator_covariate(dependent_params = ['v'],
     choices = np.squeeze(np.stack(choices, axis = 0))
     
     # Preprocess 
-    data = hddm_preprocess([rts, choices], subj_id)
+    data = _hddm_preprocess([rts, choices], subj_id)
     
     # Call the covariate BOLD (unnecessary but in style)
     data['BOLD'] = tmp_covariate_by_sample
@@ -345,14 +477,47 @@ def simulator_covariate(dependent_params = ['v'],
     
     return (data, gt)
 
+# ALEX TD: Change n_samples_by_subject --> n_trials_per_subject (but apply consistently)
 def simulator_hierarchical(n_subjects = 5,
-                           n_samples_by_subject = 10,
+                           n_samples_by_subject = 500,
                            prespecified_param_means = {'v': 2},
                            prespecified_param_stds = {'v': 0.3},
                            model = 'angle',
                            bin_dim = None,
                            bin_pointwise = True,
-                           max_t = 20.0):
+                           max_t = 20.0,
+                           delta_t = 0.001):
+
+    """Generate a dataset which includes covariates. Some parameters are now a function (regression) covariates.
+
+    :Arguments:
+        n_subjects: int <default=5>
+            Number of subjects in the datasets
+        n_samples_by_subject: int <default=500>
+            Number of trials for each subject
+        prspecified_param_means: dict <default={'v': 2}>
+            Prespeficied group means 
+        prespecified_param_stds: dict <default={'v': 0.3}
+            Prespeficied group standard deviations
+        model: str <default='angle'>
+            String that specifies the model to be simulated. 
+            Current options include, 'angle', 'ornstein', 'levy', 'weibull', 'full_ddm'
+        delta_t: float <default=0.001>
+            Size fo timesteps in simulator (conceptually measured in seconds)
+        max_t: float <default=20>
+            Maximum reaction the simulator can reach
+        bin_dim: int <default=None>
+            If simulator output should be binned, this specifies the number of bins to use
+        bin_pointwise: bool <default=False>
+            Determines whether to bin simulator output pointwise. Pointwise here is in contrast to producing binned output
+            in the form of a histogram. Binning pointwise gives each trial's RT and index which is the respective bin-number. 
+            This is expected when you are using the 'cnn' network to fit the dataset later. If pointwise is not chosen,
+            then the takes the form of a histogram, with bin-wise frequencies.
+
+    Returns: 
+        (panda.DataFrame, dict, np.array): The Dataframe holds a 'reaction time' column, a 'response' column and a 'BOLD' column (for the covariate). The dictionary holds the groundtruth parameter (values) and parameter names (keys).
+                                           Ready to be fit with hddm.
+    """
 
     param_ranges_half = (np.array(model_config[model]['param_bounds'][1]) - np.array(model_config[model]['param_bounds'][0])) / 2
     # Fill in some global parameter vectors
@@ -389,7 +554,7 @@ def simulator_hierarchical(n_subjects = 5,
     
     # For each subject get subject level parameters by sampling from a truncated gaussian as speficied by the global parameters above
     for i in range(n_subjects):
-        subj_id = num_to_str(i)
+        subj_id = _num_to_str(i)
         
         # Get subject parameters
         a = (model_config[model]['param_bounds'][0] - global_means[0, :]) / global_stds[0, :]
@@ -402,9 +567,10 @@ def simulator_hierarchical(n_subjects = 5,
                             n_samples = n_samples_by_subject,
                             bin_dim = bin_dim,
                             bin_pointwise = bin_pointwise,
-                            max_t = max_t)
+                            max_t = max_t,
+                            delta_t = delta_t)
         
-        dataframes.append(hddm_preprocess(simulator_data = sim_out, 
+        dataframes.append(_hddm_preprocess(simulator_data = sim_out, 
                                           subj_id = subj_id))
         
         for param in model_config[model]['params']:
