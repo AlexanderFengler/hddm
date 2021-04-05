@@ -1,22 +1,9 @@
-
-# from wfpt import wiener_like_nn_weibull
-# from wfpt import wiener_like_nn_angle 
-# from wfpt import wiener_like_nn_ddm
-# from wfpt import wiener_like_nn_ddm_analytic
-# from wfpt import wiener_like_nn_levy
-# from wfpt import wiener_like_nn_ornstein
-# from wfpt import wiener_like_nn_ddm_sdv
-# from wfpt import wiener_like_nn_ddm_sdv_analytic
-# from wfpt import wiener_like_nn_full_ddm
-
 import numpy as np
 import hddm
 from functools import partial
 from kabuki.utils import stochastic_from_dist
 from hddm.simulators import *
 import data_simulators
-
-#import wfpt
 
 # Defining the likelihood functions
 def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):

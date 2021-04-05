@@ -19,9 +19,102 @@ from hddm.cnn.wrapper import load_cnn
 
 
 class HDDMnn(HDDM):
-    """ HDDM model class that uses neural net likelihoods for
-    WEIBULL, ANGLE,  ORNSTEIN, LEVY models.
+    """ HDDM model class that uses neural network based likelihoods to include a variety of other models.
+
+    :Arguments:
+        data : pandas.DataFrame
+            Input data with a row for each trial.
+            Must contain the following columns:
+              * 'rt': Reaction time of trial in seconds.
+              * 'response': Binary response (e.g. 0->error, 1->correct)
+              * 'subj_idx': A unique ID (int) of each subject.
+              * Other user-defined columns that can be used in depends_on
+                keyword.
+
+    :Optional:
+
+        model: str <default='ddm>
+            String that determines which model you would like to fit your data to.
+            Currently available models are: 'ddm', 'full_ddm', 'angle', 'weibull', 'ornstein', 'levy'
+        
+        network_type: str <default='mlp>
+            String that defines which kind of network to use for the likelihoods. There are currently two 
+            options: 'mlp', 'cnn'. CNNs should be treated as experimental at this point.
+
+        nbin: int <default=512>
+            Relevant only if network type was chosen to be 'cnn'. CNNs can be trained on coarser or
+            finer binnings of RT space. At this moment only networks with 512 bins are available.
+
+        include: list <default=None>
+            A list with parameters we wish to include in the fitting procedure. Generally, per default included
+            in fitting are the drift parameter 'v', the boundary separation parameter 'a' and the non-decision-time 't'. 
+            Which parameters you can include depends on the model you specified under the model parameters.
+
+        informative : bool <default=True>
+            Whether to use informative priors (True) or vague priors
+            (False).  Informative priors are not yet implemented for neural network based 
+            models.
+
+        is_group_model : bool
+            If True, this results in a hierarchical
+            model with separate parameter distributions for each
+            subject. The subject parameter distributions are
+            themselves distributed according to a group parameter
+            distribution.
+
+        depends_on : dict
+            Specifies which parameter depends on data
+            of a column in data. For each unique element in that
+            column, a separate set of parameter distributions will be
+            created and applied. Multiple columns can be specified in
+            a sequential container (e.g. list)
+
+            :Example:
+
+                >>> hddm.HDDM(data, depends_on={'v': 'difficulty'})
+
+                Separate drift-rate parameters will be estimated
+                for each difficulty. Requires 'data' to have a
+                column difficulty.
+
+        bias : bool
+            Whether to allow a bias to be estimated. This
+            is normally used when the responses represent
+            left/right and subjects could develop a bias towards
+            responding right. This is normally never done,
+            however, when the 'response' column codes
+            correct/error.
+
+        p_outlier : double (default=0)
+            The probability of outliers in the data. if p_outlier is passed in the
+            'include' argument, then it is estimated from the data and the value passed
+            using the p_outlier argument is ignored.
+
+        default_intervars : dict (default = {'sz': 0, 'st': 0, 'sv': 0})
+            Fix intertrial variabilities to a certain value. Note that this will only
+            have effect for variables not estimated from the data. This is relevant only when fitting the
+            Full-DDM model, and not when fitting e.g. the weibull, angle, ornstein or levy models.
+
+        plot_var : bool
+             Plot group variability parameters when calling pymc.Matplot.plot()
+             (i.e. variance of Normal distribution.)
+
+        trace_subjs : bool
+             Save trace for subjs (needed for many
+             statistics so probably a good idea.)
+
+        std_depends : bool (default=False)
+             Should the depends_on keyword affect the group std node.
+             If True it means that both, group mean and std will be split
+             by condition.
+
+    :Example:
+        >>> data, params = hddm.generate.gen_rand_data() # gen data
+        >>> model = hddm.HDDMnn(data, model = 'angle', network_type = 'mlp) # create object
+        >>> mcmc.sample(5000, burn=20) # Sample from posterior
+
     """
+
     def __init__(self, *args, **kwargs):
         kwargs['nn'] = True
         self.network_type = kwargs.pop('network_type', 'mlp')
@@ -40,19 +133,17 @@ class HDDMnn(HDDM):
         if self.network_type == 'mlp':
             self.network = load_mlp(model = self.model)
             network_dict = {'network': self.network}
-            #likelihood_ = hddm.likelihoods_mlp.make_mlp_likelihood(model = self.model)
             self.wfpt_nn = hddm.likelihoods_mlp.make_mlp_likelihood_complete(model = self.model, **network_dict)
 
         if self.network_type == 'cnn':
             self.network = load_cnn(model = self.model, nbin=self.nbin)
             network_dict = {'network': self.network}
             self.wfpt_nn = hddm.likelihoods_cnn.make_cnn_likelihood(model = self.model, pdf_multiplier = self.cnn_pdf_multiplier, **network_dict)
-            #likelihood_ = hddm.likelihoods_cnn.make_cnn_likelihood(model = self.model)
-            #partial(wrapper, specific_forward_pass)
 
         # Make model specific likelihood
         # self.wfpt_nn = stochastic_from_dist('Wienernn' + '_' + self.model,
         #                                    partial(likelihood_, **network_dict))
+        
         # Initialize super class
         super(HDDMnn, self).__init__(*args, **kwargs)
         print(self.p_outlier)
@@ -92,426 +183,3 @@ class HDDMnn(HDDM):
         d['wfpt_nn'] = stochastic_from_dist('Wienernn' + '_' + d['model'],
                                             partial(likelihood_, **network_dict))
         super(HDDMnn, self).__setstate__(d)
-        
-    # def __setstate__(self, d):
-    #     d['wfpt_reg_class'] = deepcopy(wfpt_reg_like)
-    #     print("WARNING: Custom link functions will not be loaded.")
-    #     for model in d['model_descrs']:
-    #         model['link_func'] = lambda x: x
-    #     super(HDDMRegressor, self).__setstate__(d)
-
-
-
-    # def _create_stochastic_knodes(self, include):
-    #     knodes = OrderedDict()
-        
-    #     # SPLIT BY MODEL TO ACCOMMODATE TRAINED PARAMETER BOUNDS BY MODEL
-
-    #     # PARAMETERS COMMON TO ALL MODELS
-    #     if 'p_outlier' in include:
-    #         knodes.update(self._create_family_invlogit('p_outlier',
-    #                                                     value = 0.2,
-    #                                                     g_tau = 10**-2,
-    #                                                     std_std = 0.5
-    #                                                     ))
-
-    #     if self.model == 'weibull' or self.model == 'weibull_cdf':
-    #         if 'a' in include:
-    #             knodes.update(self._create_family_trunc_normal('a',
-    #                                                            lower = 0.3,
-    #                                                            upper = 2.5,
-    #                                                            value = 1,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'v' in include:
-    #             knodes.update(self._create_family_trunc_normal('v', 
-    #                                                            lower = - 2.5,
-    #                                                            upper = 2.5,
-    #                                                            value = 0,
-    #                                                            std_upper = 1.5
-    #                                                            ))
-    #         if 't' in include:
-    #             knodes.update(self._create_family_trunc_normal('t', 
-    #                                                            lower = 1e-3,
-    #                                                            upper = 2, 
-    #                                                            value = .01,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'z' in include:
-    #             knodes.update(self._create_family_invlogit('z',
-    #                                                        value = .5,
-    #                                                        g_tau = 10**-2,
-    #                                                        std_std = 0.5
-    #                                                        )) # should have lower = 0.2, upper = 0.8
-    #         if 'alpha' in include:
-    #             knodes.update(self._create_family_trunc_normal('alpha',
-    #                                                            lower = 0.31, 
-    #                                                            upper = 4.99, 
-    #                                                            value = 2.34,
-    #                                                            std_upper = 2
-    #                                                            ))
-    #         if 'beta' in include:
-    #             knodes.update(self._create_family_trunc_normal('beta', 
-    #                                                            lower = 0.31, 
-    #                                                            upper = 6.99, 
-    #                                                            value = 3.34,
-    #                                                            std_upper = 2
-    #                                                            ))
-
-    #     if self.model == 'weibull_cdf_concave':
-    #         if 'a' in include:
-    #             knodes.update(self._create_family_trunc_normal('a',
-    #                                                            lower = 0.3,
-    #                                                            upper = 2.5,
-    #                                                            value = 1,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'v' in include:
-    #             knodes.update(self._create_family_trunc_normal('v', 
-    #                                                            lower = - 2.5,
-    #                                                            upper = 2.5,
-    #                                                            value = 0,
-    #                                                            std_upper = 1.5
-    #                                                            ))
-    #         if 't' in include:
-    #             knodes.update(self._create_family_trunc_normal('t', 
-    #                                                            lower = 1e-3,
-    #                                                            upper = 2, 
-    #                                                            value = .01,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'z' in include:
-    #             knodes.update(self._create_family_invlogit('z',
-    #                                                        value = .5,
-    #                                                        g_tau = 10**-2,
-    #                                                        std_std = 0.5
-    #                                                        )) # should have lower = 0.2, upper = 0.8
-    #         if 'alpha' in include:
-    #             knodes.update(self._create_family_trunc_normal('alpha',
-    #                                                            lower = 1.00, # this guarantees initial concavity of the likelihood
-    #                                                            upper = 4.99, 
-    #                                                            value = 2.34,
-    #                                                            std_upper = 2
-    #                                                            ))
-    #         if 'beta' in include:
-    #             knodes.update(self._create_family_trunc_normal('beta', 
-    #                                                            lower = 0.31, 
-    #                                                            upper = 6.99, 
-    #                                                            value = 3.34,
-    #                                                            std_upper = 2
-    #                                                            ))
-
-    #     if self.model == 'ddm' or self.model == 'ddm_analytic':
-    #         if 'a' in include:
-    #             knodes.update(self._create_family_trunc_normal('a',
-    #                                                            lower = 0.3,
-    #                                                            upper = 2.5,
-    #                                                            value = 1.4,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'v' in include:
-    #             knodes.update(self._create_family_trunc_normal('v', 
-    #                                                            lower = - 3.0,
-    #                                                            upper = 3.0,
-    #                                                            value = 0,
-    #                                                            std_upper = 1.5
-    #                                                            ))
-    #         if 't' in include:
-    #             knodes.update(self._create_family_trunc_normal('t', 
-    #                                                            lower = 1e-3,
-    #                                                            upper = 2, 
-    #                                                            value = .01,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'z' in include:
-    #             knodes.update(self._create_family_invlogit('z',
-    #                                                        value = .5,
-    #                                                        g_tau = 10**-2,
-    #                                                        std_std = 0.5
-    #                                                        )) # should have lower = 0.1, upper = 0.9
-
-    #         print(knodes.keys())
-
-        
-    #     if self.model == 'ddm_sdv' or self.model == 'ddm_sdv_analytic':
-    #         if 'a' in include:
-    #             knodes.update(self._create_family_trunc_normal('a',
-    #                                                            lower = 0.3,
-    #                                                            upper = 2.5,
-    #                                                            value = 1.4,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'v' in include:
-    #             knodes.update(self._create_family_trunc_normal('v', 
-    #                                                            lower = - 3.0,
-    #                                                            upper = 3.0,
-    #                                                            value = 0,
-    #                                                            std_upper = 1.5
-    #                                                            ))
-    #         if 't' in include:
-    #             knodes.update(self._create_family_trunc_normal('t', 
-    #                                                            lower = 1e-3,
-    #                                                            upper = 2, 
-    #                                                            value = .01,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'z' in include:
-    #             knodes.update(self._create_family_invlogit('z',
-    #                                                        value = .5,
-    #                                                        g_tau = 10**-2,
-    #                                                        std_std = 0.5
-    #                                                        )) # should have lower = 0.1, upper = 0.9
-    #         if 'sv' in include:
-    #             knodes.update(self._create_family_trunc_normal('sv', 
-    #                                                            lower = 1e-3,
-    #                                                            upper = 2.5, 
-    #                                                            value = 1,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-
-    #     if self.model == 'full_ddm' or self.model == 'full_ddm2':
-    #         if 'a' in include:
-    #             knodes.update(self._create_family_trunc_normal('a',
-    #                                                            lower = 0.3,
-    #                                                            upper = 2.5,
-    #                                                            value = 1.4,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'v' in include:
-    #             knodes.update(self._create_family_trunc_normal('v', 
-    #                                                            lower = - 3.0,
-    #                                                            upper = 3.0,
-    #                                                            value = 0,
-    #                                                            std_upper = 1.5
-    #                                                            ))
-    #         if 't' in include:
-    #             knodes.update(self._create_family_trunc_normal('t', 
-    #                                                            lower = 0.25,
-    #                                                            upper = 2.25, 
-    #                                                            value = .5,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'z' in include:
-    #             knodes.update(self._create_family_invlogit('z',
-    #                                                        value = .5,
-    #                                                        g_tau = 10**-2,
-    #                                                        std_std = 0.5
-    #                                                        )) # should have lower = 0.1, upper = 0.9
-
-    #         if 'sz' in include:
-    #             knodes.update(self._create_family_trunc_normal('sz', 
-    #                                                            lower = 1e-3,
-    #                                                            upper = 0.2, 
-    #                                                            value = 0.1,
-    #                                                            std_upper = 0.1 # added AF
-    #                                                            ))
-
-    #         if 'sv' in include:
-    #             knodes.update(self._create_family_trunc_normal('sv', 
-    #                                                            lower = 1e-3,
-    #                                                            upper = 2.0, 
-    #                                                            value = 1.0,
-    #                                                            std_upper = 0.5 # added AF
-    #                                                            ))
-
-    #         if 'st' in include:
-    #             knodes.update(self._create_family_trunc_normal('st', 
-    #                                                            lower = 1e-3,
-    #                                                            upper = 0.25, 
-    #                                                            value = 0.125,
-    #                                                            std_upper = 0.1 # added AF
-    #                                                            ))
-
-    #     if self.model == 'angle':
-    #         if 'a' in include:
-    #             knodes.update(self._create_family_trunc_normal('a',
-    #                                                            lower = 0.3,
-    #                                                            upper = 2.0,
-    #                                                            value = 1,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'v' in include:
-    #             knodes.update(self._create_family_trunc_normal('v', 
-    #                                                            lower = - 3.0,
-    #                                                            upper = 3.0,
-    #                                                            value = 0,
-    #                                                            std_upper = 1.5
-    #                                                            ))
-    #         if 't' in include:
-    #             knodes.update(self._create_family_trunc_normal('t', 
-    #                                                            lower = 1e-3,
-    #                                                            upper = 2, 
-    #                                                            value = .01,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'z' in include:
-    #             knodes.update(self._create_family_invlogit('z',
-    #                                                        value = .5,
-    #                                                        g_tau = 10**-2,
-    #                                                        std_std = 0.5
-    #                                                        ))
-    #         if 'theta' in include:
-    #             knodes.update(self._create_family_trunc_normal('theta',
-    #                                                            lower = -0.1, 
-    #                                                            upper = 1.45, 
-    #                                                            value = 0.5,
-    #                                                            std_upper = 1
-    #                                                            )) # should have lower = 0.2, upper = 0.8
-
-    #     if self.model == 'ornstein':
-    #         if 'a' in include:
-    #             knodes.update(self._create_family_trunc_normal('a',
-    #                                                            lower = 0.3,
-    #                                                            upper = 2.0,
-    #                                                            value = 1,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'v' in include:
-    #             knodes.update(self._create_family_trunc_normal('v', 
-    #                                                            lower = - 2.0,
-    #                                                            upper = 2.0,
-    #                                                            value = 0,
-    #                                                            std_upper = 1.5
-    #                                                            ))
-    #         if 't' in include:
-    #             knodes.update(self._create_family_trunc_normal('t', 
-    #                                                            lower = 1e-3,
-    #                                                            upper = 2, 
-    #                                                            value = .01,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'z' in include:
-    #             knodes.update(self._create_family_invlogit('z',
-    #                                                        value = .5,
-    #                                                        g_tau = 10**-2,
-    #                                                        std_std = 0.5
-    #                                                        ))
-    #         if 'g' in include:
-    #             knodes.update(self._create_family_trunc_normal('g',
-    #                                                            lower = -1.0, 
-    #                                                            upper = 1.0, 
-    #                                                            value = 0.5,
-    #                                                            std_upper = 1
-    #                                                            )) # should have lower = 0.2, upper = 0.8
-        
-    #     if self.model == 'levy':
-    #         if 'a' in include:
-    #             knodes.update(self._create_family_trunc_normal('a',
-    #                                                            lower = 0.3,
-    #                                                            upper = 2.0,
-    #                                                            value = 1,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'v' in include:
-    #             knodes.update(self._create_family_trunc_normal('v', 
-    #                                                            lower = - 3.0,
-    #                                                            upper = 3.0,
-    #                                                            value = 0,
-    #                                                            std_upper = 1.5
-    #                                                            ))
-    #         if 't' in include:
-    #             knodes.update(self._create_family_trunc_normal('t', 
-    #                                                            lower = 1e-3,
-    #                                                            upper = 2, 
-    #                                                            value = .01,
-    #                                                            std_upper = 1 # added AF
-    #                                                            ))
-    #         if 'z' in include:
-    #             knodes.update(self._create_family_invlogit('z',
-    #                                                        value = .5,
-    #                                                        g_tau = 10**-2,
-    #                                                        std_std = 0.5
-    #                                                        ))
-    #         if 'alpha' in include:
-    #             knodes.update(self._create_family_trunc_normal('alpha',
-    #                                                            lower = 1.0, 
-    #                                                            upper = 2.0, 
-    #                                                            value = 1.5,
-    #                                                            std_upper = 1
-    #                                                            ))
-    #                                                            # should have lower = 0.1, upper = 0.9
-                      
-    #     print('knodes')
-    #     print(knodes)
-
-    #     return knodes
-
-    # def _create_wfpt_parents_dict(self, knodes):
-    #     wfpt_parents = OrderedDict()
-    #     wfpt_parents['a'] = knodes['a_bottom']
-    #     wfpt_parents['v'] = knodes['v_bottom']
-    #     wfpt_parents['t'] = knodes['t_bottom']
-    #     wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
-    #     wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
-    #     wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
-
-    #     # MODEL SPECIFIC PARAMETERS
-    #     if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
-    #         wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 3 
-    #         wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else 3
-        
-    #     if self.model == 'ornstein':
-    #         wfpt_parents['g'] = knodes['g_bottom'] if 'g' in self.include else 0
-        
-    #     if self.model == 'levy':
-    #         wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 2
-        
-    #     if self.model == 'angle':
-    #         wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else 0
-
-    #     if self.model == 'full_ddm' or self.model =='full_ddm2':
-    #         wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else 0 #self.default_intervars['sv']
-    #         wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else 0 #self.default_intervars['sz']
-    #         wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else 0 #self.default_intervars['st']
-
-    #     print('wfpt parents: ')
-    #     print(wfpt_parents)
-    #     return wfpt_parents
-
-
-
-    # def save(self, filename = None):
-    #     if filename is not None:
-    #         #del self.network
-    #         hickle.dump(self, filename, mode = 'w')
-
-# UNUSED -------------------------------------------------------------
-        
-# if self.model == 'ddm':
-#     # Previous
-#     #self.wfpt_nn = generate_wfpt_stochastic_class()
-#     if self.network_type == 'mlp':
-#         pass
-#         #self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', partial(wienernn_like_ddm, **network_dict))
-#     #likelihood_fun = wienernn_like_ddm
-#     print('Loaded MLP Likelihood for ', self.model, ' model!')
-        
-# if self.model == 'ddm_sdv':
-#     if self.network_type == 'mlp':
-#         self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv', partial(wienernn_like_ddm_sdv, **network_dict))
-
-# if self.model == 'ddm_analytic':
-#     if self.network_type == 'mlp':
-#         self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_analytic', partial(wienernn_like_ddm_analytic, **network_dict))
-
-# if self.model == 'ddm_sdv_analytic':
-#     if self.network_type == 'mlp':
-#         self.wfpt_nn = stochastic_from_dist('Wienernn_ddm_sdv_analytic', partial(wienernn_like_ddm_sdv_analytic, **network_dict))
-
-# if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
-#     if self.network_type == 'mlp':
-#         self.wfpt_nn = stochastic_from_dist('Wienernn_weibull', wienernn_like_weibull)
-
-# if self.model == 'angle':
-#     self.wfpt_nn = stochastic_from_dist('Wienernn_angle', wienernn_like_angle) 
-
-# if self.model == 'levy':
-#     self.wfpt_nn = stochastic_from_dist('Wienernn_levy', wienernn_like_levy) 
-
-# if self.model == 'ornstein':
-#     self.wfpt_nn = stochastic_from_dist('Wienernn_ornstein', wienernn_like_ornstein)
-
-# if self.model == 'full_ddm' or self.model == 'full_ddm2':
-#     self.wfpt_nn = stochastic_from_dist('Wienernn_full_ddm', wienernn_like_full_ddm)
-
-# ------------------------------------------------------------------------

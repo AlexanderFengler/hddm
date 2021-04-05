@@ -22,7 +22,7 @@ from functools import partial
 # from wfpt import wiener_like_nn_full_ddm
 
 class HDDMnnStimCoding(HDDM):
-    """HDDM model that can be used when stimulus coding and estimation
+    """HDDMnn model that can be used when stimulus coding and estimation
     of bias (i.e. displacement of starting point z) is required.
 
     In that case, the 'resp' column in your data should contain 0 and
@@ -31,7 +31,27 @@ class HDDMnnStimCoding(HDDM):
     have to provide another column (referred to as stim_col) which
     contains information about which the correct response was.
 
+    HDDMnnStimCoding distinguishes itself from the HDDMStimCoding class by allowing you
+    to specify a variety of generative models. Likelihoods are based on Neural Networks.
+
     :Arguments:
+        model: str <default='ddm>
+            String that determines which model you would like to fit your data to.
+            Currently available models are: 'ddm', 'full_ddm', 'angle', 'weibull', 'ornstein', 'levy'
+        
+        network_type: str <default='mlp>
+            String that defines which kind of network to use for the likelihoods. There are currently two 
+            options: 'mlp', 'cnn'. CNNs should be treated as experimental at this point.
+
+        nbin: int <default=512>
+            Relevant only if network type was chosen to be 'cnn'. CNNs can be trained on coarser or
+            finer binnings of RT space. At this moment only networks with 512 bins are available.
+
+        include: list <default=None>
+            A list with parameters we wish to include in the fitting procedure. Generally, per default included
+            in fitting are the drift parameter 'v', the boundary separation parameter 'a' and the non-decision-time 't'. 
+            Which parameters you can include depends on the model you specified under the model parameters.
+
         split_param : {'v', 'z'} <default='z'>
             There are two ways to model stimulus coding in the case where both stimuli
             have equal information (so that there can be no difference in drift):
