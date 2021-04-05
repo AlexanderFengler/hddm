@@ -15,6 +15,9 @@ def _hddm_preprocess(simulator_data = None, subj_id = 'none'):
     
     # Define dataframe if simulator output is normal (comes out as list tuple [rts, choices, metadata])
     if len(simulator_data) == 3:
+        print('Simulator data: ')
+        print(simulator_data[0])
+        print(simulator_data[0].shape)
         df = pd.DataFrame(simulator_data[0].astype(np.double), columns = ['rt'])
         df['response'] = simulator_data[1].astype(int)
     # Define dataframe if simulator output is binned pointwise (comes out as tuple [np.array, metadata])
