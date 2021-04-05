@@ -223,10 +223,10 @@ def simulator_condition_effects(n_conditions = 4,
                                 bin_dim = None,
                                 bin_pointwise = False,
                                 max_t = 20.0,
-                                delta_t = delta_t,
+                                delta_t = 0.001,
                                 ):
 
-   """Generate a dataset with multiple conditions.
+    """ Generate a dataset with multiple conditions.
 
     :Arguments:
         n_conditions: int <default=4>
@@ -321,7 +321,8 @@ def simulator_condition_effects(n_conditions = 4,
                             n_samples = n_samples_by_condition,
                             bin_dim = bin_dim,
                             bin_pointwise = bin_pointwise,
-                            max_t = max_t)
+                            max_t = max_t,
+                            delta_t = delta_t)
         
         dataframes.append(_hddm_preprocess(simulator_data = sim_out, subj_id = i))
     
