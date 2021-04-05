@@ -350,7 +350,8 @@ def simulator_covariate(dependent_params = ['v'],
                         bin_dim = None, 
                         bin_pointwise = True,
                         max_t = 20.0,
-                        delta_t = 0.001):
+                        delta_t = 0.001
+                        ):
 
    """Generate a dataset which includes covariates. Some parameters are now a function (regression) covariates.
 
