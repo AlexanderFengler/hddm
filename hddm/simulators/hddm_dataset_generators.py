@@ -455,6 +455,9 @@ def simulator_covariate(dependent_params = ['v'],
                         bin_pointwise = bin_pointwise,
                         max_t = max_t,
                         delta_t = delta_t)
+    
+    sim_out[0] = np.squeeze(sim_out[0], axis = 0)
+    sim_out[1] = np.squeeze(sim_out[1], axis = 0)
         
         #rts.append(sim_out[0])
         #choices.append(sim_out[1])
