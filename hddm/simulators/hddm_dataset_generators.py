@@ -456,8 +456,10 @@ def simulator_covariate(dependent_params = ['v'],
                         max_t = max_t,
                         delta_t = delta_t)
     
-    sim_out[0] = np.squeeze(sim_out[0], axis = 0)
-    sim_out[1] = np.squeeze(sim_out[1], axis = 0)
+    sim_out_copy = []
+    sim_out_copy.append(np.squeeze(sim_out[0], axis = 0))
+    sim_out_copy.append(np.squeeze(sim_out[1], axis = 0))
+    sim_out_copy.append(sim_out[2])
         
         #rts.append(sim_out[0])
         #choices.append(sim_out[1])
@@ -466,7 +468,7 @@ def simulator_covariate(dependent_params = ['v'],
     # choices = np.squeeze(np.stack(choices, axis = 0))
     
     # Preprocess 
-    data = _hddm_preprocess(sim_out, subj_id)
+    data = _hddm_preprocess(sim_out_copy, subj_id)
     # data = _hddm_preprocess([rts, choices], subj_id)
     
     # Call the covariate BOLD (unnecessary but in style)
