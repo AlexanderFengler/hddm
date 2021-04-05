@@ -350,10 +350,10 @@ def simulator_covariate(dependent_params = ['v'],
                         bin_dim = None, 
                         bin_pointwise = True,
                         max_t = 20.0,
-                        delta_t = 0.001
+                        delta_t = 0.001,
                         ):
 
-   """Generate a dataset which includes covariates. Some parameters are now a function (regression) covariates.
+    """ Generate a dataset which includes covariates. Some parameters are now a function (regression) covariates.
 
     :Arguments:
         dependent_params: list of strings <default=['v']>
@@ -388,6 +388,7 @@ def simulator_covariate(dependent_params = ['v'],
     Returns: 
         (panda.DataFrame, dict): The Dataframe holds a 'reaction time' column, a 'response' column and a 'BOLD' column (for the covariate). The dictionary holds the groundtruth parameter (values) and parameter names (keys).
                                  Ready to be fit with hddm.
+    
     """
 
     if betas == None:
