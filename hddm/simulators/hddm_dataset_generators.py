@@ -290,7 +290,7 @@ def simulator_condition_effects(n_conditions = 4,
             for i in range(n_conditions):
                 # Assign randomly
                 param_base[i, id_tmp] = np.random.uniform(low = model_config[model]['param_bounds'][0][id_tmp], 
-                                                        high = model_config[model]['param_bounds'][1][id_tmp])
+                                                          high = model_config[model]['param_bounds'][1][id_tmp])
                 
                 # But if we actually specified it for each condition
                 if prespecified_params is not None:
@@ -348,7 +348,7 @@ def simulator_covariate(dependent_params = ['v'],
                         prespecified_params = None,
                         subj_id = 'none',
                         bin_dim = None, 
-                        bin_pointwise = True,
+                        bin_pointwise = False,
                         max_t = 20.0,
                         delta_t = 0.001,
                         ):
@@ -418,7 +418,6 @@ def simulator_covariate(dependent_params = ['v'],
             id_tmp = model_config[model]['params'].index(param)
             param_base[:, id_tmp] = prespecified_params[param]
 
-    
     # TD: Be more clever about covariate magnitude (maybe supply?)
     # Parameters that have a
     for covariate in dependent_params:
@@ -439,28 +438,29 @@ def simulator_covariate(dependent_params = ['v'],
         else: 
             param_base[:, id_tmp] = param_base[:, id_tmp] + (0.1 * tmp_covariate_by_sample)
     
-    rts = []
-    choices = []
+    #rts = []
+    #choices = []
 
     # TD: IMPROVE THIS SIMULATOR SO THAT WE CAN PASS MATRICES OF PARAMETERS
     # WAY TOO SLOW RIGHT NOW
-    for i in range(n_samples):
-        sim_out = simulator(param_base[i, :],
-                            model = model,
-                            n_samples = 1,
-                            bin_dim = bin_dim,
-                            bin_pointwise = bin_pointwise,
-                            max_t = max_t,
-                            delta_t = delta_t)
+    #for i in range(n_samples):
+    sim_out = simulator(param_base, # param_base[i, :],
+                        model = model,
+                        n_samples = 1,
+                        bin_dim = bin_dim,
+                        bin_pointwise = bin_pointwise,
+                        max_t = max_t,
+                        delta_t = delta_t)
         
-        rts.append(sim_out[0])
-        choices.append(sim_out[1])
+        #rts.append(sim_out[0])
+        #choices.append(sim_out[1])
     
-    rts = np.squeeze(np.stack(rts, axis = 0))
-    choices = np.squeeze(np.stack(choices, axis = 0))
+    # rts = np.squeeze(np.stack(rts, axis = 0))
+    # choices = np.squeeze(np.stack(choices, axis = 0))
     
     # Preprocess 
-    data = _hddm_preprocess([rts, choices], subj_id)
+    data = _hddm_preprocess(sim_out, subj_id)
+    # data = _hddm_preprocess([rts, choices], subj_id)
     
     # Call the covariate BOLD (unnecessary but in style)
     data['BOLD'] = tmp_covariate_by_sample
