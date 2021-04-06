@@ -49,7 +49,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
         #print('self shape: ')
         #print(self.shape)
         sim_out = simulator(theta = theta, model = model, n_samples = self.shape[0], max_t = 20)
-        return hddm_preprocess(sim_out)
+        return _hddm_preprocess(sim_out)
 
 
     if model == 'ddm':
@@ -709,7 +709,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
             # sim_out_copy.append(np.squeeze(sim_out[0], axis = 0))
             # sim_out_copy.append(np.squeeze(sim_out[1], axis = 0))
             # sim_out_copy.append(sim_out[2])
-            return hddm_preprocess(sim_out)
+            return _hddm_preprocess(sim_out)
 
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ddm, **kwargs))
         stoch.random = random
