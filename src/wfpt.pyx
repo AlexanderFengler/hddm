@@ -137,7 +137,7 @@ def wiener_pdf_cnn_2(np.ndarray[long, ndim = 1] x,
     cdef np.ndarray[float, ndim = 1] log_p = np.zeros(size, dtype = np.float32)
     #cdef np.ndarray[float, ndim = 2] 
     pred = kwargs['network'](parameters)
-    #print(pred.shape)
+    print(pred.shape)
     #log_p = 0
     for i in range(size):
         if response[i] == 0:
