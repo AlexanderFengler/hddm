@@ -673,12 +673,12 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
         # Need to rewrite these random parts !
         def random(self):
             param_dict = deepcopy(self.parents.value)
-            print('param dict')
-            print(param_dict)
+            #print('param dict')
+            #print(param_dict)
             del param_dict['reg_outcomes']
             sampled_rts = self.value.copy()
-            print('sampled rts')
-            print(sampled_rts)
+            #print('sampled rts')
+            #print(sampled_rts)
 
             size = sampled_rts.shape[0]
             n_params = 4
@@ -687,8 +687,8 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
             cnt = 0
             for tmp_str in ['v', 'a', 'z', 't']:
                 if tmp_str in self.parents['reg_outcomes']:
-                    print('param dict values')
-                    print(param_dict[tmp_str].values[:, 0])
+                    #print('param dict values')
+                    #print(param_dict[tmp_str].values[:, 0])
                     param_data[:, cnt] = param_dict[tmp_str].values[:, 0]
                 else:
                     param_data[:, cnt] = param_dict[tmp_str]
