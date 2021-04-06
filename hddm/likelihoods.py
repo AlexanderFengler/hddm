@@ -84,9 +84,9 @@ def generate_wfpt_stochastic_class(wiener_params=None, sampling_method='cdf', cd
         #                                                     range_ = cdf_range,
         #                                                     structured = True,
         #                                                     **self.parents.value))
-        print('random out')
-        print(dir(out))
-        print(out)
+        #print('random out')
+        #print(dir(out))
+        #print(out)
         return out 
 
     #create pdf function
