@@ -655,7 +655,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
             data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
             cnt = 0
-            for tmp_str in model_config[model]['params']: #['v', 'a', 'z', 't']:
+            for tmp_str in ['v', 'a', 'z', 't']: # model_config[model]['params']:
 
                 if tmp_str in reg_outcomes:
                     data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
