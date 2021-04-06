@@ -680,17 +680,36 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
             print('sampled rts')
             print(sampled_rts)
 
-            for i in self.value.index:
-                #get current params
-                for p in self.parents['reg_outcomes']:
-                    param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
-                #sample
-                samples = hddm.generate.gen_rts(method=sampling_method,
-                                                size=1, dt=sampling_dt, **param_dict)
+            size = sampled_rts.shape[0]
+            n_params = 4
+            param_data = np.zeros((size, n_params), dtype = np.float32)
 
-                sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+            cnt = 0
+            for tmp_str in ['v', 'a', 'z', 't']:
+                if tmp_str in self.parents['reg_outcomes']:
+                    print('param dict values')
+                    print(param_dict[tmp_str].values[:, 0])
+                    param_data[:, cnt] = param_dict[tmp_str].values[:, 0]
+                else:
+                    param_data[:, cnt] = param_dict[tmp_str].values[:, 1]
+                cnt += 1
 
-            return sampled_rts
+            # for i in self.value.index:
+            #     #get current params
+            #     for p in self.parents['reg_outcomes']:
+            #         param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+            #     #sample
+            #     samples = hddm.generate.gen_rts(method=sampling_method,
+            #                                     size=1, dt=sampling_dt, **param_dict)
+
+            #     sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+            sim_out = simulator(theta = param_data, n_trials = size, model = model, n_samples = 1, max_t = 20)
+            # sim_out_copy = []
+            # sim_out_copy.append(np.squeeze(sim_out[0], axis = 0))
+            # sim_out_copy.append(np.squeeze(sim_out[1], axis = 0))
+            # sim_out_copy.append(sim_out[2])
+            return hddm_preprocess(sim_out)
 
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ddm, **kwargs))
         stoch.random = random

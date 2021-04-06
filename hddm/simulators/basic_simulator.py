@@ -538,8 +538,11 @@ def simulator(theta,
                                boundary_multiplicative = True,
                                boundary_params = {})
     
+    # Output compatibility
     if n_trials == 1:
         x = (np.squeeze(x[0], axis = 1), np.squeeze(x[1], axis = 1), x[2])
+    if n_trials > 1 and n_samples == 1:
+        x = (np.squeeze(x[0], axis = 0), np.squeeze(x[1], axis = 0), x[2])
 
     if bin_dim == 0 or bin_dim == None:
         return x
