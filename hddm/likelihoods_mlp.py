@@ -49,7 +49,7 @@ def make_mlp_likelihood_complete(model, **kwargs):
         #print('self shape: ')
         #print(self.shape)
         sim_out = simulator(theta = theta, model = model, n_samples = self.shape[0], max_t = 20)
-        return hddm_preprocess(sim_out)
+        return hddm_preprocess(sim_out, keep_negative_responses = True)
 
 
     if model == 'ddm':
