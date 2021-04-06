@@ -44,7 +44,7 @@ def bin_simulator_output_pointwise(out = [0, 0],
         2d array. The first columns collects bin-identifiers by trial, the second column lists the corresponding choices.
     """
     
-    # out_copy = deepcopy(out)
+    out_copy = deepcopy(out)
 
     # Generate bins
     if nbins == 0:
