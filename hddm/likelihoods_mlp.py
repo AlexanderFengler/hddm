@@ -691,7 +691,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                     print(param_dict[tmp_str].values[:, 0])
                     param_data[:, cnt] = param_dict[tmp_str].values[:, 0]
                 else:
-                    param_data[:, cnt] = param_dict[tmp_str].values[:, 1]
+                    param_data[:, cnt] = param_dict[tmp_str]
                 cnt += 1
 
             # for i in self.value.index:
