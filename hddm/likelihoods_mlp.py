@@ -709,7 +709,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
             # sim_out_copy.append(np.squeeze(sim_out[0], axis = 0))
             # sim_out_copy.append(np.squeeze(sim_out[1], axis = 0))
             # sim_out_copy.append(sim_out[2])
-            return hddm_preprocess(sim_out)
+            return hddm_preprocess(sim_out, keep_negative_responses = True)
 
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ddm, **kwargs))
         stoch.random = random

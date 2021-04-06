@@ -11,7 +11,7 @@ from scipy.stats import truncnorm
 from hddm.simulators.basic_simulator import *
 
 # Helper
-def hddm_preprocess(simulator_data = None, subj_id = 'none'):
+def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_responses = False):
     
     # Define dataframe if simulator output is normal (comes out as list tuple [rts, choices, metadata])
     if len(simulator_data) == 3:
@@ -28,7 +28,9 @@ def hddm_preprocess(simulator_data = None, subj_id = 'none'):
         df['response'] = simulator_data[0][:, 1].astype(int)
 
     #df['nn_response'] = df['response']
-    df.loc[df['response'] == -1.0, 'response'] = 0.0
+    if not keep_negative_responses:
+        df.loc[df['response'] == -1.0, 'response'] = 0.0
+    
     df['subj_idx'] = subj_id
     return df
 

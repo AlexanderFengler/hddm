@@ -75,10 +75,10 @@ def generate_wfpt_stochastic_class(wiener_params=None, sampling_method='cdf', cd
     #create random function
     def random(self):
         out = hddm.utils.flip_errors(hddm.generate.gen_rts(method = sampling_method,
-                                                            size = self.shape, dt = sampling_dt,
-                                                            range_ = cdf_range,
-                                                            structured = True,
-                                                            **self.parents.value))
+                                                           size = self.shape, dt = sampling_dt,
+                                                           range_ = cdf_range,
+                                                           structured = True,
+                                                           **self.parents.value))
         # return hddm.utils.flip_errors(hddm.generate.gen_rts(method = sampling_method,
         #                                                     size = self.shape, dt = sampling_dt,
         #                                                     range_ = cdf_range,
