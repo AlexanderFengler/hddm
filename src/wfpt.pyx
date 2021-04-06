@@ -163,8 +163,8 @@ def wiener_pdf_reg_cnn_2(np.ndarray[long, ndim = 1] x,
     cdef np.ndarray[float, ndim = 1] log_p = np.zeros(size, dtype = np.float32)
     cdef np.ndarray[float, ndim = 2] pred = kwargs['network'](parameters)
     #log_p = 0
-    print(pred.shape)
-    print(pred)
+    #print(pred.shape)
+    #print(pred)
     for i in range(size):
         if response[i] == 0:
             log_p[i] += np.log(pred[0, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
