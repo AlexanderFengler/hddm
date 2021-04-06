@@ -136,8 +136,35 @@ def wiener_pdf_cnn_2(np.ndarray[long, ndim = 1] x,
     cdef Py_ssize_t i
     cdef np.ndarray[float, ndim = 1] log_p = np.zeros(size, dtype = np.float32)
     cdef np.ndarray[float, ndim = 2] pred = kwargs['network'](parameters)
+    print(pred.shape)
     #log_p = 0
+    for i in range(size):
+        if response[i] == 0:
+            log_p[i] += np.log(pred[0, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
+        else: 
+            log_p[i] += np.log(pred[0, 2 * x[i] + 1] * (1 - p_outlier) + w_outlier * p_outlier)
     
+    if logp == 0:
+        log_p = np.exp(log_p)
+
+    # Call to network:
+    return log_p
+
+def wiener_pdf_reg_cnn_2(np.ndarray[long, ndim = 1] x, 
+                         np.ndarray[long, ndim = 1] response, 
+                         np.ndarray[float, ndim = 2] parameters,
+                         double p_outlier = 0, 
+                         double w_outlier = 0,
+                         bint logp = 0,
+                         **kwargs):
+
+    cdef Py_ssize_t size = x.shape[0]
+    cdef Py_ssize_t i
+    cdef np.ndarray[float, ndim = 1] log_p = np.zeros(size, dtype = np.float32)
+    cdef np.ndarray[float, ndim = 2] pred = kwargs['network'](parameters)
+    #log_p = 0
+    print(pred.shape)
+    print(pred)
     for i in range(size):
         if response[i] == 0:
             log_p[i] += np.log(pred[0, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
