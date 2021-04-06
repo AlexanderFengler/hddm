@@ -649,13 +649,13 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
             """Log-likelihood for the full DDM using the interpolation method"""
 
             params = {'v': v, 'a': a, 'z': z, 't': t}
-            n_params = int(4)
+            n_params = model_config[model]['n_params']
             size = int(value.shape[0])
-            data = np.zeros((size, 6), dtype = np.float32)
+            data = np.zeros((size, n_params + 2), dtype = np.float32)
             data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
 
             cnt = 0
-            for tmp_str in ['v', 'a', 'z', 't']:
+            for tmp_str in model_config[model]['params']: #['v', 'a', 'z', 't']:
 
                 if tmp_str in reg_outcomes:
                     data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
