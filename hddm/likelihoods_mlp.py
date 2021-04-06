@@ -681,11 +681,11 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
             #print(sampled_rts)
 
             size = sampled_rts.shape[0]
-            n_params = 4
+            n_params = model_config[model]['n_params']
             param_data = np.zeros((size, n_params), dtype = np.float32)
 
             cnt = 0
-            for tmp_str in ['v', 'a', 'z', 't']:
+            for tmp_str in model_config[model]['params']: #['v', 'a', 'z', 't']:
                 if tmp_str in self.parents['reg_outcomes']:
                     #print('param dict values')
                     #print(param_dict[tmp_str].values[:, 0])
