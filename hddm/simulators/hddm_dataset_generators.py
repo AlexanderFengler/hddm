@@ -11,7 +11,7 @@ from scipy.stats import truncnorm
 from hddm.simulators.basic_simulator import *
 
 # Helper
-def _hddm_preprocess(simulator_data = None, subj_id = 'none'):
+def hddm_preprocess(simulator_data = None, subj_id = 'none'):
     
     # Define dataframe if simulator output is normal (comes out as list tuple [rts, choices, metadata])
     if len(simulator_data) == 3:
@@ -109,7 +109,7 @@ def simulator_single_subject(parameters = [0, 0, 0],
                   bin_dim = bin_dim,
                   bin_pointwise = bin_pointwise)
     
-    return _hddm_preprocess(x)
+    return hddm_preprocess(x)
 
 # TD: DIDN'T GO OVER THIS ONE YET !
 def simulator_stimcoding(model = 'angle',
@@ -211,7 +211,7 @@ def simulator_stimcoding(model = 'angle',
                             bin_pointwise = bin_pointwise,
                             max_t = max_t)
 
-        dataframes.append(_hddm_preprocess(simulator_data = sim_out, subj_id = i + 1))
+        dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i + 1))
     
     data_out = pd.concat(dataframes)
     data_out = data_out.rename(columns = {'subj_idx': "stim"})
@@ -327,11 +327,11 @@ def simulator_condition_effects(n_conditions = 4,
                             max_t = max_t,
                             delta_t = delta_t)
         
-        dataframes.append(_hddm_preprocess(simulator_data = sim_out, subj_id = i))
+        dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i))
     
     data_out = pd.concat(dataframes)
     
-    # Change 'subj_idx' column name to 'condition' ('subj_idx' is assigned automatically by _hddm_preprocess() function)
+    # Change 'subj_idx' column name to 'condition' ('subj_idx' is assigned automatically by hddm_preprocess() function)
     data_out = data_out.rename(columns = {'subj_idx': "condition"})
     data_out['subj_idx'] = 0
     data_out.reset_index(drop = True, inplace = True)
@@ -468,8 +468,8 @@ def simulator_covariate(dependent_params = ['v'],
     # choices = np.squeeze(np.stack(choices, axis = 0))
     
     # Preprocess 
-    data = _hddm_preprocess(sim_out, subj_id)
-    # data = _hddm_preprocess([rts, choices], subj_id)
+    data = hddm_preprocess(sim_out, subj_id)
+    # data = hddm_preprocess([rts, choices], subj_id)
     
     # Call the covariate BOLD (unnecessary but in style)
     data['BOLD'] = tmp_covariate_by_sample
@@ -582,7 +582,7 @@ def simulator_hierarchical(n_subjects = 5,
                             max_t = max_t,
                             delta_t = delta_t)
         
-        dataframes.append(_hddm_preprocess(simulator_data = sim_out, 
+        dataframes.append(hddm_preprocess(simulator_data = sim_out, 
                                           subj_id = subj_id))
         
         for param in model_config[model]['params']:
