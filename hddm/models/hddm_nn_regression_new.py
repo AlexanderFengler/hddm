@@ -76,7 +76,7 @@ class HDDMnnRegressor(HDDM):
     """
 
     def __init__(self, data, models, group_only_regressors = True, keep_regressor_trace = False, **kwargs):
-        """Instantiate a regression model.
+        """Instantiate a regression model, with neural network based likelihoods.
         
         :Arguments:
 
@@ -192,7 +192,7 @@ class HDDMnnRegressor(HDDM):
             network_dict = {'network': self.network}
 
         # Make likelihood function
-        self.wfpt_reg_class = hddm.likelihoods_mlp.generate_wfpt_nn_ddm_reg_stochastic_class(sampling_method = 'drift', model = self.model, **network_dict)
+        self.wfpt_reg_class = hddm.likelihoods_mlp.generate_wfpt_nn_ddm_reg_stochastic_class(model = self.model, **network_dict)
         
         # Initialize Base class 
         super(HDDMnnRegressor, self).__init__(data, **kwargs)

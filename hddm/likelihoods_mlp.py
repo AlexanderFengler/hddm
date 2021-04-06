@@ -1,14 +1,3 @@
-
-# from wfpt import wiener_like_nn_weibull
-# from wfpt import wiener_like_nn_angle 
-# from wfpt import wiener_like_nn_ddm
-# from wfpt import wiener_like_nn_ddm_analytic
-# from wfpt import wiener_like_nn_levy
-# from wfpt import wiener_like_nn_ornstein
-# from wfpt import wiener_like_nn_ddm_sdv
-# from wfpt import wiener_like_nn_ddm_sdv_analytic
-# from wfpt import wiener_like_nn_full_ddm
-
 import numpy as np
 import hddm
 from functools import partial
@@ -16,9 +5,8 @@ from kabuki.utils import stochastic_from_dist
 from hddm.simulators import *
 import data_simulators
 
-#import wfpt
-
-def make_mlp_likelihood_complete(model, **kwargs):
+def make_mlp_likelihood_complete(model,
+                                 **kwargs):
     def random(self):
         # print(self.parents)
         # print('printing the dir of self.parents directly')
@@ -54,13 +42,13 @@ def make_mlp_likelihood_complete(model, **kwargs):
 
     if model == 'ddm':
         def wienernn_like_ddm(x, 
-                                v,  
-                                a, 
-                                z,  
-                                t, 
-                                p_outlier = 0,
-                                w_outlier = 0.1,
-                                **kwargs):
+                              v,  
+                              a, 
+                              z,  
+                              t, 
+                              p_outlier = 0,
+                              w_outlier = 0.1,
+                              **kwargs):
 
             return hddm.wfpt.wiener_like_nn_ddm(x['rt'].values,
                                                 x['response'].values,  
@@ -429,215 +417,51 @@ def make_mlp_likelihood_complete(model, **kwargs):
         return wfpt_nn
     else:
         return 'Not implemented errror: Failed to load likelihood because the model specified is not implemented'
-    #print('printing wfpt_nn')
-    #print(wfpt_nn)
-    #return wfpt_nn
-
-    # # if model != 'ddm':
-    # #     return 'Not yet implemented for models other than the DDM'
-
-# Defining the likelihood functions
-# def make_mlp_likelihood(model):
-#     if model == 'weibull_cdf' or model == 'weibull':
-#         def wienernn_like_weibull(x, 
-#                                   v,
-#                                   a, 
-#                                   alpha,
-#                                   beta,
-#                                   z,
-#                                   t,
-#                                   p_outlier = 0,
-#                                   w_outlier = 0,
-#                                   **kwargs): #theta
-
-#             return hddm.wfpt.wiener_like_nn_weibull(x['rt'].values,
-#                                                     x['response'].values, 
-#                                                     v, 
-#                                                     a, 
-#                                                     alpha, 
-#                                                     beta,
-#                                                     z, 
-#                                                     t, 
-#                                                     p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-#                                                     w_outlier = w_outlier,
-#                                                     **kwargs)
-#         return wienernn_like_weibull
-
-#     if model == 'ddm':
-#         def wienernn_like_ddm(x, 
-#                               v,  
-#                               a, 
-#                               z,  
-#                               t, 
-#                               p_outlier = 0,
-#                               w_outlier = 0.1,
-#                               **kwargs):
-
-#             return hddm.wfpt.wiener_like_nn_ddm(x['rt'].values,
-#                                                 x['response'].values,  
-#                                                 v, # sv,
-#                                                 a, 
-#                                                 z, # sz,
-#                                                 t, # st,
-#                                                 p_outlier = p_outlier,
-#                                                 w_outlier = w_outlier,
-#                                                 **kwargs)
-#         return wienernn_like_ddm
-
-#     if model == 'ddm_sdv':
-#         def wienernn_like_ddm_sdv(x, 
-#                           v,
-#                           sv,
-#                           a, 
-#                           z, 
-#                           t,
-#                           p_outlier = 0,
-#                           w_outlier = 0,
-#                           **kwargs):
-
-#             return hddm.wfpt.wiener_like_nn_ddm_sdv(x['rt'].values,
-#                                                     x['response'].values,  
-#                                                     v,
-#                                                     sv,
-#                                                     a,
-#                                                     z, 
-#                                                     t, 
-#                                                     p_outlier = p_outlier,
-#                                                     w_outlier = w_outlier,
-#                                                     **kwargs)
-#         return wienernn_like_ddm_sdv
-
-#     if model == 'ddm_sdv_analytic':
-#         def wienernn_like_ddm_sdv_analytic(x, 
-#                                            v, 
-#                                            sv,
-#                                            a, 
-#                                            z, 
-#                                            t, 
-#                                            p_outlier = 0,
-#                                            w_outlier = 0,
-#                                            **kwargs):
-
-#             return hddm.wfpt.wiener_like_nn_ddm_sdv_analytic(x['rt'].values,
-#                                                 x['response'].values,  
-#                                                 v, 
-#                                                 sv, 
-#                                                 a, 
-#                                                 z, 
-#                                                 t,
-#                                                 p_outlier = p_outlier,
-#                                                 w_outlier = w_outlier,
-#                                                 **kwargs)
-#         return wienernn_like_ddm_sdv_analytic
-
-#     if model == 'levy':
-#         def wienernn_like_levy(x, 
-#                                v, 
-#                                a, 
-#                                alpha,
-#                                z,
-#                                t,
-#                                p_outlier = 0.1,
-#                                w_outlier = 0.1,
-#                                **kwargs): #theta
-
-#             return hddm.wfpt.wiener_like_nn_levy(x['rt'].values,
-#                                     x['response'].values, 
-#                                     v,
-#                                     a, 
-#                                     alpha, 
-#                                     z,
-#                                     t, 
-#                                     p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-#                                     w_outlier = w_outlier,
-#                                     **kwargs)
-#         return wienernn_like_levy
-
-#     if model == 'ornstein':
-#         def wienernn_like_ornstein(x,
-#                                    v, 
-#                                    a, 
-#                                    g,
-#                                    z, 
-#                                    t,
-#                                    p_outlier = 0,
-#                                    w_outlier = 0,
-#                                    **kwargs): #theta
-    
-#             return hddm.wfpt.wiener_like_nn_ornstein(x['rt'].values,
-#                                                      x['response'].values, 
-#                                                      v, 
-#                                                      a, 
-#                                                      g, 
-#                                                      z, 
-#                                                      t, 
-#                                                      p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
-#                                                      w_outlier = w_outlier,
-#                                                      **kwargs)
-#         return wienernn_like_ornstein
-
-#     if model == 'full_ddm' or model == 'full_ddm2':
-#         def wienernn_like_full_ddm(x, 
-#                                    v, 
-#                                    sv, 
-#                                    a, 
-#                                    z, 
-#                                    sz, 
-#                                    t, 
-#                                    st, 
-#                                    p_outlier = 0,
-#                                    w_outlier = 0,
-#                                    **kwargs):
-
-#             return hddm.wfpt.wiener_like_nn_full_ddm(x['rt'].values,
-#                                                      x['response'].values,
-#                                                      v,
-#                                                      sv,
-#                                                      a,
-#                                                      z, 
-#                                                      sz, 
-#                                                      t,
-#                                                      st,
-#                                                      p_outlier = p_outlier,
-#                                                      w_outlier = w_outlier,
-#                                                      **kwargs)
-
-#         return wienernn_like_full_ddm
-
-#     if model == 'angle':
-#         def wienernn_like_angle(x, 
-#                                 v, 
-#                                 a,
-#                                 theta,
-#                                 z,
-#                                 t,
-#                                 p_outlier = 0,
-#                                 w_outlier = 0,
-#                                 **kwargs):
-
-#             return hddm.wfpt.wiener_like_nn_angle(x['rt'].values,
-#                                                   x['response'].values,  
-#                                                   v,
-#                                                   a, 
-#                                                   theta,
-#                                                   z,
-#                                                   t,
-#                                                   p_outlier = p_outlier,
-#                                                   w_outlier = w_outlier,
-#                                                   **kwargs)
-        
-#         return wienernn_like_angle
-#     else:
-#         return 'Not implemented errror: Failed to load likelihood because the model specified is not implemented'
-
 
 # Defining only the model likelihood at this point !
-def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
-                                              sampling_method = 'cdf',
-                                              cdf_range = (-5, 5), 
-                                              sampling_dt = 1e-4,
-                                              model = None,
+def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                                               **kwargs):
+
+        # Need to rewrite these random parts !
+    def random(self):
+        param_dict = deepcopy(self.parents.value)
+        #print('param dict')
+        #print(param_dict)
+        del param_dict['reg_outcomes']
+        sampled_rts = self.value.copy()
+        #print('sampled rts')
+        #print(sampled_rts)
+
+        size = sampled_rts.shape[0]
+        n_params = model_config[model]['n_params']
+        param_data = np.zeros((size, n_params), dtype = np.float32)
+
+        cnt = 0
+        for tmp_str in model_config[model]['params']: #['v', 'a', 'z', 't']:
+            if tmp_str in self.parents['reg_outcomes']:
+                #print('param dict values')
+                #print(param_dict[tmp_str].values[:, 0])
+                param_data[:, cnt] = param_dict[tmp_str].values[:, 0]
+            else:
+                param_data[:, cnt] = param_dict[tmp_str]
+            cnt += 1
+
+        # for i in self.value.index:
+        #     #get current params
+        #     for p in self.parents['reg_outcomes']:
+        #         param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+        #     #sample
+        #     samples = hddm.generate.gen_rts(method=sampling_method,
+        #                                     size=1, dt=sampling_dt, **param_dict)
+
+        #     sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+        sim_out = simulator(theta = param_data, n_trials = size, model = model, n_samples = 1, max_t = 20)
+        # sim_out_copy = []
+        # sim_out_copy.append(np.squeeze(sim_out[0], axis = 0))
+        # sim_out_copy.append(np.squeeze(sim_out[1], axis = 0))
+        # sim_out_copy.append(sim_out[2])
+        return hddm_preprocess(sim_out, keep_negative_responses = True)
 
     if model == 'ddm':
         def wiener_multi_like_nn_ddm(value, v, a, z, t, 
@@ -669,47 +493,6 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                                       p_outlier = p_outlier,
                                                       w_outlier = w_outlier,
                                                       **kwargs)
-
-        # Need to rewrite these random parts !
-        def random(self):
-            param_dict = deepcopy(self.parents.value)
-            #print('param dict')
-            #print(param_dict)
-            del param_dict['reg_outcomes']
-            sampled_rts = self.value.copy()
-            #print('sampled rts')
-            #print(sampled_rts)
-
-            size = sampled_rts.shape[0]
-            n_params = model_config[model]['n_params']
-            param_data = np.zeros((size, n_params), dtype = np.float32)
-
-            cnt = 0
-            for tmp_str in model_config[model]['params']: #['v', 'a', 'z', 't']:
-                if tmp_str in self.parents['reg_outcomes']:
-                    #print('param dict values')
-                    #print(param_dict[tmp_str].values[:, 0])
-                    param_data[:, cnt] = param_dict[tmp_str].values[:, 0]
-                else:
-                    param_data[:, cnt] = param_dict[tmp_str]
-                cnt += 1
-
-            # for i in self.value.index:
-            #     #get current params
-            #     for p in self.parents['reg_outcomes']:
-            #         param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
-            #     #sample
-            #     samples = hddm.generate.gen_rts(method=sampling_method,
-            #                                     size=1, dt=sampling_dt, **param_dict)
-
-            #     sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
-
-            sim_out = simulator(theta = param_data, n_trials = size, model = model, n_samples = 1, max_t = 20)
-            # sim_out_copy = []
-            # sim_out_copy.append(np.squeeze(sim_out[0], axis = 0))
-            # sim_out_copy.append(np.squeeze(sim_out[1], axis = 0))
-            # sim_out_copy.append(sim_out[2])
-            return hddm_preprocess(sim_out, keep_negative_responses = True)
 
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ddm, **kwargs))
         stoch.random = random
@@ -743,23 +526,6 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                                         p_outlier = p_outlier,
                                                         w_outlier = w_outlier,
                                                         **kwargs)
-
-        def random(self):
-            param_dict = deepcopy(self.parents.value)
-            del param_dict['reg_outcomes']
-            sampled_rts = self.value.copy()
-
-            for i in self.value.index:
-                #get current params
-                for p in self.parents['reg_outcomes']:
-                    param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
-                #sample
-                samples = hddm.generate.gen_rts(method=sampling_method,
-                                                size=1, dt=sampling_dt, **param_dict)
-
-                sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
-
-            return sampled_rts
 
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_full_ddm, **kwargs))
         stoch.random = random
@@ -795,23 +561,6 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                                         w_outlier = w_outlier,
                                                         **kwargs)
 
-        def random(self):
-            param_dict = deepcopy(self.parents.value)
-            del param_dict['reg_outcomes']
-            sampled_rts = self.value.copy()
-
-            for i in self.value.index:
-                #get current params
-                for p in self.parents['reg_outcomes']:
-                    param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
-                #sample
-                samples = hddm.generate.gen_rts(method=sampling_method,
-                                                size=1, dt=sampling_dt, **param_dict)
-
-                sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
-
-            return sampled_rts
-
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_angle, **kwargs))
         stoch.random = random
 
@@ -846,23 +595,6 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                                     w_outlier = w_outlier,
                                                     **kwargs)
 
-        def random(self):
-            param_dict = deepcopy(self.parents.value)
-            del param_dict['reg_outcomes']
-            sampled_rts = self.value.copy()
-
-            for i in self.value.index:
-                #get current params
-                for p in self.parents['reg_outcomes']:
-                    param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
-                #sample
-                samples = hddm.generate.gen_rts(method=sampling_method,
-                                                size=1, dt=sampling_dt, **param_dict)
-
-                sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
-
-            return sampled_rts
-
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_levy, **kwargs))
         stoch.random = random
     
@@ -896,23 +628,6 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                                         w_outlier = w_outlier,
                                                         **kwargs)
 
-        def random(self):
-            param_dict = deepcopy(self.parents.value)
-            del param_dict['reg_outcomes']
-            sampled_rts = self.value.copy()
-
-            for i in self.value.index:
-                #get current params
-                for p in self.parents['reg_outcomes']:
-                    param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
-                #sample
-                samples = hddm.generate.gen_rts(method=sampling_method,
-                                                size=1, dt=sampling_dt, **param_dict)
-
-                sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
-
-            return sampled_rts
-
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ornstein, **kwargs))
         stoch.random = random
 
@@ -944,24 +659,6 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(wiener_params = None,
                                                         p_outlier = p_outlier,
                                                         w_outlier = w_outlier,
                                                         **kwargs)
-
-
-        def random(self):
-            param_dict = deepcopy(self.parents.value)
-            del param_dict['reg_outcomes']
-            sampled_rts = self.value.copy()
-
-            for i in self.value.index:
-                #get current params
-                for p in self.parents['reg_outcomes']:
-                    param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
-                #sample
-                samples = hddm.generate.gen_rts(method=sampling_method,
-                                                size=1, dt=sampling_dt, **param_dict)
-
-                sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
-
-            return sampled_rts
 
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_weibull, **kwargs))
         stoch.random = random
