@@ -303,15 +303,15 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
         return hddm_preprocess(sim_out, keep_negative_responses = True)
 
     if model == 'ddm':
-        def wiener_multi_like_nn_ddm(x, 
-                              v,
-                              a,
-                              z,
-                              t,
-                              reg_outcomes,
-                              p_outlier = 0,
-                              w_outlier = 0,
-                              **kwargs): #theta
+        def wiener_multi_like_nn_ddm(value, 
+                                     v,
+                                     a,
+                                     z,
+                                     t,
+                                     reg_outcomes,
+                                     p_outlier = 0,
+                                     w_outlier = 0,
+                                     **kwargs): #theta
 
             params = {'v': v, 'a': a, 'z': z, 't': t}
             n_params = 4 #model_config[model]['n_params']
