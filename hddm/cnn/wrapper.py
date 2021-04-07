@@ -13,6 +13,10 @@ class Infer:
 		self.cfg = config
 		self.target = []
 		self.inp = tf.placeholder(tf.float32, self.cfg.test_param_dims)
+		
+		# AF ADD
+		self.inp_flex = tf.placeholder(tf.float32, self.cfg.param_dims)
+
 		self.initialized = False
 
 		#with tf.device('/gpu:0'):
@@ -37,11 +41,17 @@ class Infer:
 	def forward(self, params):
 		pred_hist = self.sess.run(self.model.output, feed_dict={self.inp:params.reshape(self.cfg.test_param_dims)})
 		return pred_hist
+	
+	# AF: ADD
+	def forward_flex(self, params):
+		pred_hist = self.sess.run(self.model.output, feed_dict = {self.inp_flex:params})
+		return pred_hist	
 
 def load_cnn(model, nbin):
 	cfg = Config(model = model, bins = nbin)
 	inference_class = Infer(config = cfg)
-	return inference_class.forward
+	#return inference_class.forward
+	return inference_class.forward_flex
 
 
 # if __name__ == '__main__':
