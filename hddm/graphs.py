@@ -438,7 +438,7 @@ def model_plot(posterior_samples = None,
             print('ground truth data')
             print(ground_truth_data)
             print(ground_truth_data[sorted_keys[i]])
-            print(type(ground_truth_data[sorted_keys[i]])))
+            print(type(ground_truth_data[sorted_keys[i]]))
             print(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == 1, 0])
             counts_2_up, bins = np.histogram(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == 1, 0],
                                             bins = np.linspace(0, max_t, nbins),
