@@ -491,6 +491,7 @@ def model_plot(posterior_samples = None,
                         tmp_samples = posterior_samples[i, idx[j], :]
                         tmp_alpha = 0.5
                         tmp_color = 'black'
+                        tmp_linewidth = posterior_linewidth
                     elif j == n_posterior_parameters and model_ground_truth is not None:
                         tmp_samples = ground_truth_parameters[i, :]
                         tmp_model = model_ground_truth
@@ -501,6 +502,7 @@ def model_plot(posterior_samples = None,
                         tmp_color = tmp_colors[int(tmp_bool)]
                         tmp_alpha = 1
                         tmp_label = 'Ground Truth Model'
+                        tmp_linewidth = gt_linewidth
                     elif j == n_posterior_parameters and model_ground_truth == None:
                         break
                     else:
@@ -509,6 +511,7 @@ def model_plot(posterior_samples = None,
                         tmp_alpha = 0.05
                         tmp_color = 'black'
                         tmp_label = None
+                        tmp_linewidth = posterior_linewidth
 
                     print(tmp_label)
                     
@@ -539,14 +542,14 @@ def model_plot(posterior_samples = None,
                     ax_tmp.plot(t_s + tmp_samples[model_config[tmp_model]['params'].index('t')], b, tmp_color,
                                 alpha = tmp_alpha,
                                 zorder = 1000 + j,
-                                linewidth = posterior_linewidth,
+                                linewidth = tmp_linewidth,
                                 label = tmp_label,
                                 )
 
                     ax_tmp.plot(t_s + tmp_samples[model_config[tmp_model]['params'].index('t')], -b, tmp_color, 
                                 alpha = tmp_alpha,
                                 zorder = 1000 + j,
-                                linewidth = posterior_linewidth,
+                                linewidth = tmp_linewidth,
                                 )
 
                     ax_tmp.plot(t_s[:maxid] + tmp_samples[model_config[tmp_model]['params'].index('t')],
@@ -554,14 +557,14 @@ def model_plot(posterior_samples = None,
                                 c = tmp_color, 
                                 alpha = tmp_alpha,
                                 zorder = 1000 + j,
-                                linewidth = posterior_linewidth) # TOOK AWAY LABEL
+                                linewidth = tmp_linewidth) # TOOK AWAY LABEL
 
                     ax_tmp.axvline(x = tmp_samples[model_config[tmp_model]['params'].index('t')], # this should identify the index of ndt directly via model config !
                                    ymin = - ylimit, 
                                    ymax = ylimit, 
                                    c = tmp_color, 
                                    linestyle = '--',
-                                   linewidth = posterior_linewidth,
+                                   linewidth = tmp_linewidth,
                                    alpha = tmp_alpha)
 
                     if tmp_label == 'Ground Truth Model' and row_tmp == 0 and col_tmp == 0:
