@@ -111,9 +111,9 @@ def wiener_like_cnn_2(np.ndarray[long, ndim = 1] x,
 
     cdef Py_ssize_t size = x.shape[0]
     cdef Py_ssize_t i 
-    cdef float log_p
+    cdef float log_p = 0
     cdef np.ndarray[float, ndim = 2] pred = kwargs['network'](parameters)
-    log_p = 0
+    #log_p = 0
     
     for i in range(size):
         if response[i] == 0:
@@ -160,7 +160,7 @@ def wiener_like_reg_cnn_2(np.ndarray[long, ndim = 1] x,
 
     cdef Py_ssize_t size = x.shape[0]
     cdef Py_ssize_t i
-    cdef np.ndarray[float, ndim = 1] log_p = np.zeros(size, dtype = np.float32)
+    cdef float log_p
     #cdef np.ndarray[float, ndim = 2] 
     pred = kwargs['network'](parameters)
     #log_p = 0
@@ -168,13 +168,10 @@ def wiener_like_reg_cnn_2(np.ndarray[long, ndim = 1] x,
     #print(pred)
     for i in range(size):
         if response[i] == 0:
-            log_p[i] += np.log(pred[i, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
+            log_p += np.log(pred[i, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
         else: 
-            log_p[i] += np.log(pred[i, 2 * x[i] + 1] * (1 - p_outlier) + w_outlier * p_outlier)
+            log_p += np.log(pred[i, 2 * x[i] + 1] * (1 - p_outlier) + w_outlier * p_outlier)
     
-    if logp == 0:
-        log_p = np.exp(log_p)
-
     # Call to network:
     return log_p
 
@@ -195,7 +192,7 @@ def wiener_like_nn_full_ddm(np.ndarray[float, ndim = 1] x,
                             **kwargs):
 
     cdef Py_ssize_t size = x.shape[0]
-    cdef float log_p
+    cdef float log_p = 0
     cdef int n_params = 7
     cdef float ll_min = -16.11809
     cdef np.ndarray[float, ndim = 2] data = np.zeros((size, n_params + 2), dtype = np.float32)
