@@ -126,7 +126,7 @@ class Config(object):
         self.model_name = 'ddm'
         self.param_dims = [None, 1, 4, 1]
         self.test_param_dims = [1, 1, 4, 1]
-        self.flex_param_dims = [-1, 1, 4, 1],
+        self.flex_param_dims = [-1, 1, 4, 1]
         self.output_hist_dims = [None, 1, nbins, 2]
         self.bounds = [(-2.5, 2.5), (0.5, 2.2), (0.25, 0.75), (0.05, 1.95)] # done
         self.param_names = ['v', 'a', 'w', 'ndt']
