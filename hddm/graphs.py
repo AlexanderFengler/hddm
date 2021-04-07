@@ -194,6 +194,7 @@ def model_plot(posterior_samples = None,
             gt_dat_dict[0] = ground_truth_data
             ground_truth_data = gt_dat_dict
             #ground_truth_data = np.expand_dims(ground_truth_data, 0)
+            sorted_keys = [0]
             
     title = 'Model Plot: '
     
@@ -213,7 +214,7 @@ def model_plot(posterior_samples = None,
             gt_dat_dict[i] = gt_dat_dict[i].values
         ground_truth_data = gt_dat_dict
 
-        sorted_keys = np.sort(np.unique(ground_truth_data['subj_idx']))
+        sorted_keys = np.sort(np.unique(ground_truth_data[condition_column]))
         ground_truth_data = gt_dat_dict
 
         print(sorted_keys)
@@ -222,10 +223,11 @@ def model_plot(posterior_samples = None,
         
     
     # AF TODO: Generalize to arbitrary response coding !
-    elif ground_truth_data is not None and datatype == 'hierarchical' or datatype == 'single_subject':
+    elif ground_truth_data is not None and datatype == 'hierarchical':
         gt_dat_dict = dict()
         
         for i in np.sort(np.unique(ground_truth_data['subj_idx'])):
+            print(i)
             gt_dat_dict[i] = ground_truth_data.loc[ground_truth_data['subj_idx'] == i][['rt', 'response']]
             gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
             gt_dat_dict[i] = gt_dat_dict[i].values
