@@ -329,9 +329,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
                 cnt += 1
 
-
-            return hddm.wfpt.wiener_like_reg_cnn_2(x['rt'].values,
-                                                   x['response'].values, 
+            print(value)
+            return hddm.wfpt.wiener_like_reg_cnn_2(value['rt'].values,
+                                                   value['response'].values, 
                                                    data, 
                                                    p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
                                                    w_outlier = w_outlier,
