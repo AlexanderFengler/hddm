@@ -191,7 +191,7 @@ def model_plot(posterior_samples = None,
             posterior_samples = np.expand_dims(posterior_samples, 0)
         if ground_truth_data is not None:
             gt_dat_dict = dict()
-            gt_dat_dict[0] = ground_truth_data
+            gt_dat_dict[0] = ground_truth_data.values
             ground_truth_data = gt_dat_dict
             #ground_truth_data = np.expand_dims(ground_truth_data, 0)
             sorted_keys = [0]
