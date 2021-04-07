@@ -140,31 +140,31 @@ class HDDMnn(HDDM):
             network_dict = {'network': self.network}
             self.wfpt_nn = hddm.likelihoods_cnn.make_cnn_likelihood(model = self.model, pdf_multiplier = self.cnn_pdf_multiplier, **network_dict)
         
-        net_out = self.network(np.zeros((10, 1, 4, 1), dtype = np.float32))
+        # net_out = self.network(np.zeros((10, 1, 4, 1), dtype = np.float32))
         
-        print('net out 1: ')
-        print(net_out)
-        print(net_out.shape)
+        # print('net out 1: ')
+        # print(net_out)
+        # print(net_out.shape)
 
-        #net_out = self.network(np.tile([0, 1, 0.5, 1], (100, 1)))
-        net_out = self.network(np.zeros((112, 1, 4, 1), dtype = np.float32))
+        # #net_out = self.network(np.tile([0, 1, 0.5, 1], (100, 1)))
+        # net_out = self.network(np.zeros((112, 1, 4, 1), dtype = np.float32))
         
-        print('net out 2: ')
-        print(net_out)
-        print(net_out.shape)
+        # print('net out 2: ')
+        # print(net_out)
+        # print(net_out.shape)
 
-        net_out = self.network(np.zeros(4, dtype = np.float32))
+        # net_out = self.network(np.zeros(4, dtype = np.float32))
         
-        print('net out 3: ')
-        print(net_out)
-        print(net_out.shape)
+        # print('net out 3: ')
+        # print(net_out)
+        # print(net_out.shape)
 
 
-        net_out = self.network(np.zeros((100, 4), dtype = np.float32))
+        # net_out = self.network(np.zeros((100, 4), dtype = np.float32))
         
-        print('net out 4: ')
-        print(net_out)
-        print(net_out.shape)
+        # print('net out 4: ')
+        # print(net_out)
+        # print(net_out.shape)
         # Make model specific likelihood
         # self.wfpt_nn = stochastic_from_dist('Wienernn' + '_' + self.model,
         #                                    partial(likelihood_, **network_dict))
