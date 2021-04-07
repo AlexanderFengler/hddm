@@ -148,7 +148,7 @@ class HDDMnn(HDDM):
 
 
         #net_out = self.network(np.tile([0, 1, 0.5, 1], (100, 1)))
-        
+        net_out = self.network(np.zeros((112, 1, 4, 1), dtype = np.float32))
         print('net out 2: ')
         print(net_out)
         print(net_out.shape)
