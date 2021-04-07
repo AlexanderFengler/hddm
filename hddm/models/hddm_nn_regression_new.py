@@ -136,6 +136,13 @@ class HDDMnnRegressor(HDDM):
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
         self.network_type = kwargs.pop('network_type', 'mlp')
         self.network = None
+        self.nbin = kwargs.pop('nbin', 512)
+
+        if self.nbin == 512:
+            self.cnn_pdf_multiplier = 51.2
+        elif self.nbin == 256:
+            self.cnn_pdf_multiplier = 25.6
+
         self.keep_regressor_trace = keep_regressor_trace
         
         if isinstance(models, (str, dict)):
