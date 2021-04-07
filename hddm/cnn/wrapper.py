@@ -22,7 +22,10 @@ class Infer:
 		#with tf.device('/gpu:0'):
 		with tf.variable_scope("model", reuse=tf.AUTO_REUSE) as scope:
 			self.model = cnn_model_struct()
-			self.model.build(self.inp, self.cfg.test_param_dims[1:], self.cfg.output_hist_dims[1:], train_mode=False, verbose=False)
+			# self.model.build(self.inp, self.cfg.test_param_dims[1:], self.cfg.output_hist_dims[1:], train_mode=False, verbose=False)
+			# AF: ADD changed self.inp --> self.inp_flex
+			self.model.build(self.inp_flex, self.cfg.test_param_dims[1:], self.cfg.output_hist_dims[1:], train_mode=False, verbose=False)
+
 			#	self.gpuconfig = tf.ConfigProto()
 			#	self.gpuconfig.gpu_options.allow_growth = True
 			#	self.gpuconfig.allow_soft_placement = True
@@ -39,7 +42,7 @@ class Infer:
 		return hasattr(self, item)
 
 	def forward(self, params):
-		pred_hist = self.sess.run(self.model.output, feed_dict={self.inp:params.reshape(self.cfg.test_param_dims)})
+		pred_hist = self.sess.run(self.model.output, feed_dict = {self.inp:params.reshape(self.cfg.test_param_dims)})
 		return pred_hist
 	
 	# AF: ADD
