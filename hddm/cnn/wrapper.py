@@ -47,7 +47,7 @@ class Infer:
 	
 	# AF: ADD
 	def forward_flex(self, params):
-		pred_hist = self.sess.run(self.model.output, feed_dict = {self.inp_flex:params})
+		pred_hist = self.sess.run(self.model.output, feed_dict = {self.inp_flex:params.reshape(self.cfg.flex_param_dims)})
 		return pred_hist	
 
 def load_cnn(model, nbin):
