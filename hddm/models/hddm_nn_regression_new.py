@@ -10,6 +10,7 @@ from patsy import dmatrix
 import hddm
 from hddm.models import HDDM
 from hddm.keras_models import load_mlp
+from hddm.cnn.wrapper import load_cnn
 import kabuki
 from kabuki import Knode
 from kabuki.utils import stochastic_from_dist
