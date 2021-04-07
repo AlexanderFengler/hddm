@@ -546,12 +546,17 @@ def simulator(theta,
 
     if bin_dim == 0 or bin_dim == None:
         return x
-    elif bin_dim > 0 and not bin_pointwise and n_trials == 1:
+    elif bin_dim > 0 and n_trials == 1 and not bin_pointwise:
         binned_out = bin_simulator_output(x, nbins = bin_dim)
         return (binned_out, x[2])
-    elif bin_dim > 0 and bin_pointwise and n_trials == 1:
+    elif bin_dim > 0 and n_trials == 1 and bin_pointwise:
         binned_out = bin_simulator_output_pointwise(x, nbins = bin_dim)
         return (np.expand_dims(binned_out[:,0], axis = 1), np.expand_dims(binned_out[:, 1], axis = 1), x[2])
+    elif bin_dim > 0 and n_trials > 1 and n_samples == 1 and bin_pointwise:
+        binned_out = bin_simulator_output_pointwise(x, nbins = bin_dim)
+        return (np.expand_dims(binned_out[:,0], axis = 1), np.expand_dims(binned_out[:, 1], axis = 1), x[2])
+    elif bin_dim > 0 and n_trials > 1 and n_samples > 1 and bin_pointwise:
+        return 'currently n_trials > 1 and n_samples > 1 will not work together with bin_pointwise'
     elif bin_dim > 0 and n_trials > 1 and not bin_pointwise:
         return 'currently binned outputs not implemented for multi-trial simulators'
     elif bin_dim == -1:
