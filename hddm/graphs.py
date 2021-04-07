@@ -19,16 +19,16 @@ from scipy.stats import scoreatpercentile
 from scipy.stats.mstats import mquantiles
 from copy import deepcopy
 
-def run_simulator():
-    return simulator([0, 1, 0.5, 0.3, 0.3],
-                            model = 'angle',
-                            n_samples = 10000,
-                            n_trials = 1,
-                            delta_t = 0.001,
-                            max_t = 20,
-                            cartoon = False,
-                            bin_dim = None, 
-                            bin_pointwise = False)
+# def run_simulator():
+#     return simulator([0, 1, 0.5, 0.3, 0.3],
+#                             model = 'angle',
+#                             n_samples = 10000,
+#                             n_trials = 1,
+#                             delta_t = 0.001,
+#                             max_t = 20,
+#                             cartoon = False,
+#                             bin_dim = None, 
+#                             bin_pointwise = False)
 
 
 # Plot preprocessing functions
@@ -529,7 +529,7 @@ def model_plot(posterior_samples = None,
                     out = simulator(theta = tmp_samples,
                                     model = tmp_model, 
                                     n_samples = 1,
-                                    cartoon = True,
+                                    no_noise = True,
                                     delta_t = delta_t_graph,
                                     bin_dim = None)
                     
