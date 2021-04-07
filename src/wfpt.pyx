@@ -160,9 +160,8 @@ def wiener_like_reg_cnn_2(np.ndarray[long, ndim = 1] x,
 
     cdef Py_ssize_t size = x.shape[0]
     cdef Py_ssize_t i
-    cdef float log_p
-    #cdef np.ndarray[float, ndim = 2] 
-    pred = kwargs['network'](parameters)
+    cdef float log_p = 0
+    cdef np.ndarray[float, ndim = 2] pred = kwargs['network'](parameters)
     #log_p = 0
     #print(pred.shape)
     #print(pred)
