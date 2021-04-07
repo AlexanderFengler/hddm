@@ -151,12 +151,12 @@ def wiener_pdf_cnn_2(np.ndarray[long, ndim = 1] x,
     return log_p
 
 def wiener_like_reg_cnn_2(np.ndarray[long, ndim = 1] x, 
-                         np.ndarray[long, ndim = 1] response, 
-                         np.ndarray[float, ndim = 2] parameters,
-                         double p_outlier = 0, 
-                         double w_outlier = 0,
-                         bint logp = 0,
-                         **kwargs):
+                          np.ndarray[long, ndim = 1] response, 
+                          np.ndarray[float, ndim = 2] parameters,
+                          double p_outlier = 0, 
+                          double w_outlier = 0,
+                          bint logp = 0,
+                          **kwargs):
 
     cdef Py_ssize_t size = x.shape[0]
     cdef Py_ssize_t i
