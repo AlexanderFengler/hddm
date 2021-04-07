@@ -160,21 +160,21 @@ def model_plot(posterior_samples = None,
                 z_cnt += 1
         if z_cnt < 1:
             posterior_samples['z_trans'] = 0.0
-
-        print('z not part of fitted parameters --> Figures assume it was set to 0.5')
+            print('z not part of fitted parameters --> Figures assume it was set to 0.5')
             
     # Inputs are hddm_traces --> make plot ready
     if input_is_hddm_trace and posterior_samples is not None:
+        if datatype == 'single_subject':
+            posterior_samples = _make_trace_plotready_single_subject(posterior_samples, 
+                                                                     model = model_fitted)
+        
         if datatype == 'hierarchical':
             posterior_samples = _make_trace_plotready_hierarchical(posterior_samples, 
                                                                    model = model_fitted)
             #print(posterior_samples.shape)
             n_plots = posterior_samples.shape[0]
 #             print(posterior_samples)
-            
-        if datatype == 'single_subject':
-            posterior_samples = _make_trace_plotready_single_subject(posterior_samples, 
-                                                                     model = model_fitted)
+        
         if datatype == 'condition':
             posterior_samples = _make_trace_plotready_condition(posterior_samples, 
                                                                 model = model_fitted)
@@ -418,7 +418,11 @@ def model_plot(posterior_samples = None,
         if ground_truth_data is not None:
             # These splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
             # Wiser because either way we can have varying numbers of trials for each subject !
-            
+            print('sorted keys')
+            print(sorted_keys)
+
+            print('ground truth data')
+            print(ground_truth_data)
             counts_2_up, bins = np.histogram(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == 1, 0],
                                             bins = np.linspace(0, max_t, nbins),
                                             density = True)
