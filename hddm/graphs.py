@@ -212,10 +212,17 @@ def model_plot(posterior_samples = None,
             gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
             gt_dat_dict[i] = gt_dat_dict[i].values
         ground_truth_data = gt_dat_dict
+
+        sorted_keys = np.sort(np.unique(ground_truth_data['subj_idx']))
+        ground_truth_data = gt_dat_dict
+
+        print(sorted_keys)
+        print(ground_truth_data.keys())
+        # print('Supplying ground truth data not yet implemented for hierarchical datasets')
         
     
     # AF TODO: Generalize to arbitrary response coding !
-    elif ground_truth_data is not None and datatype == 'hierarchical':
+    elif ground_truth_data is not None and datatype == 'hierarchical' or datatype == 'single_subject':
         gt_dat_dict = dict()
         
         for i in np.sort(np.unique(ground_truth_data['subj_idx'])):
@@ -230,8 +237,13 @@ def model_plot(posterior_samples = None,
         print(ground_truth_data.keys())
         # print('Supplying ground truth data not yet implemented for hierarchical datasets')
 
-    elif ground_truth_data is not None and datatype == 'single_subject':
-        sorted_keys = np.sort(list(ground_truth_data.keys()))
+    # elif ground_truth_data is not None and datatype == 'single_subject':
+    #     gt_dat_dict = dict()
+
+    #     for 
+
+    #     sorted_keys = np.sort(np.unique(ground_truth_data['subj_idx']()))
+
 
     # Define number of rows we need for display
     if n_plots > 1:
