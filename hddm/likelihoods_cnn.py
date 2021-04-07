@@ -308,6 +308,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                               a,
                               z,
                               t,
+                              reg_outcomes,
                               p_outlier = 0,
                               w_outlier = 0,
                               **kwargs): #theta
