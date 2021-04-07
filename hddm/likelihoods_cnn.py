@@ -303,7 +303,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
         return hddm_preprocess(sim_out, keep_negative_responses = True)
 
     if model == 'ddm':
-         def wiener_multi_like_nn_ddm(x, 
+        def wiener_multi_like_nn_ddm(x, 
                               v,
                               a,
                               z,
