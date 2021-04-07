@@ -12,7 +12,7 @@ from hddm.simulators.basic_simulator import *
 
 # Helper
 def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_responses = False):
-    
+    print(simulator_data)
     # Define dataframe if simulator output is normal (comes out as list tuple [rts, choices, metadata])
     if len(simulator_data) == 3:
         #print('Simulator data: ')
