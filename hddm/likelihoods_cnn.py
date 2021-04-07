@@ -256,3 +256,255 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
         return wfpt_nn
     else:
         return 'Not implemented errror: Failed to load likelihood because the model specified is not implemented'
+
+
+def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
+                                              **kwargs):
+
+    # Need to rewrite these random parts !
+    def random(self):
+        param_dict = deepcopy(self.parents.value)
+        #print('param dict')
+        #print(param_dict)
+        del param_dict['reg_outcomes']
+        sampled_rts = self.value.copy()
+        #print('sampled rts')
+        #print(sampled_rts)
+
+        size = sampled_rts.shape[0]
+        n_params = model_config[model]['n_params']
+        param_data = np.zeros((size, n_params), dtype = np.float32)
+
+        cnt = 0
+        for tmp_str in model_config[model]['params']: #['v', 'a', 'z', 't']:
+            if tmp_str in self.parents['reg_outcomes']:
+                #print('param dict values')
+                #print(param_dict[tmp_str].values[:, 0])
+                param_data[:, cnt] = param_dict[tmp_str].values[:, 0]
+            else:
+                param_data[:, cnt] = param_dict[tmp_str]
+            cnt += 1
+
+        # for i in self.value.index:
+        #     #get current params
+        #     for p in self.parents['reg_outcomes']:
+        #         param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
+        #     #sample
+        #     samples = hddm.generate.gen_rts(method=sampling_method,
+        #                                     size=1, dt=sampling_dt, **param_dict)
+
+        #     sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+
+        sim_out = simulator(theta = param_data, n_trials = size, model = model, n_samples = 1, max_t = 20)
+        # sim_out_copy = []
+        # sim_out_copy.append(np.squeeze(sim_out[0], axis = 0))
+        # sim_out_copy.append(np.squeeze(sim_out[1], axis = 0))
+        # sim_out_copy.append(sim_out[2])
+        return hddm_preprocess(sim_out, keep_negative_responses = True)
+
+    if model == 'ddm':
+         def wiener_multi_like_nn_ddm(x, 
+                              v,
+                              a,
+                              z,
+                              t,
+                              p_outlier = 0,
+                              w_outlier = 0,
+                              **kwargs): #theta
+
+            params = {'v': v, 'a': a, 'z': z, 't': t}
+            n_params = 4 #model_config[model]['n_params']
+            size = int(value.shape[0])
+            data = np.zeros((size, n_params), dtype = np.float32)
+            #data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+
+            cnt = 0
+            for tmp_str in ['v', 'a', 'z', 't']: # model_config[model]['params']:
+
+                if tmp_str in reg_outcomes:
+                    data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                else:
+                    data[:, cnt] = params[tmp_str]
+
+                cnt += 1
+
+
+            return hddm.wfpt.wiener_like_reg_cnn_2(x['rt'].values,
+                                                   x['response'].values, 
+                                                   data, 
+                                                   p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
+                                                   w_outlier = w_outlier,
+                                                   **kwargs)
+    
+        stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ddm, **kwargs))
+        stoch.random = random
+    return stoch
+        
+
+    # if model == 'full_ddm' or model == 'full_ddm2':
+    #     def wiener_multi_like_nn_full_ddm(value, v, sv, a, z, sz, t, st, 
+    #                                      reg_outcomes, 
+    #                                      p_outlier = 0, 
+    #                                      w_outlier = 0.1,
+    #                                      **kwargs):
+
+    #         params = {'v': v, 'a': a, 'z': z, 't': t, 'sz': sz, 'sv': sv, 'st': st}
+
+    #         n_params = int(7)
+    #         size = int(value.shape[0])
+    #         data = np.zeros((size, 9), dtype = np.float32)
+    #         data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+
+    #         cnt = 0
+    #         for tmp_str in ['v', 'a', 'z', 't', 'sz', 'sv', 'st']:
+
+    #             if tmp_str in reg_outcomes:
+    #                 data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+    #             else:
+    #                 data[:, cnt] = params[tmp_str]
+
+    #             cnt += 1
+
+    #         # THIS IS NOT YET FINISHED !
+    #         return hddm.wfpt.wiener_like_multi_nn_full_ddm(data,
+    #                                                     p_outlier = p_outlier,
+    #                                                     w_outlier = w_outlier,
+    #                                                     **kwargs)
+
+    #     stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_full_ddm, **kwargs))
+    #     stoch.random = random
+
+    # if model == 'angle':
+    #     def wiener_multi_like_nn_angle(value, v, a, theta, z, t, 
+    #                                reg_outcomes, 
+    #                                p_outlier = 0, 
+    #                                w_outlier = 0.1,
+    #                                **kwargs):
+
+    #         """Log-likelihood for the full DDM using the interpolation method"""
+
+    #         params = {'v': v, 'a': a, 'z': z, 't': t, 'theta': theta}
+    #         n_params = int(5)
+    #         size = int(value.shape[0])
+    #         data = np.zeros((size, 7), dtype = np.float32)
+    #         data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+
+    #         cnt = 0
+    #         for tmp_str in ['v', 'a', 'z', 't', 'theta']:
+
+    #             if tmp_str in reg_outcomes:
+    #                 data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+    #             else:
+    #                 data[:, cnt] = params[tmp_str]
+
+    #             cnt += 1
+
+    #         # THIS IS NOT YET FINISHED !
+    #         return hddm.wfpt.wiener_like_multi_nn_angle(data,
+    #                                                     p_outlier = p_outlier,
+    #                                                     w_outlier = w_outlier,
+    #                                                     **kwargs)
+
+    #     stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_angle, **kwargs))
+    #     stoch.random = random
+
+    # if model == 'levy':
+    #     def wiener_multi_like_nn_levy(value, v, a, alpha, z, t, 
+    #                                     reg_outcomes, 
+    #                                     p_outlier = 0, 
+    #                                     w_outlier = 0.1,
+    #                                     **kwargs):
+
+    #         """Log-likelihood for the full DDM using the interpolation method"""
+
+    #         params = {'v': v, 'a': a, 'z': z, 'alpha': alpha, 't': t}
+    #         n_params = int(5)
+    #         size = int(value.shape[0])
+    #         data = np.zeros((size, 7), dtype = np.float32)
+    #         data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+
+    #         cnt = 0
+    #         for tmp_str in ['v', 'a', 'z', 'alpha', 't']:
+
+    #             if tmp_str in reg_outcomes:
+    #                 data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+    #             else:
+    #                 data[:, cnt] = params[tmp_str]
+
+    #             cnt += 1
+
+    #         # THIS IS NOT YET FINISHED !
+    #         return hddm.wfpt.wiener_like_multi_nn_levy(data,
+    #                                                 p_outlier = p_outlier,
+    #                                                 w_outlier = w_outlier,
+    #                                                 **kwargs)
+
+    #     stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_levy, **kwargs))
+    #     stoch.random = random
+    
+    # if model == 'ornstein':
+    #     def wiener_multi_like_nn_ornstein(value, v, a, g, z, t, 
+    #                                   reg_outcomes, 
+    #                                   p_outlier = 0, 
+    #                                   w_outlier = 0.1,
+    #                                   **kwargs):
+
+    #         params = {'v': v, 'a': a, 'z': z, 'g': g, 't': t}
+            
+    #         n_params = int(5)
+    #         size = int(value.shape[0])
+    #         data = np.zeros((size, 7), dtype = np.float32)
+    #         data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+
+    #         cnt = 0
+    #         for tmp_str in ['v', 'a', 'z', 'g', 't']:
+
+    #             if tmp_str in reg_outcomes:
+    #                 data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+    #             else:
+    #                 data[:, cnt] = params[tmp_str]
+
+    #             cnt += 1
+
+    #         # THIS IS NOT YET FINISHED !
+    #         return hddm.wfpt.wiener_like_multi_nn_ornstein(data,
+    #                                                     p_outlier = p_outlier,
+    #                                                     w_outlier = w_outlier,
+    #                                                     **kwargs)
+
+    #     stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ornstein, **kwargs))
+    #     stoch.random = random
+
+    # if model == 'weibull_cdf' or model == 'weibull':
+    #     def wiener_multi_like_nn_weibull(value, v, a, alpha, beta, z, t, 
+    #                                      reg_outcomes, 
+    #                                      p_outlier = 0, 
+    #                                      w_outlier = 0.1,
+    #                                      **kwargs):
+
+    #         params = {'v': v, 'a': a, 'z': z, 't': t, 'alpha': alpha, 'beta': beta}
+    #         n_params = int(6)
+    #         size = int(value.shape[0])
+    #         data = np.zeros((size, 8), dtype = np.float32)
+    #         data[:, n_params:] = np.stack([ np.absolute(value['rt']).astype(np.float32), value['response'].astype(np.float32) ], axis = 1)
+
+    #         cnt = 0
+    #         for tmp_str in ['v', 'a', 'z', 't', 'alpha', 'beta']:
+
+    #             if tmp_str in reg_outcomes:
+    #                 data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+    #             else:
+    #                 data[:, cnt] = params[tmp_str]
+
+    #             cnt += 1
+
+    #         # THIS IS NOT YET FINISHED !
+    #         return hddm.wfpt.wiener_like_multi_nn_weibull(data,
+    #                                                     p_outlier = p_outlier,
+    #                                                     w_outlier = w_outlier,
+    #                                                     **kwargs)
+
+    #     stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_weibull, **kwargs))
+    #     stoch.random = random
+    # return stoch
+

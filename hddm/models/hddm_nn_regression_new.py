@@ -190,9 +190,14 @@ class HDDMnnRegressor(HDDM):
             self.network = load_mlp(model = self.model)
             network_dict = {'network': self.network}
 
-        # Make likelihood function
-        self.wfpt_nn_reg_class = hddm.likelihoods_mlp.generate_wfpt_nn_ddm_reg_stochastic_class(model = self.model, **network_dict)
-        
+            # Make likelihood function
+            self.wfpt_nn_reg_class = hddm.likelihoods_mlp.generate_wfpt_nn_ddm_reg_stochastic_class(model = self.model, **network_dict)
+
+        if self.network_type == 'cnn':
+            self.network = load_cnn(model = self.model, nbin = self.nbin)
+            network_dict = {'network': self.network}
+            self.wfpt_nn_reg_class = hddm.likelihoods_cnn.generate_wfpt_nn_ddm_reg_stochastic_class(model = self.model, **network_dict)
+            
         # Initialize Base class 
         super(HDDMnnRegressor, self).__init__(data, **kwargs)
 

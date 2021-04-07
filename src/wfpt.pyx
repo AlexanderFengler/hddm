@@ -150,9 +150,9 @@ def wiener_pdf_cnn_2(np.ndarray[long, ndim = 1] x,
     # Call to network:
     return log_p
 
-def wiener_pdf_reg_cnn_2(np.ndarray[long, ndim = 1] x, 
+def wiener_like_reg_cnn_2(np.ndarray[long, ndim = 1] x, 
                          np.ndarray[long, ndim = 1] response, 
-                         np.ndarray[float, ndim = 1] parameters,
+                         np.ndarray[float, ndim = 2] parameters,
                          double p_outlier = 0, 
                          double w_outlier = 0,
                          bint logp = 0,
@@ -168,9 +168,9 @@ def wiener_pdf_reg_cnn_2(np.ndarray[long, ndim = 1] x,
     #print(pred)
     for i in range(size):
         if response[i] == 0:
-            log_p[i] += np.log(pred[0, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
+            log_p[i] += np.log(pred[i, 2 * x[i]] * (1 - p_outlier) + w_outlier * p_outlier)
         else: 
-            log_p[i] += np.log(pred[0, 2 * x[i] + 1] * (1 - p_outlier) + w_outlier * p_outlier)
+            log_p[i] += np.log(pred[i, 2 * x[i] + 1] * (1 - p_outlier) + w_outlier * p_outlier)
     
     if logp == 0:
         log_p = np.exp(log_p)
