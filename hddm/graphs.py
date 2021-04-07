@@ -203,6 +203,8 @@ def model_plot(posterior_samples = None,
         ax_titles = ''
         
     if ground_truth_data is not None and datatype == 'condition':
+        if condition_column is None:
+            return 'Need to specify the name of the condition column'
         ####
         gt_dat_dict = dict()
         for i in np.sort(np.unique(ground_truth_data[condition_column])):
@@ -228,7 +230,7 @@ def model_plot(posterior_samples = None,
         print(ground_truth_data.keys())
         # print('Supplying ground truth data not yet implemented for hierarchical datasets')
 
-    elif ground_truth_data is not None and datatype == 'dict':
+    elif ground_truth_data is not None and datatype == 'single_subject':
         sorted_keys = np.sort(list(ground_truth_data.keys()))
 
     # Define number of rows we need for display
