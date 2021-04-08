@@ -68,12 +68,43 @@ def _pad_subj_id(in_str):
     # print(out_str)
     return out_str
 
+def _add_outliers(sim_out = None, 
+                  p_outlier = None,
+                  n_samples = None,
+                  max_rt_outlier = 0.05,
+                  ):
+
+    if p_outlier == 0:
+        return sim_out
+    else:
+        # Sample number of outliers from appropriate binomial
+        n_outliers = np.random.binomial(n = n_samples, p = p_outlier)
+
+        # Only if the sampled number of outliers is above 0,
+        # do we bother generating and storing them
+        if n_outliers > 0:
+            # Initialize the outlier data
+            outlier_data = np.zeros((n_outliers, 2))
+
+            # Generate outliers
+            # Reaction times are uniform between 0 and 1/max_rt_outlier (default 1 / 0.1)
+            # Choice are random with equal probability among the valid choice options
+            outlier_data[:, 0] = np.random.uniform(low = 0.0, high = max_rt_outlier, size = n_outliers)
+            outlier_data[:, 1] = np.random.choice(sim_out[2]['possible_choices'], size = n_outliers)
+
+            # Exchange the last parts of the simulator data for the outliers
+            sim_out[0][-n_outliers:, 0] = outlier_data[:, 0]
+            sim_out[1][-n_outliers:, 0] = outlier_data[:, 1]
+    return 
+
+    
+
 # -------------------------------------------------------------------------------------
 
 # Dataset generators
 def simulator_single_subject(parameters = [0, 0, 0],
                              p_outlier = 0.0,
-                             w_outlier = 0.1,
+                             max_rt_outlier = 10.0,
                              model = 'angle',
                              n_samples = 1000,
                              delta_t = 0.001,
@@ -88,9 +119,9 @@ def simulator_single_subject(parameters = [0, 0, 0],
         p_outlier: float between 0 and 1 <default=0>
             Probability of generating outlier datapoints. An outlier is defined 
             as a random choice from a uniform RT distribution
-        w_outlier: float > 0 <default=0.1>
-            Using w_outlier (which is commonly defined for hddm models) here as an imlicit maximum 
-            on the RT of outliers. Outlier RTs are sampled uniformly from [0, 1 / w_outlier]
+        max_rt_outlier: float > 0 <default=10.0>
+            Using max_rt_outlier (which is commonly defined for hddm models) here as an imlicit maximum 
+            on the RT of outliers. Outlier RTs are sampled uniformly from [0, max_rt_outlier]
         model: str <default='angle'>
             String that specifies the model to be simulated. 
             Current options include, 'angle', 'ornstein', 'levy', 'weibull', 'full_ddm'
@@ -114,7 +145,7 @@ def simulator_single_subject(parameters = [0, 0, 0],
     
     # Sanity checks
     assert p_outlier >= 0 and p_outlier <= 1, 'p_outlier is not between 0 and 1'
-    assert w_outlier > 0, 'w_outlier needs to be > 0'
+    assert max_rt_outlier > 0, 'max_rt__outlier needs to be > 0'
 
     x = simulator(theta = parameters,
                   model = model,
@@ -124,28 +155,12 @@ def simulator_single_subject(parameters = [0, 0, 0],
                   bin_dim = bin_dim,
                   bin_pointwise = bin_pointwise)
 
-    # If it is desired to include outliers into the dataset, 
-    # we do this here.
-    if p_outlier != 0:
-        # Sample number of outliers from appropriate binomial
-        n_outliers = np.random.binomial(n = n_samples, p = p_outlier)
-
-        # Only if the sampled number of outliers is above 0,
-        # do we bother generating and storing them
-        if n_outliers > 0:
-            # Initialize the outlier data
-            outlier_data = np.zeros((n_outliers, 2))
-
-            # Generate outliers
-            # Reaction times are uniform between 0 and 1/w_outlier (default 1 / 0.1)
-            # Choice are random with equal probability among the valid choice options
-            outlier_data[:, 0] = np.random.uniform(low = 0.0, high = 1 / w_outlier, size = n_outliers)
-            outlier_data[:, 1] = np.random.choice(x[2]['possible_choices'], size = n_outliers)
-
-            # Exchange the last parts of the simulator data for the outliers
-            x[0][-n_outliers:, 0] = outlier_data[:, 0]
-            x[1][-n_outliers:, 0] = outlier_data[:, 1]
-
+    # Add outliers 
+    # (Potentially 0 outliers)
+    x = _add_outliers(sim_out = x,
+                      p_outlier = p_outlier,
+                      n_samples = n_samples,
+                      max_rt_outlier = max_rt_outlier)
         
     data_out = hddm_preprocess(x)
 
@@ -160,6 +175,8 @@ def simulator_single_subject(parameters = [0, 0, 0],
 # TD: DIDN'T GO OVER THIS ONE YET !
 def simulator_stimcoding(model = 'angle',
                          split_by = 'v',
+                         p_outlier = 0.0,
+                         max_rt_outlier = 10.0,
                          decision_criterion = 0.0,
                          n_samples_by_condition = 1000,
                          delta_t = 0.001,
@@ -180,6 +197,12 @@ def simulator_stimcoding(model = 'angle',
             You can split by 'v' or 'z'. If splitting by 'v' one condition's v_0 = decision_criterion + 'v', the other 
             condition's v_1 = decision_criterion - 'v'.
             Respectively for 'z', 'z_0' = 'z' and 'z_1' = 1 - 'z'.
+        p_outlier: float between 0 and 1 <default=0>
+            Probability of generating outlier datapoints. An outlier is defined 
+            as a random choice from a uniform RT distribution
+        max_rt_outlier: float > 0 <default=10.0>
+            Using max_rt_outlier (which is commonly defined for hddm models) here as an imlicit maximum 
+            on the RT of outliers. Outlier RTs are sampled uniformly from [0, max_rt_outlier]
         decision_criterion: float <default=0.0>
             Parameter that can be treated as the 'bias part' of the slope, in case we split_by 'v'.
         n_samples_by_condition: int <default=1000>
@@ -257,6 +280,12 @@ def simulator_stimcoding(model = 'angle',
                             bin_pointwise = bin_pointwise,
                             max_t = max_t,
                             delta_t = delta_t)
+        
+        sim_out = _add_outliers(sim_out = sim_out,
+                                p_outlier = p_outlier,
+                                n_samples = n_samples_by_condition,
+                                max_rt_outlier = max_rt_outlier)
+        
 
         dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i + 1))
     
@@ -269,6 +298,8 @@ def simulator_condition_effects(n_conditions = 4,
                                 n_samples_by_condition = 1000,
                                 condition_effect_on_param = None,
                                 prespecified_params = None,
+                                p_outlier = 0.0,
+                                max_rt_outlier = 10.0,
                                 model = 'angle',
                                 bin_dim = None,
                                 bin_pointwise = False,
@@ -294,6 +325,12 @@ def simulator_condition_effects(n_conditions = 4,
             Size fo timesteps in simulator (conceptually measured in seconds)
         prespecified_params: dict <default = {}>
             A dictionary with parameter names keys. Values are list of either length 1, or length equal to the number of conditions.
+        p_outlier: float between 0 and 1 <default=0>
+            Probability of generating outlier datapoints. An outlier is defined 
+            as a random choice from a uniform RT distribution
+        max_rt_outlier: float > 0 <default=10.0>
+            Using max_rt_outlier (which is commonly defined for hddm models) here as an imlicit maximum 
+            on the RT of outliers. Outlier RTs are sampled uniformly from [0, max_rt_outlier]
         max_t: float <default=20>
             Maximum reaction the simulator can reach
         bin_dim: int <default=None>
@@ -307,6 +344,10 @@ def simulator_condition_effects(n_conditions = 4,
     Returns: 
         pandas.DataFrame: Holds a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
     """
+
+    # Sanity checks
+    assert p_outlier >= 0 and p_outlier <= 1, 'p_outlier is not between 0 and 1'
+    assert max_rt_outlier > 0, 'max_rt__outlier needs to be > 0'
 
     # Get list of keys in prespecified_params and return if it is not a dict when it is in fact not None
     if prespecified_params is not None:
@@ -373,6 +414,11 @@ def simulator_condition_effects(n_conditions = 4,
                             max_t = max_t,
                             delta_t = delta_t)
         
+        sim_out = _add_outliers(sim_out = sim_out,
+                                p_outlier = p_outlier,
+                                n_samples = n_samples_by_condition,
+                                max_rt_outlier = max_rt_outlier)
+        
         dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i))
     
     data_out = pd.concat(dataframes)
@@ -395,6 +441,8 @@ def simulator_covariate(dependent_params = ['v'],
                         betas = {'v': 0.1},
                         covariate_magnitudes = {'v': 1.0},
                         prespecified_params = None,
+                        p_outlier = 0.0,
+                        max_rt_outlier = 10.0,
                         subj_id = 'none',
                         bin_dim = None, 
                         bin_pointwise = False,
@@ -409,6 +457,12 @@ def simulator_covariate(dependent_params = ['v'],
             Parameters which will be treated as a deterministic function of a covariate
         prespecified_params: list or numpy array
             A list or numpy array of parameters to prespecify. These parameters are not functions of covariates.
+        p_outlier: float between 0 and 1 <default=0>
+            Probability of generating outlier datapoints. An outlier is defined 
+            as a random choice from a uniform RT distribution
+        max_rt_outlier: float > 0 <default=10.0>
+            Using max_rt_outlier (which is commonly defined for hddm models) here as an imlicit maximum 
+            on the RT of outliers. Outlier RTs are sampled uniformly from [0, max_rt_outlier]
         model: str <default='angle'>
             String that specifies the model to be simulated. 
             Current options include, 'angle', 'ornstein', 'levy', 'weibull', 'full_ddm'
@@ -439,6 +493,10 @@ def simulator_covariate(dependent_params = ['v'],
                                  Ready to be fit with hddm.
     
     """
+
+    # Sanity checks
+    assert p_outlier >= 0 and p_outlier <= 1, 'p_outlier is not between 0 and 1'
+    assert max_rt_outlier > 0, 'max_rt__outlier needs to be > 0'
 
     if betas == None:
         betas = {}
@@ -501,6 +559,11 @@ def simulator_covariate(dependent_params = ['v'],
                         bin_pointwise = bin_pointwise,
                         max_t = max_t,
                         delta_t = delta_t)
+
+    sim_out = _add_outliers(sim_out = sim_out,
+                            p_outlier = p_outlier,
+                            n_samples = n_samples,
+                            max_rt_outlier = max_rt_outlier)
     
     # sim_out_copy = []
     # sim_out_copy.append(np.squeeze(sim_out[0], axis = 0))
@@ -540,6 +603,8 @@ def simulator_hierarchical(n_subjects = 5,
                            n_samples_by_subject = 500,
                            prespecified_param_means = {'v': 2},
                            prespecified_param_stds = {'v': 0.3},
+                           p_outlier = 0.0,
+                           max_rt_outlier = 10.0,
                            model = 'angle',
                            bin_dim = None,
                            bin_pointwise = True,
@@ -557,6 +622,12 @@ def simulator_hierarchical(n_subjects = 5,
             Prespeficied group means 
         prespecified_param_stds: dict <default={'v': 0.3}
             Prespeficied group standard deviations
+        p_outlier: float between 0 and 1 <default=0>
+            Probability of generating outlier datapoints. An outlier is defined 
+            as a random choice from a uniform RT distribution
+        max_rt_outlier: float > 0 <default=10.0>
+            Using max_rt_outlier (which is commonly defined for hddm models) here as an imlicit maximum 
+            on the RT of outliers. Outlier RTs are sampled uniformly from [0, max_rt_outlier]
         model: str <default='angle'>
             String that specifies the model to be simulated. 
             Current options include, 'angle', 'ornstein', 'levy', 'weibull', 'full_ddm'
@@ -577,6 +648,11 @@ def simulator_hierarchical(n_subjects = 5,
                                            Ready to be fit with hddm.
     """
 
+    # Sanity checks
+    assert p_outlier >= 0 and p_outlier <= 1, 'p_outlier is not between 0 and 1'
+    assert max_rt_outlier > 0, 'max_rt__outlier needs to be > 0'
+
+    # AF TD: Why is this unused ?!
     param_ranges_half = (np.array(model_config[model]['param_bounds'][1]) - np.array(model_config[model]['param_bounds'][0])) / 2
     # Fill in some global parameter vectors
     global_means = np.random.uniform(low = model_config[model]['param_bounds'][0],
@@ -627,6 +703,11 @@ def simulator_hierarchical(n_subjects = 5,
                             bin_pointwise = bin_pointwise,
                             max_t = max_t,
                             delta_t = delta_t)
+
+        sim_out = _add_outliers(sim_out = sim_out,
+                                p_outlier = p_outlier,
+                                n_samples = n_samples_by_subject,
+                                max_rt_outlier = max_rt_outlier)
         
         dataframes.append(hddm_preprocess(simulator_data = sim_out, 
                                           subj_id = subj_id))
