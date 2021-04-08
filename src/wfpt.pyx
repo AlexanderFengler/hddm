@@ -590,7 +590,6 @@ def wiener_like_nn_ornstein_pdf(np.ndarray[float, ndim = 1] x,
     
     return log_p
 
-
 def wiener_like_nn_ddm_sdv(np.ndarray[float, ndim = 1] x, 
                            np.ndarray[float, ndim = 1] response, 
                            double v,
@@ -704,8 +703,6 @@ def wiener_like_nn_ddm_sdv_analytic_pdf(np.ndarray[float, ndim = 1] x,
         log_p = np.exp(log_p) # shouldn't be called log_p anymore but no need for an extra array here
     
     return log_p
-
-
 
 ###############
 # Regression style likelihoods: (Can prob simplify and make all mlp likelihoods of this form)
@@ -1066,7 +1063,6 @@ def gen_rts_from_cdf(double v, double sv, double a, double z, double sz, double 
         rts[i] = rt
     return rts
 
-
 def wiener_like_contaminant(np.ndarray[double, ndim=1] x, np.ndarray[int, ndim=1] cont_x, double v,
                             double sv, double a, double z, double sz, double t, double st, double t_min,
                             double t_max, double err, int n_st=10, int n_sz=10, bint use_adaptive=1,
@@ -1098,7 +1094,6 @@ def wiener_like_contaminant(np.ndarray[double, ndim=1] x, np.ndarray[int, ndim=1
 
     return sum_logp
 
-
 def gen_cdf_using_pdf(double v, double sv, double a, double z, double sz, double t, double st, double err,
                       int N=500, double time=5., int n_st=2, int n_sz=2, bint use_adaptive=1, double simps_err=1e-3,
                       double p_outlier=0, double w_outlier=0):
@@ -1125,7 +1120,6 @@ def gen_cdf_using_pdf(double v, double sv, double a, double z, double sz, double
     cdf_array /= cdf_array[x.shape[0] - 1]
 
     return x, cdf_array
-
 
 def split_cdf(np.ndarray[double, ndim=1] x, np.ndarray[double, ndim=1] data):
 

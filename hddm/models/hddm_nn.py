@@ -111,7 +111,7 @@ class HDDMnn(HDDM):
     :Example:
         >>> data, params = hddm.generate.gen_rand_data() # gen data
         >>> model = hddm.HDDMnn(data, model = 'angle', network_type = 'mlp) # create object
-        >>> mcmc.sample(5000, burn=20) # Sample from posterior
+        >>> mcmc.sample(500, burn=20) # Sample from posterior
 
     """
 

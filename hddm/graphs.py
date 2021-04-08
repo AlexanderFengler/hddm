@@ -33,6 +33,17 @@ from copy import deepcopy
 
 # Plot preprocessing functions
 def _make_trace_plotready_single_subject(hddm_trace = None, model = ''):
+    """Internal function to turn trace into data-format expected by plots. This
+       version handles single subject data (a single subject's dataset).
+
+    Arguments:
+        hddm_trace: panda DataFrame
+            Output of the hddm.get_traces() function.
+        model: str <default=''>
+            Name of the model that was fit (e.g. 'ddm', 'weibull', 'levy' ...)
+    Return:
+        panda DataFrame: Adjusted traces.
+    """
     
     posterior_samples = np.zeros(hddm_trace.shape)
     
@@ -49,6 +60,17 @@ def _make_trace_plotready_single_subject(hddm_trace = None, model = ''):
     return posterior_samples
 
 def _make_trace_plotready_hierarchical(hddm_trace = None, model = ''):
+    """Internal function to turn trace into data-format expected by plots. This
+       version handles a hierarchical dataset with multiple subjects.
+
+    Arguments:
+        hddm_trace: panda DataFrame
+            Output of the hddm.get_traces() function.
+        model: str <default=''>
+            Name of the model that was fit (e.g. 'ddm', 'weibull', 'levy' ...)
+    Return:
+        panda DataFrame: Adjusted traces.
+    """
     
     subj_l = []
     for key in hddm_trace.keys():
@@ -78,6 +100,17 @@ def _make_trace_plotready_hierarchical(hddm_trace = None, model = ''):
     return dat 
 
 def _make_trace_plotready_condition(hddm_trace = None, model = ''):
+    """Internal function to turn trace into data-format expected by plots. This
+       version handles a dataset with multiple conditions.
+
+    Arguments:
+        hddm_trace: panda DataFrame
+            Output of the hddm.get_traces() function.
+        model: str <default=''>
+            Name of the model that was fit (e.g. 'ddm', 'weibull', 'levy' ...)
+    Return:
+        panda DataFrame: Adjusted traces.
+    """
     
     cond_l = []
     for key in hddm_trace.keys():
@@ -122,7 +155,7 @@ def model_plot(posterior_samples = None,
                ground_truth_data = None,
                model_ground_truth = 'weibull_cdf',
                model_fitted = 'angle',
-               input_is_hddm_trace = False,
+               input_is_hddm_trace = True,
                datatype = 'single_subject', # 'hierarchical', 'single_subject', 'condition' # data structure
                condition_column = 'condition', # data structure
                n_plots = 4, 
@@ -138,13 +171,88 @@ def model_plot(posterior_samples = None,
                linewidth_trajectories = 1.0,
                ylimit = 2, # styling
                posterior_linewidth = 3, # styling
-               gt_linewidth = 3, # styling
+               ground_truth_linewidth = 3, # styling
                hist_linewidth = 3, # styling
                bin_size = 0.025, # styling
                save = False,
                scale_x = 1.0,
                scale_y = 1.0,
                delta_t_graph = 0.01):
+    
+    """The model plot is useful to illustrate model behavior graphically. It is quite a flexible 
+       plot allowing you to show path trajectories and embedded reaction time histograms etc.. 
+       The main feature is the graphical illustration of a given model 
+       (this works for 'ddm', 'ornstein', 'levy', 'weibull', 'angle') separately colored for the ground truth parameterization
+       and the parameterizations supplied as posterior samples from a hddm sampling run. 
+
+    Arguments:
+        posterior_samples: panda.DataFrame <default=None>
+            Holds the posterior samples. This will usually be the output of 
+            hddm_model.get_traces().
+        ground_truth_parameters: np.array <default=None>
+            Array holding ground truth parameters. Depending on the structure supplied under the 
+            datatype argument, this may be a 1d or 2d array.
+        ground_truth_data: panda.DataFrame
+            Ground truth dataset as supplied to hddm. Has a 'rt' column, a 'response' column and a 'subj_idx' column
+            and potentially a 'condition' column.
+        model_ground_truth: str <default='weibull_cdf'>
+            String that speficies which model was the ground truth. This is useful mainly for parameter recovery excercises,
+            one obviously doesn't usually have access to the ground truth.
+        model_fitted: str <default='angle'>
+            String that specifies which model the data was fitted to. This is necessary, for the plot to interpret the 
+            supplied traces correctly, and to choose the correct simulator for visualization.
+        datatype: str <default='single_subject'>
+            Three options as of now. 'single_subject', 'hierarchical', 'condition'
+        condition_column: str <default='condition'>
+            The column that specifies the condition in the data supplied under the ground_truth_data argument.
+        n_plots: int <default=4>
+            The plot attempts to be smart in trying to figure out how many plots are desired, however choosing it manual is a 
+            save option.
+        n_posterior_parameters: int <default=500>
+            Number of posterior samples to draw for plotting. This needs to be smaller or equal to the number 
+            of posterior samples supplied to the plot.
+        n_simulations_per_parameter: int <default=10>
+            How many simulations to perform for each posterior parameter vector drawn.
+        cols: int <default=3>
+            Number of columns to split the plot into.
+        max_t: float <default=10>
+            Maximim reaction time to allow for internal simulations for the plot.
+        show_model: bool <default=True>
+            Whether or not to show the model in the final output (other option is to just show reaction time histograms)
+        show_trajectories: bool <default=False>
+            Whether or not to show some example trajectories of the simulators.
+        n_trajectories: int <default=10>
+            Number of trajectories to show if the show_trajectories argument is set to True,
+        color_trajectories: str <default='blue'>
+            Color of the trajectories if the show_trajectories arguent is set to True.
+        alpha_trajectories: float <default=0.2>
+            Sets transparency level of trajectories if the show_trajectories argument is set to True.
+        linewidth_trajectories: float <default=1.0>
+            Sets the linewidth of trajectories if the show_trajectories argument is set to True.
+        ylimit: float <default=2>
+            Sets the limit on the y-axis
+        posterior_linewidth: float <default=3>
+            Linewidth of the model visualizations corresponding to posterior samples.
+        ground_truth_linewidth: float <default=3>
+            Linewidth of the model visualization corresponding to the ground truth model
+        hist_linewidth: float <default=3>
+            Linewidth of the reaction time histograms (for gorund truth and posterior samples).
+            To hide the reaction time histograms, set it to 0.
+        bin_size: float <default=0.025>
+            Bin size for the reaction time histograms.
+        save: bool <default=False>
+            Whether to save the plot
+        scale_x: float <default=1.0>
+            Scales the x axis of the graph
+        scale_y: float <default=1.0>
+            Salces the y axes o the graph
+        delta_t_graph: float <default=0.01>
+            Timesteps to use for the simulation runs performed for plotting.
+        input_is_hddm_trace: bin <default=True>>
+            Whether or not the posterior samples supplied are coming from hddm traces. 
+            NOTE, this does not accept False as of now.
+    Return: plot object
+    """
     
     if save == True:
         pass
@@ -502,7 +610,7 @@ def model_plot(posterior_samples = None,
                         tmp_color = tmp_colors[int(tmp_bool)]
                         tmp_alpha = 1
                         tmp_label = 'Ground Truth Model'
-                        tmp_linewidth = gt_linewidth
+                        tmp_linewidth = ground_truth_linewidth
                     elif j == n_posterior_parameters and model_ground_truth == None:
                         break
                     else:
@@ -642,6 +750,60 @@ def posterior_predictive_plot(posterior_samples = None,
                               scale_x = 0.5,
                               scale_y = 0.5,
                               save = False):
+    """An alternative posterior predictive plot. Works for all models listed in hddm (e.g. 'ddm', 'angle', 'weibull', 'levy', 'ornstein')
+
+    Arguments:
+        posterior_samples: panda.DataFrame <default=None>
+            Holds the posterior samples. This will usually be the output of 
+            hddm_model.get_traces().
+        ground_truth_parameters: np.array <default=None>
+            Array holding ground truth parameters. Depending on the structure supplied under the 
+            datatype argument, this may be a 1d or 2d array.
+        ground_truth_data: panda.DataFrame
+            Ground truth dataset as supplied to hddm. Has a 'rt' column, a 'response' column and a 'subj_idx' column
+            and potentially a 'condition' column.
+        model_ground_truth: str <default='weibull_cdf'>
+            String that speficies which model was the ground truth. This is useful mainly for parameter recovery excercises,
+            one obviously doesn't usually have access to the ground truth.
+        model_fitted: str <default='angle'>
+            String that specifies which model the data was fitted to. This is necessary, for the plot to interpret the 
+            supplied traces correctly, and to choose the correct simulator for visualization.
+        datatype: str <default='single_subject'>
+            Three options as of now. 'single_subject', 'hierarchical', 'condition'
+        condition_column: str <default='condition'>
+            The column that specifies the condition in the data supplied under the ground_truth_data argument.
+        n_plots: int <default=4>
+            The plot attempts to be smart in trying to figure out how many plots are desired, however choosing it manual is a 
+            save option.
+        n_posterior_parameters: int <default=500>
+            Number of posterior samples to draw for plotting. This needs to be smaller or equal to the number 
+            of posterior samples supplied to the plot.
+        n_simulations_per_parameter: int <default=10>
+            How many simulations to perform for each posterior parameter vector drawn.
+        cols: int <default=3>
+            Number of columns to split the plot into.
+        max_t: float <default=10>
+            Maximim reaction time to allow for internal simulations for the plot.
+        xlimit: float <default=2>
+            Sets the limit on the x-axis
+        hist_linewidth: float <default=3>
+            Linewidth of the reaction time histograms (for gorund truth and posterior samples).
+            To hide the reaction time histograms, set it to 0.
+        bin_size: float <default=0.025>
+            Bin size for the reaction time histograms.
+        save: bool <default=False>
+            Whether to save the plot
+        scale_x: float <default=1.0>
+            Scales the x axis of the graph
+        scale_y: float <default=1.0>
+            Salces the y axes o the graph
+        delta_t_graph: float <default=0.01>
+            Timesteps to use for the simulation runs performed for plotting.
+        input_is_hddm_trace: bin <default=True>>
+            Whether or not the posterior samples supplied are coming from hddm traces. 
+            NOTE, this does not accept False as of now.
+    Return: plot object
+    """
     
     if save == True:
         pass
@@ -851,12 +1013,48 @@ def caterpillar_plot(posterior_samples = [],
                      datatype = 'hierarchical', # 'hierarchical', 'single_subject', 'condition'
                      drop_sd = True,
                      keep_key = None,
-                     x_lims = [-2, 2],
+                     x_limits = [-2, 2],
                      aspect_ratio = 2,
                      figure_scale = 1.0,
                      save = False,
                      tick_label_size_x = 22,
                      tick_label_size_y = 14):
+
+    """An alternative posterior predictive plot. Works for all models listed in hddm (e.g. 'ddm', 'angle', 'weibull', 'levy', 'ornstein')
+
+    Arguments:
+        posterior_samples: panda.DataFrame <default=None>
+            Holds the posterior samples. This will usually be the output of 
+            hddm_model.get_traces().
+        ground_truth_parameters: np.array <default=None>
+            Array holding ground truth parameters. Depending on the structure supplied under the 
+            datatype argument, this may be a 1d or 2d array.
+        model_fitted: str <default='angle'>
+            String that specifies which model the data was fitted to. This is necessary, for the plot to interpret the 
+            supplied traces correctly, and to choose the correct simulator for visualization.
+        datatype: str <default='single_subject'>
+            Three options as of now. 'single_subject', 'hierarchical', 'condition'
+        drop_sd: bool <default=True>
+            Whether or not to drop group level standard deviations from the caterpillar plot.
+            This is sometimes useful because scales can be off if included.
+        keep_key: list <default=None>
+            If you want to keep only a specific list of parameters in the caterpillar plot, supply those here as 
+            a list. All other parameters for which you supply traces in the posterior samples are going to be ignored.
+        x_limits: float <default=2>
+            Sets the limit on the x-axis
+        aspect_ratio: float <default=2>
+            Aspect ratio of plot.
+        figure_scale: float <default=1.0>
+            Figure scaling. 1.0 refers to 10 inches as a baseline size.
+        tick_label_size_x: int <default=22>
+            Basic plot styling. Tick label size.
+        tick_label_size_y: int <default=14>
+            Basic plot styling. Tick label size.
+        save: bool <default=False>
+            Whether to save the plot
+
+    Return: plot object
+    """
     
     if save == True:
         pass
@@ -954,7 +1152,7 @@ def caterpillar_plot(posterior_samples = [],
         if ground_truth_parameters is not None:
             ax.scatter(gt_dict[k.replace('-', '_')], k,  c = 'red', marker = "|")
         
-    ax.set_xlim(x_lims[0], x_lims[1])
+    ax.set_xlim(x_limits[0], x_limits[1])
     ax.tick_params(axis = 'y', size = tick_label_size_y)
     ax.tick_params(axis = 'x', size = tick_label_size_x)
         
@@ -967,14 +1165,41 @@ def caterpillar_plot(posterior_samples = [],
     return plt.show()
 
 # Posterior Pair Plot
-def posterior_pair_plot(posterior_samples = [], # Here expects single subject's posterior samples as panda dataframe (dictionary may work)
+def posterior_pair_plot(posterior_samples = None, # Here expects single subject's posterior samples as panda dataframe (dictionary may work)
                         axes_limits = 'samples', # 'samples' or dict({'parameter_name': [lower bound, upper bound]})
                         height = 10,
                         aspect_ratio = 1,
                         n_subsample = 1000,
-                        ground_truths = [],
+                        ground_truths = None,
                         model_fitted = None,
                         save = False):
+
+    """Basic pair plot useful for inspecting posterior parameters.
+       At this point can be used only for single subject data. 
+       Works for all models listed in hddm (e.g. 'ddm', 'angle', 'weibull', 'levy', 'ornstein')
+
+    Arguments:
+        posterior_samples: pandas.DataFrame <default=None>
+            Supplies the posterior samples as a pandas DataFrame with columns determining the parameters for which rows 
+            store traces.
+        axes_limits: str or dict <default='samples'>
+            Either a string that says 'samples', which makes axes limits depends on the posterior sample values directly,
+            (separately for each parameter). Or a dictionary with keys parameter names, and values a 2-list with a lower
+            and an upper bound ([lower, upper]).
+        height: float <default=10>
+            Figure height in inches.
+        aspect_ratio: float <default=1>
+            Aspect ratio of figure 
+        n_subsample: int <default=1000>
+            Number of posterior samples to use for figure finally. Subsamples from the provided traces.
+        ground_truths: list or numpy.array <default=None>
+            Ground truth parameters (will be shown in the plot if supplied)
+        model_fitted: str <default=None>
+            String that supplies which model was fitted to the data.
+        save: bool <default= False>
+            Whether or not to save the figure.
+    Return: plot object
+    """
     
     if save == True:
         pass

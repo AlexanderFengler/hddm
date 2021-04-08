@@ -7,6 +7,22 @@ import data_simulators
 
 # Defining the likelihood functions
 def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
+    """Defines the likelihoods for the CNN networks.
+
+    :Arguments:
+        model: str <default='ddm>
+            String that determines which model you would like to fit your data to.
+            Currently available models are: 'ddm', 'full_ddm', 'angle', 'weibull', 'ornstein', 'levy'
+        pdf_multiplier: int <default=1>
+            Currently not used. Is meant to adjust for the bin size on which CNN RT histograms were based, to get 
+            the right proportionality constant. 
+        **kwargs: dict
+            Dictionary of additional keyword arguments. 
+            Importantly here, this carries the preloaded CNN.
+    :Returns:
+        pymc.object: Returns a stochastic object as defined by PyMC2
+    """
+    
     def random(self):
         # print(self.parents)
         # print('printing the dir of self.parents directly')
@@ -260,6 +276,18 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
 
 def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                                               **kwargs):
+    """Defines the regressor likelihoods for the CNN networks.
+
+    :Arguments:
+        model: str <default='ddm>
+            String that determines which model you would like to fit your data to.
+            Currently available models are: 'ddm', 'full_ddm', 'angle', 'weibull', 'ornstein', 'levy'
+        **kwargs: dict
+            Dictionary of additional keyword arguments. 
+            Importantly here, this carries the preloaded CNN.
+    :Returns:
+        pymc.object: Returns a stochastic object as defined by PyMC2
+    """
 
     # Need to rewrite these random parts !
     def random(self):

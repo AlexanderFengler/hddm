@@ -100,7 +100,8 @@ def simulator_single_subject(parameters = [0, 0, 0],
             This is expected when you are using the 'cnn' network to fit the dataset later. If pointwise is not chosen,
             then the takes the form of a histogram, with bin-wise frequencies.
 
-    Return: panda.DataFrame holding a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
+    Return: pandas.DataFrame 
+        Holds a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
     """
     
     x = simulator(theta = parameters,
@@ -154,7 +155,7 @@ def simulator_stimcoding(model = 'angle',
             This is expected when you are using the 'cnn' network to fit the dataset later. If pointwise is not chosen,
             then the takes the form of a histogram, with bin-wise frequencies.
 
-    Return: panda.DataFrame holding a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
+    Return: pandas.DataFrame holding a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
     """
     
     param_base = np.tile(np.random.uniform(low = model_config[model]['param_bounds'][0],
@@ -236,7 +237,6 @@ def simulator_condition_effects(n_conditions = 4,
     :Arguments:
         n_conditions: int <default=4>
 
-
         parameters: list or numpy array
             Model parameters with which to simulate.
         model: str <default='angle'>
@@ -261,7 +261,7 @@ def simulator_condition_effects(n_conditions = 4,
             then the takes the form of a histogram, with bin-wise frequencies.
 
     Returns: 
-        panda.DataFrame: Holds a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
+        pandas.DataFrame: Holds a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
     """
 
     # Get list of keys in prespecified_params and return if it is not a dict when it is in fact not None
@@ -391,7 +391,7 @@ def simulator_covariate(dependent_params = ['v'],
             then the takes the form of a histogram, with bin-wise frequencies.
 
     Returns: 
-        (panda.DataFrame, dict): The Dataframe holds a 'reaction time' column, a 'response' column and a 'BOLD' column (for the covariate). The dictionary holds the groundtruth parameter (values) and parameter names (keys).
+        (pandas.DataFrame, dict): The Dataframe holds a 'reaction time' column, a 'response' column and a 'BOLD' column (for the covariate). The dictionary holds the groundtruth parameter (values) and parameter names (keys).
                                  Ready to be fit with hddm.
     
     """
@@ -529,7 +529,7 @@ def simulator_hierarchical(n_subjects = 5,
             then the takes the form of a histogram, with bin-wise frequencies.
 
     Returns: 
-        (panda.DataFrame, dict, np.array): The Dataframe holds a 'reaction time' column, a 'response' column and a 'BOLD' column (for the covariate). The dictionary holds the groundtruth parameter (values) and parameter names (keys).
+        (pandas.DataFrame, dict, np.array): The Dataframe holds a 'reaction time' column, a 'response' column and a 'BOLD' column (for the covariate). The dictionary holds the groundtruth parameter (values) and parameter names (keys).
                                            Ready to be fit with hddm.
     """
 

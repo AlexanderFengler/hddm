@@ -7,6 +7,19 @@ import data_simulators
 
 def make_mlp_likelihood_complete(model,
                                  **kwargs):
+    """Defines the likelihoods for the MLP networks.
+
+    :Arguments:
+        model: str <default='ddm>
+            String that determines which model you would like to fit your data to.
+            Currently available models are: 'ddm', 'full_ddm', 'angle', 'weibull', 'ornstein', 'levy'
+        **kwargs: dict
+            Dictionary of additional keyword arguments. 
+            Importantly here, this carries the preloaded CNN.
+    :Returns:
+        pymc.object: Returns a stochastic object as defined by PyMC2
+    """
+
     def random(self):
         # print(self.parents)
         # print('printing the dir of self.parents directly')
@@ -421,6 +434,18 @@ def make_mlp_likelihood_complete(model,
 # Defining only the model likelihood at this point !
 def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                                               **kwargs):
+    """Defines the regressor likelihoods for the MLP networks.
+
+    :Arguments:
+        model: str <default='ddm>
+            String that determines which model you would like to fit your data to.
+            Currently available models are: 'ddm', 'full_ddm', 'angle', 'weibull', 'ornstein', 'levy'
+        **kwargs: dict
+            Dictionary of additional keyword arguments. 
+            Importantly here, this carries the preloaded CNN.
+    :Returns:
+        pymc.object: Returns a stochastic object as defined by PyMC2
+    """
 
         # Need to rewrite these random parts !
     def random(self):
