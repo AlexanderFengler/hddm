@@ -72,6 +72,8 @@ def _pad_subj_id(in_str):
 
 # Dataset generators
 def simulator_single_subject(parameters = [0, 0, 0],
+                             p_outlier = 0.0,
+                             w_outlier = 0.1,
                              model = 'angle',
                              n_samples = 1000,
                              delta_t = 0.001,
@@ -83,6 +85,12 @@ def simulator_single_subject(parameters = [0, 0, 0],
     :Arguments:
         parameters: list or numpy array
             Model parameters with which to simulate.
+        p_outlier: float between 0 and 1 <default=0>
+            Probability of generating outlier datapoints. An outlier is defined 
+            as a random choice from a uniform RT distribution
+        w_outlier: float > 0 <default=0.1>
+            Using w_outlier (which is commonly defined for hddm models) here as an imlicit maximum 
+            on the RT of outliers. Outlier RTs are sampled uniformly from [0, 1 / w_outlier]
         model: str <default='angle'>
             String that specifies the model to be simulated. 
             Current options include, 'angle', 'ornstein', 'levy', 'weibull', 'full_ddm'
@@ -104,6 +112,10 @@ def simulator_single_subject(parameters = [0, 0, 0],
         Holds a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
     """
     
+    # Sanity checks
+    assert p_outlier >= 0 and p_outlier <= 1, 'p_outlier is not between 0 and 1'
+    assert w_outlier > 0, 'w_outlier needs to be > 0'
+
     x = simulator(theta = parameters,
                   model = model,
                   n_samples = n_samples,
@@ -111,8 +123,39 @@ def simulator_single_subject(parameters = [0, 0, 0],
                   max_t = max_t,
                   bin_dim = bin_dim,
                   bin_pointwise = bin_pointwise)
+
+    # If it is desired to include outliers into the dataset, 
+    # we do this here.
+    if p_outlier != 0:
+        # Sample number of outliers from appropriate binomial
+        n_outliers = np.random.binomial(n = n_samples, p = p_outlier)
+
+        # Only if the sampled number of outliers is above 0,
+        # do we bother generating and storing them
+        if n_outliers > 0:
+            # Initialize the outlier data
+            outlier_data = np.zeros((n_outliers, 2))
+
+            # Generate outliers
+            # Reaction times are uniform between 0 and 1/w_outlier (default 1 / 0.1)
+            # Choice are random with equal probability among the valid choice options
+            outlier_data[:, 0] = np.random.uniform(low = 0.0, high = 1 / w_outlier, size = n_outliers)
+            outlier_data[:, 1] = np.random.choice(x[2]['possible_choices'], size = n_outliers)
+
+            # Exchange the last parts of the simulator data for the outliers
+            x[0][-n_outliers:, 0] = outlier_data[:, 0]
+            x[1][-n_outliers:, 0] = outlier_data[:, 1]
+
+        
+    data_out = hddm_preprocess(x)
+
+
+    gt = {}
+    for param in model_config[model]['params']:
+        id_tmp = model_config[model]['params'].index(param)
+        gt[param] = parameters[id_tmp]
     
-    return hddm_preprocess(x)
+    return (data_out, gt, parameters)
 
 # TD: DIDN'T GO OVER THIS ONE YET !
 def simulator_stimcoding(model = 'angle',
@@ -212,7 +255,8 @@ def simulator_stimcoding(model = 'angle',
                             n_samples = n_samples_by_condition,
                             bin_dim = bin_dim,
                             bin_pointwise = bin_pointwise,
-                            max_t = max_t)
+                            max_t = max_t,
+                            delta_t = delta_t)
 
         dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i + 1))
     
