@@ -10,6 +10,7 @@ from . import likelihoods_cnn
 from . import generate
 from . import utils
 from . import graphs
+from . import network_inspectors
 from . import models
 from . import simulators
 import cdfdif_wrapper
