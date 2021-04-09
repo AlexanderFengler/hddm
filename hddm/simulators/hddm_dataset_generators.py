@@ -101,9 +101,9 @@ def _add_outliers(sim_out = None,
 
 # -------------------------------------------------------------------------------------
 # Parameter set generator
-def make_parameter_vectors(model = 'angle',
-                           param_dict = None,
-                           n_parameter_vectors = 10):
+def make_parameter_vectors_nn(model = 'angle',
+                              param_dict = None,
+                              n_parameter_vectors = 10):
     """Generates a (number of) parameter vector(s) for a given model. 
 
     :Arguments:
