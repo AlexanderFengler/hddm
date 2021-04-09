@@ -593,7 +593,7 @@ def model_plot(posterior_samples = None,
             if posterior_samples is None:
                 # If we didn't supply posterior_samples but want to show model
                 # we set n_posterior_parameters to 1 and should be 
-                n_posterior_parameters = 1
+                n_posterior_parameters = 0
                 for j in range(n_posterior_parameters + 1):
                     tmp_label = ""
                     if j == (n_posterior_parameters - 1):
