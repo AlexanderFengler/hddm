@@ -100,6 +100,47 @@ def _add_outliers(sim_out = None,
     
 
 # -------------------------------------------------------------------------------------
+# Parameter set generator
+def make_parameter_sets(model = 'weibull_cdf',
+                        param_dict = None,
+                        n_parameter_vectors = 10):
+    
+    parameter_data = np.zeros((n_parameter_vectors, len(model_config[model]['params'])))
+    
+    if param_dict is not None:
+        cnt = 0
+        for param in model_config[model]['params']:
+
+            if param in param_dict.keys():
+
+                if (len(param_dict[param]) == n_parameter_vectors) or (len(param_dict[param]) == 1):
+                    # Check if parameters are properly in bounds
+                    if np.sum(np.array(param_dict[param]) < model_config[model]['param_bounds'][0][cnt]) > 0 \
+                    or np.sum(np.array(param_dict[param]) > model_config[model]['param_bounds'][1][cnt]) > 0:
+                        
+                        print('The parameter: ', 
+                              param, 
+                              ', is out of the accepted bounds [', 
+                              model_config[model]['param_bounds'][0][cnt], 
+                              ',', 
+                              model_config[model]['param_bounds'][1][cnt], ']')
+                        return 
+                    else:
+                        parameter_data[:, cnt] = param_dict[param]
+                else:
+                    print('Param dict not specified correctly. Lengths of parameter lists needs to be 1 or equal to n_param_sets')
+
+            else:
+                parameter_data[:, cnt] = np.random.uniform(low = model_config[model]['param_bounds'][0][cnt],
+                                                           high = model_config[model]['param_bounds'][1][cnt], 
+                                                           size = n_parameter_vectors)
+            cnt += 1
+    else:
+        parameter_data = np.random.uniform(low = model_config[model]['param_bounds'][0],
+                                           high = model_config[model]['param_bounds'][1],
+                                           size = (n_parameter_vectors, len(model_config[model]['params'])))
+                                           
+    return pd.DataFrame(parameter_data, columns = model_config[model]['params'])
 
 # Dataset generators
 def simulator_single_subject(parameters = [0, 0, 0],
