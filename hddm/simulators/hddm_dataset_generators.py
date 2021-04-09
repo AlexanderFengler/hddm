@@ -114,8 +114,10 @@ def simulator_single_subject(parameters = [0, 0, 0],
     """Generate a hddm-ready dataset from a single set of parameters
 
     :Arguments:
-        parameters: list or numpy array
-            Model parameters with which to simulate.
+        parameters: dict list, numpy array
+            Model parameters with which to simulate. Dict is preferable for informative error messages.
+            If you know the order of parameters for your model of choice, you can also directly supply a
+            list or nump.array which needs to have the parameters in the correct order.
         p_outlier: float between 0 and 1 <default=0>
             Probability of generating outlier datapoints. An outlier is defined 
             as a random choice from a uniform RT distribution
@@ -139,13 +141,33 @@ def simulator_single_subject(parameters = [0, 0, 0],
             This is expected when you are using the 'cnn' network to fit the dataset later. If pointwise is not chosen,
             then the takes the form of a histogram, with bin-wise frequencies.
 
-    Return: pandas.DataFrame 
-        Holds a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
+    Return: tuple of (pandas.DataFrame, dict, list)
+        The first part of the tuple holds a DataFrame with a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
+        The second part of the tuple hold a dict with parameter names as keys and parameter values as values.
+        The third part gives back the parameters supplied in array form.
+        This return is consistent with the returned objects in other data generators under hddm.simulators
     """
     
     # Sanity checks
     assert p_outlier >= 0 and p_outlier <= 1, 'p_outlier is not between 0 and 1'
     assert max_rt_outlier > 0, 'max_rt__outlier needs to be > 0'
+
+    print('Model: ', model)
+    print('Parameters needed: ', model_config[model]['params'])
+    if type(parameters) != dict:
+        gt = {}
+        for param in model_config[model]['params']:
+            id_tmp = model_config[model]['params'].index(param)
+            gt[param] = parameters[id_tmp]      
+    else:  
+        gt = parameters.copy()
+        parameters = []
+        for param in model_config[model]['params']:
+            if param in gt.keys():
+                parameters.append(gt[param])
+            else:
+                print('The parameter ', param, ' was not supplied to the function')
+                parameters.append(model_config[model]['default_params'][model_config[model]['params'].index(param)])
 
     x = simulator(theta = parameters,
                   model = model,
@@ -164,13 +186,7 @@ def simulator_single_subject(parameters = [0, 0, 0],
         
     data_out = hddm_preprocess(x)
 
-
-    gt = {}
-    for param in model_config[model]['params']:
-        id_tmp = model_config[model]['params'].index(param)
-        gt[param] = parameters[id_tmp]
-    
-    return (data_out, gt, parameters)
+    return (data_out, gt, np.array(parameters))
 
 # TD: DIDN'T GO OVER THIS ONE YET !
 def simulator_stimcoding(model = 'angle',
