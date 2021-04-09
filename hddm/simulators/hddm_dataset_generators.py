@@ -114,7 +114,7 @@ def simulator_single_subject(parameters = [0, 0, 0],
     """Generate a hddm-ready dataset from a single set of parameters
 
     :Arguments:
-        parameters: dict list, numpy array
+        parameters: dict, list or numpy array
             Model parameters with which to simulate. Dict is preferable for informative error messages.
             If you know the order of parameters for your model of choice, you can also directly supply a
             list or nump.array which needs to have the parameters in the correct order.
@@ -166,7 +166,8 @@ def simulator_single_subject(parameters = [0, 0, 0],
             if param in gt.keys():
                 parameters.append(gt[param])
             else:
-                print('The parameter ', param, ' was not supplied to the function')
+                print('The parameter ', param, ' was not supplied to the function.')
+                print('Taking default', param, ' from hddm.model_config.')
                 parameters.append(model_config[model]['default_params'][model_config[model]['params'].index(param)])
 
     x = simulator(theta = parameters,
