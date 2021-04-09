@@ -101,9 +101,26 @@ def _add_outliers(sim_out = None,
 
 # -------------------------------------------------------------------------------------
 # Parameter set generator
-def make_parameter_sets(model = 'weibull_cdf',
-                        param_dict = None,
-                        n_parameter_vectors = 10):
+def make_parameter_vectors(model = 'angle',
+                           param_dict = None,
+                           n_parameter_vectors = 10):
+    """Generates a (number of) parameter vector(s) for a given model. 
+
+    :Arguments:
+
+        model: str <default='angle'>
+            String that specifies the model to be simulated. 
+            Current options include, 'angle', 'ornstein', 'levy', 'weibull', 'full_ddm'
+        param_dict: dict <default=None>
+            Dictionary of parameter values that you would like to pre-specify. The dictionary takes the form (for the simple examples of the ddm),
+            {'v': [0], 'a': [1.5]} etc.. For a given key supply either a list of length 1, or a list of 
+            length equal to the n_parameter_vectors argument supplied.
+        n_parameter_vectors: int <default=10>
+            Nuber of parameter vectors you want to generate
+
+    Return: pandas.DataFrame
+            Columns are parameter names and rows fill the parameter values.
+    """
     
     parameter_data = np.zeros((n_parameter_vectors, len(model_config[model]['params'])))
     
