@@ -1087,7 +1087,7 @@ def caterpillar_plot(posterior_samples = [],
         
         if datatype == 'single_subject':
             if type(ground_truth_parameters) is not dict:
-                for v in config[model_fitted]['params']:
+                for v in model_config[model_fitted]['params']:
                     gt_dict[v] = ground_truth_parameters[cnt]
                     cnt += 1
             else:
