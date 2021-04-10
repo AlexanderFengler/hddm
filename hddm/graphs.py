@@ -842,11 +842,11 @@ def posterior_predictive_plot(posterior_samples = None,
         if ground_truth_data is not None:
             label_idx = [0] #np.unique(ground_truth_data['subj_idx'])
             gt_dat_dict = dict()
-            gt_dat_dict[0] = ground_truth_data
+            gt_dat_dict[0] = ground_truth_data.values
+            gt_dat_dict[0][:, 1][gt_dat_dict[0][:, 1] == 0.0] = -1.0
+            gt_dat_dict[0]
             ground_truth_data = gt_dat_dict
             
-            #ground_truth_data = np.expand_dims(ground_truth_data, 0)     
-    
     # Take care of ground_truth_data
     #label_idx = list()
     if ground_truth_data is not None and datatype == 'hierarchical':
@@ -941,8 +941,8 @@ def posterior_predictive_plot(posterior_samples = None,
             gt_color = 'red'
             #print('passed through')
         elif ground_truth_data is not None:
-            gt_tmp = ground_truth_data[label_idx[i]].values # using the relevant label here instead of the plot number 
-            gt_tmp[:, 1][gt_tmp[:,1] == 0.0] = -1.0 # set zero choices to -1 
+            gt_tmp = ground_truth_data[label_idx[i]] # .values # using the relevant label here instead of the plot number 
+            # gt_tmp[:, 1][gt_tmp[:,1] == 0.0] = -1.0 # set zero choices to -1 
             print(gt_tmp)
             gt_color = 'blue'
 
