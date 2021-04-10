@@ -942,6 +942,7 @@ def posterior_predictive_plot(posterior_samples = None,
             #print('passed through')
         elif ground_truth_data is not None:
             gt_tmp = ground_truth_data[label_idx[i]] # using the relevant label here instead of the plot number 
+            print(gt_tmp)
             gt_color = 'blue'
 
         if rows > 1 and cols > 1:
