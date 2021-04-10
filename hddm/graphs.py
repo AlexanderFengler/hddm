@@ -1258,6 +1258,11 @@ def posterior_pair_plot(posterior_samples = None, # Here expects single subject'
     for ax in g.axes[:, 0]:
         ylabel = ax.yaxis.get_label_text()
         ylabels.append(ylabel)
+
+    print('xlabels: ')
+    print(xlabels)
+    print('ylabels: ')
+    print(ylabels)
     
     if axes_limits == 'model':
         for i in range(len(xlabels)):
