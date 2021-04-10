@@ -912,7 +912,7 @@ def posterior_predictive_plot(posterior_samples = None,
         col_tmp = i - (cols * row_tmp)
         
         post_tmp = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
-        idx = np.random.choice(posterior_samples.shape[1], 
+        idx = np.random.choice(posterior_samples.shape[0], 
                                size = n_posterior_parameters, 
                                replace = False)
 
