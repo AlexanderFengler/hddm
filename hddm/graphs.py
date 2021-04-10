@@ -838,7 +838,7 @@ def posterior_predictive_plot(posterior_samples = None,
         if model_ground_truth is not None:
             ground_truth_parameters = np.expand_dims(ground_truth_parameters, 0)
         if posterior_samples is not None:
-            posterior_samples = np.expand_dims(posterior_samples, 0)
+            posterior_samples = np.expand_dims(posterior_samples, 0) # Seems unnecessary
         if ground_truth_data is not None:
             gt_dat_dict = dict()
             gt_dat_dict[0] = ground_truth_data
@@ -877,16 +877,15 @@ def posterior_predictive_plot(posterior_samples = None,
 
     # Taking care of special case with 1 plot
     if n_plots == 1:
-        rows = 1
         cols = 1
     
-    if n_plots == 1:
-        if model_ground_truth is not None:
-            ground_truth_parameters = np.expand_dims(ground_truth_parameters, 0)
-        if posterior_samples is not None:
-            posterior_samples = np.expand_dims(posterior_samples, 0)
-        if ground_truth_data is not None:
-            ground_truth_data = np.expand_dims(ground_truth_data, 0)
+    # if n_plots == 1:
+    #     if model_ground_truth is not None:
+    #         ground_truth_parameters = np.expand_dims(ground_truth_parameters, 0)
+    #     if posterior_samples is not None:
+    #         posterior_samples = np.expand_dims(posterior_samples, 0)
+    #     if ground_truth_data is not None:
+    #         ground_truth_data = np.expand_dims(ground_truth_data, 0)
 
     print(posterior_samples.shape)
  
