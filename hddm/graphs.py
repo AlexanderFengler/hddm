@@ -887,6 +887,8 @@ def posterior_predictive_plot(posterior_samples = None,
             posterior_samples = np.expand_dims(posterior_samples, 0)
         if ground_truth_data is not None:
             ground_truth_data = np.expand_dims(ground_truth_data, 0)
+
+    print(posterior_samples.shape)
  
     # General plot parameters
     nbins = int((2 * max_t) / bin_size)     
@@ -912,7 +914,7 @@ def posterior_predictive_plot(posterior_samples = None,
         col_tmp = i - (cols * row_tmp)
         
         post_tmp = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
-        idx = np.random.choice(posterior_samples.shape[0], 
+        idx = np.random.choice(posterior_samples.shape[1], 
                                size = n_posterior_parameters, 
                                replace = False)
 
