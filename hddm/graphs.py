@@ -941,7 +941,8 @@ def posterior_predictive_plot(posterior_samples = None,
             gt_color = 'red'
             #print('passed through')
         elif ground_truth_data is not None:
-            gt_tmp = ground_truth_data[label_idx[i]] # using the relevant label here instead of the plot number 
+            gt_tmp = ground_truth_data[label_idx[i]].values # using the relevant label here instead of the plot number 
+            gt_tmp[:, 1][gt_tmp[:,1] == 0.0] = -1.0 # set zero choices to -1 
             print(gt_tmp)
             gt_color = 'blue'
 
@@ -956,25 +957,25 @@ def posterior_predictive_plot(posterior_samples = None,
         
         # ACTUAL PLOTTING
         ax_tmp.hist(post_tmp[:, 0] * post_tmp[:, 1], 
-                                  bins = np.linspace(- max_t, max_t, nbins), #50, # kde = False, # rug = False, 
-                                  alpha =  1, 
-                                  color = 'black',
-                                  histtype = 'step', 
-                                  density = 1, 
-                                  edgecolor = 'black',
-                                  linewidth = hist_linewidth
-                                  )
+                    bins = np.linspace(- max_t, max_t, nbins), #50, # kde = False, # rug = False, 
+                    alpha =  1, 
+                    color = 'black',
+                    histtype = 'step', 
+                    density = 1, 
+                    edgecolor = 'black',
+                    linewidth = hist_linewidth
+                    )
         if ground_truth_data is not None:
             ax_tmp.hist(gt_tmp[:, 0] * gt_tmp[:, 1], 
-                                    alpha = 0.5, 
-                                    color = gt_color, 
-                                    density = 1, 
-                                    edgecolor = gt_color,  
-                                    histtype = 'step',
-                                    linewidth = hist_linewidth, 
-                                    bins = np.linspace(-max_t, max_t, nbins), #50, 
-                                    # kde = False, #rug = False,
-                                    )
+                        alpha = 0.5, 
+                        color = gt_color, 
+                        density = 1, 
+                        edgecolor = gt_color,  
+                        histtype = 'step',
+                        linewidth = hist_linewidth, 
+                        bins = np.linspace(-max_t, max_t, nbins), #50, 
+                        # kde = False, #rug = False,
+                        )
         
         # EXTRA STYLING    
         ax_tmp.set_xlim(- xlimit, xlimit)
