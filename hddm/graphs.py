@@ -300,6 +300,9 @@ def model_plot(posterior_samples = None,
         if ground_truth_data is not None:
             gt_dat_dict = dict()
             gt_dat_dict[0] = ground_truth_data.values
+            gt_dat_dict[0][:, 1][gt_dat_dict[0][:, 1] == 0.0] = -1.0
+            #gt_dat_dict[0]
+            ground_truth_data = gt_dat_dict
             ground_truth_data = gt_dat_dict
             #ground_truth_data = np.expand_dims(ground_truth_data, 0)
             sorted_keys = [0]
