@@ -840,14 +840,16 @@ def posterior_predictive_plot(posterior_samples = None,
         if posterior_samples is not None:
             posterior_samples = np.expand_dims(posterior_samples, 0) # Seems unnecessary
         if ground_truth_data is not None:
+            label_idx = np.unique(ground_truth_data['subj_idx'])
             gt_dat_dict = dict()
             gt_dat_dict[0] = ground_truth_data
             ground_truth_data = gt_dat_dict
+            
             #ground_truth_data = np.expand_dims(ground_truth_data, 0)     
     
     # Take care of ground_truth_data
-    label_idx = list()
-    if ground_truth_data is not None and datatype == 'hierarchical' or datatype == 'single_subject':
+    #label_idx = list()
+    if ground_truth_data is not None and datatype == 'hierarchical':
         # initialize ground truth data dictionary
         gt_dat_dict = dict()
         
