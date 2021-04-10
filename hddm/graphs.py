@@ -597,99 +597,99 @@ def model_plot(posterior_samples = None,
                 # If we didn't supply posterior_samples but want to show model
                 # we set n_posterior_parameters to 1 and should be 
                 n_posterior_parameters = 0
-                for j in range(n_posterior_parameters + 1):
-                    tmp_label = ""
-                    if j == (n_posterior_parameters - 1):
-                        tmp_label = 'Model Samples'
-                        tmp_model = model_fitted
-                        tmp_samples = posterior_samples[i, idx[j], :]
-                        tmp_alpha = 0.5
-                        tmp_color = 'black'
-                        tmp_linewidth = posterior_linewidth
-                    elif j == n_posterior_parameters and model_ground_truth is not None:
-                        tmp_samples = ground_truth_parameters[i, :]
-                        tmp_model = model_ground_truth
-                        
-                        # If we supplied ground truth data --> make ground truth model blue, otherwise red
-                        tmp_colors = ['red', 'blue']
-                        tmp_bool = ground_truth_data is not None
-                        tmp_color = tmp_colors[int(tmp_bool)]
-                        tmp_alpha = 1
-                        tmp_label = 'Ground Truth Model'
-                        tmp_linewidth = ground_truth_linewidth
-                    elif j == n_posterior_parameters and model_ground_truth == None:
-                        break
-                    else:
-                        tmp_model = model_fitted
-                        tmp_samples = posterior_samples[i, idx[j], :]
-                        tmp_alpha = 0.05
-                        tmp_color = 'black'
-                        tmp_label = None
-                        tmp_linewidth = posterior_linewidth
-
-                    print(tmp_label)
+            for j in range(n_posterior_parameters + 1):
+                tmp_label = ""
+                if j == (n_posterior_parameters - 1):
+                    tmp_label = 'Model Samples'
+                    tmp_model = model_fitted
+                    tmp_samples = posterior_samples[i, idx[j], :]
+                    tmp_alpha = 0.5
+                    tmp_color = 'black'
+                    tmp_linewidth = posterior_linewidth
+                elif j == n_posterior_parameters and model_ground_truth is not None:
+                    tmp_samples = ground_truth_parameters[i, :]
+                    tmp_model = model_ground_truth
                     
-                    # MAKE BOUNDS (FROM MODEL CONFIG) !
-                    if tmp_model == 'weibull_cdf' or tmp_model == 'weibull_cdf2' or tmp_model == 'weibull_cdf_concave' or tmp_model == 'weibull':
-                        b = np.maximum(tmp_samples[1] * model_config[tmp_model]['boundary'](t = t_s, 
-                                                                                            alpha = tmp_samples[4],
-                                                                                            beta = tmp_samples[5]), 0)
+                    # If we supplied ground truth data --> make ground truth model blue, otherwise red
+                    tmp_colors = ['red', 'blue']
+                    tmp_bool = ground_truth_data is not None
+                    tmp_color = tmp_colors[int(tmp_bool)]
+                    tmp_alpha = 1
+                    tmp_label = 'Ground Truth Model'
+                    tmp_linewidth = ground_truth_linewidth
+                elif j == n_posterior_parameters and model_ground_truth == None:
+                    break
+                else:
+                    tmp_model = model_fitted
+                    tmp_samples = posterior_samples[i, idx[j], :]
+                    tmp_alpha = 0.05
+                    tmp_color = 'black'
+                    tmp_label = None
+                    tmp_linewidth = posterior_linewidth
 
-                    if tmp_model == 'angle' or tmp_model == 'angle2':
-                        b = np.maximum(tmp_samples[1] + model_config[tmp_model]['boundary'](t = t_s, theta = tmp_samples[4]), 0)
-                    
-                    if tmp_model == 'ddm' or tmp_model == 'ornstein' or tmp_model == 'levy' or tmp_model == 'full_ddm':
-                        b = tmp_samples[1] * np.ones(t_s.shape[0]) #model_config[tmp_model]['boundary'](t = t_s)                   
+                print(tmp_label)
+                
+                # MAKE BOUNDS (FROM MODEL CONFIG) !
+                if tmp_model == 'weibull_cdf' or tmp_model == 'weibull_cdf2' or tmp_model == 'weibull_cdf_concave' or tmp_model == 'weibull':
+                    b = np.maximum(tmp_samples[1] * model_config[tmp_model]['boundary'](t = t_s, 
+                                                                                        alpha = tmp_samples[4],
+                                                                                        beta = tmp_samples[5]), 0)
+
+                if tmp_model == 'angle' or tmp_model == 'angle2':
+                    b = np.maximum(tmp_samples[1] + model_config[tmp_model]['boundary'](t = t_s, theta = tmp_samples[4]), 0)
+                
+                if tmp_model == 'ddm' or tmp_model == 'ornstein' or tmp_model == 'levy' or tmp_model == 'full_ddm':
+                    b = tmp_samples[1] * np.ones(t_s.shape[0]) #model_config[tmp_model]['boundary'](t = t_s)                   
 
 
-                    # MAKESLOPES (VIA TRAJECTORIES) !
-                    out = simulator(theta = tmp_samples,
-                                    model = tmp_model, 
-                                    n_samples = 1,
-                                    no_noise = True,
-                                    delta_t = delta_t_graph,
-                                    bin_dim = None)
-                    
-                    tmp_traj = out[2]['trajectory']
-                    maxid = np.minimum(np.argmax(np.where(tmp_traj > - 999)), t_s.shape[0])
+                # MAKESLOPES (VIA TRAJECTORIES) !
+                out = simulator(theta = tmp_samples,
+                                model = tmp_model, 
+                                n_samples = 1,
+                                no_noise = True,
+                                delta_t = delta_t_graph,
+                                bin_dim = None)
+                
+                tmp_traj = out[2]['trajectory']
+                maxid = np.minimum(np.argmax(np.where(tmp_traj > - 999)), t_s.shape[0])
 
-                    ax_tmp.plot(t_s + tmp_samples[model_config[tmp_model]['params'].index('t')], b, tmp_color,
-                                alpha = tmp_alpha,
-                                zorder = 1000 + j,
-                                linewidth = tmp_linewidth,
-                                label = tmp_label,
-                                )
+                ax_tmp.plot(t_s + tmp_samples[model_config[tmp_model]['params'].index('t')], b, tmp_color,
+                            alpha = tmp_alpha,
+                            zorder = 1000 + j,
+                            linewidth = tmp_linewidth,
+                            label = tmp_label,
+                            )
 
-                    ax_tmp.plot(t_s + tmp_samples[model_config[tmp_model]['params'].index('t')], -b, tmp_color, 
-                                alpha = tmp_alpha,
-                                zorder = 1000 + j,
-                                linewidth = tmp_linewidth,
-                                )
+                ax_tmp.plot(t_s + tmp_samples[model_config[tmp_model]['params'].index('t')], -b, tmp_color, 
+                            alpha = tmp_alpha,
+                            zorder = 1000 + j,
+                            linewidth = tmp_linewidth,
+                            )
 
-                    ax_tmp.plot(t_s[:maxid] + tmp_samples[model_config[tmp_model]['params'].index('t')],
-                                tmp_traj[:maxid],
+                ax_tmp.plot(t_s[:maxid] + tmp_samples[model_config[tmp_model]['params'].index('t')],
+                            tmp_traj[:maxid],
+                            c = tmp_color, 
+                            alpha = tmp_alpha,
+                            zorder = 1000 + j,
+                            linewidth = tmp_linewidth) # TOOK AWAY LABEL
+
+                ax_tmp.axvline(x = tmp_samples[model_config[tmp_model]['params'].index('t')], # this should identify the index of ndt directly via model config !
+                                ymin = - ylimit, 
+                                ymax = ylimit, 
                                 c = tmp_color, 
-                                alpha = tmp_alpha,
-                                zorder = 1000 + j,
-                                linewidth = tmp_linewidth) # TOOK AWAY LABEL
+                                linestyle = '--',
+                                linewidth = tmp_linewidth,
+                                alpha = tmp_alpha)
 
-                    ax_tmp.axvline(x = tmp_samples[model_config[tmp_model]['params'].index('t')], # this should identify the index of ndt directly via model config !
-                                   ymin = - ylimit, 
-                                   ymax = ylimit, 
-                                   c = tmp_color, 
-                                   linestyle = '--',
-                                   linewidth = tmp_linewidth,
-                                   alpha = tmp_alpha)
+                if tmp_label == 'Ground Truth Model' and row_tmp == 0 and col_tmp == 0:
+                    ax_tmp.legend(loc = 'upper right')
+                    print('generated upper right label')
+                    print('row: ', row_tmp)
+                    print('col: ', col_tmp)
+                    print('j: ', j)
 
-                    if tmp_label == 'Ground Truth Model' and row_tmp == 0 and col_tmp == 0:
-                        ax_tmp.legend(loc = 'upper right')
-                        print('generated upper right label')
-                        print('row: ', row_tmp)
-                        print('col: ', col_tmp)
-                        print('j: ', j)
-
-                    if rows == 1 and cols == 1:
-                        ax_tmp.patch.set_visible(False)
+                if rows == 1 and cols == 1:
+                    ax_tmp.patch.set_visible(False)
                     
         # Set plot title
         title_tmp = ''
