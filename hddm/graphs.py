@@ -1181,7 +1181,7 @@ def posterior_pair_plot(posterior_samples = None, # Here expects single subject'
                         height = 10,
                         aspect_ratio = 1,
                         n_subsample = 1000,
-                        ground_truths = None,
+                        ground_truth_parameters = None,
                         model_fitted = None,
                         save = False):
 
@@ -1203,8 +1203,9 @@ def posterior_pair_plot(posterior_samples = None, # Here expects single subject'
             Aspect ratio of figure 
         n_subsample: int <default=1000>
             Number of posterior samples to use for figure finally. Subsamples from the provided traces.
-        ground_truths: list or numpy.array <default=None>
-            Ground truth parameters (will be shown in the plot if supplied)
+        ground_truth_parameters: dict <default=None>
+            Ground truth parameters (will be shown in the plot if supplied). Supplied as a dict of the form (e.g. DDM)
+            {'v': 1, 'a': 2, 'z': 0.5, 't': 2}
         model_fitted: str <default=None>
             String that supplies which model was fitted to the data.
         save: bool <default= False>
@@ -1296,28 +1297,28 @@ def posterior_pair_plot(posterior_samples = None, # Here expects single subject'
     
     posterior_samples_key_set = np.sort(posterior_samples.keys())
     # If ground truth is available add it in:
-    if ground_truths is not None:
+    if ground_truth_parameters is not None:
         for i in range(g.axes.shape[0]):
             for j in range(i + 1, g.axes.shape[0], 1):
-                g.axes[j,i].plot(ground_truths[xlabels[i]], 
-                                 ground_truths[ylabels[j]], #posterior_samples_key_set[j]], 
+                g.axes[j,i].plot(ground_truth_parameters[xlabels[i]], 
+                                 ground_truth_parameters[ylabels[j]], #posterior_samples_key_set[j]], 
                                  '.', 
                                  color = 'red',
                                  markersize = 10)
-                # g.axes[j,i].plot(ground_truths[model_config[model_fitted]['params'].index(xlabels[i])], 
-                #                  ground_truths[model_config[model_fitted]['params'].index(ylabels[j])], 
+                # g.axes[j,i].plot(ground_truth_parameters[model_config[model_fitted]['params'].index(xlabels[i])], 
+                #                  ground_truth_parameters[model_config[model_fitted]['params'].index(ylabels[j])], 
                 #                  '.', 
                 #                  color = 'red',
                 #                  markersize = 10)
 
         for i in range(g.axes.shape[0]):
-            # g.axes[i,i].plot(ground_truths[model_config[model_fitted]['params'].index(xlabels[i])],
+            # g.axes[i,i].plot(ground_truth_parameters[model_config[model_fitted]['params'].index(xlabels[i])],
             #                  g.axes[i,i].get_ylim()[0], 
             #                  '.', 
             #                  color = 'red',
             #                  markersize = 10)
 
-            g.axes[i,i].plot(ground_truths[xlabels[i]],
+            g.axes[i,i].plot(ground_truth_parameters[xlabels[i]],
                              g.axes[i,i].get_ylim()[0], 
                              '.', 
                              color = 'red',

@@ -55,7 +55,7 @@ def _num_to_str(num = 0, n_digits = 3):
         new_str += str(num)
     return new_str
 
-def _pad_subj_id(in_str):
+def pad_subj_id(in_str):
     # Make subj ids have three digits by prepending 0s if necessary
     stridx = in_str.find('.') # get index of 'subj.' substring
     subj_idx_len = len(in_str[(stridx + len('.')):]) # check how many letters remain after 'subj.' is enocuntered
