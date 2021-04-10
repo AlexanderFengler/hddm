@@ -1124,7 +1124,6 @@ def caterpillar_plot(posterior_samples = [],
             # Deal with _transformed parameters
             if '_trans' in k:
                 label_tmp = k.replace('_trans', '')
-
                 key_param_only = k.split('_')[0]
                 print(key_param_only)
                 print(k)

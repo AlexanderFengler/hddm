@@ -35,7 +35,7 @@ def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_respo
     return df
 
 
-def _str_to_num(string = '', n_digits = 3):
+def str_to_num(string = '', n_digits = 3):
     new_str = ''
     leading = 1
     for digit in range(n_digits):
@@ -46,7 +46,7 @@ def _str_to_num(string = '', n_digits = 3):
             leading = 0
     return int(new_str)
 
-def _num_to_str(num = 0, n_digits = 3):
+def num_to_str(num = 0, n_digits = 3):
     new_str = ''
     for i in range(n_digits - 1, -1, -1):
         if num < np.power(10, i):
@@ -763,7 +763,7 @@ def simulator_hierarchical(n_subjects = 5,
     
     # For each subject get subject level parameters by sampling from a truncated gaussian as speficied by the global parameters above
     for i in range(n_subjects):
-        subj_id = _num_to_str(i)
+        subj_id = num_to_str(i)
         
         # Get subject parameters
         a = (model_config[model]['param_bounds'][0] - global_means[0, :]) / global_stds[0, :]
