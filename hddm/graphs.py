@@ -847,7 +847,7 @@ def posterior_predictive_plot(posterior_samples = None,
     
     # Take care of ground_truth_data
     label_idx = list()
-    if ground_truth_data is not None and datatype == 'hierarchical':
+    if ground_truth_data is not None and datatype == 'hierarchical' or datatype == 'single_subject':
         # initialize ground truth data dictionary
         gt_dat_dict = dict()
         
