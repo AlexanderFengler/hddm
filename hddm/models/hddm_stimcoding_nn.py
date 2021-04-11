@@ -76,6 +76,14 @@ class HDDMnnStimCoding(HDDM):
         self.model = kwargs.pop('model', 'ddm')
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
 
+        self.nbin = kwargs.pop('nbin', 512)
+
+        if self.nbin == 512:
+            self.cnn_pdf_multiplier = 51.2
+        elif self.nbin == 256:
+            self.cnn_pdf_multiplier = 25.6
+        
+
         print(kwargs['include'])
         # Attach likelihood corresponding to model
         # if self.model == 'ddm':
@@ -86,10 +94,17 @@ class HDDMnnStimCoding(HDDM):
         if self.network_type == 'mlp':
             self.network = load_mlp(model = self.model)
             network_dict = {'network': self.network}
-            likelihood_ = hddm.likelihoods_mlp.make_mlp_likelihood(model = self.model)
+            self.wfpt_nn = hddm.likelihoods_mlp.make_mlp_likelihood_complete(model = self.model, **network_dict)
+    
+        if self.network_type == 'cnn':
+            self.network = load_cnn(model = self.model, nbin=self.nbin)
+            network_dict = {'network': self.network}
+            self.wfpt_nn = hddm.likelihoods_cnn.make_cnn_likelihood(model = self.model, pdf_multiplier = self.cnn_pdf_multiplier, **network_dict)
+        
 
-        self.wfpt_nn = stochastic_from_dist('Wiennernn' + '_' + self.model,
-                                            partial(likelihood_, **network_dict))
+
+        # self.wfpt_nn = stochastic_from_dist('Wiennernn' + '_' + self.model,
+        #                                     partial(likelihood_, **network_dict))
 
         if self.split_param == 'z':
             assert not self.drift_criterion, "Setting drift_criterion requires split_param='v'."
