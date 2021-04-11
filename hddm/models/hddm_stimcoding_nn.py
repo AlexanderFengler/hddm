@@ -6,6 +6,7 @@ from kabuki.hierarchical import Knode
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
 from hddm.keras_models import load_mlp
+from hddm.cnn.wrapper import load_cnn
 import hddm
 
 import wfpt
