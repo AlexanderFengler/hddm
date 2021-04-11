@@ -256,7 +256,7 @@ def simulator_stimcoding(model = 'angle',
                          n_samples_by_condition = 1000,
                          delta_t = 0.001,
                          prespecified_params = {},
-                         bin_pointwise = True,
+                         bin_pointwise = False,
                          bin_dim = None,
                          max_t = 20.0):
 
