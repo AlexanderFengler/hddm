@@ -323,7 +323,7 @@ def model_plot(posterior_samples = None,
             gt_dat_dict[i] = ground_truth_data.loc[ground_truth_data[condition_column] == i][['rt', 'response']]
             gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
             gt_dat_dict[i] = gt_dat_dict[i].values
-        ground_truth_data = gt_dat_dict
+        #ground_truth_data = gt_dat_dict
 
         sorted_keys = np.sort(np.unique(ground_truth_data[condition_column]))
         ground_truth_data = gt_dat_dict
