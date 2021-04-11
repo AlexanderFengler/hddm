@@ -530,8 +530,9 @@ def simulator_covariate(dependent_params = ['v'],
     :Arguments:
         dependent_params: list of strings <default=['v']>
             Parameters which will be treated as a deterministic function of a covariate
-        prespecified_params: list or numpy array
-            A list or numpy array of parameters to prespecify. These parameters are not functions of covariates.
+        prespecified_params: dict <default=None>
+            Dictionary of parameters to prespecify. These parameters can not be functions of covariates.
+            Example (e.g. for 'ddm' model): {'v': 0, 'a': 1.5, 'z': 0.5, 't':1.0}
         p_outlier: float between 0 and 1 <default=0>
             Probability of generating outlier datapoints. An outlier is defined 
             as a random choice from a uniform RT distribution
@@ -545,10 +546,6 @@ def simulator_covariate(dependent_params = ['v'],
             Ground truth regression betas for the parameters which are functions of covariates.
         covariates_magnitudes: dict <default={'v': 1.0}>
             A dict which holds magnitudes of the covariate vectors (value), by for each parameters (key).
-        n_samples_by_condition: int <default=1000>
-            Number of samples to simulate per condition (here 2 condition by design).
-        condition_effect_on_param: list of strings <default=None>
-            List containing the parameters which will be affected by the condition.
         subj_id: str <default='none'>
             Hddm expects a subject column in the dataset. This supplies a specific label if so desired.
         delta_t: float <default=0.001>
@@ -564,8 +561,11 @@ def simulator_covariate(dependent_params = ['v'],
             then the takes the form of a histogram, with bin-wise frequencies.
 
     Returns: 
-        (pandas.DataFrame, dict): The Dataframe holds a 'reaction time' column, a 'response' column and a 'BOLD' column (for the covariate). The dictionary holds the groundtruth parameter (values) and parameter names (keys).
-                                 Ready to be fit with hddm.
+        (pandas.DataFrame, dict, numpy.array): 
+            The Dataframe holds a 'reaction time' column, a 'response' column and a 'BOLD' column (for the covariate). 
+            The dictionary holds the groundtruth parameter (values) and parameter names (keys).
+            The numpy.array hold trial-wise parameterizations as resulting from applying the regression on the covariates.
+            Ready to be fit with hddm.
     
     """
 
@@ -671,7 +671,7 @@ def simulator_covariate(dependent_params = ['v'],
         
         gt[param] = param_base[0, id_tmp]
     
-    return (data, gt)
+    return (data, gt, param_base)
 
 # ALEX TD: Change n_samples_by_subject --> n_trials_per_subject (but apply consistently)
 def simulator_hierarchical(n_subjects = 5,

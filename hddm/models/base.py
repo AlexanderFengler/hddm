@@ -892,6 +892,8 @@ class HDDMBase(AccumulatorModel):
 
     def _create_wfpt_parents_dict(self, knodes):
         wfpt_parents = OrderedDict()
+        print('printing from create_wfpt_parents_dict')
+        print(model)
         
         if self.nn:
             # Define parents for HDDMnn across included models
