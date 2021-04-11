@@ -907,22 +907,22 @@ class HDDMBase(AccumulatorModel):
             
             # MODEL SPECIFIC PARAMETERS
             if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
-                wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else model_config[self.model]['default_params'][model_config[self.model]['params'].index['alpha']]
-                wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index['beta']]
+                wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else model_config[self.model]['default_params'][model_config[self.model]['params'].index('alpha')]
+                wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index('beta')]
             
             if self.model == 'ornstein':
-                wfpt_parents['g'] = knodes['g_bottom'] if 'g' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index['g']]
+                wfpt_parents['g'] = knodes['g_bottom'] if 'g' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index('g')]
             
             if self.model == 'levy':
-                wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index['alpha']]
+                wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index('alpha')]
             
             if self.model == 'angle':
-                wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index['theta']]
+                wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index('theta')]
 
             if self.model == 'full_ddm' or self.model =='full_ddm2':
-                wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index['sv']] #self.default_intervars['sv']
-                wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index['sz']] #self.default_intervars['sz']
-                wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index['st']] #self.default_intervars['st']
+                wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index('sv')] #self.default_intervars['sv']
+                wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index('sz')] #self.default_intervars['sz']
+                wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index('st')] #self.default_intervars['st']
 
             print('wfpt parents: ')
             print(wfpt_parents)
