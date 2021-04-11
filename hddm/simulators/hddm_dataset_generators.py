@@ -252,7 +252,7 @@ def simulator_stimcoding(model = 'angle',
                          split_by = 'v',
                          p_outlier = 0.0,
                          max_rt_outlier = 10.0,
-                         decision_criterion = 0.0,
+                         drift_criterion = 0.0,
                          n_samples_by_condition = 1000,
                          delta_t = 0.001,
                          prespecified_params = {},
@@ -269,8 +269,8 @@ def simulator_stimcoding(model = 'angle',
             String that specifies the model to be simulated. 
             Current options include, 'angle', 'ornstein', 'levy', 'weibull', 'full_ddm'
         split_by: str <default='v'>
-            You can split by 'v' or 'z'. If splitting by 'v' one condition's v_0 = decision_criterion + 'v', the other 
-            condition's v_1 = decision_criterion - 'v'.
+            You can split by 'v' or 'z'. If splitting by 'v' one condition's v_0 = drift_criterion + 'v', the other 
+            condition's v_1 = drift_criterion - 'v'.
             Respectively for 'z', 'z_0' = 'z' and 'z_1' = 1 - 'z'.
         p_outlier: float between 0 and 1 <default=0>
             Probability of generating outlier datapoints. An outlier is defined 
@@ -278,7 +278,7 @@ def simulator_stimcoding(model = 'angle',
         max_rt_outlier: float > 0 <default=10.0>
             Using max_rt_outlier (which is commonly defined for hddm models) here as an imlicit maximum 
             on the RT of outliers. Outlier RTs are sampled uniformly from [0, max_rt_outlier]
-        decision_criterion: float <default=0.0>
+        drift_criterion: float <default=0.0>
             Parameter that can be treated as the 'bias part' of the slope, in case we split_by 'v'.
         n_samples_by_condition: int <default=1000>
             Number of samples to simulate per condition (here 2 condition by design).
@@ -331,15 +331,15 @@ def simulator_stimcoding(model = 'angle',
 #                                                       high = model_config[model]['param_bounds'][1][id_tmp])
             if 'v' in split_by:
                 id_tmp = model_config[model]['params'].index('v')
-                param_base[i, id_tmp] = decision_criterion + param_base[i, id_tmp]
+                param_base[i, id_tmp] = drift_criterion + param_base[i, id_tmp]
                 gt['v'] = param_base[i, id_tmp]
-                gt['decision_criterion'] = decision_criterion
+                gt['drift_criterion'] = drift_criterion
    
         if i == 1:
             
             if 'v' in split_by:
                 id_tmp = model_config[model]['params'].index('v')
-                param_base[i, id_tmp] = decision_criterion - param_base[i, id_tmp]
+                param_base[i, id_tmp] = drift_criterion - param_base[i, id_tmp]
             if 'z' in split_by:
                 id_tmp = model_config[model]['params'].index('z')
                 param_base[i, id_tmp] = 1 - param_base[i, id_tmp]

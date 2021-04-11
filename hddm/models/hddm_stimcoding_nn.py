@@ -130,7 +130,8 @@ class HDDMnnStimCoding(HDDM):
 
     def _create_stochastic_knodes(self, include):
         knodes = super(HDDMnnStimCoding, self)._create_stochastic_knodes(include)
-
+        print('knodes')
+        print(knodes)
         if self.drift_criterion:
             knodes.update(self._create_family_normal_normal_hnormal('dc',
                                                                      value = 0,
@@ -142,6 +143,7 @@ class HDDMnnStimCoding(HDDM):
 
     def _create_wfpt_parents_dict(self, knodes):
         wfpt_parents = super(HDDMnnStimCoding, self)._create_wfpt_parents_dict(knodes)
+        
         # SPECIFIC TO STIMCODING
         if self.drift_criterion: 
             wfpt_parents['dc'] = knodes['dc_bottom']
