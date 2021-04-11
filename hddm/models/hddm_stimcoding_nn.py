@@ -101,8 +101,6 @@ class HDDMnnStimCoding(HDDM):
             network_dict = {'network': self.network}
             self.wfpt_nn = hddm.likelihoods_cnn.make_cnn_likelihood(model = self.model, pdf_multiplier = self.cnn_pdf_multiplier, **network_dict)
         
-
-
         # self.wfpt_nn = stochastic_from_dist('Wiennernn' + '_' + self.model,
         #                                     partial(likelihood_, **network_dict))
 
