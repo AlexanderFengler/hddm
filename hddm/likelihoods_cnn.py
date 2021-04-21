@@ -22,7 +22,7 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
     :Returns:
         pymc.object: Returns a stochastic object as defined by PyMC2
     """
-    
+
     def random(self):
         # print(self.parents)
         # print('printing the dir of self.parents directly')
@@ -46,8 +46,8 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
                 theta[cnt] = np.array(self.parents.value[param]).astype(np.float32)
             cnt += 1
         
-        print('print theta from random function in wfpt_nn')
-        print(theta)
+        #print('print theta from random function in wfpt_nn')
+        #print(theta)
 
         #new_func = partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
         #print('self shape: ')
@@ -70,16 +70,16 @@ def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):
         # We could change this ...
 
         #rt = np.array()
-        print('rt')
+        #print('rt')
         rt = np.array(x, dtype = np.int_)
-        print(rt)
+        #print(rt)
         response = rt.copy()
         response[rt < 0] = 0
         response[rt > 0] = 1
         response = response.astype(np.int_)
         rt = np.abs(rt)
-        print(rt)
-        print(response)
+        #print(rt)
+        #print(response)
         #response = rt / np.abs(rt)
         #rt = np.abs(rt)
         

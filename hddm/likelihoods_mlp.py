@@ -43,8 +43,8 @@ def make_mlp_likelihood_complete(model,
                 theta[cnt] = np.array(self.parents.value[param]).astype(np.float32)
             cnt += 1
         
-        print('print theta from random function in wfpt_nn')
-        print(theta)
+        #print('print theta from random function in wfpt_nn')
+        #print(theta)
 
         #new_func = partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
         #print('self shape: ')

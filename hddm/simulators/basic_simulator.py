@@ -170,7 +170,7 @@ def bin_arbitrary_fptd(out = None,
 
     for choice in choice_codes:
         counts[:, cnt] = np.histogram(out[:, 0][out[:, 1] == choice], bins = bins)[0] 
-        print(np.histogram(out[:, 0][out[:, 1] == choice], bins = bins)[1])
+        #print(np.histogram(out[:, 0][out[:, 1] == choice], bins = bins)[1])
         cnt += 1
     return counts
 

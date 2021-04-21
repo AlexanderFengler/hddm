@@ -184,7 +184,7 @@ class HDDMnn(HDDM):
 
     def __getstate__(self):
         d = super(HDDMnn, self).__getstate__()
-        print(d)
+        #print(d)
         del d['network']
         del d['wfpt_nn']
         #del d['wfpt_class']

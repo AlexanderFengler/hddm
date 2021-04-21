@@ -328,8 +328,8 @@ def model_plot(posterior_samples = None,
         sorted_keys = np.sort(np.unique(ground_truth_data[condition_column]))
         ground_truth_data = gt_dat_dict
 
-        print(sorted_keys)
-        print(ground_truth_data.keys())
+        #print(sorted_keys)
+        #print(ground_truth_data.keys())
         # print('Supplying ground truth data not yet implemented for hierarchical datasets')
         
     
@@ -338,7 +338,7 @@ def model_plot(posterior_samples = None,
         gt_dat_dict = dict()
         
         for i in np.sort(np.unique(ground_truth_data['subj_idx'])):
-            print(i)
+            #print(i)
             gt_dat_dict[i] = ground_truth_data.loc[ground_truth_data['subj_idx'] == i][['rt', 'response']]
             gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
             gt_dat_dict[i] = gt_dat_dict[i].values
@@ -346,8 +346,8 @@ def model_plot(posterior_samples = None,
         sorted_keys = np.sort(np.unique(ground_truth_data['subj_idx']))
         ground_truth_data = gt_dat_dict
         
-        print(sorted_keys)
-        print(ground_truth_data.keys())
+        #print(sorted_keys)
+        #print(ground_truth_data.keys())
         # print('Supplying ground truth data not yet implemented for hierarchical datasets')
 
     # elif ground_truth_data is not None and datatype == 'single_subject':
@@ -543,15 +543,15 @@ def model_plot(posterior_samples = None,
         if ground_truth_data is not None:
             # These splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
             # Wiser because either way we can have varying numbers of trials for each subject !
-            print('sorted keys')
-            print(sorted_keys)
+            #print('sorted keys')
+            #print(sorted_keys)
 
-            print('ground truth data')
-            print(ground_truth_data)
-            print(ground_truth_data[sorted_keys[i]])
-            print(type(ground_truth_data[sorted_keys[i]]))
-            print(ground_truth_data[sorted_keys[i]][:, 1] == 1)
-            print(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == 1, 0])
+            #print('ground truth data')
+            #print(ground_truth_data)
+            #print(ground_truth_data[sorted_keys[i]])
+            #print(type(ground_truth_data[sorted_keys[i]]))
+            #print(ground_truth_data[sorted_keys[i]][:, 1] == 1)
+            #print(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == 1, 0])
             counts_2_up, bins = np.histogram(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == 1, 0],
                                             bins = np.linspace(0, max_t, nbins),
                                             density = True)
@@ -627,7 +627,7 @@ def model_plot(posterior_samples = None,
                     tmp_label = None
                     tmp_linewidth = posterior_linewidth
 
-                print(tmp_label)
+                #print(tmp_label)
                 
                 # MAKE BOUNDS (FROM MODEL CONFIG) !
                 if tmp_model == 'weibull_cdf' or tmp_model == 'weibull_cdf2' or tmp_model == 'weibull_cdf_concave' or tmp_model == 'weibull':
@@ -683,10 +683,10 @@ def model_plot(posterior_samples = None,
 
                 if tmp_label == 'Ground Truth Model' and row_tmp == 0 and col_tmp == 0:
                     ax_tmp.legend(loc = 'upper right')
-                    print('generated upper right label')
-                    print('row: ', row_tmp)
-                    print('col: ', col_tmp)
-                    print('j: ', j)
+                    #print('generated upper right label')
+                    #print('row: ', row_tmp)
+                    #print('col: ', col_tmp)
+                    #print('j: ', j)
 
                 if rows == 1 and cols == 1:
                     ax_tmp.patch.set_visible(False)
@@ -892,7 +892,7 @@ def posterior_predictive_plot(posterior_samples = None,
     #     if ground_truth_data is not None:
     #         ground_truth_data = np.expand_dims(ground_truth_data, 0)
 
-    print(posterior_samples.shape)
+    #print(posterior_samples.shape)
  
     # General plot parameters
     nbins = int((2 * max_t) / bin_size)     
@@ -946,7 +946,7 @@ def posterior_predictive_plot(posterior_samples = None,
         elif ground_truth_data is not None:
             gt_tmp = ground_truth_data[label_idx[i]] # .values # using the relevant label here instead of the plot number 
             # gt_tmp[:, 1][gt_tmp[:,1] == 0.0] = -1.0 # set zero choices to -1 
-            print(gt_tmp)
+            #print(gt_tmp)
             gt_color = 'blue'
 
         if rows > 1 and cols > 1:
@@ -1125,8 +1125,8 @@ def caterpillar_plot(posterior_samples = [],
             if '_trans' in k:
                 label_tmp = k.replace('_trans', '')
                 key_param_only = k.split('_')[0]
-                print(key_param_only)
-                print(k)
+                #print(key_param_only)
+                #print(k)
                 lower_lim = model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(key_param_only)]
                 upper_lim = model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(key_param_only)]
                 trace[label_tmp] = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- trace[k])))
@@ -1259,10 +1259,10 @@ def posterior_pair_plot(posterior_samples = None, # Here expects single subject'
         ylabel = ax.yaxis.get_label_text()
         ylabels.append(ylabel)
 
-    print('xlabels: ')
-    print(xlabels)
-    print('ylabels: ')
-    print(ylabels)
+    #print('xlabels: ')
+    #print(xlabels)
+    #print('ylabels: ')
+    #print(ylabels)
     
     if axes_limits == 'model':
         for i in range(len(xlabels)):
