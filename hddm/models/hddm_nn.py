@@ -123,7 +123,7 @@ class HDDMnn(HDDM):
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
         self.model = kwargs.pop('model', 'ddm')
         self.nbin = kwargs.pop('nbin', 512)
-        self.is_informative = kwargs.pop('informative', False)
+        #self.is_informative = kwargs.pop('informative', False)
 
         if self.nbin == 512:
             self.cnn_pdf_multiplier = 51.2
