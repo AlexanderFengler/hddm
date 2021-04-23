@@ -943,7 +943,7 @@ class HDDMBase(AccumulatorModel):
             wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else self.default_intervars['st']
             wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
             wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
-            wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
+            #wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
 
         return wfpt_parents
 
