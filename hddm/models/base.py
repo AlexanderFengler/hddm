@@ -898,6 +898,8 @@ class HDDMBase(AccumulatorModel):
         
         if self.nn:
             # Define parents for HDDMnn across included models
+            print('printing knodes')
+            print(knodes)
             wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
             wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
 
@@ -929,6 +931,8 @@ class HDDMBase(AccumulatorModel):
             print(wfpt_parents)
 
         else:
+            print('printing knodes')
+            print(knodes)
             # This defines parents for basic hddm
             wfpt_parents['a'] = knodes['a_bottom']
             wfpt_parents['v'] = knodes['v_bottom']
@@ -939,6 +943,8 @@ class HDDMBase(AccumulatorModel):
             wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else self.default_intervars['st']
             wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
             wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
+            wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
+
         return wfpt_parents
 
     def _create_wfpt_knode(self, knodes):
