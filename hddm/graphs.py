@@ -45,7 +45,7 @@ def _make_trace_plotready_single_subject(hddm_trace = None, model = ''):
         panda DataFrame: Adjusted traces.
     """
     
-    posterior_samples = np.zeros(hddm_trace.shape)
+    posterior_samples = np.zeros((hddm_trace.shape[0], model_config[model]['n_params']))
     
     cnt = 0
     for param in model_config[model]['params']:
