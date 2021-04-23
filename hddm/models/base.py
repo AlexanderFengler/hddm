@@ -839,6 +839,7 @@ class HDDMBase(AccumulatorModel):
         print('Now adding the HDDMBase include:')
         self.include = set(['v', 'a', 't']) # Doesn't seem to execute when this is initialized as part of HDDMnn __init__ --> this is correct, but check what is going on there
         print('Include from inside HDDMBase: ', self.include)
+        
         if include is not None:
             if include == 'all':
                 [self.include.add(param) for param in ('z', 'st','sv','sz', 'p_outlier')]
@@ -892,8 +893,8 @@ class HDDMBase(AccumulatorModel):
 
     def _create_wfpt_parents_dict(self, knodes):
         wfpt_parents = OrderedDict()
-        print('printing from create_wfpt_parents_dict')
-        print(self.model)
+        #print('printing from create_wfpt_parents_dict')
+        #print(self.model)
         
         if self.nn:
             # Define parents for HDDMnn across included models
