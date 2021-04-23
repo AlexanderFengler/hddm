@@ -820,6 +820,8 @@ def posterior_predictive_plot(posterior_samples = None,
         input_is_hddm_trace: bin <default=True>>
             Whether or not the posterior samples supplied are coming from hddm traces. 
             NOTE, this does not accept False as of now.
+        input_from_hddmnn: bin <default=False>
+            Whether or not the input came from a HDDMnn fit or HDDM fit. This is used to convert parameters internally.
     Return: plot object
     """
     
