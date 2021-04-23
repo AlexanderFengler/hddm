@@ -150,6 +150,13 @@ def _make_trace_plotready_condition(hddm_trace = None, model = ''):
             dat[:, :, model_config[model]['params'].index(key)] = val_tmp
             
     return dat
+
+
+def _convert_params(data = None):
+    for key in data.keys():
+        if 'a' in key:
+            data[key] = data[key] / 2
+    return data
 # --------------------------------------------------------------------------------------------
 
 # Plot bound
@@ -750,6 +757,7 @@ def posterior_predictive_plot(posterior_samples = None,
                               model_ground_truth = 'angle',
                               datatype = 'single_subject',
                               condition_column = 'condition',
+                              input_is_hddmnn = False,
                               input_is_hddm_trace = True,
                               n_posterior_parameters = 100,
                               max_t = 20,
@@ -820,7 +828,12 @@ def posterior_predictive_plot(posterior_samples = None,
         #matplotlib.rcParams['text.usetex'] = True
         #matplotlib.rcParams['pdf.fonttype'] = 42
         #matplotlib.rcParams['svg.fonttype'] = 'none'
-    
+
+    # Convert parameters for consistency between HDDM and HDDMnn fits
+    if posterior_samples is not None:
+        if not input_from_hddmnn:
+            posterior_samples = _convert_params(data = posterior_samples)
+
     if model_ground_truth is None and ground_truth_data is None and posterior_samples is None:
         return 'No ground truth model was supplied, no dataset was supplied and no posterior sample was supplied. Nothing to plot' 
 
