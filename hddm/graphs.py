@@ -50,8 +50,12 @@ def _make_trace_plotready_single_subject(hddm_trace = None, model = ''):
     cnt = 0
     for param in model_config[model]['params']:
         if param == 'z':
-            posterior_samples[:, cnt] = model_config[model]['param_bounds'][0][model_config[model]['params'].index('z')] + \
-                (  model_config[model]['param_bounds'][1][model_config[model]['params'].index('z')] - model_config[model]['param_bounds'][0][model_config[model]['params'].index('z')] ) * (1 / (1 + np.exp( - hddm_trace['z_trans'])))
+            if 'z_trans' not in hddm_trace.keys():
+                posterior_samples[:, cnt] = model_config[model]['default_params'][model_config[model]['params'].index('z')]
+            else:
+                posterior_samples[:, cnt] = model_config[model]['param_bounds'][0][model_config[model]['params'].index('z')] + \
+                    (  model_config[model]['param_bounds'][1][model_config[model]['params'].index('z')] - model_config[model]['param_bounds'][0][model_config[model]['params'].index('z')] ) * \
+                         (1 / (1 + np.exp( - hddm_trace['z_trans'])))
             # posterior_samples[:, cnt] = 1 / (1 + np.exp( - hddm_trace['z_trans']))
         else:
             posterior_samples[:, cnt] = hddm_trace[param]
