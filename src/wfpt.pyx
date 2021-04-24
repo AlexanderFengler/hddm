@@ -1003,7 +1003,7 @@ def wiener_like_multi(np.ndarray[double, ndim = 1] x, v, sv, a, z, sz, t, st,
                       int n_sz = 10, 
                       bint use_adaptive = 1, 
                       double simps_err = 1e-3,
-                      double p_outlier = 0, 
+                      double p_outlier = 0,
                       double w_outlier = 0):
 
     cdef Py_ssize_t size = x.shape[0]
