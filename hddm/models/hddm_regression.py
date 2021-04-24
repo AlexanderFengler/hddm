@@ -35,7 +35,7 @@ def generate_wfpt_reg_stochastic_class(wiener_params = None,
                                            params['v'], params['sv'], params['a'], params['z'],
                                            params['sz'], params['t'], params['st'], 1e-4,
                                            reg_outcomes,
-                                           w_outlier = wp['w_outlier']
+                                           w_outlier = wp['w_outlier'],
                                            p_outlier=p_outlier)
 
 
