@@ -866,7 +866,7 @@ def posterior_predictive_plot(posterior_samples = None,
             gt_dat_dict = dict()
             gt_dat_dict[0] = ground_truth_data.values
             gt_dat_dict[0][:, 1][gt_dat_dict[0][:, 1] == 0.0] = -1.0
-            gt_dat_dict[0]
+            #gt_dat_dict[0]
             ground_truth_data = gt_dat_dict
             
     # Take care of ground_truth_data
@@ -942,7 +942,7 @@ def posterior_predictive_plot(posterior_samples = None,
                                replace = False)
 
         # Run Model simulations for posterior samples
-        print('Simulations for plot: ', i)
+        #print('Simulations for plot: ', i)
         for j in range(n_posterior_parameters):
             out = simulator(theta = posterior_samples[i, idx[j], :], 
                             model = model_fitted,
