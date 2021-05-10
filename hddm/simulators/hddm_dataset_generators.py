@@ -751,12 +751,13 @@ def simulator_hierarchical(n_subjects = 5,
     # Update global parameter vectors according to what was pre-specified
     for param in model_config[model]['params']:
         id_tmp = model_config[model]['params'].index(param)
-        
-        if param in prespecified_param_means.keys():
-            global_means[0, id_tmp] = prespecified_param_means[param]
+        if prespecified_param_means is not None:
+            if param in prespecified_param_means.keys():
+                global_means[0, id_tmp] = prespecified_param_means[param]
 
-        if param in prespecified_param_stds.keys():
-            global_stds[0, id_tmp] = prespecified_param_stds[param]
+        if prespecified_param_stds is not None:
+            if param in prespecified_param_stds.keys():
+                global_stds[0, id_tmp] = prespecified_param_stds[param]
         
         gt[param] = global_means[0, id_tmp]
         gt[param + '_std'] = global_stds[0, id_tmp]
