@@ -1,0 +1,6 @@
+NumPy>=1.6.0
+SciPy>=0.6.0
+kabuki>=0.6.0
+PyMC>=2.3.3
+pandas>=0.12.0
+patsy

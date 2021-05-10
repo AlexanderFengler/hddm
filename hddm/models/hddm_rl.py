@@ -59,7 +59,6 @@ class HDDMrl(HDDM):
 
 
 def wienerRL_like(x, v, alpha, pos_alpha, sv, a, z, sz, t, st, p_outlier=0):
-
     wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
                      'use_adaptive': 1,
                      'simps_err': 1e-3,

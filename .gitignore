@@ -2,6 +2,8 @@
 *.so
 *.c
 *~
+.eggs/
+.vscode/
 build/
 dist/
 docs/build

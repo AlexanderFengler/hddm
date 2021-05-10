@@ -602,6 +602,42 @@ def gen_rand_rl_data(scaler, alpha, size=1, p_upper=1, p_lower=0, z=0.5, q_init=
 
     return all_data
 
+
+# Multi(two)-armed bandit
+def gen_rl_data_MAB(beta, num_trials, mu, mu_sd):
+    k = 2 # number of bandits/actions
+    np_eps = 2.718281828459
+    q_val = np.zeros(k) # q-values
+    num_act = np.zeros(k) # keep count of every action
+
+    response = list()
+    feedback = list()
+    trial_no = list()
+
+    for i in range(0, num_trials):
+        # Compute softmax and prob. action selection
+        action_values = q_val[:]
+        exp_act_val = np.power([np_eps]*len(action_values), beta * action_values)
+        deno = np.sum(exp_act_val)
+        prob_tuple = exp_act_val/deno
+        a = np.random.choice(k, 1, p=prob_tuple)[0]
+        
+        # reward obtained on taking action a
+        reward = np.random.normal(mu[a], mu_sd, 1)[0]
+
+        # q-value update
+        num_act[a] += 1
+        q_val[a] = q_val[a] + (reward-q_val[a])/num_act[a]
+
+        trial_no.append(i)
+        response.append(a)
+        feedback.append(reward)
+
+    trial_data = {'trial': trial_no, 'response': response, 'feedback': feedback}
+    data = pd.DataFrame(data=trial_data)
+
+    return data
+
 # function that takes the data as input to simulate the same trials that the subject received
 # the only difference from the simulation fit is that you update q-values not on the simulated choices but on the observed. but you still use the simulated rt and choices
 # to look at ability to recreate choice patterns.
