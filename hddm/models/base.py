@@ -949,14 +949,15 @@ class HDDMBase(AccumulatorModel):
 
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
-
         return Knode(self.wfpt_class, 'wfpt', observed = True, col_name = 'rt', **wfpt_parents)
 
     def create_knodes(self):
         knodes = self._create_stochastic_knodes(self.include) # AF TODO CHECK 
         knodes['wfpt'] = self._create_wfpt_knode(knodes)
-
         return list(knodes.values())
+    
+    def _create_stochastic_knodes():
+        raise NotImplementedError("create_stochastic_knodes has to be overwritten by ")
 
     def plot_posterior_predictive(self, *args, **kwargs):
         if 'value_range' not in kwargs:

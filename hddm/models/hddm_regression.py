@@ -66,7 +66,6 @@ def generate_wfpt_reg_stochastic_class(wiener_params = None,
 
 wfpt_reg_like = generate_wfpt_reg_stochastic_class(sampling_method='drift')
 
-
 ################################################################################################
 
 class KnodeRegress(kabuki.hierarchical.Knode):

@@ -30,7 +30,6 @@ from copy import deepcopy
 #                             bin_dim = None, 
 #                             bin_pointwise = False)
 
-
 # Plot preprocessing functions
 def _make_trace_plotready_single_subject(hddm_trace = None, model = ''):
     """Internal function to turn trace into data-format expected by plots. This

@@ -676,8 +676,8 @@ def simulator_covariate(dependent_params = ['v'],
 # ALEX TD: Change n_samples_by_subject --> n_trials_per_subject (but apply consistently)
 def simulator_hierarchical(n_subjects = 5,
                            n_samples_by_subject = 500,
-                           prespecified_param_means = {'v': 2},
-                           prespecified_param_stds = {'v': 0.3},
+                           prespecified_param_means = None, # {'v': 2},
+                           prespecified_param_stds = None, # {'v': 0.3},
                            p_outlier = 0.0,
                            max_rt_outlier = 10.0,
                            model = 'angle',
@@ -756,7 +756,7 @@ def simulator_hierarchical(n_subjects = 5,
             global_means[0, id_tmp] = prespecified_param_means[param]
 
         if param in prespecified_param_stds.keys():
-            global_stds[0, id_tmp] = prespecified_param_means[param]
+            global_stds[0, id_tmp] = prespecified_param_stds[param]
         
         gt[param] = global_means[0, id_tmp]
         gt[param + '_std'] = global_stds[0, id_tmp]
