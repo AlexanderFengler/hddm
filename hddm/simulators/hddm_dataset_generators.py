@@ -32,8 +32,11 @@ def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_respo
         df.loc[df['response'] == -1.0, 'response'] = 0.0
     
     df['subj_idx'] = subj_id
-    return df
 
+    # Add ground truth parameters to dataframe
+    for param in model_config[simulator_data[2]['model']]['params']:
+        df[param] = simulator_data[2][param]
+    return df
 
 def str_to_num(string = '', n_digits = 3):
     new_str = ''
@@ -794,4 +797,4 @@ def simulator_hierarchical(n_subjects = 5,
         
     data_out = pd.concat(dataframes)
     
-    return (data_out, gt, subject_parameters)   
+    return (data_out, gt, subject_parameters)
