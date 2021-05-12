@@ -136,7 +136,7 @@ def test(np.ndarray[float, ndim = 1] v, # drift by timestep 'delta_t'
     cdef float delta_t_sqrt = sqrt(delta_t)
     cdef float sqrt_st = delta_t_sqrt * s
 
-    cdef float y, t
+    cdef float y, t_particle
 
     #cdef int n
     cdef Py_ssize_t n, k
@@ -148,12 +148,12 @@ def test(np.ndarray[float, ndim = 1] v, # drift by timestep 'delta_t'
         # Loop over samples
         for n in range(n_samples):
             y = z_view[k] * a_view[k] # reset starting point
-            t = 0.0 # reset time
+            t_particle = 0.0 # reset time
 
             # Random walker
             while y <= a_view[k] and y >= 0 and t <= max_t:
                 y += v_view[k] * delta_t + sqrt_st * gaussian_values[m] # update particle position
-                t += delta_t
+                t_particle += delta_t
                 m += 1
                 if m == num_draws:
                     gaussian_values = draw_gaussian(num_draws)
@@ -161,7 +161,7 @@ def test(np.ndarray[float, ndim = 1] v, # drift by timestep 'delta_t'
 
             # Note that for purposes of consistency with Navarro and Fuss, 
             # the choice corresponding the lower barrier is +1, higher barrier is -1
-            rts_view[n, k, 0] = t + t_view[k] # store rt
+            rts_view[n, k, 0] = t_particle + t_view[k] # store rt
             choices_view[n, k, 0] = (-1) * sign(y) # store choice
   
     return (rts, choices, {'v': v,
@@ -210,7 +210,7 @@ def ddm(np.ndarray[float, ndim = 1] v, # drift by timestep 'delta_t'
     cdef float delta_t_sqrt = sqrt(delta_t)
     cdef float sqrt_st = delta_t_sqrt * s
 
-    cdef float y, t
+    cdef float y, t_particle
 
     #cdef int n
     cdef Py_ssize_t n, k
@@ -222,12 +222,12 @@ def ddm(np.ndarray[float, ndim = 1] v, # drift by timestep 'delta_t'
         # Loop over samples
         for n in range(n_samples):
             y = z_view[k] * a_view[k] # reset starting point
-            t = 0.0 # reset time
+            t_particle = 0.0 # reset time
 
             # Random walker
             while y <= a_view[k] and y >= 0 and t <= max_t:
                 y += v_view[k] * delta_t + sqrt_st * gaussian_values[m] # update particle position
-                t += delta_t
+                t_particle += delta_t
                 m += 1
                 if m == num_draws:
                     gaussian_values = draw_gaussian(num_draws)
@@ -235,7 +235,7 @@ def ddm(np.ndarray[float, ndim = 1] v, # drift by timestep 'delta_t'
 
             # Note that for purposes of consistency with Navarro and Fuss, 
             # the choice corresponding the lower barrier is +1, higher barrier is -1
-            rts_view[n, k, 0] = t + t_view[k] # store rt
+            rts_view[n, k, 0] = t_particle + t_view[k] # store rt
             choices_view[n, k, 0] = (-1) * sign(y) # store choice
         
     return (rts, choices, {'v': v,
@@ -285,7 +285,7 @@ def ddm_cov(np.ndarray[float, ndim = 1] v, # drift by timestep 'delta_t'
     cdef float delta_t_sqrt = sqrt(delta_t)
     cdef float sqrt_st = delta_t_sqrt * s
 
-    cdef float y, t
+    cdef float y, t_particle
 
     # cdef int n
     cdef Py_ssize_t n
@@ -298,12 +298,12 @@ def ddm_cov(np.ndarray[float, ndim = 1] v, # drift by timestep 'delta_t'
     for n in range(n_samples):
         for k in range(n_trials):
             y = z_view[k] * a_view[k] # reset starting point
-            t = 0.0 # reset time
+            t_particle = 0.0 # reset time
 
             # Random walker
             while y <= a[k] and y >= 0 and t <= max_t:
                 y += v_view[k] * delta_t + sqrt_st * gaussian_values[m] # update particle position
-                t += delta_t
+                t_particle += delta_t
                 m += 1
                 if m == num_draws:
                     gaussian_values = draw_gaussian(num_draws)
@@ -311,7 +311,7 @@ def ddm_cov(np.ndarray[float, ndim = 1] v, # drift by timestep 'delta_t'
 
             # Note that for purposes of consistency with Navarro and Fuss, 
             # the choice corresponding the lower barrier is +1, higher barrier is -1
-            rts_view[n, k, 0] = t + t_view[k] # store rt
+            rts_view[n, k, 0] = t_particle + t_view[k] # store rt
             choices_view[n, k, 0] = (-1) * sign(y) # store choice
 
     return (rts, choices, {'v': v,
@@ -369,7 +369,7 @@ def ddm_flexbound(np.ndarray[float, ndim = 1] v,
     t_s = np.arange(0, max_t + delta_t, delta_t).astype(DTYPE)
     boundary = np.zeros(t_s.shape, dtype = DTYPE)
 
-    cdef float y, t
+    cdef float y, t_particle
     cdef Py_ssize_t n 
     cdef Py_ssize_t ix
     cdef Py_ssize_t m = 0
@@ -389,7 +389,7 @@ def ddm_flexbound(np.ndarray[float, ndim = 1] v,
     
         for n in range(n_samples):
             y = (-1) * boundary_view[0] + (z_view[k] * 2 * (boundary_view[0]))  # reset starting position 
-            t = 0 # reset time
+            t_particle = 0.0 # reset time
             ix = 0 # reset boundary index
             
             # Can improve with less checks
@@ -400,7 +400,7 @@ def ddm_flexbound(np.ndarray[float, ndim = 1] v,
             # Random walker
             while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
                 y += (v_view[k] * delta_t) + (sqrt_st * gaussian_values[m])
-                t += delta_t
+                t_particle += delta_t
                 ix += 1
                 m += 1
                 
@@ -413,7 +413,7 @@ def ddm_flexbound(np.ndarray[float, ndim = 1] v,
                     gaussian_values = draw_gaussian(num_draws)
                     m = 0
 
-            rts_view[n, k, 0] = t + t_view[k] # Store rt
+            rts_view[n, k, 0] = t_particle + t_view[k] # Store rt
             choices_view[n, k, 0] = sign(y) # Store choice
     
     return (rts, choices,  {'v': v,
@@ -463,7 +463,7 @@ def ddm_flexbound_max(float v = 0.0,
     boundary = np.zeros(t_s.shape, dtype = DTYPE)
 
 
-    cdef float y, t
+    cdef float y, t_particle
     cdef Py_ssize_t n 
     cdef Py_ssize_t ix
     cdef Py_ssize_t m = 0
@@ -480,13 +480,13 @@ def ddm_flexbound_max(float v = 0.0,
 
     for n in range(n_samples):
         y = (-1) * boundary_view[0] + (z * 2 * (boundary_view[0]))  # reset starting position 
-        t = 0 # reset time
+        t_particle = 0.0 # reset time
         ix = 0 # reset boundary index
 
         # Random walker
         while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
             y += (v * delta_t) + (sqrt_st * gaussian_values[m])
-            t += delta_t
+            t_particle += delta_t
             ix += 1
             m += 1
             
@@ -495,7 +495,7 @@ def ddm_flexbound_max(float v = 0.0,
                 gaussian_values = draw_gaussian(num_draws)
                 m = 0
 
-        rts_view[n, 0] = t + t # Store rt
+        rts_view[n, 0] = t_particle + t # Store rt
         choices_view[n, 0] = sign(y) # Store choice
     
 
@@ -563,7 +563,7 @@ def levy_flexbound(np.ndarray[float, ndim = 1] v,
     boundary = np.zeros(t_s.shape, dtype = DTYPE)
     cdef float[:] boundary_view = boundary
 
-    cdef float y, t
+    cdef float y, t_particle
     cdef Py_ssize_t n 
     cdef Py_ssize_t ix
     cdef Py_ssize_t k
@@ -587,7 +587,7 @@ def levy_flexbound(np.ndarray[float, ndim = 1] v,
         # Loop over samples
         for n in range(n_samples):
             y = (-1) * boundary_view[0] + (z_view[k] * 2 * (boundary_view[0]))  # reset starting position 
-            t = 0 # reset time
+            t_particle = 0.0 # reset time
             ix = 0 # reset boundary index
             if n == 0:
                 if k == 0:
@@ -596,7 +596,7 @@ def levy_flexbound(np.ndarray[float, ndim = 1] v,
             # Random walker
             while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
                 y += (v_view[k] * delta_t) + (delta_t_alpha * alpha_stable_values[m])
-                t += delta_t
+                t_particle += delta_t
                 ix += 1
                 m += 1
                 if n == 0:
@@ -606,7 +606,7 @@ def levy_flexbound(np.ndarray[float, ndim = 1] v,
                     alpha_stable_values = draw_random_stable(num_draws, alpha_diff_view[k])
                     m = 0
 
-            rts_view[n, k, 0] = t + t_view[k] # Store rt
+            rts_view[n, k, 0] = t_particle + t_view[k] # Store rt
             choices_view[n, k, 0] = sign(y) # Store choice
         
     return (rts, choices,  {'v': v,
@@ -677,7 +677,7 @@ def full_ddm(np.ndarray[float, ndim = 1] v, # = 0,
     boundary = np.zeros(t_s.shape, dtype = DTYPE)
     cdef float[:] boundary_view = boundary
 
-    cdef float y, t, t_tmp
+    cdef float y, t_particle, t_tmp
     cdef Py_ssize_t n, ix, k
     cdef Py_ssize_t m = 0
     cdef float drift_increment = 0.0
@@ -713,7 +713,7 @@ def full_ddm(np.ndarray[float, ndim = 1] v, # = 0,
                     gaussian_values = draw_gaussian(num_draws)
                     m = 0
             
-            t = 0 # reset time
+            t_particle = 0.0 # reset time
             ix = 0 # reset boundary index
             
             if n == 0:
@@ -723,7 +723,7 @@ def full_ddm(np.ndarray[float, ndim = 1] v, # = 0,
             # Random walker
             while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
                 y += drift_increment + (sqrt_st * gaussian_values[m])
-                t += delta_t
+                t_particle += delta_t
                 ix += 1
                 m += 1
                 
@@ -734,7 +734,7 @@ def full_ddm(np.ndarray[float, ndim = 1] v, # = 0,
                     gaussian_values = draw_gaussian(num_draws)
                     m = 0
 
-            rts_view[n, k, 0] = t + t_tmp # Store rt
+            rts_view[n, k, 0] = t_particle + t_tmp # Store rt
             choices_view[n, k, 0] = np.sign(y) # Store choice
 
     return (rts, choices,  {'v': v,
@@ -810,7 +810,7 @@ def ddm_sdv(np.ndarray[float, ndim = 1] v,
         # print(a)
         boundary_view[:] = np.add(a, boundary_fun(t = t_s, **boundary_params)).astype(DTYPE)
     
-    cdef float y, t
+    cdef float y, t_particle
     cdef Py_ssize_t n, ix, k
     cdef Py_ssize_t m = 0
     cdef float drift_increment = 0.0
@@ -839,7 +839,7 @@ def ddm_sdv(np.ndarray[float, ndim = 1] v,
                     gaussian_values = draw_gaussian(num_draws)
                     m = 0
             
-            t = 0 # reset time
+            t_particle = 0.0 # reset time
             ix = 0 # reset boundary index
             
             if n == 0:
@@ -849,7 +849,7 @@ def ddm_sdv(np.ndarray[float, ndim = 1] v,
             # Random walker
             while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
                 y += drift_increment + (sqrt_st * gaussian_values[m])
-                t += delta_t
+                t_particle += delta_t
                 ix += 1
                 m += 1
                 
@@ -862,7 +862,7 @@ def ddm_sdv(np.ndarray[float, ndim = 1] v,
                     m = 0
 
 
-            rts_view[n, k, 0] = t + t_view[k] # Store rt
+            rts_view[n, k, 0] = t_particle + t_view[k] # Store rt
             choices_view[n, k, 0] = np.sign(y) # Store choice
 
 
@@ -930,7 +930,7 @@ def ornstein_uhlenbeck(np.ndarray[float, ndim = 1] v, # drift parameter
     boundary = np.zeros(t_s.shape, dtype = DTYPE)
     cdef float[:] boundary_view = boundary
 
-    cdef float y, t
+    cdef float y, t_particle
     cdef Py_ssize_t n, ix, k
     cdef Py_ssize_t m = 0
     cdef float[:] gaussian_values = draw_gaussian(num_draws)
@@ -950,7 +950,7 @@ def ornstein_uhlenbeck(np.ndarray[float, ndim = 1] v, # drift parameter
         # Loop over samples
         for n in range(n_samples):
             y = (-1) * boundary_view[0] + (z_view[k] * 2 * boundary_view[0])
-            t = 0
+            t_particle = 0.0
             ix = 0
 
             if n == 0:
@@ -960,7 +960,7 @@ def ornstein_uhlenbeck(np.ndarray[float, ndim = 1] v, # drift parameter
             # Random walker
             while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
                 y += ((v_view[k] - (g_view[k] * y)) * delta_t) + sqrt_st * gaussian_values[m]
-                t += delta_t
+                t_particle += delta_t
                 ix += 1
                 m += 1
 
@@ -972,7 +972,7 @@ def ornstein_uhlenbeck(np.ndarray[float, ndim = 1] v, # drift parameter
                     gaussian_values = draw_gaussian(num_draws)
                     m = 0
 
-            rts_view[n, k, 0] = t_view[k] + t
+            rts_view[n, k, 0] = t_particle + t_view[k] 
             choices_view[n, k, 0] = sign(y)
 
     return (rts, choices, {'v': v,
@@ -1070,7 +1070,7 @@ def race_model(np.ndarray[float, ndim = 2] v,  # np.array expected, one column o
     cdef float[:] boundary_view = boundary
 
     # Initialize variables needed for for loop 
-    cdef float t
+    cdef float t_particle
     cdef Py_ssize_t n, ix, j, k
     cdef Py_ssize_t m = 0
 
@@ -1092,7 +1092,7 @@ def race_model(np.ndarray[float, ndim = 2] v,  # np.array expected, one column o
             for j in range(n_particles):
                 particles_view[j] = z_view[k, j] * boundary_view[0] # Reset particle starting points
             
-            t = 0 # reset time
+            t_particle = 0.0 # reset time
             ix = 0
 
             if n == 0:
@@ -1108,7 +1108,7 @@ def race_model(np.ndarray[float, ndim = 2] v,  # np.array expected, one column o
                     if m == num_draws:
                         m = 0
                         gaussian_values = draw_gaussian(num_draws)
-                t += delta_t
+                t_particle += delta_t
                 ix += 1
                 if n == 0:
                     if k == 0:
@@ -1117,7 +1117,7 @@ def race_model(np.ndarray[float, ndim = 2] v,  # np.array expected, one column o
 
             choices_view[n, k, 0] = np.argmax(particles)
             #rts_view[n, 0] = t + t[choices_view[n, 0]]
-            rts_view[n , k, 0] = t + t[k, 0] # for now no t per choice option
+            rts_view[n , k, 0] = t_particle + t[k, 0] # for now no t per choice option
 
         # Create some dics
         v_dict = {}
@@ -1198,7 +1198,7 @@ def lca(np.ndarray[float, ndim = 2] v, # drift parameters (np.array expect: one 
     
     cdef Py_ssize_t n, i, ix, k
     cdef Py_ssize_t m = 0
-    cdef float t, particles_sum
+    cdef float t_par, particles_sum
     
     # Boundary storage                                                             
     cdef int num_steps = int((max_t / delta_t) + 2)
@@ -1227,7 +1227,7 @@ def lca(np.ndarray[float, ndim = 2] v, # drift parameters (np.array expect: one 
             for i in range(n_particles):
                 particles_view[i] = z_view[k, i] * boundary_view[0]
             
-            t = 0.0 # reset time
+            t_particle = 0.0 # reset time
             ix = 0 # reset boundary index
 
             if n == 0:
@@ -1251,7 +1251,7 @@ def lca(np.ndarray[float, ndim = 2] v, # drift parameters (np.array expect: one 
                         gaussian_values = draw_gaussian(num_draws)
                         m = 0
                 
-                t += delta_t # increment time
+                t_particle += delta_t # increment time
                 ix += 1 # increment boundary index
 
                 if n == 0:
@@ -1260,7 +1260,7 @@ def lca(np.ndarray[float, ndim = 2] v, # drift parameters (np.array expect: one 
                             traj_view[ix, i] = particles[i]
         
             choices_view[n, k, 0] = particles.argmax() # store choices for sample n
-            rts_view[n, k, 0] = t + t_view[k, 0] # t[choices_view[n, 0]] # store reaction time for sample n
+            rts_view[n, k, 0] = t_particle + t_view[k, 0] # t[choices_view[n, 0]] # store reaction time for sample n
         
     # Create some dics
     v_dict = {}
@@ -1340,7 +1340,7 @@ def ddm_flexbound_seq2(np.ndarray[float, ndim = 1] v_h,
     boundary = np.zeros(t_s.shape, dtype = DTYPE)
     cdef float[:] boundary_view = boundary
 
-    cdef float y_h, t, y_l
+    cdef float y_h, t_particle, y_l
     cdef Py_ssize_t n, ix, k
     cdef Py_ssize_t m = 0
     cdef Py_ssize_t traj_id
@@ -1360,7 +1360,7 @@ def ddm_flexbound_seq2(np.ndarray[float, ndim = 1] v_h,
     
         # Loop over samples
         for n in range(n_samples):
-            t = 0 # reset time
+            t_particle = 0.0 # reset time
             ix = 0 # reset boundary index
 
             # Random walker 1
@@ -1372,7 +1372,7 @@ def ddm_flexbound_seq2(np.ndarray[float, ndim = 1] v_h,
             
             while y_h >= (-1) * boundary_view[ix] and y_h <= boundary_view[ix] and t <= max_t:
                 y_h += (v_h_view[k] * delta_t) + (sqrt_st * gaussian_values[m])
-                t += delta_t
+                t_particle += delta_t
                 ix += 1
                 m += 1
                 
@@ -1414,7 +1414,7 @@ def ddm_flexbound_seq2(np.ndarray[float, ndim = 1] v_h,
             # Random walker 2
             while y_l >= (-1) * boundary_view[ix] and y_l <= boundary_view[ix] and t <= max_t:
                 y_l += (v_l * delta_t) + (sqrt_st * gaussian_values[m])
-                t += delta_t
+                t_particle += delta_t
                 ix += 1
                 m += 1
                 if m == num_draws:
@@ -1425,7 +1425,7 @@ def ddm_flexbound_seq2(np.ndarray[float, ndim = 1] v_h,
                     if k == 0:
                         traj_view[ix, traj_id] = y_l
 
-            rts_view[n, k, 0] = t + t_view[k]
+            rts_view[n, k, 0] = t_particle + t_view[k]
             if sign(y_l) >= 0: # store choice update
                 choices_view[n, k, 0] += 1
 
@@ -1536,8 +1536,8 @@ def ddm_flexbound_par2(np.ndarray[float, ndim = 1] v_h,
         
         # Loop over samples
         for n in range(n_samples):
-            t_h = 0 # reset time high dimension
-            t_l = 0 # reset time low dimension
+            t_h = 0.0 # reset time high dimension
+            t_l = 0.0 # reset time low dimension
             ix = 0 # reset boundary index
 
             # Initialize walkers
