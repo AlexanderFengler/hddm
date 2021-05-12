@@ -1269,7 +1269,7 @@ def lca(np.ndarray[float, ndim = 2] v, # drift parameters (np.array expect: one 
     
     for i in range(n_particles):
         v_dict['v_' + str(i)] = v[:, i]
-        z_dict['z_' + str(i)] = w[:, i]
+        z_dict['z_' + str(i)] = z[:, i]
 
     return (rts, choices, {**v_dict,
                            'a': a,
