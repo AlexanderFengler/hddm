@@ -1125,7 +1125,7 @@ def race_model(np.ndarray[float, ndim = 2] v,  # np.array expected, one column o
         #t_dict = {}
         for i in range(n_particles):
             v_dict['v_' + str(i)] = v[:, i]
-            w_dict['z_' + str(i)] = w[:, i]
+            z_dict['z_' + str(i)] = z[:, i]
             #t_dict['t_' + str(i)] = t[i] # for now no t by choice
 
 
