@@ -1303,17 +1303,12 @@ def model_plot_new(hddm_model = None,
             font_scale = 2)
 
     for plot_n in range(n_plots):
-
-        fig, ax = plt.subplots(rows, cols, 
-                            figsize = (20 * scale_x, 20 * rows * scale_y), 
-                            sharex = False, 
-                            sharey = False)
     
         # Title adjustments depending on whether ground truth model was supplied
-        if model_ground_truth is not None:  
-            my_suptitle = fig.suptitle(title + model_ground_truth, fontsize = 40)
-        else:
-            my_suptitle = fig.suptitle(title.replace(':', ''), fontsize = 40)
+        # if model_ground_truth is not None:  
+        #     my_suptitle = fig.suptitle(title + model_ground_truth, fontsize = 40)
+        # else:
+        #     my_suptitle = fig.suptitle(title.replace(':', ''), fontsize = 40)
             
         sns.despine(right = True)
 
@@ -1343,6 +1338,11 @@ def model_plot_new(hddm_model = None,
             rows = int(np.ceil(n_subplot / cols))
         else:
             rows = 1
+
+        fig, ax = plt.subplots(rows, cols, 
+                               figsize = (20 * scale_x, 20 * rows * scale_y), 
+                               sharex = False, 
+                               sharey = False)
         
         subplot_cnt = 0
         for i in sub_data.keys():
