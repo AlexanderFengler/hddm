@@ -1421,7 +1421,7 @@ def model_plot_new(hddm_model = None,
                 # idx = np.random.choice(posterior_samples.shape[1], size = n_posterior_parameters, replace = False)
 
                 for j in range(n_posterior_parameters):
-                    out = simulator(theta = sub_data[i][idx[j], :], # posterior_samples[plot_n, i, idx[j], :],
+                    out = simulator(theta = sub_data[i].iloc[idx[j], :], # posterior_samples[plot_n, i, idx[j], :],
                                     model = model_fitted,
                                     n_samples = n_simulations_per_parameter,
                                     bin_dim = None)
@@ -1479,7 +1479,7 @@ def model_plot_new(hddm_model = None,
                                                 bins = np.linspace(0, max_t, nbins),
                                                 density = True)
 
-                choice_p_up_true_dat = np.sum(sub_data[i]['data']['response'] == 1) / sub_data[i]['data'].values.shape[0]
+                choice_p_up_true_dat = np.sum(sub_data[i]['data']['response'].values == 1) / sub_data[i]['data'].values.shape[0]
                 # choice_p_up_true_dat = np.sum(ground_truth_data[sorted_keys[i]][:, 1] == 1) / ground_truth_data[sorted_keys[i]].shape[0]
 
                 if row_tmp == 0 and col_tmp == 0:
@@ -1522,7 +1522,7 @@ def model_plot_new(hddm_model = None,
                     if j == (n_posterior_parameters - 1):
                         tmp_label = 'Model Samples'
                         tmp_model = model_fitted
-                        tmp_samples = sub_data[i]['traces'][idx[j], :] #posterior_samples[i, idx[j], :]
+                        tmp_samples = sub_data[i]['traces'].iloc[idx[j], :] #posterior_samples[i, idx[j], :]
                         # tmp_samples = posterior_samples[i, idx[j], :]
                         tmp_alpha = 0.5
                         tmp_color = 'black'
