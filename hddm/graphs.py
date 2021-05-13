@@ -1327,7 +1327,7 @@ def model_plot_new(hddm_model = None,
                 sub_data[key] = data[key][subj_key]
         if multi_subject and not multi_condition:
             # Condition three
-            sub_data = data[list(data.keys()[0])]
+            sub_data = data[list(data.keys())[0]]
         if not multi_subject and not multi_condition:
             # Condition four
             sub_data = data[0]
