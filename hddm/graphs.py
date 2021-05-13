@@ -1534,7 +1534,7 @@ def model_plot_new(hddm_model = None,
                         
                         # If we supplied ground truth data --> make ground truth model blue, otherwise red
                         tmp_colors = ['red', 'blue']
-                        tmp_bool = ground_truth_data is not None
+                        tmp_bool = sub_data[i]['data'] is not None
                         tmp_color = tmp_colors[int(tmp_bool)]
                         tmp_alpha = 1
                         tmp_label = 'Ground Truth Model'
