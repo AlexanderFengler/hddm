@@ -1613,7 +1613,7 @@ def model_plot_new(hddm_model = None,
                     if rows == 1 and cols == 1:
                         ax_tmp.patch.set_visible(False)
 
-                    subplot_cnt += 1
+            subplot_cnt += 1
                         
             # Set plot title
             title_tmp = ''
