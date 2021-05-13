@@ -1421,7 +1421,7 @@ def model_plot_new(hddm_model = None,
                 # idx = np.random.choice(posterior_samples.shape[1], size = n_posterior_parameters, replace = False)
 
                 for j in range(n_posterior_parameters):
-                    out = simulator(theta = sub_data[i].iloc[idx[j], :], # posterior_samples[plot_n, i, idx[j], :],
+                    out = simulator(theta = sub_data[i]['traces'].iloc[idx[j], :], # posterior_samples[plot_n, i, idx[j], :],
                                     model = model_fitted,
                                     n_samples = n_simulations_per_parameter,
                                     bin_dim = None)
