@@ -1417,7 +1417,7 @@ def model_plot_new(hddm_model = None,
                 
                 # Run Model simulations for posterior samples
                 tmp_post = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
-                idx = np.random.choice(sub_data[i].shape[0], size = n_posterior_parameters, replace = False)
+                idx = np.random.choice(sub_data[i]['traces'].shape[0], size = n_posterior_parameters, replace = False)
                 # idx = np.random.choice(posterior_samples.shape[1], size = n_posterior_parameters, replace = False)
 
                 for j in range(n_posterior_parameters):
