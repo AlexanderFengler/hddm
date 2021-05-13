@@ -1137,35 +1137,28 @@ def model_plot(posterior_samples = None,
 
 # Plot bound
 # Mean posterior predictives
-def model_plot_new(hddm_model = 
-                   posterior_samples = None,
-                   ground_truth_parameters = None,
-                   ground_truth_data = None,
+def model_plot_new(hddm_model = None,
                    model_ground_truth = 'weibull_cdf',
-                   #model_fitted = 'angle',
-                   #input_is_hddm_trace = True,
-                   #datatype = 'single_subject', # 'hierarchical', 'single_subject', 'condition' # data structure
-                   #condition_column = 'condition', # data structure
-                   #n_plots = 4, 
-                   n_posterior_parameters = 500,
-                   n_simulations_per_parameter = 10,
+                   n_posterior_parameters = 500, # optional / styling
+                   n_simulations_per_parameter = 10, # optional / stiling
                    cols = 3, # styling
                    max_t = 5, # styling
                    show_model = True, # styling
                    show_trajectories = False, # styling
-                   n_trajectories = 10,
-                   color_trajectories = 'blue',
-                   alpha_trajectories = 0.2,
-                   linewidth_trajectories = 1.0,
+                   n_trajectories = 10, # styling
+                   color_trajectories = 'blue', # styling
+                   alpha_trajectories = 0.2, # styling
+                   linewidth_trajectories = 1.0, # styling
                    ylimit = 2, # styling
                    posterior_linewidth = 3, # styling
                    ground_truth_linewidth = 3, # styling
                    hist_linewidth = 3, # styling
                    bin_size = 0.025, # styling
                    save = False,
-                   scale_x = 1.0,
-                   scale_y = 1.0,
-                   delta_t_graph = 0.01):
+                   scale_x = 1.0, # styling
+                   scale_y = 1.0, # styling
+                   delta_t_graph = 0.01 # styling
+                   ):
     
     """The model plot is useful to illustrate model behavior graphically. It is quite a flexible 
        plot allowing you to show path trajectories and embedded reaction time histograms etc.. 
@@ -1242,11 +1235,23 @@ def model_plot_new(hddm_model =
     Return: plot object
     """
 
+    #posterior_samples = None,
+    #ground_truth_parameters = None,
+    #ground_truth_data = None,
+     #model_fitted = 'angle',
+    #input_is_hddm_trace = True,
+    #datatype = 'single_subject', # 'hierarchical', 'single_subject', 'condition' # data structure
+    #condition_column = 'condition', # data structure
+    #n_plots = 4
+
     model_fitted = hddm_model.model
-    datatype = 'single_subject'
-    input_is_hddm_trace = True
-    condition_column = 'condition'
-    n_plots = 4 
+    # posterior_samples
+    # ground_truth_parameters
+    #ground_truth_data
+    #datatype = 'single_subject'
+    #input_is_hddm_trace = True
+    #condition_column = 'condition'
+    #n_plots = 4 
 
     if save == True:
         pass
@@ -1279,10 +1284,11 @@ def model_plot_new(hddm_model =
         return 'Please provide either posterior samples, \n or a ground truth model and parameter set to plot something here. \n Currently you are requesting an empty plot' 
             
     title = 'Model Plot: '
-    if model_ground_truth is not None:
-        ax_titles = model_config[model_ground_truth]['params']
-    else: 
-        ax_titles = ''
+
+    # if model_ground_truth is not None:
+    #     ax_titles = model_config[model_ground_truth]['params']
+    # else: 
+    #     ax_titles = ''
         
     # Define number of plots we need:
     if multi_subject and multi_condition:
@@ -1302,12 +1308,6 @@ def model_plot_new(hddm_model =
                             figsize = (20 * scale_x, 20 * rows * scale_y), 
                             sharex = False, 
                             sharey = False)
-
-        # Define number of rows we need for display
-        if n_subplot > 1:
-            rows = int(np.ceil(n_subplot / cols))
-        else:
-            rows = 1
     
         # Title adjustments depending on whether ground truth model was supplied
         if model_ground_truth is not None:  
@@ -1320,8 +1320,7 @@ def model_plot_new(hddm_model =
         t_s = np.arange(0, max_t, delta_t_graph)
         nbins = int((max_t) / bin_size)
 
-        # AF-TODO: Inner loop shouldn't depend on traces
-        # Define keys to iterate over 
+        # Define datastructure that refers to the current plot (encompasses only subplots in current display) 
         if multi_subject and multi_condition:
             # Condition one
             sub_data = data[data.keys()[plot_n]]
@@ -1331,13 +1330,19 @@ def model_plot_new(hddm_model =
             for key in data.keys():
                 subj_key = data[key].keys()[0]
                 sub_data[key] = data[key][subj_key]
-            for key
         if multi_subject and not multi_condition:
             # Condition three
             sub_data = data[data.keys()[0]]
         if not multi_subject and not multi_condition:
             # Condition four
             sub_data = data[0]
+
+        # Define number of rows we need for display
+        n_subplots = len(sub_data.keys())
+        if n_subplots > 1:
+            rows = int(np.ceil(n_subplot / cols))
+        else:
+            rows = 1
         
         subplot_cnt = 0
         for i in sub_data.keys():
@@ -1459,58 +1464,10 @@ def model_plot_new(hddm_model =
                             edgecolor = 'black',
                             linewidth = hist_linewidth,
                             zorder = -1)
-                            
-            # if model_ground_truth is not None and ground_truth_data is None:
-            #     counts_2_up, bins = np.histogram(tmp_true[tmp_true[:, 1] == 1, 0],
-            #                                     bins = np.linspace(0, max_t, nbins),
-            #                                     density = True)
 
-            #     counts_2_down, _ = np.histogram(tmp_true[tmp_true[:, 1] == - 1, 0],
-            #                                     bins = np.linspace(0, max_t, nbins),
-            #                                     density = True)
-
-            #     if row_tmp == 0 and col_tmp == 0:
-            #         tmp_label = 'Ground Truth Data'
-            #     else: 
-            #         tmp_label = None
-                
-            #     ax_tmp_twin_up.hist(bins[:-1], 
-            #                         bins, 
-            #                         weights = choice_p_up_true * counts_2_up,
-            #                         histtype = 'step',
-            #                         alpha = 0.5, 
-            #                         color = 'red',
-            #                         edgecolor = 'red',
-            #                         zorder = -1,
-            #                         linewidth = hist_linewidth,
-            #                         label = tmp_label)
-
-            #     ax_tmp_twin_down.hist(bins[:-1], 
-            #                         bins, 
-            #                         weights = (1 - choice_p_up_true) * counts_2_down,
-            #                         histtype = 'step',
-            #                         alpha = 0.5, 
-            #                         color = 'red',
-            #                         edgecolor = 'red',
-            #                         linewidth = hist_linewidth,
-            #                         zorder = -1)
-    
-            #     if row_tmp == 0 and col_tmp == 0:
-            #         ax_tmp_twin_up.legend(loc = 'lower right')
-                
             if (hddm_model is None) and (ground_truth_data is not None):
                 # These splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
                 # Wiser because either way we can have varying numbers of trials for each subject !
-                #print('sorted keys')
-                #print(sorted_keys)
-
-                #print('ground truth data')
-                #print(ground_truth_data)
-                #print(ground_truth_data[sorted_keys[i]])
-                #print(type(ground_truth_data[sorted_keys[i]]))
-                #print(ground_truth_data[sorted_keys[i]][:, 1] == 1)
-                #print(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == 1, 0])
-                
                 counts_2_up, bins = np.histogram(sub_data[i]['data'].loc[sub_data[i]['data']['response'] == 1, :]['rt'].values,
                                                 bins = np.linspace(0, max_t, nbins),
                                                 density = True)
