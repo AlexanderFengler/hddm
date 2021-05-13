@@ -1333,7 +1333,7 @@ def model_plot_new(hddm_model = None,
             sub_data = data[0]
 
         # Define number of rows we need for display
-        n_subplots = len(sub_data.keys())
+        n_subplots = len(list(sub_data.keys()))
         if n_subplots > 1:
             rows = int(np.ceil(n_subplot / cols))
         else:
