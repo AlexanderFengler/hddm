@@ -1350,7 +1350,7 @@ def model_plot_new(hddm_model = None,
         #for i in range(traces[plot_n, :, :, :]):
 
             row_tmp = int(np.floor(subplot_cnt / cols))
-            col_tmp = i - (cols * row_tmp)
+            col_tmp = subplot_cnt - (cols * row_tmp)
             
             if rows > 1 and cols > 1:
                 ax[row_tmp, col_tmp].set_xlim(0, max_t)
