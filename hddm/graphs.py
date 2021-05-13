@@ -1646,7 +1646,7 @@ def model_plot_new(hddm_model = None,
                 ax_tmp.axhline(y = 0, xmin = 0, xmax = sub_data[i]['gt_parameter_vector'][model_config[model_ground_truth]['params'].index('t')] / max_t, c = 'red',  linestyle = '--')
 
         if rows > 1 and cols > 1:
-            for i in range(n_subplot, rows * cols, 1):
+            for i in range(n_subplots, rows * cols, 1):
                 row_tmp = int(np.floor(i / cols))
                 col_tmp = i - (cols * row_tmp)
                 ax[row_tmp, col_tmp].axis('off')
