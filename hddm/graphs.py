@@ -1261,7 +1261,7 @@ def model_plot_new(hddm_model = None,
 
     # AF-TODO: Shape checks
     if hddm_model is not None:
-        data = filter_subject_condition_traces(hddmnn_model, 
+        data = filter_subject_condition_traces(hddm_model, 
                                                ground_truth_model = model_ground_truth)
 
     # Classify plot type:
