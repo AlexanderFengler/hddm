@@ -1318,16 +1318,16 @@ def model_plot_new(hddm_model = None,
         # Define datastructure that refers to the current plot (encompasses only subplots in current display) 
         if multi_subject and multi_condition:
             # Condition one
-            sub_data = data[data.keys()[plot_n]]
+            sub_data = data[list(data.keys())[plot_n]]
         if multi_condition and not multi_subject:
             # Condition two
             sub_data = {}
             for key in data.keys():
-                subj_key = data[key].keys()[0]
+                subj_key = list(data[key].keys())[0]
                 sub_data[key] = data[key][subj_key]
         if multi_subject and not multi_condition:
             # Condition three
-            sub_data = data[data.keys()[0]]
+            sub_data = data[list(data.keys()[0])]
         if not multi_subject and not multi_condition:
             # Condition four
             sub_data = data[0]
