@@ -35,9 +35,9 @@ def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_respo
 
     # Add ground truth parameters to dataframe
     for param in model_config[simulator_data[2]['model']]['params']:
-        print(simulator_data[2][param])
-        print(type(simulator_data[2][param]))
-        print(simulator_data[2][param].shape)
+        #print(simulator_data[2][param])
+        #print(type(simulator_data[2][param]))
+        #print(simulator_data[2][param].shape)
         if len(simulator_data[2][param]) > 1:
             df[param] = simulator_data[2][param]
         else:
