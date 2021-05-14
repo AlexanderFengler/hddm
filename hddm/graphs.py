@@ -1280,6 +1280,9 @@ def model_plot_new(hddm_model = None,
             color_codes = True,
             font_scale = 2)
 
+    print('n_plots')
+    print(n_plots)
+
     for plot_n in range(n_plots):
         sns.despine(right = True)
 
@@ -1301,7 +1304,11 @@ def model_plot_new(hddm_model = None,
             sub_data = data[list(data.keys())[0]]
         if not multi_subject and not multi_condition:
             # Condition four
+            print(sub_data)
+            print(sub_data)
             sub_data = data[0]
+            print(sub_data[i]['traces'])
+
 
         # Define number of rows we need for display
         n_subplots = len(list(sub_data.keys()))
