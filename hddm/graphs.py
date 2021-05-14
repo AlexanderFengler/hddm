@@ -1617,6 +1617,7 @@ def model_plot_new(hddm_model = None,
                         
             # Set plot title
             title_tmp = ''
+            title_size = 24
             if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
                 title_tmp += 'Subject: ' + str(i)
             elif multi_condition and not multi_subject:
@@ -1625,7 +1626,7 @@ def model_plot_new(hddm_model = None,
                         title_tmp += str(label_key) + ': '
                         title_tmp += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
                 title_tmp = title_tmp[:-1]
-                title_size = 24 / (0.5 * len(list(sub_data[i]['cond_subj_label'].keys())))
+                title_size = title_size / (0.5 * len(list(sub_data[i]['cond_subj_label'].keys())))
             elif not multi_condition and not multi_subject:
                 # No extra title needed for simple single subject plot
                 pass
