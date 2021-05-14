@@ -1642,8 +1642,8 @@ def model_plot_new(hddm_model = None,
             # Some extra styling:
             if model_ground_truth is not None:
                 if show_model:
-                    ax_tmp.axvline(x = sub_data[i]['gt_parameter_vector'][model_config[model_ground_truth]['params'].index('t')], ymin = - ylimit, ymax = ylimit, c = 'red', linestyle = '--')
-                ax_tmp.axhline(y = 0, xmin = 0, xmax = sub_data[i]['gt_parameter_vector'][model_config[model_ground_truth]['params'].index('t')] / max_t, c = 'red',  linestyle = '--')
+                    ax_tmp.axvline(x = sub_data[i]['gt_parameter_vector'][model_config[model_ground_truth]['params'].index('t')], ymin = - ylimit, ymax = ylimit, c = tmp_color, linestyle = '--')
+                ax_tmp.axhline(y = 0, xmin = 0, xmax = sub_data[i]['gt_parameter_vector'][model_config[model_ground_truth]['params'].index('t')] / max_t, c = tmp_color,  linestyle = '--')
 
         if rows > 1 and cols > 1:
             for i in range(n_subplots, rows * cols, 1):
