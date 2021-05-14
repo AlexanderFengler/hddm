@@ -1304,9 +1304,10 @@ def model_plot_new(hddm_model = None,
             sub_data = data[list(data.keys())[0]]
         if not multi_subject and not multi_condition:
             # Condition four
-            print(sub_data)
-            print(sub_data)
             sub_data = data[0]
+            print('sub_data')
+            print(sub_data)
+            print('sub_data[i][traces]')
             print(sub_data[i]['traces'])
 
 
