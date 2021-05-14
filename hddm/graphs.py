@@ -1622,7 +1622,7 @@ def model_plot_new(hddm_model = None,
             elif multi_condition and not multi_subject:
                 for label_key in sub_data[i]['cond_subj_label'].keys():
                     title_tmp += str(label_key) + ': '
-                    title_tmp += sub_data[i]['cond_subj_label'][[label_key]] + ', '
+                    title_tmp += str(sub_data[i]['cond_subj_label'][[label_key]].values) + ', '
                 title_tmp = title_tmp[:-1]
             elif not multi_condition and not multi_subject:
                 # No extra title needed for simple single subject plot
