@@ -1308,7 +1308,7 @@ def model_plot_new(hddm_model = None,
             print('sub_data')
             print(sub_data)
             print('sub_data[i][traces]')
-            print(sub_data[i]['traces'])
+            print(sub_data[list(sub_data.keys())[0]]['traces'])
 
 
         # Define number of rows we need for display
