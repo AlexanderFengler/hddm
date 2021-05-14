@@ -1621,7 +1621,7 @@ def model_plot_new(hddm_model = None,
                 title_tmp += 'Subject: ' + str(i)
             elif multi_condition and not multi_subject:
                 for label_key in sub_data[i]['cond_subj_label'].keys():
-                    if 'subj_idx' is not in label_key:
+                    if 'subj_idx' not in label_key:
                         title_tmp += str(label_key) + ': '
                         title_tmp += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
                 title_tmp = title_tmp[:-1]
