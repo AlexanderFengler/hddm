@@ -1235,23 +1235,8 @@ def model_plot_new(hddm_model = None,
     Return: plot object
     """
 
-    #posterior_samples = None,
-    #ground_truth_parameters = None,
-    #ground_truth_data = None,
-     #model_fitted = 'angle',
-    #input_is_hddm_trace = True,
-    #datatype = 'single_subject', # 'hierarchical', 'single_subject', 'condition' # data structure
-    #condition_column = 'condition', # data structure
-    #n_plots = 4
-
+    # Set model fitted (just to aid clarity of the code)
     model_fitted = hddm_model.model
-    # posterior_samples
-    # ground_truth_parameters
-    #ground_truth_data
-    #datatype = 'single_subject'
-    #input_is_hddm_trace = True
-    #condition_column = 'condition'
-    #n_plots = 4 
 
     if save == True:
         pass
@@ -1282,14 +1267,7 @@ def model_plot_new(hddm_model = None,
 
     if hddm_model is None and model_ground_truth is None:
         return 'Please provide either posterior samples, \n or a ground truth model and parameter set to plot something here. \n Currently you are requesting an empty plot' 
-            
-    title = 'Model Plot: '
 
-    # if model_ground_truth is not None:
-    #     ax_titles = model_config[model_ground_truth]['params']
-    # else: 
-    #     ax_titles = ''
-        
     # Define number of plots we need:
     if multi_subject and multi_condition:
         n_plots = len(data.keys())
@@ -1303,13 +1281,6 @@ def model_plot_new(hddm_model = None,
             font_scale = 2)
 
     for plot_n in range(n_plots):
-    
-        # Title adjustments depending on whether ground truth model was supplied
-        # if model_ground_truth is not None:  
-        #     my_suptitle = fig.suptitle(title + model_ground_truth, fontsize = 40)
-        # else:
-        #     my_suptitle = fig.suptitle(title.replace(':', ''), fontsize = 40)
-            
         sns.despine(right = True)
 
         t_s = np.arange(0, max_t, delta_t_graph)
@@ -1346,9 +1317,6 @@ def model_plot_new(hddm_model = None,
         
         subplot_cnt = 0
         for i in sub_data.keys():
-        #for i in range(len(data[data.keys()[plot_n]].keys())):
-        #for i in range(traces[plot_n, :, :, :]):
-
             row_tmp = int(np.floor(subplot_cnt / cols))
             col_tmp = subplot_cnt - (cols * row_tmp)
             
@@ -1398,20 +1366,6 @@ def model_plot_new(hddm_model = None,
                     #ax_ins.plot([0, 1, 2, 3])
     
             # ADD HISTOGRAMS
-
-            # RUN SIMULATIONS: GROUND TRUTH PARAMETERS
-            # AF-CHANGE: I think this is kind of useless --> can always provide simulated data here ...
-            # No need to run within the plot
-            # if model_ground_truth is not None and ground_truth_data is None: # If ground truth model is supplied but not corresponding dataset --> we simulate one
-            #     # AF-TODO: Ground-Truth Parameters --> make into 4 dimensions
-            #     out = simulator(theta = ground_truth_parameters[i, :],
-            #                     model = model_ground_truth, 
-            #                     n_samples = 20000,
-            #                     bin_dim = None)
-                
-            #     tmp_true = np.concatenate([out[0], out[1]], axis = 1)
-            #     choice_p_up_true = np.sum(tmp_true[:, 1] == 1) / tmp_true.shape[0]
-            
             # RUN SIMULATIONS: POSTERIOR SAMPLES
             if hddm_model is not None:
                 
@@ -1471,16 +1425,12 @@ def model_plot_new(hddm_model = None,
                 counts_2_up, bins = np.histogram(sub_data[i]['data'].loc[sub_data[i]['data']['response'] == 1, :]['rt'].values,
                                                 bins = np.linspace(0, max_t, nbins),
                                                 density = True)
-                # counts_2_up, bins = np.histogram(ground_truth_data[sorted_keys[i]][ground_truth_data[sorted_keys[i]][:, 1] == 1, 0],
-                #                                 bins = np.linspace(0, max_t, nbins),
-                #                                 density = True)
 
                 counts_2_down, _ = np.histogram(sub_data[i]['data'].loc[sub_data[i]['data']['response'] == - 1, :]['rt'].values,
                                                 bins = np.linspace(0, max_t, nbins),
                                                 density = True)
 
                 choice_p_up_true_dat = np.sum(sub_data[i]['data']['response'].values == 1) / sub_data[i]['data'].values.shape[0]
-                # choice_p_up_true_dat = np.sum(ground_truth_data[sorted_keys[i]][:, 1] == 1) / ground_truth_data[sorted_keys[i]].shape[0]
 
                 if row_tmp == 0 and col_tmp == 0:
                     tmp_label = 'Dataset'
@@ -1550,8 +1500,6 @@ def model_plot_new(hddm_model = None,
                         tmp_label = None
                         tmp_linewidth = posterior_linewidth
 
-                    #print(tmp_label)
-                    
                     # MAKE BOUNDS (FROM MODEL CONFIG) !
                     if tmp_model == 'weibull_cdf' or tmp_model == 'weibull_cdf2' or tmp_model == 'weibull_cdf_concave' or tmp_model == 'weibull':
                         b = np.maximum(tmp_samples[1] * model_config[tmp_model]['boundary'](t = t_s, 
@@ -1605,10 +1553,7 @@ def model_plot_new(hddm_model = None,
 
                     if tmp_label == 'Ground Truth Model' and row_tmp == 0 and col_tmp == 0:
                         ax_tmp.legend(loc = 'upper right')
-                        #print('generated upper right label')
-                        #print('row: ', row_tmp)
-                        #print('col: ', col_tmp)
-                        #print('j: ', j)
+
 
                     if rows == 1 and cols == 1:
                         ax_tmp.patch.set_visible(False)
@@ -1625,6 +1570,7 @@ def model_plot_new(hddm_model = None,
                     condition_label += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
             condition_label = condition_label[:-1]
 
+
             title_size = 24
             if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
                 title_tmp = 'Subject: ' + str(i)
@@ -1635,6 +1581,9 @@ def model_plot_new(hddm_model = None,
             elif not multi_condition and not multi_subject:
                 # No extra title needed for simple single subject plot
                 title_tmp = ''
+
+            # Set plot-global title
+            fig.suptitle(fig_title_tmp, fontsize = 40)
 
             if row_tmp == (rows - 1):
                 ax_tmp.set_xlabel('rt', 
