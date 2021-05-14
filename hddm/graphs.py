@@ -385,9 +385,9 @@ def filter_subject_condition_traces(hddm_model,
         # dim 2: subplot number
         # dim 3: trace row
         # dim 4: trace col
-        traces_array = np.zeros((1, 1, traces.shape[0], traces.shape[1]))
+        traces_array = np.zeros((traces.shape[0], traces.shape[1]))
         for trace_key in traces.keys():
-            traces_array[0, 0, :, model_config[model]['params'].index(trace_key)] = traces[trace_key].copy()
+            traces_array[:, model_config[model]['params'].index(trace_key)] = traces[trace_key].copy()
 
 
         ######
