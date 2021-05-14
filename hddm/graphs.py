@@ -1616,20 +1616,25 @@ def model_plot_new(hddm_model = None,
             subplot_cnt += 1
                         
             # Set plot title
-            title_tmp = ''
+            
+            # Make condition label
+            condition_label = ''
+            for label_key in sub_data[i]['cond_subj_label'].keys():
+                    if 'subj_idx' not in label_key:
+                        condition_label += str(label_key) + ': '
+                        condition_label += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
+                condition_label = condition_label[:-1]
+
             title_size = 24
             if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
-                title_tmp += 'Subject: ' + str(i)
+                title_tmp = 'Subject: ' + str(i)
+                fig_title_tmp = condition_label
             elif multi_condition and not multi_subject:
-                for label_key in sub_data[i]['cond_subj_label'].keys():
-                    if 'subj_idx' not in label_key:
-                        title_tmp += str(label_key) + ': '
-                        title_tmp += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
-                title_tmp = title_tmp[:-1]
+                title_tmp = condition_label
                 title_size = title_size / (0.5 * len(list(sub_data[i]['cond_subj_label'].keys())))
             elif not multi_condition and not multi_subject:
                 # No extra title needed for simple single subject plot
-                pass
+                title_tmp = ''
 
             if row_tmp == (rows - 1):
                 ax_tmp.set_xlabel('rt', 
