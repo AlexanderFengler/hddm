@@ -1544,7 +1544,7 @@ def model_plot_new(hddm_model = None,
                         break
                     else:
                         tmp_model = model_fitted
-                        tmp_samples = sub_data[i]['gt_parameter_vector'] # posterior_samples[i, idx[j], :]
+                        tmp_samples = sub_data[i]['traces'][idx[j], :] # posterior_samples[i, idx[j], :]
                         tmp_alpha = 0.05
                         tmp_color = 'black'
                         tmp_label = None
@@ -1621,9 +1621,11 @@ def model_plot_new(hddm_model = None,
                 title_tmp += 'Subject: ' + str(i)
             elif multi_condition and not multi_subject:
                 for label_key in sub_data[i]['cond_subj_label'].keys():
-                    title_tmp += str(label_key) + ': '
-                    title_tmp += str(sub_data[i]['cond_subj_label'][[label_key]].values) + ', '
+                    if 'subj_idx' is not in label_key:
+                        title_tmp += str(label_key) + ': '
+                        title_tmp += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
                 title_tmp = title_tmp[:-1]
+                title_size = 24 / (0.5 * len(list(sub_data[i]['cond_subj_label'].keys())))
             elif not multi_condition and not multi_subject:
                 # No extra title needed for simple single subject plot
                 pass
@@ -1635,7 +1637,7 @@ def model_plot_new(hddm_model = None,
                             fontsize = 20);
 
             ax_tmp.set_title(title_tmp,
-                            fontsize = 20)
+                            fontsize = title_size)
             ax_tmp.tick_params(axis = 'y', size = 20)
             ax_tmp.tick_params(axis = 'x', size = 20)
 
