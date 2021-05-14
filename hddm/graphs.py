@@ -1465,7 +1465,7 @@ def model_plot_new(hddm_model = None,
                             linewidth = hist_linewidth,
                             zorder = -1)
 
-            if (hddm_model is None) and (ground_truth_data is not None):
+            if sub_data[i]['data'] is not None:
                 # These splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
                 # Wiser because either way we can have varying numbers of trials for each subject !
                 counts_2_up, bins = np.histogram(sub_data[i]['data'].loc[sub_data[i]['data']['response'] == 1, :]['rt'].values,
