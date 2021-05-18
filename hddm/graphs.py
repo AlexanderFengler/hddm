@@ -1373,7 +1373,7 @@ def model_plot_new(hddm_model = None,
                 ax_tmp_twin_up = ax[row_tmp, col_tmp].twinx()
                 ax_tmp_twin_down = ax[row_tmp, col_tmp].twinx()
             elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-                ax_tmp = ax[i]
+                ax_tmp = ax[subplot_cnt]
                 ax_tmp_twin_up = ax[subplot_cnt].twinx()
                 ax_tmp_twin_down = ax[subplot_cnt].twinx()
             else:
