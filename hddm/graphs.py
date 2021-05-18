@@ -220,7 +220,7 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
                 #print(data_subset['subj_idx'].unique())
                 if is_group_model:
                     if param_tmp in params_group_only:
-                        param_str = param_tmp + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ').'
+                        param_str = param_tmp + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ')'
                         param_ids_by_condition.append(param_str)
                     else:
                         ids = get_subj_ids(data = data_subset)
@@ -287,7 +287,7 @@ def filter_subject_condition_traces(hddm_model,
             model = 'ddm'
             # include_diff = set(hddm.simulators.model_config[hddm_model.model]) - set(includes) 
 
-    includes_diff = set(tmp_cfg['params']) - (set(includes_full) - set(group_only_nodes))
+    includes_diff = set(tmp_cfg['params']) - set(includes_full).union(set(list(depends.keys()))).union(set(group_only_nodes)) # - set(group_only_nodes))
 
     # Note: There are two kinds of plots
     # subject wise posterior predictive: -> using the subject level parameterizations
