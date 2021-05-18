@@ -220,7 +220,7 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
                 #print(data_subset['subj_idx'].unique())
                 if is_group_model:
                     if param_tmp in params_group_only:
-                        param_str = param_tmp + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ').' + id_tmp 
+                        param_str = param_tmp + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ').'
                         param_ids_by_condition.append(param_str)
                     else:
                         ids = get_subj_ids(data = data_subset)
@@ -231,6 +231,9 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
                 else: 
                     param_str = param_tmp + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ')'
                     param_ids_by_condition.append(param_str)
+            
+            print('params_depends')
+            print(params_depends)
             print('params subj_only')
             print(params_subj_only)
             print('params group only')
@@ -284,7 +287,7 @@ def filter_subject_condition_traces(hddm_model,
             model = 'ddm'
             # include_diff = set(hddm.simulators.model_config[hddm_model.model]) - set(includes) 
 
-    includes_diff = set(tmp_cfg['params']) - set(includes_full)
+    includes_diff = set(tmp_cfg['params']) - (set(includes_full) - set(group_only_nodes))
 
     # Note: There are two kinds of plots
     # subject wise posterior predictive: -> using the subject level parameterizations
@@ -336,7 +339,7 @@ def filter_subject_condition_traces(hddm_model,
         # Get parameters that were not even fit
 
         # Have to add these parameters to the final trace objects
-        params_default_fixed = list(includes_diff - set(group_only_nodes)) # was computed above
+        params_default_fixed = list(includes_diff) # - set(group_only_nodes)) # was computed above
         traces = untransform_traces(hddm_model.get_traces(), model = model, is_nn = hddm_model.nn) #untransform_traces(hddm_model.get_traces())
 
         # Now for each 'frame' define the trace columns which we want to keep !
@@ -372,7 +375,6 @@ def filter_subject_condition_traces(hddm_model,
             # print('included params')
             # print(included_params)
             condition_wise_params_dict[key_tmp]['traces'] = traces[included_params].copy()
-
 
             # --> Add in 'fake' traces for parameters that where fixed as 'default value' as specified by model config
             #print('includes diff')
