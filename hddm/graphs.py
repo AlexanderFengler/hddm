@@ -231,7 +231,14 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
                 else: 
                     param_str = param_tmp + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ')'
                     param_ids_by_condition.append(param_str)
-            
+            print('params subj_only')
+            print(params_subj_only)
+            print('params group only')
+            print(params_group_only)
+            print('params_default_fixed')
+            print(params_default_fixed)
+            print('params')
+            print(param_ids_by_condition)
             out_dict[i] = {'data': data_subset.copy(), 'params': param_ids_by_condition.copy(), 'condition_label': condition_dataframe.iloc[i]}
             
     else: 
