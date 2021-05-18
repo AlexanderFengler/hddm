@@ -1362,8 +1362,8 @@ def model_plot_new(hddm_model = None,
                 ax[row_tmp, col_tmp].set_xlim(0, max_t)
                 ax[row_tmp, col_tmp].set_ylim(- ylimit, ylimit)
             elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-                ax[i].set_xlim(0, max_t)
-                ax[i].set_ylim(-ylimit, ylimit)
+                ax[subplot_cnt].set_xlim(0, max_t)
+                ax[subplot_cnt].set_ylim(-ylimit, ylimit)
             else:
                 ax.set_xlim(0, max_t)
                 ax.set_ylim(-ylimit, ylimit)
@@ -1374,8 +1374,8 @@ def model_plot_new(hddm_model = None,
                 ax_tmp_twin_down = ax[row_tmp, col_tmp].twinx()
             elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
                 ax_tmp = ax[i]
-                ax_tmp_twin_up = ax[i].twinx()
-                ax_tmp_twin_down = ax[i].twinx()
+                ax_tmp_twin_up = ax[subplot_cnt].twinx()
+                ax_tmp_twin_down = ax[subplot_cnt].twinx()
             else:
                 ax_tmp = ax
                 ax_tmp_twin_up = ax.twinx()
