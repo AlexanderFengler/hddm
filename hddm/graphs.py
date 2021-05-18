@@ -1343,6 +1343,11 @@ def model_plot_new(hddm_model = None,
         else:
             rows = 1
 
+        print('rows')
+        print(rows)
+        print('columns')
+        print(cols)
+
         fig, ax = plt.subplots(rows, cols, 
                                figsize = (20 * scale_x, 20 * rows * scale_y), 
                                sharex = False, 
