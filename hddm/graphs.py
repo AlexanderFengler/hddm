@@ -175,7 +175,7 @@ def make_trace_plotready_h_c(trace_dict = None,
     #else:
     #    return (dat_c, dat_traces_c, dat_traces_params_only_c)
           
-def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default_fixed = None, params_subj_only = None, params_depends = None, is_group_model = True):
+def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default_fixed = None, params_subj_only = None, params_depends = None, params_group_only = None, is_group_model = True):
     
     # params_default_fixed
     # just store and add fixed vals
@@ -194,6 +194,12 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
                 # make str
                 param_str = param_tmp + '_subj.' + str(id_tmp)
                 param_ids.append(param_str)
+        
+        if len(set(params_group_only) - set(params_depends)) > 0:
+            for param_tmp in set(params_group_only) - set(params_depends):
+                param_str = str(param_tmp)
+                param_ids.append(param_str)
+
 
     # params_depends
     out_dict = {}
@@ -213,11 +219,15 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
 
                 #print(data_subset['subj_idx'].unique())
                 if is_group_model:
-                    ids = get_subj_ids(data = data_subset)
-                    for id_tmp in ids:
-                        # make str 
-                        param_str = param_tmp + '_subj' + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ').' + id_tmp 
+                    if param_tmp in params_group_only:
+                        param_str = param_tmp + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ').' + id_tmp 
                         param_ids_by_condition.append(param_str)
+                    else:
+                        ids = get_subj_ids(data = data_subset)
+                        for id_tmp in ids:
+                            # make str 
+                            param_str = param_tmp + '_subj' + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ').' + id_tmp 
+                            param_ids_by_condition.append(param_str)
                 else: 
                     param_str = param_tmp + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ')'
                     param_ids_by_condition.append(param_str)
@@ -234,6 +244,9 @@ def filter_subject_condition_traces(hddm_model,
                                     ground_truth_model = None, # None, 'model_name'
                                     ):
     data = hddm_model.data
+
+    # TODO-AF: Take into account 'group-only-knodes'
+
     
     # Since hddm asks only for parameters in addition to 'a', 'v', 't' in the include statement
     # for the logic applied here we add those back in to get the full set of parameters which where fit
@@ -241,9 +254,11 @@ def filter_subject_condition_traces(hddm_model,
     # This works for all models thus far includes (since they follow the 'a', 'v', 't' parameterization)
 
     # AF-TODO: If adding in other models to HDDM --> we might need a condition here in case some models do not include ['a', 'v', 't'] in the parameters
+
     includes_full = list(hddm_model.include) + ['a', 'v', 't']
     is_group_model = hddm_model.is_group_model
     depends = hddm_model.depends_on
+    group_only_nodes = list(hddm_model.group_only_nodes)
 
     # If hddmnn get model attribute from arguments
     if hddm_model.nn:
@@ -309,12 +324,12 @@ def filter_subject_condition_traces(hddm_model,
         #print(n_frames)
         
         # Get parameters that have no condition dependence (only subj) (but were fit)
-        params_subj_only = list(set(includes_full) - set(params_depends))
+        params_subj_only = list(set(includes_full) - (set(params_depends).union(set(group_only_nodes))))
 
         # Get parameters that were not even fit
 
         # Have to add these parameters to the final trace objects
-        params_default_fixed = includes_diff # was computed above
+        params_default_fixed = list(includes_diff - set(group_only_nodes)) # was computed above
         traces = untransform_traces(hddm_model.get_traces(), model = model, is_nn = hddm_model.nn) #untransform_traces(hddm_model.get_traces())
 
         # Now for each 'frame' define the trace columns which we want to keep !
@@ -324,6 +339,7 @@ def filter_subject_condition_traces(hddm_model,
                                                          params_default_fixed = params_default_fixed, 
                                                          params_subj_only = params_subj_only,
                                                          params_depends = depends,
+                                                         params_group_only = group_only_nodes,
                                                          is_group_model = is_group_model)
         
         print('keys of condition_wise_params dict')
