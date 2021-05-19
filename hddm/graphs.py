@@ -562,6 +562,52 @@ def _make_trace_plotready_condition(hddm_trace = None, model = ''):
             
     return dat
 
+def extract_mutli_cond_subj_plot_n(data = None):
+    # Classify plot type:
+    # Check if dataset has multiple conditions
+    multi_condition = 0
+    if len(data.keys()) > 1:
+        multi_condition = 1
+
+    # Check if any condition has more than one subject
+    multi_subject = 0 
+    max_len = 0
+    for key in data.keys():
+        tmp_len = len(data[key].keys()) 
+        if tmp_len > max_len:
+            max_len = tmp_len
+    if max_len > 1:
+        multi_subject = 1
+
+    # Define number of plots we need:
+    if multi_subject and multi_condition:
+        n_plots = len(data.keys())
+    else:
+        n_plots = 1
+
+    return multi_condition, multi_subject, n_plots
+
+def _make_plot_sub_data(data = None, plot_n = None, multi_subject = None, multi_condition = None):
+    if multi_subject and multi_condition:
+        # Condition one
+        sub_data = data[list(data.keys())[plot_n]]
+    if multi_condition and not multi_subject:
+        # Condition two
+        sub_data = {}
+        for key in data.keys():
+            subj_key = list(data[key].keys())[0]
+            sub_data[key] = data[key][subj_key]
+    if multi_subject and not multi_condition:
+        # Condition three
+        sub_data = data[list(data.keys())[0]]
+    if not multi_subject and not multi_condition:
+        # Condition four
+        sub_data = data[0]
+        print('sub_data')
+        print(sub_data)
+        print('sub_data[i][traces]')
+        print(sub_data[list(sub_data.keys())[0]]['traces'])
+    return sub_data
 
 def _convert_params(data = None):
     for key in data.keys():
@@ -1269,35 +1315,39 @@ def model_plot_new(hddm_model = None,
         #matplotlib.rcParams['pdf.fonttype'] = 42
         # matplotlib.rcParams['svg.fonttype'] = 'none'
 
+    if hddm_model is None and model_ground_truth is None:
+        return 'Please provide either posterior samples, \n or a ground truth model and parameter set to plot something here. \n Currently you are requesting an empty plot' 
+
     # AF-TODO: Shape checks
     if hddm_model is not None:
         data = filter_subject_condition_traces(hddm_model, 
                                                ground_truth_model = model_ground_truth)
+        multi_condition, multi_subject, n_plots = extract_multi_cond_subj_plot_n(data = data)
 
-    # Classify plot type:
-    # Check if dataset has multiple conditions
-    multi_condition  = 0
-    if len(data.keys()) > 1:
-        multi_condition = 1
+
+
+    # # Classify plot type:
+    # # Check if dataset has multiple conditions
+    # multi_condition  = 0
+    # if len(data.keys()) > 1:
+    #     multi_condition = 1
     
-    # Check if any condition has more than one subject
-    multi_subject = 0 
-    max_len = 0
-    for key in data.keys():
-        tmp_len = len(data[key].keys()) 
-        if tmp_len > max_len:
-            max_len = tmp_len
-    if max_len > 1:
-        multi_subject = 1
+    # # Check if any condition has more than one subject
+    # multi_subject = 0 
+    # max_len = 0
+    # for key in data.keys():
+    #     tmp_len = len(data[key].keys()) 
+    #     if tmp_len > max_len:
+    #         max_len = tmp_len
+    # if max_len > 1:
+    #     multi_subject = 1
 
-    if hddm_model is None and model_ground_truth is None:
-        return 'Please provide either posterior samples, \n or a ground truth model and parameter set to plot something here. \n Currently you are requesting an empty plot' 
 
-    # Define number of plots we need:
-    if multi_subject and multi_condition:
-        n_plots = len(data.keys())
-    else:
-        n_plots = 1
+    # # Define number of plots we need:
+    # if multi_subject and multi_condition:
+    #     n_plots = len(data.keys())
+    # else:
+    #     n_plots = 1
 
     # Some style settings
     sns.set(style = "white", 
@@ -1314,28 +1364,30 @@ def model_plot_new(hddm_model = None,
         t_s = np.arange(0, max_t, delta_t_graph)
         nbins = int((max_t) / bin_size)
 
+        # Make sub
+        sub_data = _make_plot_sub_data(data = data, plot_n = plot_n, multi_subject = multi_subject, multi_condition = multi_condition)
+
         # Define datastructure that refers to the current plot (encompasses only subplots in current display) 
-        if multi_subject and multi_condition:
-            # Condition one
-            sub_data = data[list(data.keys())[plot_n]]
-        if multi_condition and not multi_subject:
-            # Condition two
-            sub_data = {}
-            for key in data.keys():
-                subj_key = list(data[key].keys())[0]
-                sub_data[key] = data[key][subj_key]
-        if multi_subject and not multi_condition:
-            # Condition three
-            sub_data = data[list(data.keys())[0]]
-        if not multi_subject and not multi_condition:
-            # Condition four
-            sub_data = data[0]
-            print('sub_data')
-            print(sub_data)
-            print('sub_data[i][traces]')
-            print(sub_data[list(sub_data.keys())[0]]['traces'])
-
-
+        # if multi_subject and multi_condition:
+        #     # Condition one
+        #     sub_data = data[list(data.keys())[plot_n]]
+        # if multi_condition and not multi_subject:
+        #     # Condition two
+        #     sub_data = {}
+        #     for key in data.keys():
+        #         subj_key = list(data[key].keys())[0]
+        #         sub_data[key] = data[key][subj_key]
+        # if multi_subject and not multi_condition:
+        #     # Condition three
+        #     sub_data = data[list(data.keys())[0]]
+        # if not multi_subject and not multi_condition:
+        #     # Condition four
+        #     sub_data = data[0]
+        #     print('sub_data')
+        #     print(sub_data)
+        #     print('sub_data[i][traces]')
+        #     print(sub_data[list(sub_data.keys())[0]]['traces'])
+      
         # Define number of rows we need for display
         n_subplots = len(list(sub_data.keys()))
         if n_subplots > 1:
@@ -1606,7 +1658,7 @@ def model_plot_new(hddm_model = None,
                 if 'subj_idx' not in label_key:
                     condition_label += str(label_key) + ': '
                     condition_label += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
-            condition_label = condition_label[:-1]
+            condition_label = condition_label[:-2]
 
 
             title_size = 24
@@ -1657,6 +1709,316 @@ def model_plot_new(hddm_model = None,
         else:
             plt.show()
     
+    return plt.show()
+
+def posterior_predictive_plot_new(hddm_model = ,
+                                  # posterior_samples = None,
+                                  # ground_truth_parameters = None,
+                                  # ground_truth_data = None,
+                                  # n_plots = 9,
+                                  #model_fitted = 'angle',
+                                  # datatype = 'single_subject',
+                                  #condition_column = 'condition',
+                                  #input_from_hddmnn = False,
+                                  #input_is_hddm_trace = True,
+                                  model_ground_truth = 'angle',
+                                  cols = 3,
+                                  n_posterior_parameters = 100,
+                                  max_t = 20,
+                                  n_simulations_per_parameter = 10,
+                                  xlimit = 10,
+                                  bin_size = 0.025,
+                                  hist_linewidth = 3,
+                                  scale_x = 0.5,
+                                  scale_y = 0.5,
+                                  save = False):
+    
+    """An alternative posterior predictive plot. Works for all models listed in hddm (e.g. 'ddm', 'angle', 'weibull', 'levy', 'ornstein')
+
+    Arguments:
+        posterior_samples: panda.DataFrame <default=None>
+            Holds the posterior samples. This will usually be the output of 
+            hddm_model.get_traces().
+        ground_truth_parameters: np.array <default=None>
+            Array holding ground truth parameters. Depending on the structure supplied under the 
+            datatype argument, this may be a 1d or 2d array.
+        ground_truth_data: panda.DataFrame
+            Ground truth dataset as supplied to hddm. Has a 'rt' column, a 'response' column and a 'subj_idx' column
+            and potentially a 'condition' column.
+        model_ground_truth: str <default='weibull_cdf'>
+            String that speficies which model was the ground truth. This is useful mainly for parameter recovery excercises,
+            one obviously doesn't usually have access to the ground truth.
+        model_fitted: str <default='angle'>
+            String that specifies which model the data was fitted to. This is necessary, for the plot to interpret the 
+            supplied traces correctly, and to choose the correct simulator for visualization.
+        datatype: str <default='single_subject'>
+            Three options as of now. 'single_subject', 'hierarchical', 'condition'
+        condition_column: str <default='condition'>
+            The column that specifies the condition in the data supplied under the ground_truth_data argument.
+        n_plots: int <default=4>
+            The plot attempts to be smart in trying to figure out how many plots are desired, however choosing it manual is a 
+            save option.
+        n_posterior_parameters: int <default=500>
+            Number of posterior samples to draw for plotting. This needs to be smaller or equal to the number 
+            of posterior samples supplied to the plot.
+        n_simulations_per_parameter: int <default=10>
+            How many simulations to perform for each posterior parameter vector drawn.
+        cols: int <default=3>
+            Number of columns to split the plot into.
+        max_t: float <default=10>
+            Maximim reaction time to allow for internal simulations for the plot.
+        xlimit: float <default=2>
+            Sets the limit on the x-axis
+        hist_linewidth: float <default=3>
+            Linewidth of the reaction time histograms (for gorund truth and posterior samples).
+            To hide the reaction time histograms, set it to 0.
+        bin_size: float <default=0.025>
+            Bin size for the reaction time histograms.
+        save: bool <default=False>
+            Whether to save the plot
+        scale_x: float <default=1.0>
+            Scales the x axis of the graph
+        scale_y: float <default=1.0>
+            Salces the y axes o the graph
+        delta_t_graph: float <default=0.01>
+            Timesteps to use for the simulation runs performed for plotting.
+        input_is_hddm_trace: bin <default=True>>
+            Whether or not the posterior samples supplied are coming from hddm traces. 
+            NOTE, this does not accept False as of now.
+        input_from_hddmnn: bin <default=False>
+            Whether or not the input came from a HDDMnn fit or HDDM fit. This is used to convert parameters internally.
+    Return: plot object
+    """
+    # Just to aid clarity of the code --> set model fitted
+    model_fitte = hddm_model.model
+
+    if save == True:
+        pass
+        #matplotlib.rcParams['text.usetex'] = True
+        #matplotlib.rcParams['pdf.fonttype'] = 42
+        #matplotlib.rcParams['svg.fonttype'] = 'none'
+
+    # Convert parameters for consistency between HDDM and HDDMnn fits
+#     if posterior_samples is not None:
+#         if not input_from_hddmnn:
+#             posterior_samples = _convert_params(data = posterior_samples)
+
+#     if model_ground_truth is None and ground_truth_data is None and posterior_samples is None:
+#         return 'No ground truth model was supplied, no dataset was supplied and no posterior sample was supplied. Nothing to plot' 
+
+#     # Inputs are hddm_traces --> make plot ready
+#     if input_is_hddm_trace and posterior_samples is not None:
+#         if datatype == 'hierarchical':
+#             posterior_samples = _make_trace_plotready_hierarchical(posterior_samples, 
+#                                                                    model = model_fitted)
+#             n_plots = posterior_samples.shape[0]
+# #             print(posterior_samples)
+            
+#         if datatype == 'single_subject':
+#             posterior_samples = _make_trace_plotready_single_subject(posterior_samples, 
+#                                                                      model = model_fitted)
+#         if datatype == 'condition':
+#             posterior_samples = _make_trace_plotready_condition(posterior_samples, 
+#                                                                 model = model_fitted)
+#             n_plots = posterior_samples.shape[0]
+
+    # # Taking care of special case with 1 plot
+    # if n_plots == 1:
+    #     if model_ground_truth is not None:
+    #         ground_truth_parameters = np.expand_dims(ground_truth_parameters, 0)
+    #     if posterior_samples is not None:
+    #         posterior_samples = np.expand_dims(posterior_samples, 0) # Seems unnecessary
+    #     if ground_truth_data is not None:
+    #         label_idx = [0] #np.unique(ground_truth_data['subj_idx'])
+    #         gt_dat_dict = dict()
+    #         gt_dat_dict[0] = ground_truth_data.values
+    #         gt_dat_dict[0][:, 1][gt_dat_dict[0][:, 1] == 0.0] = -1.0
+    #         #gt_dat_dict[0]
+    #         ground_truth_data = gt_dat_dict
+            
+    # # Take care of ground_truth_data
+    # #label_idx = list()
+    # if ground_truth_data is not None and datatype == 'hierarchical':
+    #     # initialize ground truth data dictionary
+    #     gt_dat_dict = dict()
+        
+    #     # Collect and keep relevant labels for later use
+    #     label_idx = list()
+        
+    #     for i in np.sort(np.unique(ground_truth_data['subj_idx'])):
+    #         label_idx.append(i)
+    #         gt_dat_dict[i] = ground_truth_data.loc[ground_truth_data['subj_idx'] == i][['rt', 'response']]
+    #         gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
+    #         gt_dat_dict[i] = gt_dat_dict[i].values
+    #     ground_truth_data = gt_dat_dict
+     
+    # if ground_truth_data is not None and datatype == 'condition':
+    #     # initialize ground truth data dictionary
+    #     gt_dat_dict = dict()
+        
+    #     # Collect and keep relevant labels for later use
+    #     label_idx = list()
+
+    #     for i in np.sort(np.unique(ground_truth_data[condition_column])):
+    #         label_idx.append(i)
+    #         gt_dat_dict[i] = ground_truth_data.loc[ground_truth_data[condition_column] == i][['rt', 'response']]
+    #         gt_dat_dict[i].loc[gt_dat_dict[i]['response'] == 0,  'response'] = - 1
+    #         gt_dat_dict[i] = gt_dat_dict[i].values
+    #     ground_truth_data = gt_dat_dict
+
+    # # Taking care of special case with 1 plot
+    # if n_plots == 1:
+    #     cols = 1
+    
+    # if n_plots == 1:
+    #     if model_ground_truth is not None:
+    #         ground_truth_parameters = np.expand_dims(ground_truth_parameters, 0)
+    #     if posterior_samples is not None:
+    #         posterior_samples = np.expand_dims(posterior_samples, 0)
+    #     if ground_truth_data is not None:
+    #         ground_truth_data = np.expand_dims(ground_truth_data, 0)
+
+    #print(posterior_samples.shape)
+
+     # AF-TODO: Shape checks
+    if hddm_model is not None:
+        data = filter_subject_condition_traces(hddm_model, 
+                                               ground_truth_model = model_ground_truth)
+        multi_condition, multi_subject, n_plots = extract_multi_cond_subj_plot_n(data = data)
+
+    # Taking care of special case with 1 plot
+    if n_plots == 1:
+        cols = 1
+    
+    # General plot parameters
+    nbins = int((2 * max_t) / bin_size)     
+    rows = int(np.ceil(n_plots / cols))
+    sns.set(style = "white", 
+            palette = "muted", 
+            color_codes = True,
+            font_scale = 2)
+    
+    sns.despine(right = True)
+
+    # Cycle through plots
+    for plot_n in range(n_plots):
+        n_subplots = len(list(sub_data.keys()))
+        if n_subplots > 1:
+            rows = int(np.ceil(n_subplots / cols))
+        else:
+            rows = 1
+        
+        fig, ax = plt.subplots(rows, cols, 
+                               figsize = (20 * scale_x, 20 * rows * scale_y), 
+                               sharex = False, 
+                               sharey = False)
+        fig.suptitle('Posterior Predictive: ', fontsize = 24)
+
+        subplot_cnt = 0
+        for i in sub_data.keys():
+            row_tmp = int(np.floor(i / cols))
+            col_tmp = i - (cols * row_tmp)
+            post_tmp = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
+            idx = np.random.choice(sub_data[i]['traces'].shape[0],
+                                   size = n_posterior_parameters, 
+                                   replace = False)
+
+            # MODEL SIMULATIONS FOR POSTERIOR PARAMETERS
+            #print('Simulations for plot: ', i)
+            for j in range(n_posterior_parameters):
+                out = simulator(theta = sub_data[i]['traces'][idx[j], :], # posterior_samples[i, idx[j], :], 
+                                model = model_fitted,
+                                n_samples = n_simulations_per_parameter,
+                                bin_dim = None)
+            
+                post_tmp[(n_simulations_per_parameter * j):(n_simulations_per_parameter * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
+            
+            # MODEL SIMULATIONS FOR TRUE PARAMETERS
+            # Supply data too !
+            if hddm_model is not None:
+                out = simulator(theta = sub_data[i]['gt_parameter_vector'],
+                                model = model_ground_truth,
+                                n_samples = 20000,
+                                bin_dim = None)
+    
+                gt_tmp = np.concatenate([out[0], out[1]], axis = 1)
+                gt_color = 'blue'
+                #print('passed through')
+            # elif ground_truth_data is not None:
+            #     gt_tmp = ground_truth_data[label_idx[i]] # .values # using the relevant label here instead of the plot number 
+            #     # gt_tmp[:, 1][gt_tmp[:,1] == 0.0] = -1.0 # set zero choices to -1 
+            #     #print(gt_tmp)
+            #     gt_color = 'blue'
+
+            if rows > 1 and cols > 1:
+                ax_tmp = ax[row_tmp, col_tmp]
+            
+            elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
+                ax_tmp = ax[i]
+            
+            else:
+                ax_tmp = ax
+            
+            # ACTUAL PLOTTING
+            ax_tmp.hist(post_tmp[:, 0] * post_tmp[:, 1], 
+                        bins = np.linspace(- max_t, max_t, nbins), #50, # kde = False, # rug = False, 
+                        alpha =  1, 
+                        color = 'black',
+                        histtype = 'step', 
+                        density = 1, 
+                        edgecolor = 'black',
+                        linewidth = hist_linewidth
+                        )
+
+            if ground_truth_data is not None:
+                ax_tmp.hist(gt_tmp[:, 0] * gt_tmp[:, 1], 
+                            alpha = 0.5, 
+                            color = gt_color, 
+                            density = 1, 
+                            edgecolor = gt_color,  
+                            histtype = 'step',
+                            linewidth = hist_linewidth, 
+                            bins = np.linspace(-max_t, max_t, nbins), #50, 
+                            # kde = False, #rug = False,
+                            )
+            
+            # EXTRA STYLING    
+            ax_tmp.set_xlim(- xlimit, xlimit)
+                
+            if row_tmp == 0 and col_tmp == 0:
+                if model_ground_truth is not None:
+                    label_0 = 'Ground Truth'
+                else:
+                    label_0 = 'DATA'
+                ax_tmp.legend(labels = ['Posterior Predictive', label_0], 
+                            fontsize = 12, 
+                            loc = 'upper right')
+                
+            if row_tmp == (rows - 1):
+                ax_tmp.set_xlabel('rt', 
+                                fontsize = 24)
+
+            if col_tmp == 0:
+                ax_tmp.set_ylabel('', 
+                                fontsize = 24)
+
+            ax_tmp.tick_params(axis = 'y', size = 22)
+            ax_tmp.tick_params(axis = 'x', size = 22)
+            sublot_cnt += 1
+        
+    if rows > 1 and cols > 1:
+        for i in range(n_plots, rows * cols, 1):
+            row_tmp = int(np.floor(i / cols))
+            col_tmp = i - (cols * row_tmp)
+            ax[row_tmp, col_tmp].axis('off')    
+            
+    if save == True:
+        plt.savefig('figures/' + 'posterior_predictive_plot_' + model_ground_truth + '_' + datatype + '.png',
+                    format = 'png', 
+                    transparent = True,
+                    frameon = False)
+        plt.close()
+
     return plt.show()
 
 def posterior_predictive_plot(posterior_samples = None,
