@@ -1711,7 +1711,7 @@ def model_plot_new(hddm_model = None,
     
     return plt.show()
 
-def posterior_predictive_plot_new(hddm_model = ,
+def posterior_predictive_plot_new(hddm_model = None,
                                   # posterior_samples = None,
                                   # ground_truth_parameters = None,
                                   # ground_truth_data = None,
@@ -1790,7 +1790,7 @@ def posterior_predictive_plot_new(hddm_model = ,
     Return: plot object
     """
     # Just to aid clarity of the code --> set model fitted
-    model_fitte = hddm_model.model
+    model_fitted = hddm_model.model
 
     if save == True:
         pass
@@ -1914,10 +1914,15 @@ def posterior_predictive_plot_new(hddm_model = ,
                                sharey = False)
         fig.suptitle('Posterior Predictive: ', fontsize = 24)
 
+        sub_data = _make_plot_sub_data(data = data, 
+                                       plot_n = plot_n, 
+                                       multi_subject = multi_subject, 
+                                       multi_condition = multi_condition)
+
         subplot_cnt = 0
         for i in sub_data.keys():
-            row_tmp = int(np.floor(i / cols))
-            col_tmp = i - (cols * row_tmp)
+            row_tmp = int(np.floor(subplot_cnt / cols))
+            col_tmp = subplot_cnt - (cols * row_tmp)
             post_tmp = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
             idx = np.random.choice(sub_data[i]['traces'].shape[0],
                                    size = n_posterior_parameters, 
