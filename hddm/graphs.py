@@ -1974,17 +1974,17 @@ def posterior_predictive_plot_new(hddm_model = None,
                         linewidth = hist_linewidth
                         )
 
-            if ground_truth_data is not None:
-                ax_tmp.hist(gt_tmp[:, 0] * gt_tmp[:, 1], 
-                            alpha = 0.5, 
-                            color = gt_color, 
-                            density = 1, 
-                            edgecolor = gt_color,  
-                            histtype = 'step',
-                            linewidth = hist_linewidth, 
-                            bins = np.linspace(-max_t, max_t, nbins), #50, 
-                            # kde = False, #rug = False,
-                            )
+            #if ground_truth_data is not None:
+            ax_tmp.hist(gt_tmp[:, 0] * gt_tmp[:, 1], 
+                        alpha = 0.5, 
+                        color = gt_color, 
+                        density = 1, 
+                        edgecolor = gt_color,  
+                        histtype = 'step',
+                        linewidth = hist_linewidth, 
+                        bins = np.linspace(-max_t, max_t, nbins), #50, 
+                        # kde = False, #rug = False,
+                        )
             
             # EXTRA STYLING    
             ax_tmp.set_xlim(- xlimit, xlimit)
@@ -2405,6 +2405,8 @@ def caterpillar_plot(hddm_model = None,
 
                         # print(hddm.simulators.model_config['angle']['params'][idx_tmp])
                         # print(out[c_tmp][s_tmp]['gt_parameter_vector'][idx_tmp])
+                        print('trace_name_tmp')
+                        print(trace_name_tmp)
                         gt_dict[trace_name_tmp] = data[c_tmp][s_tmp]['gt_parameter_vector'][idx_tmp]
                     else:
                         print('problem')
