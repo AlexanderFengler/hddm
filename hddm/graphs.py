@@ -2716,7 +2716,7 @@ def posterior_pair_plot(hddm_model = None,
                     #                  color = 'red',
                     #                  markersize = 10)
 
-                    g.axes[i,i].plot(data[c_tmp][s_tmp]['gt_parameter_vector'][xlabels[i]], # ground_truth_parameters[xlabels[i]],
+                    g.axes[i,i].plot(data[c_tmp][s_tmp]['gt_parameter_vector'][i], # [xlabels[i]], # ground_truth_parameters[xlabels[i]],
                                     g.axes[i,i].get_ylim()[0], 
                                     '.', 
                                     color = 'red',
