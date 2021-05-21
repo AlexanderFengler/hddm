@@ -2316,10 +2316,6 @@ def posterior_predictive_plot_new(hddm_model = None,
 #     return plt.show()
 
 def caterpillar_plot(hddm_model = None, 
-                     # posterior_samples = [],
-                     # ground_truth_parameters = None,
-                     # model_fitted = 'angle',
-                     #datatype = 'hierarchical', # 'hierarchical', 'single_subject', 'condition'
                      drop_sd = True,
                      keep_key = None,
                      x_limits = [-2, 2],
@@ -2364,6 +2360,12 @@ def caterpillar_plot(hddm_model = None,
 
     Return: plot object
     """
+
+    # posterior_samples = [],
+    # ground_truth_parameters = None,
+    # model_fitted = 'angle',
+    #datatype = 'hierarchical', # 'hierarchical', 'single_subject', 'condition'
+
 
     if hddm_model is None:
         return ('No HDDM object supplied')
