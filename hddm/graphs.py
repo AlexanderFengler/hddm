@@ -2008,13 +2008,16 @@ def posterior_predictive_plot_new(hddm_model = None,
 
             ax_tmp.tick_params(axis = 'y', size = 22)
             ax_tmp.tick_params(axis = 'x', size = 22)
-            sublot_cnt += 1
+            subplot_cnt += 1
         
-    if rows > 1 and cols > 1:
-        for i in range(n_plots, rows * cols, 1):
-            row_tmp = int(np.floor(i / cols))
-            col_tmp = i - (cols * row_tmp)
-            ax[row_tmp, col_tmp].axis('off')    
+        if rows > 1 and cols > 1:
+            for i in range(n_plots, rows * cols, 1):
+                row_tmp = int(np.floor(i / cols))
+                col_tmp = i - (cols * row_tmp)
+                ax[row_tmp, col_tmp].axis('off')  
+
+        if show:
+            plt.show()  
             
     if save == True:
         plt.savefig('figures/' + 'posterior_predictive_plot_' + model_ground_truth + '_' + datatype + '.png',
@@ -2023,7 +2026,7 @@ def posterior_predictive_plot_new(hddm_model = None,
                     frameon = False)
         plt.close()
 
-    return plt.show()
+    return # plt.show()
 
 # def posterior_predictive_plot(posterior_samples = None,
 #                               ground_truth_parameters = None,
