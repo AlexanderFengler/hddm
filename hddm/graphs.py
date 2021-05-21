@@ -2464,6 +2464,8 @@ def caterpillar_plot(hddm_model = None,
         plot_vals = {} # [0.01, 0.9], [0.01, 0.99], [mean]
         
         for k in trace.keys():
+            print('print k')
+            print(k)
             # If we want to keep only a specific parameter we skip all traces which don't include it in 
             # their names !
             if keep_key is not None and keep_key not in k: 
