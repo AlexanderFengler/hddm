@@ -1959,7 +1959,7 @@ def posterior_predictive_plot_new(hddm_model = None,
                 ax_tmp = ax[row_tmp, col_tmp]
             
             elif (rows == 1 and cols > 1) or (rows > 1 and cols == 1):
-                ax_tmp = ax[i]
+                ax_tmp = ax[subplot_cnt]
             
             else:
                 ax_tmp = ax
@@ -2434,7 +2434,7 @@ def caterpillar_plot(hddm_model = None,
         # fig.suptitle('Caterpillar plot: ' + model_fitted.upper().replace('_', '-'), fontsize = 40)
         sns.despine(right = True)
         
-        trace = posterior_samples.copy()
+        # trace = posterior_samples.copy()
 
         trace = untransform_traces(traces = hddm_model.get_traces(),
                                    model = hddm_model.model, 
