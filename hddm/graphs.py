@@ -2315,10 +2315,11 @@ def posterior_predictive_plot_new(hddm_model = None,
 
 #     return plt.show()
 
-def caterpillar_plot(posterior_samples = [],
-                     ground_truth_parameters = None,
-                     model_fitted = 'angle',
-                     datatype = 'hierarchical', # 'hierarchical', 'single_subject', 'condition'
+def caterpillar_plot(hddm_model = None, 
+                     # posterior_samples = [],
+                     # ground_truth_parameters = None,
+                     # model_fitted = 'angle',
+                     #datatype = 'hierarchical', # 'hierarchical', 'single_subject', 'condition'
                      drop_sd = True,
                      keep_key = None,
                      x_limits = [-2, 2],
@@ -2363,6 +2364,11 @@ def caterpillar_plot(posterior_samples = [],
 
     Return: plot object
     """
+
+    if hddm_model is None:
+        return ('No HDDM object supplied')
+
+    model_fitted = hddm_model.model
     
     if save == True:
         pass
@@ -2371,9 +2377,9 @@ def caterpillar_plot(posterior_samples = [],
         #matplotlib.rcParams['svg.fonttype'] = 'none'
     
     sns.set(style = "white", 
-        palette = "muted", 
-        color_codes = True,
-        font_scale = 2)
+            palette = "muted", 
+            color_codes = True,
+            font_scale = 2)
     
     # get parameter numbers 
     # if more than 30 --> split plot into multiple ones
@@ -2393,7 +2399,7 @@ def caterpillar_plot(posterior_samples = [],
                 for trace_name_tmp in data[c_tmp][s_tmp]['trace_names']:
                     if trace_name_tmp.split('_')[0].split('(')[0] in model_config['angle']['params']:
                         tmp_param = trace_name_tmp.split('_')[0].split('(')[0]
-                        idx_tmp = model_config['angle']['params'].index(tmp_param)
+                        idx_tmp = model_config[model_ground_truth]['params'].index(tmp_param)
 
                         # print(hddm.simulators.model_config['angle']['params'][idx_tmp])
                         # print(out[c_tmp][s_tmp]['gt_parameter_vector'][idx_tmp])
@@ -2401,101 +2407,124 @@ def caterpillar_plot(posterior_samples = [],
                     else:
                         print('problem')
 
-    fig, ax = plt.subplots(1, 1, 
-                           figsize = (10 * figure_scale, aspect_ratio * 10 * figure_scale), 
-                           sharex = False, 
-                           sharey = False)
-    
-    # fig.suptitle('Caterpillar plot: ' + model_fitted.upper().replace('_', '-'), fontsize = 40)
-    sns.despine(right = True)
-    
-    trace = posterior_samples.copy()
-    
-    # In case ground truth parameters were supplied --> this is mostly of interest for parameter recovery studies etc.
-    # if ground_truth_parameters is not None:
-    #     cnt = 0
-    #     gt_dict = {}
+    total_n_parameters = hddm_model.get_traces().shape[1]
+    if total_n_parameters < 30:
+        n_plots = 1
+    else: 
+        n_plots = len(model_config[model_fitted]['params'])
+
+    for i in range(n_plots):
+        if n_plots > 1:
+            tmp_param = model_config[model_fitted]['params'][i]
+            trace_cnt_tmp  = 0
+            for trace_name in hddm_model.get_traces():
+                if ((tmp_param + '(') in trace_name) or ((trace_param + '_') in trace_name) or (trace_param == trace_name):
+                    trace_cnt_tmp += 1
+        else: 
+            trace_cnt_tmp = hddm_model.get_traces().shape[1]
         
-    #     if datatype == 'single_subject':
-    #         if type(ground_truth_parameters) is not dict:
-    #             for v in model_config[model_fitted]['params']:
-    #                 gt_dict[v] = ground_truth_parameters[cnt]
-    #                 cnt += 1
-    #         else:
-    #             gt_dict = ground_truth_parameters
-
-    #     if datatype == 'hierarchical':
-    #         gt_dict = ground_truth_parameters
-
-    #     if datatype == 'condition':
-    #         gt_dict = ground_truth_parameters
-             
-    ecdfs = {}
-    plot_vals = {} # [0.01, 0.9], [0.01, 0.99], [mean]
+        fig, ax = plt.subplots(1, 1, 
+                               figsize = (10 * figure_scale, 0.0333 * trace_cnt_tmp * aspect_ratio * 10 * figure_scale), 
+                               sharex = False, 
+                               sharey = False)
     
-    for k in trace.keys():
-        # If we want to keep only a specific parameter we skip all traces which don't include it in 
-        # their names !
-        if keep_key is not None and keep_key not in k: 
-            continue
-
-        # Deal with 
-        if 'std' in k and drop_sd:
-            pass
+        # fig.suptitle('Caterpillar plot: ' + model_fitted.upper().replace('_', '-'), fontsize = 40)
+        sns.despine(right = True)
         
-        else:
-            # Deal with _transformed parameters
-            if '_trans' in k:
-                label_tmp = k.replace('_trans', '')
-                key_param_only = k.split('_')[0]
-                #print(key_param_only)
-                #print(k)
-                lower_lim = model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(key_param_only)]
-                upper_lim = model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(key_param_only)]
-                trace[label_tmp] = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- trace[k])))
+        trace = posterior_samples.copy()
 
-                #trace[label_tmp] = 1 / (1 + np.exp(- trace[k]))
-                k = label_tmp
-
-            ok_ = 1
-            k_old = k # keep original key around for indexing
-            k = k.replace('_', '-') # assign new prettier key for plotting
+        trace = untransform_traces(traces = hddm_model.get_traces(),
+                                   model = hddm_model.model, 
+                                   is_nn = hddm_model.nn)
+        
+        # In case ground truth parameters were supplied --> this is mostly of interest for parameter recovery studies etc.
+        # if ground_truth_parameters is not None:
+        #     cnt = 0
+        #     gt_dict = {}
             
-            if drop_sd == True:
-                if 'sd' in k:
-                    ok_ = 0
-            if ok_:
-                ecdfs[k] = ECDF(trace[k_old])
-                tmp_sorted = sorted(trace[k_old])
-                _p01 =  tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.01) - 1]
-                _p99 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.99) - 1]
-                _p1 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.1) - 1]
-                _p9 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.9) - 1]
-                _pmean = trace[k_old].mean()
-                plot_vals[k] = [[_p01, _p99], [_p1, _p9], _pmean]
-    
-    x = [plot_vals[k][2] for k in plot_vals.keys()]
-    ax.scatter(x, plot_vals.keys(), c = 'black', marker = 's', alpha = 0)
-    
-    for k in plot_vals.keys():
-        k = k.replace('_', '-')
-        ax.plot(plot_vals[k][1], [k, k], c = 'grey', zorder = - 1, linewidth = 5)
-        ax.plot(plot_vals[k][0] , [k, k], c = 'black', zorder = - 1)
-        
-        if ground_truth_parameters is not None:
-            ax.scatter(gt_dict[k.replace('-', '_')], k,  c = 'red', marker = "|")
-        
-    ax.set_xlim(x_limits[0], x_limits[1])
-    ax.tick_params(axis = 'y', size = tick_label_size_y)
-    ax.tick_params(axis = 'x', size = tick_label_size_x)
-        
-    if save == True:
-        plt.savefig('figures/' + 'caterpillar_plot_' + model + '_' + datatype + '.png',
-                    format = 'png', 
-                    transparent = True,
-                    frameon = False)
+        #     if datatype == 'single_subject':
+        #         if type(ground_truth_parameters) is not dict:
+        #             for v in model_config[model_fitted]['params']:
+        #                 gt_dict[v] = ground_truth_parameters[cnt]
+        #                 cnt += 1
+        #         else:
+        #             gt_dict = ground_truth_parameters
 
-    return plt.show()
+        #     if datatype == 'hierarchical':
+        #         gt_dict = ground_truth_parameters
+
+        #     if datatype == 'condition':
+        #         gt_dict = ground_truth_parameters
+                
+        ecdfs = {}
+        plot_vals = {} # [0.01, 0.9], [0.01, 0.99], [mean]
+        
+        for k in trace.keys():
+            # If we want to keep only a specific parameter we skip all traces which don't include it in 
+            # their names !
+            if keep_key is not None and keep_key not in k: 
+                continue
+
+            # Deal with 
+            if 'std' in k and drop_sd:
+                pass
+            
+            else:
+                # Deal with _transformed parameters
+                # if '_trans' in k:
+                #     label_tmp = k.replace('_trans', '')
+                #     key_param_only = k.split('_')[0]
+                #     #print(key_param_only)
+                #     #print(k)
+                #     lower_lim = model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(key_param_only)]
+                #     upper_lim = model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(key_param_only)]
+                #     trace[label_tmp] = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- trace[k])))
+
+                #     #trace[label_tmp] = 1 / (1 + np.exp(- trace[k]))
+                #     k = label_tmp
+
+                ok_ = 1
+                k_old = k # keep original key around for indexing
+                k = k.replace('_', '-') # assign new prettier key for plotting
+                
+                if drop_sd == True:
+                    if 'sd' in k:
+                        ok_ = 0
+                if ok_:
+                    ecdfs[k] = ECDF(trace[k_old])
+                    tmp_sorted = sorted(trace[k_old])
+                    _p01 =  tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.01) - 1]
+                    _p99 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.99) - 1]
+                    _p1 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.1) - 1]
+                    _p9 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.9) - 1]
+                    _pmean = trace[k_old].mean()
+                    plot_vals[k] = [[_p01, _p99], [_p1, _p9], _pmean]
+        
+        x = [plot_vals[k][2] for k in plot_vals.keys()]
+        ax.scatter(x, plot_vals.keys(), c = 'black', marker = 's', alpha = 0)
+        
+        for k in plot_vals.keys():
+            k = k.replace('_', '-')
+            ax.plot(plot_vals[k][1], [k, k], c = 'grey', zorder = - 1, linewidth = 5)
+            ax.plot(plot_vals[k][0] , [k, k], c = 'black', zorder = - 1)
+            
+            if model_ground_truth is not None:
+                ax.scatter(gt_dict[k.replace('-', '_')], k,  c = 'red', marker = "|")
+            
+        ax.set_xlim(x_limits[0], x_limits[1])
+        ax.tick_params(axis = 'y', size = tick_label_size_y)
+        ax.tick_params(axis = 'x', size = tick_label_size_x)
+            
+        if save == True:
+            plt.savefig('figures/' + 'caterpillar_plot_' + model + '_' + datatype + '.png',
+                        format = 'png', 
+                        transparent = True,
+                        frameon = False)
+
+        if show:
+            plt.show()
+
+    return # plt.show()
 
 # Posterior Pair Plot
 def posterior_pair_plot(hddm_model = None, 
@@ -2684,13 +2713,13 @@ def posterior_pair_plot(hddm_model = None,
             if show:
                 plt.show()
             
-    if save == True:
-        plt.savefig('figures/' + 'pair_plot_' + model_fitted + '_' + datatype + '.png',
-                    format = 'png', 
-                    transparent = True,
-                    frameon = False)
-        plt.close()
-        
+            if save == True:
+                plt.savefig('figures/' + 'pair_plot_' + model_fitted + '_' + datatype + '.png',
+                            format = 'png', 
+                            transparent = True,
+                            frameon = False)
+                plt.close()
+
     # Show
     return
     #return plt.show(block = False)
