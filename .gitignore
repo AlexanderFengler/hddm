@@ -4,6 +4,8 @@
 *~
 .eggs/
 .vscode/
+HDDM.egg-info/
+
 build/
 dist/
 docs/build

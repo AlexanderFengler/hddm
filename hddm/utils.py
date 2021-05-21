@@ -12,6 +12,8 @@ from kabuki.analyze import post_pred_gen, post_pred_compare_stats
 from scipy.stats import scoreatpercentile
 from scipy.stats.mstats import mquantiles
 
+import arviz as az
+
 def flip_errors(data):
     """Flip sign for lower boundary responses.
 
@@ -305,6 +307,60 @@ def plot_posteriors(model, **kwargs):
     """
     pm.Matplot.plot(model.mc, **kwargs)
 
+def get_inference_data_object(model):
+    parameters = list()
+    for variable in model.mc._variables_to_tally:
+        parameters.append(str(variable))
+
+    datadict = dict()
+    for variable in parameters:
+        trace = model.mc.trace(variable)[:]
+        datadict[variable] = trace
+    
+    InfDataObj = az.convert_to_inference_data(datadict)
+    return InfDataObj
+
+def plot_posteriors_az(model, **kwargs):
+    """Generate posterior plots for each parameter.
+
+    This is a wrapper for arviz.plot_posterior()
+    """
+    InfDataObj = get_inference_data_object(model)
+    
+    for param in InfDataObj.posterior:
+        fig, ax = plt.subplots(1,3)
+        fig.set_size_inches(18, 6)
+
+        az.plot_posterior(InfDataObj.posterior[param], kind='hist', ax=ax[0], **kwargs)
+        az.plot_autocorr(InfDataObj.posterior[param], ax=ax[1], **kwargs)
+        trace_samples = np.array(InfDataObj.posterior[param][0])
+        ax[2].plot(np.arange(len(trace_samples)), trace_samples)
+
+        trace_range = max(trace_samples), min(trace_samples)
+        min_range = min(trace_samples)
+        max_range = max(trace_samples)
+        tr_range = max_range-min_range
+        ax[2].set_ylim([min_range-1*tr_range, max_range+1*tr_range])
+        ax[2].title.set_text(param)
+
+        fig.tight_layout()
+        plt.show()
+
+def plot_trace_az(model, **kwargs):
+    """Generate trace plots for each parameter.
+
+    This is a wrapper for arviz.plot_posterior()
+    """
+    InfDataObj = get_inference_data_object(model)
+    az.plot_trace(InfDataObj, **kwargs)
+
+def plot_autocorr_az(model, **kwargs):
+    """Generate auto correlation plots for each parameter.
+
+    This is a wrapper for arviz.plot_posterior()
+    """
+    InfDataObj = get_inference_data_object(model)
+    az.plot_autocorr(InfDataObj, **kwargs)
 
 def data_plot(model, bins=50, nrows=3):
     nplots = len(model.get_observeds())

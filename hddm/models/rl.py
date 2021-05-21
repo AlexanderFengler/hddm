@@ -12,7 +12,7 @@ from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
 from wfpt import wiener_like_rl
 from collections import OrderedDict
-
+import hddm
 
 class Hrl(HDDM):
     """RL model that can be used to analyze data from two-armed bandit tasks.
@@ -27,6 +27,9 @@ class Hrl(HDDM):
         self.rl_class = RL_like_MAB
 
         super(Hrl, self).__init__(*args, **kwargs)
+    
+    def plot_posteriors(self, **kwargs):
+        hddm.utils.plot_posteriors_az(self)
 
     def _create_stochastic_knodes(self, include):
         params = ['beta']
