@@ -562,7 +562,7 @@ def _make_trace_plotready_condition(hddm_trace = None, model = ''):
             
     return dat
 
-def extract_mutli_cond_subj_plot_n(data = None):
+def extract_multi_cond_subj_plot_n(data = None):
     # Classify plot type:
     # Check if dataset has multiple conditions
     multi_condition = 0
