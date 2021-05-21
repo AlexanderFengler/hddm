@@ -1902,6 +1902,11 @@ def posterior_predictive_plot_new(hddm_model = None,
 
     # Cycle through plots
     for plot_n in range(n_plots):
+        sub_data = _make_plot_sub_data(data = data, 
+                                       plot_n = plot_n, 
+                                       multi_subject = multi_subject, 
+                                       multi_condition = multi_condition)
+
         n_subplots = len(list(sub_data.keys()))
         if n_subplots > 1:
             rows = int(np.ceil(n_subplots / cols))
@@ -1913,11 +1918,6 @@ def posterior_predictive_plot_new(hddm_model = None,
                                sharex = False, 
                                sharey = False)
         fig.suptitle('Posterior Predictive: ', fontsize = 24)
-
-        sub_data = _make_plot_sub_data(data = data, 
-                                       plot_n = plot_n, 
-                                       multi_subject = multi_subject, 
-                                       multi_condition = multi_condition)
 
         subplot_cnt = 0
         for i in sub_data.keys():
@@ -2316,6 +2316,7 @@ def posterior_predictive_plot_new(hddm_model = None,
 #     return plt.show()
 
 def caterpillar_plot(hddm_model = None, 
+                     model_ground_truth = None,
                      drop_sd = True,
                      keep_key = None,
                      x_limits = [-2, 2],
