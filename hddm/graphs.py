@@ -2546,7 +2546,8 @@ def posterior_pair_plot(hddm_model = None,
                         # ground_truth_parameters = None,
                         # model_fitted = None,
                         model_ground_truth = None,
-                        save = False):
+                        save = False,
+                        show = True):
 
     """Basic pair plot useful for inspecting posterior parameters.
        At this point can be used only for single subject data. 
