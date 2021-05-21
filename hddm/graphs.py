@@ -2689,11 +2689,13 @@ def posterior_pair_plot(hddm_model = None,
             if model_ground_truth is not None:
                 for i in range(g.axes.shape[0]):
                     for j in range(i + 1, g.axes.shape[0], 1):
-                        g.axes[j,i].plot(data[c_tmp][s_tmp]['gt_parameter_vector'][xlabels[i]], # ground_truth_parameters[xlabels[i]], 
-                                         data[c_tmp][s_tmp]['gt_parameter_vector'][ylabels[j]], # ground_truth_parameters[ylabels[j]], #posterior_samples_key_set[j]], 
+                        g.axes[j,i].plot(data[c_tmp][s_tmp]['gt_parameter_vector'][i], #[xlabels[i]],
+                                         data[c_tmp][s_tmp]['gt_parameter_vector'][j], #[ylabels[j]], 
                                         '.', 
                                         color = 'red',
                                         markersize = 10)
+                        # ground_truth_parameters[xlabels[i]], 
+                        # ground_truth_parameters[ylabels[j]], #posterior_samples_key_set[j]],
                         # g.axes[j,i].plot(ground_truth_parameters[model_config[model_fitted]['params'].index(xlabels[i])], 
                         #                  ground_truth_parameters[model_config[model_fitted]['params'].index(ylabels[j])], 
                         #                  '.', 
