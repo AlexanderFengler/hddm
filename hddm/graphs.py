@@ -73,7 +73,7 @@ def subset_data(data, row_tmp):
 def make_trace_plotready_h_c(trace_dict = None,
                              model = '', 
                              is_group_model = None,
-                             ground_truth_model = None):
+                             model_ground_truth = None):
     # This should make traces plotready for the scenarios -->  condition, hierarchical (single model is dealt with trivially by using the traces as is and simply reordering the parmeters to match simulator inputs)
     # Function returns enough data to be flexibly usable across a variety of graphs. One just has to fish out the relevant parts.
 
@@ -122,13 +122,13 @@ def make_trace_plotready_h_c(trace_dict = None,
             print('still passed ? ')
             print(test_passed)
 
-            if test_passed and (ground_truth_model is None):
-                ground_truth_model = model
+            if test_passed and (model_ground_truth is None):
+                model_ground_truth = model
             
             # Dat gt_parameter_vector to dat_h_c dict 
             # If parameters not in the dataframe --> set to None
             if test_passed:
-                dat_h_c[key][subj_id]['gt_parameter_vector'] = dat_h_c[key][subj_id]['data'].loc[0, :][[param for param in model_config[ground_truth_model]['params']]].values
+                dat_h_c[key][subj_id]['gt_parameter_vector'] = dat_h_c[key][subj_id]['data'].loc[0, :][[param for param in model_config[model_ground_truth]['params']]].values
                 #x.loc[0, :][['one', 'two']].values
             else: 
                 dat_h_c[key][subj_id]['gt_parameter_vector'] = None
@@ -200,7 +200,6 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
                 param_str = str(param_tmp)
                 param_ids.append(param_str)
 
-
     # params_depends
     out_dict = {}
     if condition_dataframe is not None:
@@ -251,7 +250,7 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
     return out_dict
 
 def filter_subject_condition_traces(hddm_model,
-                                    ground_truth_model = None, # None, 'model_name'
+                                    model_ground_truth = None, # None, 'model_name'
                                     ):
     data = hddm_model.data
 
@@ -392,7 +391,7 @@ def filter_subject_condition_traces(hddm_model,
         plotready_traces = make_trace_plotready_h_c(trace_dict = condition_wise_params_dict, 
                                                     model = model, 
                                                     is_group_model = is_group_model,
-                                                    ground_truth_model = ground_truth_model)
+                                                    model_ground_truth = model_ground_truth)
 
         #print(other_data)
 
@@ -1321,7 +1320,7 @@ def model_plot_new(hddm_model = None,
     # AF-TODO: Shape checks
     if hddm_model is not None:
         data = filter_subject_condition_traces(hddm_model, 
-                                               ground_truth_model = model_ground_truth)
+                                               model_ground_truth = model_ground_truth)
         multi_condition, multi_subject, n_plots = extract_multi_cond_subj_plot_n(data = data)
 
 
@@ -1883,7 +1882,7 @@ def posterior_predictive_plot_new(hddm_model = None,
      # AF-TODO: Shape checks
     if hddm_model is not None:
         data = filter_subject_condition_traces(hddm_model, 
-                                               ground_truth_model = model_ground_truth)
+                                               model_ground_truth = model_ground_truth)
         multi_condition, multi_subject, n_plots = extract_multi_cond_subj_plot_n(data = data)
 
     # Taking care of special case with 1 plot
@@ -2391,7 +2390,7 @@ def caterpillar_plot(hddm_model = None,
 
     # 
     data = filter_subject_condition_traces(hddm_model, 
-                                           ground_truth_model = model_ground_truth)
+                                           model_ground_truth = model_ground_truth)
 
 
     # Get all ground truths
