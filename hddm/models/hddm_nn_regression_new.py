@@ -305,7 +305,7 @@ class HDDMnnRegressor(HDDM):
                     # This potentially needs change, we should cleverly constrain the covariate betas here
                     # right now the solution is to return  -np.inf in the likelihood if the betas are too big / small
                     # but this is sort of an expensive brute force procedure !
-                    reg_family = self._create_family_normal(param)
+                    reg_family = self._create_family_normal(param, std_upper = 1.0, std_value = 0.1, std_lower = 1e-10)
                     param_lookup = param
 
                 reg_parents[param] = reg_family['%s_bottom' % param_lookup]

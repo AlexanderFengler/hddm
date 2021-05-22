@@ -4,6 +4,7 @@ from functools import partial
 from kabuki.utils import stochastic_from_dist
 from hddm.simulators import *
 import data_simulators
+from copy import deepcopy
 
 def make_mlp_likelihood_complete(model,
                                  **kwargs):

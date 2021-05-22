@@ -4,6 +4,7 @@ from functools import partial
 from kabuki.utils import stochastic_from_dist
 from hddm.simulators import *
 import data_simulators
+from copy import deepcopy
 
 # Defining the likelihood functions
 def make_cnn_likelihood(model, pdf_multiplier = 1,  **kwargs):

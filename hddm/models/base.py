@@ -372,7 +372,6 @@ class AccumulatorModel(kabuki.Hierarchical):
 
         return knodes
 
-
     def _create_family_trunc_normal(self, 
                                     name, 
                                     value=0,
@@ -903,6 +902,7 @@ class HDDMBase(AccumulatorModel):
             wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
             wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
 
+            # AF-TODO: Set defaults for all parameters and make the 'include' statement completely explicit ?
             wfpt_parents['a'] = knodes['a_bottom']
             wfpt_parents['v'] = knodes['v_bottom']
             wfpt_parents['t'] = knodes['t_bottom']
