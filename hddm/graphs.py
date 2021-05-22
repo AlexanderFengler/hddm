@@ -2425,7 +2425,7 @@ def posterior_pair_plot(hddm_model = None,
             
             for ax in g.axes.flat:
                 plt.setp(ax.get_xticklabels(), rotation = 45)
-                plt.setp(ax.get_)
+                #plt.setp(ax.get_)
 
             g.fig.suptitle(model_fitted.upper(), 
                            y = 1.03, 
