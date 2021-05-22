@@ -1195,28 +1195,28 @@ def _convert_params(data = None):
 
 # Plot bound
 # Mean posterior predictives
-def model_plot_new(hddm_model = None,
-                   model_ground_truth = 'weibull_cdf',
-                   n_posterior_parameters = 500, # optional / styling
-                   n_simulations_per_parameter = 10, # optional / stiling
-                   cols = 3, # styling
-                   max_t = 5, # styling
-                   show_model = True, # styling
-                   show_trajectories = False, # styling
-                   n_trajectories = 10, # styling
-                   color_trajectories = 'blue', # styling
-                   alpha_trajectories = 0.2, # styling
-                   linewidth_trajectories = 1.0, # styling
-                   ylimit = 2, # styling
-                   posterior_linewidth = 3, # styling
-                   ground_truth_linewidth = 3, # styling
-                   hist_linewidth = 3, # styling
-                   bin_size = 0.025, # styling
-                   save = False,
-                   scale_x = 1.0, # styling
-                   scale_y = 1.0, # styling
-                   delta_t_graph = 0.01 # styling
-                   ):
+def model_plot(hddm_model = None,
+               model_ground_truth = 'weibull_cdf',
+               n_posterior_parameters = 500, # optional / styling
+               n_simulations_per_parameter = 10, # optional / stiling
+               cols = 3, # styling
+               max_t = 5, # styling
+               show_model = True, # styling
+               show_trajectories = False, # styling
+               n_trajectories = 10, # styling
+               color_trajectories = 'blue', # styling
+               alpha_trajectories = 0.2, # styling
+               linewidth_trajectories = 1.0, # styling
+               ylimit = 2, # styling
+               posterior_linewidth = 3, # styling
+               ground_truth_linewidth = 3, # styling
+               hist_linewidth = 3, # styling
+               bin_size = 0.025, # styling
+               save = False,
+               scale_x = 1.0, # styling
+               scale_y = 1.0, # styling
+               delta_t_graph = 0.01 # styling
+               ):
     
     """The model plot is useful to illustrate model behavior graphically. It is quite a flexible 
        plot allowing you to show path trajectories and embedded reaction time histograms etc.. 
@@ -1310,8 +1310,6 @@ def model_plot_new(hddm_model = None,
         data = filter_subject_condition_traces(hddm_model, 
                                                model_ground_truth = model_ground_truth)
         multi_condition, multi_subject, n_plots = extract_multi_cond_subj_plot_n(data = data)
-
-
 
     # # Classify plot type:
     # # Check if dataset has multiple conditions
@@ -1905,10 +1903,10 @@ def posterior_predictive_plot_new(hddm_model = None,
                                figsize = (20 * scale_x, 20 * rows * scale_y), 
                                sharex = False, 
                                sharey = False)
-        fig.suptitle('Posterior Predictive: ', fontsize = 24)
 
         subplot_cnt = 0
         for i in sub_data.keys():
+
             print('n subplots to plot')
             row_tmp = int(np.floor(subplot_cnt / cols))
             col_tmp = subplot_cnt - (cols * row_tmp)
@@ -1975,6 +1973,38 @@ def posterior_predictive_plot_new(hddm_model = None,
                         bins = np.linspace(-max_t, max_t, nbins), #50, 
                         # kde = False, #rug = False,
                         )
+
+
+            # Make Title:
+            # Make condition label
+            condition_label = ''
+            for label_key in sub_data[i]['cond_subj_label'].keys():
+                if 'subj_idx' not in label_key:
+                    condition_label += str(label_key) + ': '
+                    condition_label += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
+            condition_label = condition_label[:-2]
+
+
+            title_size = 24
+            
+            if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
+                title_tmp = 'Subject: ' + str(i)
+                fig_title_tmp = condition_label
+            elif multi_condition and not multi_subject:
+                title_tmp = condition_label
+                title_size = title_size / (0.5 * len(list(sub_data[i]['cond_subj_label'].keys())))
+            elif not multi_condition and not multi_subject:
+                # No extra title needed for simple single subject plot
+                title_tmp = ''
+
+            # Set plot-global title
+            fig.suptitle(fig_title_tmp, fontsize = 24)
+            # fig.suptitle('Posterior Predictive: ', fontsize = 24)
+
+            # Set subplot title
+            ax_tmp.set_title(title_tmp,
+                            fontsize = title_size)
+            
             
             # EXTRA STYLING    
             ax_tmp.set_xlim(- xlimit, xlimit)
