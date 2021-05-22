@@ -2334,10 +2334,14 @@ def posterior_pair_plot(hddm_model = None,
                                                         columns = data[c_tmp][s_tmp]['trace_names'])
 
             g = sns.PairGrid(data[c_tmp][s_tmp]['traces'].sample(n_subsample), 
-                            height = height / data[c_tmp][s_tmp]['traces'].shape[1], # len(list(posterior_samples.keys())),
-                            aspect = aspect_ratio,
-                            diag_sharey = False)
-            g = g.map_diag(sns.kdeplot, color = 'black', shade = False) # shade = True, 
+                             height = height / data[c_tmp][s_tmp]['traces'].shape[1], # len(list(posterior_samples.keys())),
+                             aspect = aspect_ratio,
+                             diag_sharey = False)
+
+            g = g.map_diag(sns.kdeplot, 
+                           color = 'black', 
+                           shade = False) # shade = True, 
+
             g = g.map_lower(sns.kdeplot, 
                             thresh = 0.01,
                             n_levels = 50,
@@ -2352,11 +2356,14 @@ def posterior_pair_plot(hddm_model = None,
 
             for ax in g.axes[-1, :]:
                 xlabel = ax.xaxis.get_label_text()
+                ax.set_xlabel(ax.get_xlabel, rotation = 45)
                 xlabels.append(xlabel)
 
             for ax in g.axes[:, 0]:
                 ylabel = ax.yaxis.get_label_text()
                 ylabels.append(ylabel)
+                #ax.yaxis.set_label_text('')
+                ax.set_ylabel('')
 
             #print('xlabels: ')
             #print(xlabels)
@@ -2388,10 +2395,11 @@ def posterior_pair_plot(hddm_model = None,
             
             for ax in g.axes.flat:
                 plt.setp(ax.get_xticklabels(), rotation = 45)
+                plt.setp(ax.get_)
 
             g.fig.suptitle(model_fitted.upper(), 
-                        y = 1.03, 
-                        fontsize = 24)
+                           y = 1.03, 
+                           fontsize = 24)
             
             # posterior_samples_key_set = np.sort(posterior_samples.keys())
             # If ground truth is available add it in:
@@ -2403,6 +2411,7 @@ def posterior_pair_plot(hddm_model = None,
                                         '.', 
                                         color = 'red',
                                         markersize = 10)
+                        
                         # ground_truth_parameters[xlabels[i]], 
                         # ground_truth_parameters[ylabels[j]], #posterior_samples_key_set[j]],
                         # g.axes[j,i].plot(ground_truth_parameters[model_config[model_fitted]['params'].index(xlabels[i])], 
