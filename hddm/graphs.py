@@ -1909,6 +1909,7 @@ def posterior_predictive_plot_new(hddm_model = None,
 
         subplot_cnt = 0
         for i in sub_data.keys():
+            print('n subplots to plot')
             row_tmp = int(np.floor(subplot_cnt / cols))
             col_tmp = subplot_cnt - (cols * row_tmp)
             post_tmp = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
