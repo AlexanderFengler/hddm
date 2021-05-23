@@ -2364,7 +2364,7 @@ def posterior_pair_plot(hddm_model = None,
                                                         columns = data[c_tmp][s_tmp]['trace_names'])
 
             g = sns.PairGrid(data[c_tmp][s_tmp]['traces'].sample(n_subsample), 
-                             height = height / data[c_tmp][s_tmp]['traces'].shape[1], # len(list(posterior_samples.keys())),
+                             height = height, # / data[c_tmp][s_tmp]['traces'].shape[1], # len(list(posterior_samples.keys())),
                              aspect = aspect_ratio,
                              diag_sharey = False)
 
@@ -2386,7 +2386,7 @@ def posterior_pair_plot(hddm_model = None,
 
             for ax in g.axes[-1, :]:
                 xlabel = ax.xaxis.get_label_text()
-                ax.set_xlabel(ax.get_xlabel, rotation = 45)
+                ax.set_xlabel(ax.get_xlabel(), rotation = 45)
                 xlabels.append(xlabel)
 
             for ax in g.axes[:, 0]:
