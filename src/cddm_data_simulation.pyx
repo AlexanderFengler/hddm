@@ -376,6 +376,10 @@ def ddm_flexbound(np.ndarray[float, ndim = 1] v,
     cdef Py_ssize_t k
     cdef float[:] gaussian_values = draw_gaussian(num_draws)
     cdef float[:] boundary_view = boundary
+
+    print('boundary shape')
+    print(boundary.shape)
+
     
     # Loop over samples
     for k in range(n_trials):
@@ -400,7 +404,9 @@ def ddm_flexbound(np.ndarray[float, ndim = 1] v,
 
             # Random walker
             print('before passed')
-            while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
+            print('boundary_view[ix]')
+            print(boundary[ix])
+            while (y >= (-1) * boundary_view[ix]) and (y <= boundary_view[ix]) and (t <= max_t):
                 print('passed')
                 y += (v_view[k] * delta_t) + (sqrt_st * gaussian_values[m])
                 t_particle += delta_t
