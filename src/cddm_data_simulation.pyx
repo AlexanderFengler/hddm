@@ -406,6 +406,22 @@ def ddm_flexbound(np.ndarray[float, ndim = 1] v,
             print('before passed')
             print('boundary_view[ix]')
             print(boundary[ix])
+            print(boundary_view[ix])
+
+            print('max_t')
+            print(max_t)
+            print('t')
+            print(t)
+
+            print('truth 1')
+            print(y >= (-1) * boundary_view[ix])
+
+            print('truth 2')
+            print(y <= boundary_view[ix])
+
+            print('truth 3')
+            print(t <= max_t)
+            
             while (y >= (-1) * boundary_view[ix]) and (y <= boundary_view[ix]) and (t <= max_t):
                 print('passed')
                 y += (v_view[k] * delta_t) + (sqrt_st * gaussian_values[m])
@@ -417,6 +433,7 @@ def ddm_flexbound(np.ndarray[float, ndim = 1] v,
                 if n == 0:
                     if k == 0:
                         traj_view[ix, 0] = y
+                
                 # Can improve with less checks
                 if m == num_draws:
                     gaussian_values = draw_gaussian(num_draws)
