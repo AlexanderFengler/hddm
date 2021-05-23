@@ -3,6 +3,7 @@ from hddm.simulators import *
 import numpy as np
 import matplotlib.pyplot as plt
 import pymc as pm
+import os
 import hddm
 import sys
 import kabuki
@@ -1916,7 +1917,7 @@ def posterior_predictive_plot_new(hddm_model = None,
                                    replace = False)
 
             # MODEL SIMULATIONS FOR POSTERIOR PARAMETERS
-            #print('Simulations for plot: ', i)
+            # print('Simulations for plot: ', i)
             for j in range(n_posterior_parameters):
                 out = simulator(theta = sub_data[i]['traces'][idx[j], :], # posterior_samples[i, idx[j], :], 
                                 model = model_fitted,
@@ -1984,7 +1985,6 @@ def posterior_predictive_plot_new(hddm_model = None,
                     condition_label += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
             condition_label = condition_label[:-2]
 
-
             title_size = 24
             
             if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
@@ -2004,7 +2004,6 @@ def posterior_predictive_plot_new(hddm_model = None,
             # Set subplot title
             ax_tmp.set_title(title_tmp,
                             fontsize = title_size)
-            
             
             # EXTRA STYLING    
             ax_tmp.set_xlim(- xlimit, xlimit)
@@ -2039,12 +2038,23 @@ def posterior_predictive_plot_new(hddm_model = None,
         if show:
             plt.show()  
             
-    if save == True:
-        plt.savefig('figures/' + 'posterior_predictive_plot_' + model_ground_truth + '_' + datatype + '.png',
-                    format = 'png', 
-                    transparent = True,
-                    frameon = False)
-        plt.close()
+        if save == True:
+            if save_path is None:
+                save_path = 'figures/'
+                if os.path.exists('figures'):
+                    pass
+                else:
+                    os.mkdir('figures')
+            elif type(save_path) == str:
+                pass
+            else:
+                return 'Error: please specify a save_path as a string'
+            
+            plt.savefig(save_path + 'posterior_predictive_plot_' + 'subplot_' + str(subplot_cnt) +  '.png',
+                        format = 'png', 
+                        transparent = True,
+                        frameon = False)
+        #plt.close()
 
     return # plt.show()
 
@@ -2273,6 +2283,7 @@ def posterior_pair_plot(hddm_model = None,
                         height = 10,
                         aspect_ratio = 1,
                         n_subsample = 1000,
+                        kde_levels = 50,
                         # ground_truth_parameters = None,
                         # model_fitted = None,
                         model_ground_truth = None,
@@ -2374,7 +2385,7 @@ def posterior_pair_plot(hddm_model = None,
 
             g = g.map_lower(sns.kdeplot, 
                             thresh = 0.01,
-                            n_levels = 50,
+                            n_levels = kde_levels,
                             shade = False,
                             cmap = 'Purples_d') # 'Greys'
             
