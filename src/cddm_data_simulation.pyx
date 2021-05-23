@@ -225,7 +225,7 @@ def ddm(np.ndarray[float, ndim = 1] v, # drift by timestep 'delta_t'
             t_particle = 0.0 # reset time
 
             # Random walker
-            while y <= a_view[k] and y >= 0 and t <= max_t:
+            while y <= a_view[k] and y >= 0 and t_particle <= max_t:
                 y += v_view[k] * delta_t + sqrt_st * gaussian_values[m] # update particle position
                 t_particle += delta_t
                 m += 1
@@ -301,7 +301,7 @@ def ddm_cov(np.ndarray[float, ndim = 1] v, # drift by timestep 'delta_t'
             t_particle = 0.0 # reset time
 
             # Random walker
-            while y <= a[k] and y >= 0 and t <= max_t:
+            while y <= a[k] and y >= 0 and t_particle <= max_t:
                 y += v_view[k] * delta_t + sqrt_st * gaussian_values[m] # update particle position
                 t_particle += delta_t
                 m += 1
@@ -385,9 +385,9 @@ def ddm_flexbound(np.ndarray[float, ndim = 1] v,
     for k in range(n_trials):
         # Precompute boundary evaluations
         boundary_params_tmp = {key: boundary_params[key][k] for key in boundary_params.keys()}
-        print('before passed')
+        # print('before passed')
         if boundary_multiplicative:
-            print('passed')
+            # print('passed')
             boundary[:] = np.multiply(a_view[k], boundary_fun(t = t_s, **boundary_params_tmp)).astype(DTYPE)
         else:
             boundary[:] = np.add(a_view[k], boundary_fun(t = t_s, **boundary_params_tmp)).astype(DTYPE)
@@ -403,27 +403,27 @@ def ddm_flexbound(np.ndarray[float, ndim = 1] v,
                     traj_view[0, 0] = y
 
             # Random walker
-            print('before passed')
-            print('boundary_view[ix]')
-            print(boundary[ix])
-            print(boundary_view[ix])
+            # print('before passed')
+            # print('boundary_view[ix]')
+            # print(boundary[ix])
+            # print(boundary_view[ix])
+# 
+            # print('max_t')
+            # print(max_t)
+            # print('t')
+            # print(t)
+# 
+            # print('truth 1')
+            # print(y >= (-1) * boundary_view[ix])
+# 
+            # print('truth 2')
+            # print(y <= boundary_view[ix])
+# 
+            # print('truth 3')
+            # print(t <= max_t)
 
-            print('max_t')
-            print(max_t)
-            print('t')
-            print(t)
-
-            print('truth 1')
-            print(y >= (-1) * boundary_view[ix])
-
-            print('truth 2')
-            print(y <= boundary_view[ix])
-
-            print('truth 3')
-            print(t <= max_t)
-            
-            while (y >= (-1) * boundary_view[ix]) and (y <= boundary_view[ix]) and (t <= max_t):
-                print('passed')
+            while (y >= (-1) * boundary_view[ix]) and (y <= boundary_view[ix]) and (t_particle <= max_t):
+                # print('passed')
                 y += (v_view[k] * delta_t) + (sqrt_st * gaussian_values[m])
                 t_particle += delta_t
                 ix += 1
@@ -510,7 +510,7 @@ def ddm_flexbound_max(float v = 0.0,
         ix = 0 # reset boundary index
 
         # Random walker
-        while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
+        while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t_particle <= max_t:
             y += (v * delta_t) + (sqrt_st * gaussian_values[m])
             t_particle += delta_t
             ix += 1
@@ -620,7 +620,7 @@ def levy_flexbound(np.ndarray[float, ndim = 1] v,
                     traj_view[0, 0] = y
 
             # Random walker
-            while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
+            while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t_particle <= max_t:
                 y += (v_view[k] * delta_t) + (delta_t_alpha * alpha_stable_values[m])
                 t_particle += delta_t
                 ix += 1
@@ -747,7 +747,7 @@ def full_ddm(np.ndarray[float, ndim = 1] v, # = 0,
                     traj_view[0, 0] = y
 
             # Random walker
-            while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
+            while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t_particle <= max_t:
                 y += drift_increment + (sqrt_st * gaussian_values[m])
                 t_particle += delta_t
                 ix += 1
@@ -873,7 +873,7 @@ def ddm_sdv(np.ndarray[float, ndim = 1] v,
                     traj_view[0, 0] = y
 
             # Random walker
-            while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
+            while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t_particle <= max_t:
                 y += drift_increment + (sqrt_st * gaussian_values[m])
                 t_particle += delta_t
                 ix += 1
@@ -984,7 +984,7 @@ def ornstein_uhlenbeck(np.ndarray[float, ndim = 1] v, # drift parameter
                     traj_view[0, 0] = y
 
             # Random walker
-            while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
+            while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t_particle <= max_t:
                 y += ((v_view[k] - (g_view[k] * y)) * delta_t) + sqrt_st * gaussian_values[m]
                 t_particle += delta_t
                 ix += 1
@@ -1127,7 +1127,7 @@ def race_model(np.ndarray[float, ndim = 2] v,  # np.array expected, one column o
                         traj_view[0, j] = particles[j]
 
             # Random walker
-            while not check_finished(particles_view, boundary_view[ix]) and t <= max_t:
+            while not check_finished(particles_view, boundary_view[ix]) and t_particle <= max_t:
                 for j in range(n_particles):
                     particles_view[j] += (v_view[k, j] * delta_t) + sqrt_st_view[k, j] * gaussian_values[m]
                     m += 1
@@ -1261,7 +1261,7 @@ def lca(np.ndarray[float, ndim = 2] v, # drift parameters (np.array expect: one 
                     for i in range(n_particles):
                         traj_view[0, i] = particles[i]
 
-            while not check_finished(particles_view, boundary_view[ix]) and t <= max_t:
+            while not check_finished(particles_view, boundary_view[ix]) and t_particle <= max_t:
                 # calculate current sum over particle positions
                 particles_sum = csum(particles_view)
                 
@@ -1396,7 +1396,7 @@ def ddm_flexbound_seq2(np.ndarray[float, ndim = 1] v_h,
                 if k == 0:
                     traj_view[0, 0] = y_h
             
-            while y_h >= (-1) * boundary_view[ix] and y_h <= boundary_view[ix] and t <= max_t:
+            while y_h >= (-1) * boundary_view[ix] and y_h <= boundary_view[ix] and t_particle <= max_t:
                 y_h += (v_h_view[k] * delta_t) + (sqrt_st * gaussian_values[m])
                 t_particle += delta_t
                 ix += 1
