@@ -1718,6 +1718,7 @@ def posterior_predictive_plot_new(hddm_model = None,
                                   scale_x = 0.5,
                                   scale_y = 0.5,
                                   save = False,
+                                  save_path = None,
                                   show = True):
     
     """An alternative posterior predictive plot. Works for all models listed in hddm (e.g. 'ddm', 'angle', 'weibull', 'levy', 'ornstein')
