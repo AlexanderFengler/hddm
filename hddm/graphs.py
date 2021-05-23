@@ -2035,9 +2035,6 @@ def posterior_predictive_plot_new(hddm_model = None,
                 row_tmp = int(np.floor(i / cols))
                 col_tmp = i - (cols * row_tmp)
                 ax[row_tmp, col_tmp].axis('off')  
-
-        if show:
-            plt.show()  
             
         if save == True:
             if save_path is None:
@@ -2051,11 +2048,12 @@ def posterior_predictive_plot_new(hddm_model = None,
             else:
                 return 'Error: please specify a save_path as a string'
             
-            plt.savefig(save_path + 'posterior_predictive_plot_' + 'subplot_' + str(subplot_cnt) +  '.png',
-                        format = 'png', 
-                        transparent = True,
-                        frameon = False)
+            plt.savefig(save_path + 'posterior_predictive_plot_' + 'subplot_' + str(plot_n) +  '.png',
+                        format = 'png')
+        if show:
+            plt.show()  
         #plt.close()
+        plt.close()
 
     return # plt.show()
 
@@ -2289,6 +2287,7 @@ def posterior_pair_plot(hddm_model = None,
                         # model_fitted = None,
                         model_ground_truth = None,
                         save = False,
+                        save_path = None,
                         show = True):
 
     """Basic pair plot useful for inspecting posterior parameters.
@@ -2350,6 +2349,7 @@ def posterior_pair_plot(hddm_model = None,
 
     #posterior_samples['z'] = 1 / ( 1 + np.exp(- posterior_samples['z_trans']))
     #posterior_samples = posterior_samples.drop('z_trans', axis = 1)
+    plot_cnt = 0
     for c_tmp in data.keys():
         for s_tmp in data[c_tmp].keys():
             # Turn traces into dataframe:
@@ -2474,6 +2474,22 @@ def posterior_pair_plot(hddm_model = None,
                                     '.', 
                                     color = 'red',
                                     markersize = 10)
+  
+            if save == True:
+                if save_path is None:
+                    save_path = 'figures/'
+                    if os.path.exists('figures'):
+                        pass
+                    else:
+                        os.mkdir('figures')
+                elif type(save_path) == str:
+                    pass
+                else:
+                    return 'Error: please specify a save_path as a string'
+                
+                plt.savefig(save_path + 'posterior_pair_plot_' + str(plot_cnt) + '.png',
+                            format = 'png', 
+                            transparent = True)
             if show:
                 plt.show()
             
@@ -2483,6 +2499,7 @@ def posterior_pair_plot(hddm_model = None,
                             transparent = True,
                             frameon = False)
                 plt.close()
+            plot_cnt += 1
 
     # Show
     return
