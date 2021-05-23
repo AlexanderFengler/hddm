@@ -381,8 +381,9 @@ def ddm_flexbound(np.ndarray[float, ndim = 1] v,
     for k in range(n_trials):
         # Precompute boundary evaluations
         boundary_params_tmp = {key: boundary_params[key][k] for key in boundary_params.keys()}
-        
+        print('before passed')
         if boundary_multiplicative:
+            print('passed')
             boundary[:] = np.multiply(a_view[k], boundary_fun(t = t_s, **boundary_params_tmp)).astype(DTYPE)
         else:
             boundary[:] = np.add(a_view[k], boundary_fun(t = t_s, **boundary_params_tmp)).astype(DTYPE)
@@ -398,7 +399,9 @@ def ddm_flexbound(np.ndarray[float, ndim = 1] v,
                     traj_view[0, 0] = y
 
             # Random walker
+            print('before passed')
             while y >= (-1) * boundary_view[ix] and y <= boundary_view[ix] and t <= max_t:
+                print('passed')
                 y += (v_view[k] * delta_t) + (sqrt_st * gaussian_values[m])
                 t_particle += delta_t
                 ix += 1
