@@ -573,7 +573,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                 print(key)
                 print('param shape')
                 print(params[key].shape)
-                
+
             n_params = int(5)
             size = int(value.shape[0])
             data = np.zeros((size, 7), dtype = np.float32)
@@ -583,6 +583,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
             for tmp_str in ['v', 'a', 'z', 't', 'theta']:
 
                 if tmp_str in reg_outcomes:
+                    print('value[rt].index.shape')
+                    print(value['rt'].index.shape)
+                    print(value['rt'][:50])
                     data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
                 else:
                     data[:, cnt] = params[tmp_str]
