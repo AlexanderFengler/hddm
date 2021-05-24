@@ -1027,6 +1027,10 @@ def posterior_predictive_plot(hddm_model = None,
     # Just to aid clarity of the code --> set model fitted
     model_fitted = hddm_model.model
 
+    if n_posterior_parameters <= 1:
+        print('ERROR: n_posterior_parameters needs to be larger than 1')
+        return
+
     if save == True:
         pass
         #matplotlib.rcParams['text.usetex'] = True
@@ -1038,6 +1042,8 @@ def posterior_predictive_plot(hddm_model = None,
         data = filter_subject_condition_traces(hddm_model, 
                                                model_ground_truth = model_ground_truth)
         multi_condition, multi_subject, n_plots = extract_multi_cond_subj_plot_n(data = data)
+    
+    print('data prep finished')
 
     # Taking care of special case with 1 plot
     if n_plots == 1:
@@ -1084,13 +1090,16 @@ def posterior_predictive_plot(hddm_model = None,
 
             # MODEL SIMULATIONS FOR POSTERIOR PARAMETERS
             # print('Simulations for plot: ', i)
-            for j in range(n_posterior_parameters):
-                out = simulator(theta = sub_data[i]['traces'][idx[j], :], # posterior_samples[i, idx[j], :], 
-                                model = model_fitted,
-                                n_samples = n_simulations_per_parameter,
-                                bin_dim = None)
+            #for j in range(n_posterior_parameters):
+            out = simulator(theta = sub_data[i]['traces'][idx, :], # posterior_samples[i, idx[j], :], 
+                            model = model_fitted,
+                            n_samples = n_simulations_per_parameter,
+                            n_trials = sub_data[i]['traces'][idx, :].shape[0],
+                            bin_dim = None)
+
+            post_tmp = np.squeeze()
             
-                post_tmp[(n_simulations_per_parameter * j):(n_simulations_per_parameter * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
+            post_tmp[:, :] = np.stack([out[0].flatten(), out[1].flatten()])
             
             # MODEL SIMULATIONS FOR TRUE PARAMETERS
             # Supply data too !
