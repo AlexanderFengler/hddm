@@ -583,6 +583,8 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
             for tmp_str in ['v', 'a', 'z', 't', 'theta']:
 
                 if tmp_str in reg_outcomes:
+                    print(params[tmp_str])
+                    print(value['rt'])
                     print('value[rt].index.shape')
                     print(value['rt'].index.shape)
                     print(value['rt'].shape)
