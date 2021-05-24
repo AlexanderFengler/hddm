@@ -566,6 +566,14 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
             """Log-likelihood for the full DDM using the interpolation method"""
 
             params = {'v': v, 'a': a, 'z': z, 't': t, 'theta': theta}
+
+            # To print
+            for key in params.keys():
+                print('key')
+                print(key)
+                print('param shape')
+                print(params[key].shape)
+                
             n_params = int(5)
             size = int(value.shape[0])
             data = np.zeros((size, 7), dtype = np.float32)
