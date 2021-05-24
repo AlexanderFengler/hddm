@@ -558,21 +558,21 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
     if model == 'angle':
         def wiener_multi_like_nn_angle(value, v, a, theta, z, t, 
-                                   reg_outcomes, 
-                                   p_outlier = 0, 
-                                   w_outlier = 0.1,
-                                   **kwargs):
+                                       reg_outcomes, 
+                                       p_outlier = 0, 
+                                       w_outlier = 0.1,
+                                       **kwargs):
 
             """Log-likelihood for the full DDM using the interpolation method"""
 
             params = {'v': v, 'a': a, 'z': z, 't': t, 'theta': theta}
 
             # To print
-            for key in params.keys():
-                print('key')
-                print(key)
-                print('param shape')
-                print(params[key].shape)
+            # for key in params.keys():
+            #     #print('key')
+            #     print(key)
+            #     print('param shape')
+            #     print(params[key].shape)
 
             n_params = int(5)
             size = int(value.shape[0])
@@ -583,13 +583,13 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
             for tmp_str in ['v', 'a', 'z', 't', 'theta']:
 
                 if tmp_str in reg_outcomes:
-                    print(params[tmp_str])
-                    print(value['rt'])
-                    print('value[rt].index.shape')
-                    print(value['rt'].index.shape)
-                    print(value['rt'].shape)
-                    print(params[tmp_str].loc[value['rt'].index].shape)
-                    print(params[tmp_str].loc[value['rt'].index].values[:, 0].shape)
+                    # print(params[tmp_str])
+                    # print(value['rt'])
+                    # print('value[rt].index.shape')
+                    # print(value['rt'].index.shape)
+                    # print(value['rt'].shape)
+                    # print(params[tmp_str].loc[value['rt'].index].shape)
+                    # print(params[tmp_str].loc[value['rt'].index].values[:, 0].shape)
                     data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
                 else:
                     data[:, cnt] = params[tmp_str]
