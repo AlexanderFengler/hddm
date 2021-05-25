@@ -232,8 +232,7 @@ model_config['full_ddm2'] = model_config['full_ddm'].copy()
 def simulator(theta, 
               model = 'angle', 
               n_samples = 1000,
-              n_trials = 1,
-              delta_t = 0.001,
+              delta_t = 0.001,  # n_trials
               max_t = 20,
               no_noise = False,
               bin_dim = None,
@@ -282,11 +281,13 @@ def simulator(theta,
     if len(theta.shape) < 2:
         theta = np.expand_dims(theta, axis = 0)
     
-    # Is this necessary ?
-    if theta.shape[0] != n_trials:
-        print('ERROR number of trials does not match first dimension of theta array')
-        return
-
+    # # Is this necessary ?
+    # if theta.shape[0] != n_trials:
+    #     print('ERROR number of trials does not match first dimension of theta array')
+    #     return
+    
+    n_trials = theta.shape[0]
+    
     # 2 choice models 
     if no_noise:
         s = 0.0
