@@ -36,8 +36,9 @@ def generate_wfpt_reg_stochastic_class(wiener_params = None,
             print(params[reg_outcome].dtype)
 
         for key in params.keys():
-            if key in reg_outcomes:
-                pass
+            if type(params[key]) == np.ndarray:
+                print(key)
+                print(params[key].dtype)
             else:
                 print(key)
                 print(type(params[key]))
