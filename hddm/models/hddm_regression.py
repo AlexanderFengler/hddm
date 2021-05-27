@@ -29,8 +29,14 @@ def generate_wfpt_reg_stochastic_class(wiener_params = None,
     def wiener_multi_like(value, v, sv, a, z, sz, t, st, reg_outcomes, p_outlier=0):
         """Log-likelihood for the full DDM using the interpolation method"""
         params = {'v': v, 'sv': sv, 'a': a, 'z': z, 'sz': sz, 't': t, 'st': st}
+        # 
         for reg_outcome in reg_outcomes:
             params[reg_outcome] = params[reg_outcome].loc[value['rt'].index].values
+
+        for key in params.keys()
+            print(key)
+            print(type(params[key]))
+        
         return hddm.wfpt.wiener_like_multi(value['rt'].values,
                                            params['v'], params['sv'], params['a'], params['z'],
                                            params['sz'], params['t'], params['st'], 1e-4,
@@ -259,9 +265,11 @@ class HDDMRegressor(HDDM):
 
             for inter, param in zip(intercept, reg['params']):
                 if inter:
+                    
                     # Intercept parameter should have original prior (not centered on 0)
                     param_lookup = param[:param.find('_')]
                     reg_family = super(HDDMRegressor, self)._create_stochastic_knodes([param_lookup])
+                    
                     # Rename nodes to avoid collissions
                     names = list(reg_family.keys())
                     for name in names:
@@ -276,6 +284,7 @@ class HDDMRegressor(HDDM):
                     param_lookup = param
 
                 reg_parents[param] = reg_family['%s_bottom' % param_lookup]
+                
                 if reg not in self.group_only_nodes:
                     reg_family['%s_subj_reg' % param] = reg_family.pop('%s_bottom' % param_lookup)
                 knodes.update(reg_family)
