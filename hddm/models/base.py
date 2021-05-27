@@ -831,7 +831,7 @@ class HDDMBase(AccumulatorModel):
     def __init__(self, data, bias = False, include=(),
                  wiener_params = None, p_outlier=0.05, **kwargs):
 
-        self.default_intervars = kwargs.pop('default_intervars', {'sz': 0, 'st': 0, 'sv': 0})
+        self.default_intervars = kwargs.pop('default_intervars', {'sz': 0.0, 'st': 0.0, 'sv': 0.0})
 
         self._kwargs = kwargs
 

@@ -36,6 +36,7 @@ def generate_wfpt_reg_stochastic_class(wiener_params = None,
         for key in params.keys():
             print(key)
             print(type(params[key]))
+            print(params[key].dtype)
         
         return hddm.wfpt.wiener_like_multi(value['rt'].values,
                                            params['v'], params['sv'], params['a'], params['z'],

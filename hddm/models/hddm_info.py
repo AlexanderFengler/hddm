@@ -177,7 +177,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'v' in include:
                 tmp_param = 'v'
@@ -193,7 +193,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'z' in include:
                 tmp_param = 'z'
@@ -210,7 +210,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 2
+                                                               std_upper = 2.0
                                                                ))
             if 'beta' in include:
                 tmp_param = 'beta'
@@ -218,7 +218,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 2
+                                                               std_upper = 2.0
                                                                ))
 
         if self.model == 'ddm' or self.model == 'ddm_analytic':
@@ -228,7 +228,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'v' in include:
                 tmp_param = 'v'
@@ -244,7 +244,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'z' in include:
                 tmp_param = 'z'
@@ -264,7 +264,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'v' in include:
                 tmp_param = 'v'
@@ -280,7 +280,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'z' in include:
                 tmp_param = 'z'
@@ -297,7 +297,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
 
         if self.model == 'full_ddm' or self.model == 'full_ddm2':
@@ -307,7 +307,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'v' in include:
                 tmp_param = 'v'
@@ -323,7 +323,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'z' in include:
                 tmp_param = 'z'
@@ -369,7 +369,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'v' in include:
                 tmp_param = 'v'
@@ -385,7 +385,7 @@ class HDDM(HDDMBase):
                                                               lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                               upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                               value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                              std_upper = 1 # added AF
+                                                              std_upper = 1.0 # added AF
                                                               ))
             if 'z' in include:
                 tmp_param = 'z'
@@ -402,7 +402,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1
+                                                               std_upper = 1.0
                                                                )) # should have lower = 0.2, upper = 0.8
 
         if self.model == 'ornstein':
@@ -412,7 +412,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'v' in include:
                 tmp_param = 'v'
@@ -428,7 +428,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'z' in include:
                 tmp_param = 'z'
@@ -445,7 +445,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1
+                                                               std_upper = 1.0
                                                                )) # should have lower = 0.2, upper = 0.8
         
         if self.model == 'levy':
@@ -455,7 +455,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'v' in include:
                 tmp_param = 'v'
@@ -471,7 +471,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1 # added AF
+                                                               std_upper = 1.0 # added AF
                                                                ))
             if 'z' in include:
                 tmp_param = 'z'
@@ -488,7 +488,7 @@ class HDDM(HDDMBase):
                                                                lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                                upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                                value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1
+                                                               std_upper = 1.0
                                                                ))
                                                                # should have lower = 0.1, upper = 0.9
                       
@@ -507,26 +507,26 @@ class HDDM(HDDMBase):
                                                                   value = 1))
         if 'v' in include:
             knodes.update(self._create_family_normal_normal_hnormal('v', 
-                                                                    value = 2,
-                                                                    g_mu = 2, 
+                                                                    value = 2.0,
+                                                                    g_mu = 2.0, 
                                                                     g_tau = 3**-2, 
-                                                                    std_std = 2))
+                                                                    std_std = 2.0))
         if 't' in include:
             knodes.update(self._create_family_gamma_gamma_hnormal('t', 
                                                                   g_mean = .4, 
                                                                   g_std = 0.2, 
                                                                   value = 0.001, 
-                                                                  std_std = 1, 
+                                                                  std_std = 1.0, 
                                                                   std_value = 0.2))
         if 'sv' in include:
             knodes['sv_bottom'] = Knode(pm.HalfNormal, 'sv', 
                                         tau = 2**-2, 
-                                        value = 1, 
+                                        value = 1.0, 
                                         depends = self.depends['sv'])
         if 'sz' in include:
             knodes['sz_bottom'] = Knode(pm.Beta, 'sz', 
-                                        alpha = 1,
-                                        beta = 3, 
+                                        alpha = 1.0,
+                                        beta = 3.0, 
                                         value = 0.01, 
                                         depends = self.depends['sz'])
         if 'st' in include:
@@ -541,8 +541,8 @@ class HDDM(HDDMBase):
                                                        std_std = 0.05))
         if 'p_outlier' in include:
             knodes['p_outlier_bottom'] = Knode(pm.Beta, 'p_outlier', 
-                                               alpha = 1, 
-                                               beta = 15, 
+                                               alpha = 1.0, 
+                                               beta = 15.0, 
                                                value = 0.01, 
                                                depends = self.depends['p_outlier'])
         return knodes
@@ -553,22 +553,22 @@ class HDDM(HDDMBase):
         if 'a' in include:
             knodes.update(self._create_family_trunc_normal('a',
                                                            lower = 0.1,
-                                                           upper = 6,
-                                                           value = 1,
-                                                           std_upper = 1 # added AF
+                                                           upper = 6.0,
+                                                           value = 1.0,
+                                                           std_upper = 1.0 # added AF
                                                            ))
         if 'v' in include:
             knodes.update(self._create_family_trunc_normal('v', 
                                                            lower = - 3.0,
                                                            upper = 3.0,
-                                                           value = 0,
+                                                           value = 0.0,
                                                            std_upper = 1.5))
         if 't' in include:
             knodes.update(self._create_family_trunc_normal('t', 
                                                            lower = 1e-3,
-                                                           upper = 2, 
+                                                           upper = 2.0, 
                                                            value = .01,
-                                                           std_upper = 1 # added AF
+                                                           std_upper = 1.0 # added AF
                                                            ))
         if 'z' in include:
             knodes.update(self._create_family_invlogit('z',
@@ -582,13 +582,13 @@ class HDDM(HDDMBase):
                                         'sv', 
                                         lower = 1e-6,
                                         upper = 1e3,
-                                        value = 1,
+                                        value = 1.0,
                                         depends = self.depends['sv'])
         if 'sz' in include:
             knodes['sz_bottom'] = Knode(pm.Beta, 
                                         'sz', 
-                                        alpha = 1,
-                                        beta = 1,
+                                        alpha = 1.0,
+                                        beta = 1.0,
                                         value = 0.01,
                                         depends = self.depends['sz'])
         if 'st' in include:
@@ -601,8 +601,8 @@ class HDDM(HDDMBase):
         if 'p_outlier' in include:
             knodes['p_outlier_bottom'] = Knode(pm.Beta, 
                                                'p_outlier',
-                                               alpha = 1,
-                                               beta = 1,
+                                               alpha = 1.0,
+                                               beta = 1.0,
                                                value = 0.01,
                                                depends = self.depends['p_outlier'])
         return knodes
