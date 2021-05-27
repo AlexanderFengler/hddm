@@ -33,7 +33,7 @@ def generate_wfpt_reg_stochastic_class(wiener_params = None,
         for reg_outcome in reg_outcomes:
             params[reg_outcome] = params[reg_outcome].loc[value['rt'].index].values
 
-        for key in params.keys()
+        for key in params.keys():
             print(key)
             print(type(params[key]))
         
