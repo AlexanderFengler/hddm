@@ -373,11 +373,6 @@ def filter_subject_condition_traces(hddm_model,
                 condition_wise_params_dict[key_tmp]['traces'][param_not_included] = model_config[model]['default_params'][model_config[model]['params'].index(param_not_included)]
             
 
-        #if is_group_model:
-        # (plotready_traces, other_data, other_data_2) = make_trace_plotready_h_c(trace_dict = condition_wise_params_dict, 
-        #                                                                         model = model, 
-        #                                                                         is_group_model = is_group_model)
-
         plotready_traces = make_trace_plotready_h_c(trace_dict = condition_wise_params_dict, 
                                                     model = model, 
                                                     is_group_model = is_group_model,
@@ -426,10 +421,6 @@ def filter_subject_condition_traces(hddm_model,
 
         out_dict = {0:{0:{'data': data, 'params': hddm.simulators.model_config[model]['params'], 'traces': traces_array, 'gt_parameter_vector': gt_parameters}}}
         return out_dict
-
-    # Scenario 3: Group Model but plot group level dists
-    if is_group_model:
-        pass
 
 def extract_multi_cond_subj_plot_n(data = None):
     # Classify plot type:
@@ -672,8 +663,8 @@ def model_plot(hddm_model = None,
             ax_tmp_twin_down.set_ylim(ylimit, -ylimit)
             ax_tmp_twin_down.set_yticks([])
                 
-            # ADD TRAJECTORIESS
-            if show_trajectories == True:
+            # ADD TRAJECTORIES OF GROUND TRUTH VECTOR
+            if (show_trajectories == True) and (model_ground_truth is not None):
                 for k in range(n_trajectories):
                     out = simulator(theta = sub_data[i]['gt_parameter_vector'], #ground_truth_parameters[i, :],
                                     model = model_ground_truth, 
@@ -876,7 +867,6 @@ def model_plot(hddm_model = None,
 
                     if tmp_label == 'Ground Truth Model' and row_tmp == 0 and col_tmp == 0:
                         ax_tmp.legend(loc = 'upper right')
-
 
                     if rows == 1 and cols == 1:
                         ax_tmp.patch.set_visible(False)
@@ -1471,17 +1461,9 @@ def caterpillar_plot(hddm_model = None,
     Return: plot object
     """
 
-    # posterior_samples = [],
-    # ground_truth_parameters = None,
-    # model_fitted = 'angle',
-    #datatype = 'hierarchical', # 'hierarchical', 'single_subject', 'condition'
-
-
     if hddm_model is None:
         return ('No HDDM object supplied')
 
-    # model_fitted = hddm_model.model
-    
     if save == True:
         pass
         #matplotlib.rcParams['text.usetex'] = True
@@ -1492,53 +1474,11 @@ def caterpillar_plot(hddm_model = None,
             palette = "muted", 
             color_codes = True,
             font_scale = 2)
-    
-    # get parameter numbers 
-    # if more than 30 --> split plot into multiple ones
-    # if less --> be smart about plot scaling
-
-
-    # 
-    # data = filter_subject_condition_traces(hddm_model, 
-    #                                        model_ground_truth = model_ground_truth)
 
     trace = untransform_traces(traces = hddm_model.get_traces(), 
                                model = hddm_model.model, 
                                is_nn = hddm_model.nn)
 
-    # Get all ground truths
-    # if model_ground_truth is not None:
-    #     gt_dict = {}
-    #     for c_tmp in data.keys():
-    #         for s_tmp in data[c_tmp].keys():
-    #             for trace_name_tmp in data[c_tmp][s_tmp]['trace_names']:
-    #                 if trace_name_tmp.split('_')[0].split('(')[0] in model_config['angle']['params']:
-    #                     tmp_param = trace_name_tmp.split('_')[0].split('(')[0]
-    #                     idx_tmp = model_config[model_ground_truth]['params'].index(tmp_param)
-
-    #                     # print(hddm.simulators.model_config['angle']['params'][idx_tmp])
-    #                     # print(out[c_tmp][s_tmp]['gt_parameter_vector'][idx_tmp])
-    #                     print('trace_name_tmp')
-    #                     print(trace_name_tmp)
-    #                     gt_dict[trace_name_tmp] = data[c_tmp][s_tmp]['gt_parameter_vector'][idx_tmp]
-    #                 else:
-    #                     print('problem')
-
-    # total_n_parameters = hddm_model.get_traces().shape[1]
-    # if total_n_parameters < 30:
-    #     n_plots = 1
-    # else: 
-    #     n_plots = len(model_config[model_fitted]['params'])
-
-    # for i in range(n_plots):
-    #     if n_plots > 1:
-    #         tmp_param = model_config[model_fitted]['params'][i]
-    #         trace_cnt_tmp  = 0
-    #         for trace_name in hddm_model.get_traces():
-    #             if ((tmp_param + '(') in trace_name) or ((trace_param + '_') in trace_name) or (trace_param == trace_name):
-    #                 trace_cnt_tmp += 1
-    #     else: 
-    
     if keep_key is None:
         trace_cnt_tmp = trace.shape[1]
     else:
@@ -1549,34 +1489,7 @@ def caterpillar_plot(hddm_model = None,
                             sharex = False, 
                             sharey = False)
 
-    # fig.suptitle('Caterpillar plot: ' + model_fitted.upper().replace('_', '-'), fontsize = 40)
     sns.despine(right = True)
-    
-    # trace = posterior_samples.copy()
-
-    # trace = untransform_traces(traces = hddm_model.get_traces(),
-    #                            model = hddm_model.model, 
-    #                            is_nn = hddm_model.nn)
-    
-    # In case ground truth parameters were supplied --> this is mostly of interest for parameter recovery studies etc.
-    # if ground_truth_parameters is not None:
-    #     cnt = 0
-    #     gt_dict = {}
-        
-    #     if datatype == 'single_subject':
-    #         if type(ground_truth_parameters) is not dict:
-    #             for v in model_config[model_fitted]['params']:
-    #                 gt_dict[v] = ground_truth_parameters[cnt]
-    #                 cnt += 1
-    #         else:
-    #             gt_dict = ground_truth_parameters
-
-    #     if datatype == 'hierarchical':
-    #         gt_dict = ground_truth_parameters
-
-    #     if datatype == 'condition':
-    #         gt_dict = ground_truth_parameters
-            
     ecdfs = {}
     plot_vals = {} # [0.01, 0.9], [0.01, 0.99], [mean]
     
@@ -1593,19 +1506,6 @@ def caterpillar_plot(hddm_model = None,
             pass
         
         else:
-            # Deal with _transformed parameters
-            # if '_trans' in k:
-            #     label_tmp = k.replace('_trans', '')
-            #     key_param_only = k.split('_')[0]
-            #     #print(key_param_only)
-            #     #print(k)
-            #     lower_lim = model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(key_param_only)]
-            #     upper_lim = model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(key_param_only)]
-            #     trace[label_tmp] = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- trace[k])))
-
-            #     #trace[label_tmp] = 1 / (1 + np.exp(- trace[k]))
-            #     k = label_tmp
-
             ok_ = 1
             k_old = k # keep original key around for indexing
             k = k.replace('_', '-') # assign new prettier key for plotting

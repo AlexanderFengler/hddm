@@ -50,7 +50,10 @@ def make_mlp_likelihood_complete(model,
         #new_func = partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
         #print('self shape: ')
         #print(self.shape)
-        sim_out = simulator(theta = theta, model = model, n_samples = self.shape[0], max_t = 20)
+        sim_out = simulator(theta = theta, 
+                            model = model, 
+                            n_samples = self.shape[0], 
+                            max_t = 20)
         return hddm_preprocess(sim_out, keep_negative_responses = True)
 
 
@@ -467,7 +470,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
             if tmp_str in self.parents['reg_outcomes']:
                 #print('param dict values')
                 #print(param_dict[tmp_str].values[:, 0])
-                param_data[:, cnt] = param_dict[tmp_str].values[:, 0]
+                param_data[:, cnt] = param_dict[tmp_str].values.iloc[self.value.index, 0]
             else:
                 param_data[:, cnt] = param_dict[tmp_str]
             cnt += 1
