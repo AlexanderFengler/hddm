@@ -1431,6 +1431,7 @@ def caterpillar_plot(hddm_model = None,
                      aspect_ratio = 2,
                      figure_scale = 1.0,
                      save = False,
+                     show = True,
                      tick_label_size_x = 22,
                      tick_label_size_y = 14):
 
@@ -1479,7 +1480,7 @@ def caterpillar_plot(hddm_model = None,
     if hddm_model is None:
         return ('No HDDM object supplied')
 
-    model_fitted = hddm_model.model
+    # model_fitted = hddm_model.model
     
     if save == True:
         pass
@@ -1501,9 +1502,9 @@ def caterpillar_plot(hddm_model = None,
     # data = filter_subject_condition_traces(hddm_model, 
     #                                        model_ground_truth = model_ground_truth)
 
-    clean_traces = untransform_traces(traces = hddm_model.get_traces(), 
-                                      model = hddm_model.model, 
-                                      is_nn = hddm_model.nn)
+    trace = untransform_traces(traces = hddm_model.get_traces(), 
+                               model = hddm_model.model, 
+                               is_nn = hddm_model.nn)
 
     # Get all ground truths
     # if model_ground_truth is not None:
@@ -1537,8 +1538,9 @@ def caterpillar_plot(hddm_model = None,
     #             if ((tmp_param + '(') in trace_name) or ((trace_param + '_') in trace_name) or (trace_param == trace_name):
     #                 trace_cnt_tmp += 1
     #     else: 
+    
     if keep_key is None:
-        trace_cnt_tmp = clean_traces.shape[1]
+        trace_cnt_tmp = traces.shape[1]
     else:
         trace_cnt_tmp = len(keep_key)
 
