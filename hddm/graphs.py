@@ -1423,223 +1423,229 @@ def posterior_pair_plot(hddm_model = None,
     return
     #return plt.show(block = False)
 
-# def caterpillar_plot(hddm_model = None, 
-#                      model_ground_truth = None,
-#                      drop_sd = True,
-#                      keep_key = None,
-#                      x_limits = [-2, 2],
-#                      aspect_ratio = 2,
-#                      figure_scale = 1.0,
-#                      save = False,
-#                      tick_label_size_x = 22,
-#                      tick_label_size_y = 14):
+def caterpillar_plot(hddm_model = None, 
+                     ground_truth_parameter_dict = None,
+                     drop_sd = True,
+                     keep_key = None,
+                     x_limits = [-2, 2],
+                     aspect_ratio = 2,
+                     figure_scale = 1.0,
+                     save = False,
+                     tick_label_size_x = 22,
+                     tick_label_size_y = 14):
 
-#     """An alternative posterior predictive plot. Works for all models listed in hddm (e.g. 'ddm', 'angle', 'weibull', 'levy', 'ornstein')
+    """An alternative posterior predictive plot. Works for all models listed in hddm (e.g. 'ddm', 'angle', 'weibull', 'levy', 'ornstein')
 
-#     Arguments:
-#         posterior_samples: panda.DataFrame <default=None>
-#             Holds the posterior samples. This will usually be the output of 
-#             hddm_model.get_traces().
-#         ground_truth_parameters: np.array <default=None>
-#             Array holding ground truth parameters. Depending on the structure supplied under the 
-#             datatype argument, this may be a 1d or 2d array.
-#         model_fitted: str <default='angle'>
-#             String that specifies which model the data was fitted to. This is necessary, for the plot to interpret the 
-#             supplied traces correctly, and to choose the correct simulator for visualization.
-#         datatype: str <default='single_subject'>
-#             Three options as of now. 'single_subject', 'hierarchical', 'condition'
-#         drop_sd: bool <default=True>
-#             Whether or not to drop group level standard deviations from the caterpillar plot.
-#             This is sometimes useful because scales can be off if included.
-#         keep_key: list <default=None>
-#             If you want to keep only a specific list of parameters in the caterpillar plot, supply those here as 
-#             a list. All other parameters for which you supply traces in the posterior samples are going to be ignored.
-#         x_limits: float <default=2>
-#             Sets the limit on the x-axis
-#         aspect_ratio: float <default=2>
-#             Aspect ratio of plot.
-#         figure_scale: float <default=1.0>
-#             Figure scaling. 1.0 refers to 10 inches as a baseline size.
-#         tick_label_size_x: int <default=22>
-#             Basic plot styling. Tick label size.
-#         tick_label_size_y: int <default=14>
-#             Basic plot styling. Tick label size.
-#         save: bool <default=False>
-#             Whether to save the plot
+    Arguments:
+        posterior_samples: panda.DataFrame <default=None>
+            Holds the posterior samples. This will usually be the output of 
+            hddm_model.get_traces().
+        ground_truth_parameters: np.array <default=None>
+            Array holding ground truth parameters. Depending on the structure supplied under the 
+            datatype argument, this may be a 1d or 2d array.
+        model_fitted: str <default='angle'>
+            String that specifies which model the data was fitted to. This is necessary, for the plot to interpret the 
+            supplied traces correctly, and to choose the correct simulator for visualization.
+        datatype: str <default='single_subject'>
+            Three options as of now. 'single_subject', 'hierarchical', 'condition'
+        drop_sd: bool <default=True>
+            Whether or not to drop group level standard deviations from the caterpillar plot.
+            This is sometimes useful because scales can be off if included.
+        keep_key: list <default=None>
+            If you want to keep only a specific list of parameters in the caterpillar plot, supply those here as 
+            a list. All other parameters for which you supply traces in the posterior samples are going to be ignored.
+        x_limits: float <default=2>
+            Sets the limit on the x-axis
+        aspect_ratio: float <default=2>
+            Aspect ratio of plot.
+        figure_scale: float <default=1.0>
+            Figure scaling. 1.0 refers to 10 inches as a baseline size.
+        tick_label_size_x: int <default=22>
+            Basic plot styling. Tick label size.
+        tick_label_size_y: int <default=14>
+            Basic plot styling. Tick label size.
+        save: bool <default=False>
+            Whether to save the plot
 
-#     Return: plot object
-#     """
+    Return: plot object
+    """
 
-#     # posterior_samples = [],
-#     # ground_truth_parameters = None,
-#     # model_fitted = 'angle',
-#     #datatype = 'hierarchical', # 'hierarchical', 'single_subject', 'condition'
+    # posterior_samples = [],
+    # ground_truth_parameters = None,
+    # model_fitted = 'angle',
+    #datatype = 'hierarchical', # 'hierarchical', 'single_subject', 'condition'
 
 
-#     if hddm_model is None:
-#         return ('No HDDM object supplied')
+    if hddm_model is None:
+        return ('No HDDM object supplied')
 
-#     model_fitted = hddm_model.model
+    model_fitted = hddm_model.model
     
-#     if save == True:
-#         pass
-#         #matplotlib.rcParams['text.usetex'] = True
-#         #matplotlib.rcParams['pdf.fonttype'] = 42
-#         #matplotlib.rcParams['svg.fonttype'] = 'none'
+    if save == True:
+        pass
+        #matplotlib.rcParams['text.usetex'] = True
+        #matplotlib.rcParams['pdf.fonttype'] = 42
+        #matplotlib.rcParams['svg.fonttype'] = 'none'
     
-#     sns.set(style = "white", 
-#             palette = "muted", 
-#             color_codes = True,
-#             font_scale = 2)
+    sns.set(style = "white", 
+            palette = "muted", 
+            color_codes = True,
+            font_scale = 2)
     
-#     # get parameter numbers 
-#     # if more than 30 --> split plot into multiple ones
-#     # if less --> be smart about plot scaling
+    # get parameter numbers 
+    # if more than 30 --> split plot into multiple ones
+    # if less --> be smart about plot scaling
 
 
-#     # 
-#     data = filter_subject_condition_traces(hddm_model, 
-#                                            model_ground_truth = model_ground_truth)
+    # 
+    # data = filter_subject_condition_traces(hddm_model, 
+    #                                        model_ground_truth = model_ground_truth)
 
+    clean_traces = untransform_traces(traces = hddm_model.get_traces(), 
+                                      model = hddm_model.model, 
+                                      is_nn = hddm_model.nn)
 
-#     # Get all ground truths
-#     if model_ground_truth is not None:
-#         gt_dict = {}
-#         for c_tmp in data.keys():
-#             for s_tmp in data[c_tmp].keys():
-#                 for trace_name_tmp in data[c_tmp][s_tmp]['trace_names']:
-#                     if trace_name_tmp.split('_')[0].split('(')[0] in model_config['angle']['params']:
-#                         tmp_param = trace_name_tmp.split('_')[0].split('(')[0]
-#                         idx_tmp = model_config[model_ground_truth]['params'].index(tmp_param)
+    # Get all ground truths
+    # if model_ground_truth is not None:
+    #     gt_dict = {}
+    #     for c_tmp in data.keys():
+    #         for s_tmp in data[c_tmp].keys():
+    #             for trace_name_tmp in data[c_tmp][s_tmp]['trace_names']:
+    #                 if trace_name_tmp.split('_')[0].split('(')[0] in model_config['angle']['params']:
+    #                     tmp_param = trace_name_tmp.split('_')[0].split('(')[0]
+    #                     idx_tmp = model_config[model_ground_truth]['params'].index(tmp_param)
 
-#                         # print(hddm.simulators.model_config['angle']['params'][idx_tmp])
-#                         # print(out[c_tmp][s_tmp]['gt_parameter_vector'][idx_tmp])
-#                         print('trace_name_tmp')
-#                         print(trace_name_tmp)
-#                         gt_dict[trace_name_tmp] = data[c_tmp][s_tmp]['gt_parameter_vector'][idx_tmp]
-#                     else:
-#                         print('problem')
+    #                     # print(hddm.simulators.model_config['angle']['params'][idx_tmp])
+    #                     # print(out[c_tmp][s_tmp]['gt_parameter_vector'][idx_tmp])
+    #                     print('trace_name_tmp')
+    #                     print(trace_name_tmp)
+    #                     gt_dict[trace_name_tmp] = data[c_tmp][s_tmp]['gt_parameter_vector'][idx_tmp]
+    #                 else:
+    #                     print('problem')
 
-#     total_n_parameters = hddm_model.get_traces().shape[1]
-#     if total_n_parameters < 30:
-#         n_plots = 1
-#     else: 
-#         n_plots = len(model_config[model_fitted]['params'])
+    # total_n_parameters = hddm_model.get_traces().shape[1]
+    # if total_n_parameters < 30:
+    #     n_plots = 1
+    # else: 
+    #     n_plots = len(model_config[model_fitted]['params'])
 
-#     for i in range(n_plots):
-#         if n_plots > 1:
-#             tmp_param = model_config[model_fitted]['params'][i]
-#             trace_cnt_tmp  = 0
-#             for trace_name in hddm_model.get_traces():
-#                 if ((tmp_param + '(') in trace_name) or ((trace_param + '_') in trace_name) or (trace_param == trace_name):
-#                     trace_cnt_tmp += 1
-#         else: 
-#             trace_cnt_tmp = hddm_model.get_traces().shape[1]
-        
-#         fig, ax = plt.subplots(1, 1, 
-#                                figsize = (10 * figure_scale, 0.0333 * trace_cnt_tmp * aspect_ratio * 10 * figure_scale), 
-#                                sharex = False, 
-#                                sharey = False)
+    # for i in range(n_plots):
+    #     if n_plots > 1:
+    #         tmp_param = model_config[model_fitted]['params'][i]
+    #         trace_cnt_tmp  = 0
+    #         for trace_name in hddm_model.get_traces():
+    #             if ((tmp_param + '(') in trace_name) or ((trace_param + '_') in trace_name) or (trace_param == trace_name):
+    #                 trace_cnt_tmp += 1
+    #     else: 
+    if keep_key is None:
+        trace_cnt_tmp = clean_traces.shape[1]
+    else:
+        trace_cnt_tmp = len(keep_key)
+
+    fig, ax = plt.subplots(1, 1, 
+                            figsize = (10 * figure_scale, 0.0333 * trace_cnt_tmp * aspect_ratio * 10 * figure_scale), 
+                            sharex = False, 
+                            sharey = False)
+
+    # fig.suptitle('Caterpillar plot: ' + model_fitted.upper().replace('_', '-'), fontsize = 40)
+    sns.despine(right = True)
     
-#         # fig.suptitle('Caterpillar plot: ' + model_fitted.upper().replace('_', '-'), fontsize = 40)
-#         sns.despine(right = True)
+    # trace = posterior_samples.copy()
+
+    # trace = untransform_traces(traces = hddm_model.get_traces(),
+    #                            model = hddm_model.model, 
+    #                            is_nn = hddm_model.nn)
+    
+    # In case ground truth parameters were supplied --> this is mostly of interest for parameter recovery studies etc.
+    # if ground_truth_parameters is not None:
+    #     cnt = 0
+    #     gt_dict = {}
         
-#         # trace = posterior_samples.copy()
+    #     if datatype == 'single_subject':
+    #         if type(ground_truth_parameters) is not dict:
+    #             for v in model_config[model_fitted]['params']:
+    #                 gt_dict[v] = ground_truth_parameters[cnt]
+    #                 cnt += 1
+    #         else:
+    #             gt_dict = ground_truth_parameters
 
-#         trace = untransform_traces(traces = hddm_model.get_traces(),
-#                                    model = hddm_model.model, 
-#                                    is_nn = hddm_model.nn)
+    #     if datatype == 'hierarchical':
+    #         gt_dict = ground_truth_parameters
+
+    #     if datatype == 'condition':
+    #         gt_dict = ground_truth_parameters
+            
+    ecdfs = {}
+    plot_vals = {} # [0.01, 0.9], [0.01, 0.99], [mean]
+    
+    for k in trace.keys():
+        print('print k')
+        print(k)
+        # If we want to keep only a specific parameter we skip all traces which don't include it in 
+        # their names !
+        if keep_key is not None and keep_key not in k: 
+            continue
+
+        # Deal with 
+        if 'std' in k and drop_sd:
+            pass
         
-#         # In case ground truth parameters were supplied --> this is mostly of interest for parameter recovery studies etc.
-#         # if ground_truth_parameters is not None:
-#         #     cnt = 0
-#         #     gt_dict = {}
+        else:
+            # Deal with _transformed parameters
+            # if '_trans' in k:
+            #     label_tmp = k.replace('_trans', '')
+            #     key_param_only = k.split('_')[0]
+            #     #print(key_param_only)
+            #     #print(k)
+            #     lower_lim = model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(key_param_only)]
+            #     upper_lim = model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(key_param_only)]
+            #     trace[label_tmp] = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- trace[k])))
+
+            #     #trace[label_tmp] = 1 / (1 + np.exp(- trace[k]))
+            #     k = label_tmp
+
+            ok_ = 1
+            k_old = k # keep original key around for indexing
+            k = k.replace('_', '-') # assign new prettier key for plotting
             
-#         #     if datatype == 'single_subject':
-#         #         if type(ground_truth_parameters) is not dict:
-#         #             for v in model_config[model_fitted]['params']:
-#         #                 gt_dict[v] = ground_truth_parameters[cnt]
-#         #                 cnt += 1
-#         #         else:
-#         #             gt_dict = ground_truth_parameters
-
-#         #     if datatype == 'hierarchical':
-#         #         gt_dict = ground_truth_parameters
-
-#         #     if datatype == 'condition':
-#         #         gt_dict = ground_truth_parameters
-                
-#         ecdfs = {}
-#         plot_vals = {} # [0.01, 0.9], [0.01, 0.99], [mean]
+            if drop_sd == True:
+                if 'sd' in k:
+                    ok_ = 0
+            if ok_:
+                ecdfs[k] = ECDF(trace[k_old])
+                tmp_sorted = sorted(trace[k_old])
+                _p01 =  tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.01) - 1]
+                _p99 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.99) - 1]
+                _p1 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.1) - 1]
+                _p9 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.9) - 1]
+                _pmean = trace[k_old].mean()
+                plot_vals[k] = [[_p01, _p99], [_p1, _p9], _pmean]
+    
+    x = [plot_vals[k][2] for k in plot_vals.keys()]
+    ax.scatter(x, plot_vals.keys(), c = 'black', marker = 's', alpha = 0)
+    
+    for k in plot_vals.keys():
+        k = k.replace('_', '-')
+        ax.plot(plot_vals[k][1], [k, k], c = 'grey', zorder = - 1, linewidth = 5)
+        ax.plot(plot_vals[k][0] , [k, k], c = 'black', zorder = - 1)
         
-#         for k in trace.keys():
-#             print('print k')
-#             print(k)
-#             # If we want to keep only a specific parameter we skip all traces which don't include it in 
-#             # their names !
-#             if keep_key is not None and keep_key not in k: 
-#                 continue
-
-#             # Deal with 
-#             if 'std' in k and drop_sd:
-#                 pass
-            
-#             else:
-#                 # Deal with _transformed parameters
-#                 # if '_trans' in k:
-#                 #     label_tmp = k.replace('_trans', '')
-#                 #     key_param_only = k.split('_')[0]
-#                 #     #print(key_param_only)
-#                 #     #print(k)
-#                 #     lower_lim = model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(key_param_only)]
-#                 #     upper_lim = model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(key_param_only)]
-#                 #     trace[label_tmp] = lower_lim + (upper_lim - lower_lim) * (1 / ( 1 + np.exp(- trace[k])))
-
-#                 #     #trace[label_tmp] = 1 / (1 + np.exp(- trace[k]))
-#                 #     k = label_tmp
-
-#                 ok_ = 1
-#                 k_old = k # keep original key around for indexing
-#                 k = k.replace('_', '-') # assign new prettier key for plotting
-                
-#                 if drop_sd == True:
-#                     if 'sd' in k:
-#                         ok_ = 0
-#                 if ok_:
-#                     ecdfs[k] = ECDF(trace[k_old])
-#                     tmp_sorted = sorted(trace[k_old])
-#                     _p01 =  tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.01) - 1]
-#                     _p99 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.99) - 1]
-#                     _p1 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.1) - 1]
-#                     _p9 = tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.9) - 1]
-#                     _pmean = trace[k_old].mean()
-#                     plot_vals[k] = [[_p01, _p99], [_p1, _p9], _pmean]
+        if ground_truth_parameter_dict is not None:
+            ax.scatter(ground_truth_parameter_dict[k.replace('-', '_')], k,  c = 'red', marker = "|")
         
-#         x = [plot_vals[k][2] for k in plot_vals.keys()]
-#         ax.scatter(x, plot_vals.keys(), c = 'black', marker = 's', alpha = 0)
+    ax.set_xlim(x_limits[0], x_limits[1])
+    ax.tick_params(axis = 'y', size = tick_label_size_y)
+    ax.tick_params(axis = 'x', size = tick_label_size_x)
         
-#         for k in plot_vals.keys():
-#             k = k.replace('_', '-')
-#             ax.plot(plot_vals[k][1], [k, k], c = 'grey', zorder = - 1, linewidth = 5)
-#             ax.plot(plot_vals[k][0] , [k, k], c = 'black', zorder = - 1)
-            
-#             if model_ground_truth is not None:
-#                 ax.scatter(gt_dict[k.replace('-', '_')], k,  c = 'red', marker = "|")
-            
-#         ax.set_xlim(x_limits[0], x_limits[1])
-#         ax.tick_params(axis = 'y', size = tick_label_size_y)
-#         ax.tick_params(axis = 'x', size = tick_label_size_x)
-            
-#         if save == True:
-#             plt.savefig('figures/' + 'caterpillar_plot_' + model + '_' + datatype + '.png',
-#                         format = 'png', 
-#                         transparent = True,
-#                         frameon = False)
+    if save == True:
+        plt.savefig('figures/' + 'caterpillar_plot_' + model + '_' + datatype + '.png',
+                    format = 'png', 
+                    transparent = True,
+                    frameon = False)
 
-#         if show:
-#             plt.show()
+    if show:
+        plt.show()
 
-#     return # plt.show()
+    return # plt.show()
 
 
 # STRUCTURE

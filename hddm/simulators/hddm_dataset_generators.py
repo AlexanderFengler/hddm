@@ -804,3 +804,416 @@ def simulator_hierarchical(n_subjects = 5,
     data_out = pd.concat(dataframes)
     
     return (data_out, gt, subject_parameters)
+    
+### NEW
+def simulator_h_c(n_subjects = 10,
+                   n_samples_by_subject = 100,
+                   model = 'ddm',
+                   conditions = {'c_one': ['high', 'low'], 'c_two': ['high', 'low'], 'c_three': ['high', 'medium', 'low']},
+                   depends_on = {'v': ['c_one', 'c_two']},
+                   regression_models = ['z ~ covariate_name'],
+                   regression_covariates = {'covariate_name': {'type': 'categorical', 'range': (0, 4)}}, # need this to make initial covariate matrix from which to use dmatrix (patsy)
+                   group_only_regressors = True,
+                   group_only = ['z'],
+                   fixed_at_default = ['t'],
+                   p_outlier = 0.0,
+                   outlier_max_t = 10):
+
+    def check_params(data = None, model = None):
+    
+        for key in data.keys():
+            if key in model_config[model]['params']:
+                if np.sum(data[key] < model_config[model]['param_bounds'][0][model_config[model]['params'].index(key)]) > 0:
+                    return 0
+                elif np.sum(data[key] > model_config[model]['param_bounds'][1][model_config[model]['params'].index(key)]) > 0:
+                    return 0
+        return 1
+
+    def make_covariate_df(regression_covariates, 
+                          n_samples_by_subject):
+
+        cov_df = pd.DataFrame(np.zeros((n_samples_by_subject, len(list(regression_covariates.keys())))), columns = [key for key in regression_covariates.keys()])
+        #print(cov_df)
+        for covariate in regression_covariates.keys():
+            tmp = regression_covariates[covariate]
+            if tmp['type'] == 'categorical':
+                #print(cov_df)
+                #print(covariate)
+                #print(np.random.choice(np.arange(tmp['range'][0], tmp['range'][1], 1), replace =  True, size = n_samples_by_subject))
+                cov_df[covariate] = np.random.choice(np.arange(tmp['range'][0], tmp['range'][1] + 1, 1), replace =  True, size = n_samples_by_subject) / (tmp['range'][1])
+            else:
+                cov_df[covariate] = np.random.uniform(low = tmp['range'][0], high = tmp['range'][1], size = n_samples_by_subject) / (tmp['range'][1])
+        
+        return cov_df
+    
+    def make_conditions_df(conditions = None):
+        arg_tuple = tuple([conditions[key] for key in conditions.keys()])
+        condition_rows = np.meshgrid(*arg_tuple)
+        return pd.DataFrame(np.column_stack([x_tmp.flatten() for x_tmp in condition_rows]), columns = [key for key in conditions.keys()])
+
+    def make_single_sub_cond_df(conditions_df, 
+                                depends_on, 
+                                regression_models, 
+                                regression_covariates, 
+                                group_only_regressors, 
+                                group_only, 
+                                fixed_at_default, 
+                                remainder,
+                                model, 
+                                full_parameter_dict,
+                                n_subjects,
+                                n_samples_by_subject):
+
+        # Construct subject data
+  
+        # Subject part -----------------------
+        full_data = []
+        # Condition --------------------------
+        for condition_id in range(conditions_df.shape[0]):
+            conditions_tmp = conditions_df.iloc[condition_id]
+            remainder_set = 0
+            regressor_set = 0
+            
+            for subj_idx in range(n_subjects):
+                # Parameter vector
+                subj_data = pd.DataFrame(index = np.arange(0, n_samples_by_subject, 1))
+                subj_data['subj_idx'] = str(subj_idx)
+
+                # Fixed part
+                if fixed_at_default is not None:
+                    for fixed_tmp in fixed_at_default:
+                        subj_data[fixed_tmp] = full_parameter_dict[fixed_tmp]
+
+                # Group only part
+                if group_only is not None:
+                    for group_only_tmp in group_only:
+                        if group_only_tmp in list(depends_on.keys()):
+                            pass
+                        else:
+                            subj_data[group_only_tmp] = full_parameter_dict[group_only_tmp]
+                    
+                # Remainder part
+                if remainder is not None:
+                    for remainder_tmp in remainder:
+                        if not remainder_set:
+                            tmp_mean = full_parameter_dict[remainder_tmp]
+                            tmp_std = full_parameter_dict[remainder_tmp + '_std']
+                            full_parameter_dict[remainder_tmp + '_subj.' + str(subj_idx)] = np.random.normal(loc = tmp_mean, scale = tmp_std)
+                            subj_data[remainder_tmp] = full_parameter_dict[remainder_tmp + '_subj.' + str(subj_idx)]
+                        if remainder_set:
+                            # print(full_parameter_dict)
+                            subj_data[remainder_tmp] = full_parameter_dict[remainder_tmp + '_subj.' + str(subj_idx)]
+
+                
+                # Depends on part
+                if depends_on is not None:
+                    for depends_tmp in depends_on.keys():
+                        # print('depends_tmp')
+                        # print(depends_tmp)
+                        conditions_df_tmp = conditions_df[depends_on[depends_tmp]].iloc[condition_id]
+                        condition_elem = '.'.join(conditions_df_tmp)
+                
+                        if depends_tmp not in group_only:
+                            tmp_mean = full_parameter_dict[depends_tmp + '(' + condition_elem + ')']
+                            tmp_std = full_parameter_dict[depends_tmp + '_std']
+
+                            full_parameter_dict[depends_tmp + '_subj(' + condition_elem + ').' + str(subj_idx)] = np.random.normal(loc = tmp_mean, scale = tmp_std)
+                            # print('depends_tmp NOT group only')
+                            # print(depends_tmp)
+
+                            subj_data[depends_tmp] = full_parameter_dict[depends_tmp + '_subj(' + condition_elem + ').' + str(subj_idx)]
+                        else:
+
+                            # print('depends_tmp group only')
+                            # print(depends_tmp)
+
+                            subj_data[depends_tmp] =  full_parameter_dict[depends_tmp + '(' + condition_elem + ')']
+
+                        for condition_key_tmp in conditions_df_tmp.keys():
+                            # print('condition_key_tmp')
+                            # print(condition_key_tmp)
+                            # print(conditions_df_tmp)   
+                            subj_data[condition_key_tmp] = conditions_df_tmp[condition_key_tmp] ##############################################################
+
+                # Regressor part
+                if regression_covariates is not None:
+                    cov_df = make_covariate_df(regression_covariates, n_samples_by_subject)
+                
+                    # Add cov_df to subject data
+                    for key_tmp in cov_df.keys():
+                        subj_data[key_tmp] = cov_df[key_tmp].copy()
+                
+                if regression_models is not None:
+                    for reg_model in regression_models:
+                        separator = regression_model.find('~')
+                        outcome = reg_model[:separator].strip(' ')
+                        reg_model_stripped = reg_model[(separator + 1):]
+                        design_matrix = dmatrix(reg_model_stripped, cov_df)
+                        #covariate_names = design_matrix.design_info.column_names
+                        
+                        # if group_only_regressors:
+                        #     #reg_params_tmp_dict = full_parameter_dict[outcome + '_reg']
+                        #     reg_params_tmp = []
+                        #     reg_param_names_tmp = []
+                            
+                        #     for reg_param_key in full_parameter_dict[outcome + '_reg'].keys():
+                        #         if 'Intercept' in reg_param_key:
+                        #             reg_params_tmp.append(np.random.normal(loc = full_parameter_dict[outcome + '_reg'][reg_param_key], 
+                        #                                                    scale = full_parameter_dict[outcome + '_reg_std'][reg_param_key]))
+                        #         else:
+                        #             reg_params_tmp.append(full_parameter_dict[outcome + '_reg'][reg_param_key])
+
+                        #     reg_params_tmp = np.array(reg_params_tmp)
+
+                        #     for key in full_parameter_dict[outcome + '_reg'].keys():
+                        #         full_parameter_dict[key] = full_parameter_dict[outcome + '_reg'][key]
+
+                            # subj_data[outcome] = (design_matrix * reg_params_tmp).sum(axis = 1)
+                        
+                        #else:
+                        reg_params_tmp = []
+                        reg_param_names_tmp = []
+                        
+                        for reg_param_key in full_parameter_dict[outcome + '_reg'].keys():
+                            if (group_only_regressors and 'Intercept' in reg_param_key) or (not group_only_regressors):
+                                reg_params_tmp.append(np.random.normal(loc = full_parameter_dict[outcome + '_reg'][reg_param_key], 
+                                                                       scale = full_parameter_dict[outcome + '_reg_std'][reg_param_key + '_std']))
+
+                                reg_param_names_tmp.append(reg_param_key + '_subj.' + str(subj_idx)) #########################################################
+                            else: 
+                                reg_params_tmp.append(full_parameter_dict[outcome + '_reg'][reg_param_key])
+                                reg_param_names_tmp.append(reg_param_key)
+
+                        reg_params_tmp = np.array(reg_params_tmp)
+
+                        for key in full_parameter_dict[outcome + '_reg'].keys():
+                            full_parameter_dict[key] = full_parameter_dict[outcome + '_reg'][key]
+                        for key in full_parameter_dict[outcome + '_reg_std'].keys():
+                            full_parameter_dict[key] = full_parameter_dict[outcome + '_reg_std'][key]
+                        
+                        if not regressor_set:
+                            for k in range(len(reg_param_names_tmp)):
+                                full_parameter_dict[reg_param_names_tmp[k]] = reg_params_tmp[k]
+
+                        # I think this is unnecessary !
+                        # else:
+                        #     reg_params_tmp = np.array([full_parameter_dict[reg_param_names_tmp[k]] for k in range(len(reg_param_names_tmp))])
+
+                        subj_data[outcome] = (design_matrix * reg_params_tmp).sum(axis = 1)
+                        
+                        # Append full data:
+                        full_data.append(subj_data.copy())
+                 
+            remainder_set = 1
+            regressor_set = 1
+
+        full_data = pd.concat(full_data)
+        parameters = full_data[model_config[model]['params']]
+
+        # Run the actual simulations
+        sim_data = hddm.simulators.simulator(theta = parameters.values,
+                                             model = model,
+                                             n_samples = 1,
+                                             delta_t = 0.001, 
+                                             max_t = 20,
+                                             no_noise = False,
+                                             bin_dim = None,
+                                             bin_pointwise = False)
+
+        # Post-processing
+        full_data['rt'] = sim_data[0].astype(np.float64)
+        full_data['response'] = sim_data[1].astype(np.float64)
+        full_data.loc[full_data['response'] < 0, ['response']] = 0.0
+
+        # Add in outliers
+        if p_outlier > 0:
+            outlier_idx = np.random.choice(list(data.index), replace = False, size = int(p_outlier * len(list(data.index))))
+            outlier_data = np.zeros((outlier_idx.shape[0], 2))
+            
+            # Outlier rts
+            outlier_data[:, 0] = np.random.uniform(low = 0.0, high = outlier_max_t, size = outlier_data.shape[0])
+
+            # Outlier choices
+            outlier_data[:, 1] = np.random.choice(sim_data[2]['possible_choices'], size = outlier_data.shape[0])
+
+            # Exchange data for outliers
+            full_data.iloc[outlier_idx, [list(full_data.keys()).index('rt'), list(full_data.keys()).index('response')]] = outlier_data
+        
+            # Identify outliers in dataframe
+            full_data['outlier']  = 0
+            full_data[outlier_idx, [list(full_data.keys()).index('outlier')]] = 1
+
+        # print([key for key in depends_on.keys()])
+        # print(['rt', 'response'] + ['subj_idx'] + [key for key in regression_covariates.keys()] + [key for key in conditions.keys()] + model_config[model]['params'])
+        # print(full_data)
+        
+        full_data = full_data[['rt', 'response'] + ['subj_idx'] + [key for key in regression_covariates.keys()] + [key for key in conditions.keys()] + model_config[model]['params']]
+        full_data.reset_index(drop = True, inplace = True)
+        
+        return full_data, full_parameter_dict
+
+    def make_group_level_params(conditions_df,
+                                group_only, 
+                                depends_on, 
+                                model, 
+                                fixed_at_default, 
+                                remainder, 
+                                group_only_regressors,
+                                regression_models, 
+                                regression_covariates):
+
+        full_parameter_dict = {}
+
+        # Fixed part
+        if fixed_at_default is not None:
+            for fixed_tmp in fixed_at_default:
+                full_parameter_dict[fixed_tmp] = np.random.uniform(low = model_config[model]['param_bounds'][0][model_config[model]['params'].index(fixed_tmp)],
+                                                                   high = model_config[model]['param_bounds'][1][model_config[model]['params'].index(fixed_tmp)])
+        # Group only part (excluding depends on)
+        if group_only is not None:
+            for group_only_tmp in group_only:
+                if group_only_tmp in list(depends_on.keys()):
+                    pass
+                else:
+                    full_parameter_dict[group_only_tmp] = np.random.uniform(low = model_config[model]['param_bounds'][0][model_config[model]['params'].index(group_only_tmp)],
+                                                                            high = model_config[model]['param_bounds'][1][model_config[model]['params'].index(group_only_tmp)])
+        # Remainder part
+        if remainder is not None:
+            for remainder_tmp in remainder:
+                full_parameter_dict[remainder_tmp] = np.random.uniform(low = model_config[model]['param_bounds'][0][model_config[model]['params'].index(remainder_tmp)],
+                                                                       high = model_config[model]['param_bounds'][1][model_config[model]['params'].index(remainder_tmp)])
+                full_parameter_dict[remainder_tmp + '_std'] = np.random.uniform(low = 0, 
+                                                                              high = (1 / 10) * (model_config[model]['param_bounds'][1][model_config[model]['params'].index(remainder_tmp)] - model_config[model]['param_bounds'][0][model_config[model]['params'].index(remainder_tmp)]))
+        
+        # Depends on part
+        if depends_on is not None:
+            for depends_tmp in depends_on.keys():
+                conditions_df_tmp = conditions_df[depends_on[depends_tmp]]
+
+                # Get unique elements:
+                unique_elems = []
+                for i in range(conditions_df_tmp.shape[0]):
+                    unique_elems.append('.'.join(conditions_df_tmp.iloc[i]))
+                unique_elems = np.unique(np.array(unique_elems))
+
+                for unique_elem in unique_elems:
+                    full_parameter_dict[depends_tmp + '(' + unique_elem + ')'] = np.random.uniform(low = model_config[model]['param_bounds'][0][model_config[model]['params'].index(depends_tmp)],
+                                                                                                   high = model_config[model]['param_bounds'][1][model_config[model]['params'].index(depends_tmp)])
+                
+                if depends_tmp not in group_only:
+                    bound_to_bound_tmp = (model_config[model]['param_bounds'][1][model_config[model]['params'].index(depends_tmp)] - model_config[model]['param_bounds'][0][model_config[model]['params'].index(depends_tmp)])
+                    full_parameter_dict[depends_tmp + '_std'] = np.random.uniform(low = 0, 
+                                                                                  high = (1 / 10) * bound_to_bound_tmp)
+            
+        # Regressor part
+        if regression_covariates is not None:
+            cov_df = make_covariate_df(regression_covariates, n_samples_by_subject)
+
+        if regression_models is not None:
+            for reg_model in regression_models:
+                separator = regression_model.find('~')
+                outcome = reg_model[:separator].strip(' ')
+                reg_model_stripped = reg_model[(separator + 1):]
+                covariate_names = dmatrix(reg_model_stripped, cov_df).design_info.column_names
+                #patsy.dmatrix(, cov_df)
+
+                reg_trace_dict = OrderedDict()
+                reg_std_trace_dict = OrderedDict()
+                
+                for covariate in covariate_names:
+                    if 'Intercept' in covariate:
+                        bound_to_bound_tmp = model_config[model]['param_bounds'][1][model_config[model]['params'].index(outcome)] - model_config[model]['param_bounds'][0][model_config[model]['params'].index(outcome)]
+                        
+                        # print('covariate')
+                        # print(covariate)
+                        reg_trace_dict[outcome + '_' + covariate] = np.random.uniform(low =  model_config[model]['param_bounds'][0][model_config[model]['params'].index(outcome)] + 0.3 *  bound_to_bound_tmp,
+                                                                                      high = model_config[model]['param_bounds'][0][model_config[model]['params'].index(outcome)] + 0.7 *  bound_to_bound_tmp)
+                        print(reg_trace_dict[outcome + '_' + covariate])
+
+                        # Intercept is always fit subject wise
+                        reg_std_trace_dict[outcome + '_' + covariate + '_' + 'std'] = np.random.uniform(low =  0,
+                                                                                                        high = bound_to_bound_tmp / 10)
+
+                    else:
+                        reg_trace_dict[outcome + '_' + covariate] = np.random.uniform(low = -.1,
+                                                                                      high = .1)
+                        if not group_only_regressors:
+                            reg_std_trace_dict[outcome + '_' + covariate + '_' + 'std'] = np.random.uniform(low =  0,
+                                                                                                            high = bound_to_bound_tmp / 10)
+                
+                full_parameter_dict[outcome + '_reg'] = reg_trace_dict.copy()
+                
+                #if not group_only_regressors:
+                full_parameter_dict[outcome + '_reg' + '_std'] = reg_std_trace_dict.copy()
+            # print(full_parameter_dict)
+        return full_parameter_dict
+
+#######################
+        
+    # Add subject parameters to full_parameter_dict
+    total_param_list = model_config[model]['params']
+    params_utilized = []
+
+    # Regression Part
+    #reg_df = make_covariate_df(regression_covariates, n_samples_by_subject)
+    for regression_model in regression_models:
+        separator = regression_model.find('~')
+        assert separator != -1, 'No outcome variable specified.'
+        params_utilized += regression_model[:separator].strip(' ')
+
+    # Group only Part
+    params_utilized += group_only
+    
+    # Fixed Part
+    params_utilized += fixed_at_default
+    
+    # Depends on Part
+    for depends_on_key in depends_on.keys():
+        params_utilized += [depends_on_key]
+
+    params_utilized = list(set(params_utilized))
+
+    # Rest of Params
+    #print(total_param_list)
+    #print(params_utilized)
+    remainder = set(total_param_list) - set(params_utilized)
+    #print(remainder)
+
+    # Make conditions df
+    conditions_df = make_conditions_df(conditions = conditions)
+    print(conditions_df)
+    
+    params_ok_all = 0
+
+    cnt = 0   
+    while params_ok_all == 0:
+        if cnt > 0:
+            print('new round of data simulation because parameter bounds where violated')
+
+        group_level_param_dict = make_group_level_params(conditions_df = conditions_df,
+                                                group_only = group_only,
+                                                depends_on = depends_on,
+                                                model = model,
+                                                fixed_at_default = fixed_at_default,
+                                                remainder = remainder,
+                                                group_only_regressors = group_only_regressors,
+                                                regression_models = regression_models,
+                                                regression_covariates = regression_covariates)
+
+        data, full_parameter_dict = make_single_sub_cond_df(conditions_df = conditions_df,
+                                                            group_only = group_only,
+                                                            depends_on = depends_on,
+                                                            model = model,
+                                                            fixed_at_default = fixed_at_default,
+                                                            remainder = remainder,
+                                                            regression_models = regression_models,
+                                                            regression_covariates = regression_covariates,
+                                                            group_only_regressors = group_only_regressors,
+                                                            full_parameter_dict = group_level_param_dict,
+                                                            n_samples_by_subject = n_samples_by_subject,
+                                                            n_subjects = n_subjects)
+                                                        
+        params_ok_all = check_params(data = data, model = model)
+        cnt += 1
+
+    return data, full_parameter_dict
