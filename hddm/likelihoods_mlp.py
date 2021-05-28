@@ -451,7 +451,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
         pymc.object: Returns a stochastic object as defined by PyMC2
     """
 
-        # Need to rewrite these random parts !
+    # Need to rewrite these random parts !
     def random(self):
         param_dict = deepcopy(self.parents.value)
         #print('param dict')
@@ -485,15 +485,18 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
         #     sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
 
-        sim_out = simulator(theta = param_data, # n_trials = size, 
-                            model = model, 
+        sim_out = simulator(theta = param_data, # n_trials = size,
+                            model = model,
                             n_samples = 1,
                             max_t = 20)
         # sim_out_copy = []
         # sim_out_copy.append(np.squeeze(sim_out[0], axis = 0))
         # sim_out_copy.append(np.squeeze(sim_out[1], axis = 0))
         # sim_out_copy.append(sim_out[2])
-        return hddm_preprocess(sim_out, keep_negative_responses = True)
+        return hddm_preprocess(sim_out, 
+                               keep_negative_responses = True, 
+                               add_model_parameters = False, 
+                               keep_subj_idx = False)
 
     if model == 'ddm':
         def wiener_multi_like_nn_ddm(value, v, a, z, t, 

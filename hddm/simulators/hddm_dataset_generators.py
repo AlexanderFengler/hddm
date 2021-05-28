@@ -14,7 +14,7 @@ from collections import OrderedDict
 from hddm.simulators.basic_simulator import *
 
 # Helper
-def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_responses = False, add_model_parameters = False):
+def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_responses = False, add_model_parameters = False, keep_subj_idx = True):
     #print(simulator_data)
     # Define dataframe if simulator output is normal (comes out as list tuple [rts, choices, metadata])
     if len(simulator_data) == 3:
@@ -34,7 +34,8 @@ def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_respo
     if not keep_negative_responses:
         df.loc[df['response'] == -1.0, 'response'] = 0.0
     
-    df['subj_idx'] = subj_id
+    if keep_subj_idx:
+        df['subj_idx'] = subj_id
 
     # Add ground truth parameters to dataframe
     if add_model_parameters:
