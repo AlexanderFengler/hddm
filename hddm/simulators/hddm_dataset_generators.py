@@ -14,7 +14,7 @@ from collections import OrderedDict
 from hddm.simulators.basic_simulator import *
 
 # Helper
-def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_responses = False):
+def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_responses = False, add_model_parameters = False):
     #print(simulator_data)
     # Define dataframe if simulator output is normal (comes out as list tuple [rts, choices, metadata])
     if len(simulator_data) == 3:
@@ -37,14 +37,15 @@ def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_respo
     df['subj_idx'] = subj_id
 
     # Add ground truth parameters to dataframe
-    for param in model_config[simulator_data[2]['model']]['params']:
-        #print(simulator_data[2][param])
-        #print(type(simulator_data[2][param]))
-        #print(simulator_data[2][param].shape)
-        if len(simulator_data[2][param]) > 1:
-            df[param] = simulator_data[2][param]
-        else:
-            df[param] = simulator_data[2][param][0]
+    if add_model_parameters:
+        for param in model_config[simulator_data[2]['model']]['params']:
+            #print(simulator_data[2][param])
+            #print(type(simulator_data[2][param]))
+            #print(simulator_data[2][param].shape)
+            if len(simulator_data[2][param]) > 1:
+                df[param] = simulator_data[2][param]
+            else:
+                df[param] = simulator_data[2][param][0]
     return df
 
 def str_to_num(string = '', n_digits = 3):
