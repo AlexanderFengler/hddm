@@ -457,11 +457,11 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
         #print('param dict')
         #print(param_dict)
         del param_dict['reg_outcomes']
-        sampled_rts = self.value.copy()
+        #sampled_rts = self.value.copy()
         #print('sampled rts')
         #print(sampled_rts)
 
-        size = sampled_rts.shape[0]
+        # size = sampled_rts.shape[0]
         n_params = model_config[model]['n_params']
         param_data = np.zeros((size, n_params), dtype = np.float32)
 
@@ -485,7 +485,10 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
         #     sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
 
-        sim_out = simulator(theta = param_data, n_trials = size, model = model, n_samples = 1, max_t = 20)
+        sim_out = simulator(theta = param_data, # n_trials = size, 
+                            model = model, 
+                            n_samples = 1,
+                            max_t = 20)
         # sim_out_copy = []
         # sim_out_copy.append(np.squeeze(sim_out[0], axis = 0))
         # sim_out_copy.append(np.squeeze(sim_out[1], axis = 0))
