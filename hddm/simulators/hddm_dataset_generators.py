@@ -7,6 +7,7 @@ import sys
 import pickle
 from statsmodels.distributions.empirical_distribution import ECDF
 from scipy.stats import truncnorm
+import patsy
 
 from hddm.simulators.basic_simulator import *
 
@@ -804,7 +805,7 @@ def simulator_hierarchical(n_subjects = 5,
     data_out = pd.concat(dataframes)
     
     return (data_out, gt, subject_parameters)
-    
+
 ### NEW
 def simulator_h_c(n_subjects = 10,
                    n_samples_by_subject = 100,
