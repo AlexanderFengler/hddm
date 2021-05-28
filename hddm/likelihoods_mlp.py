@@ -470,7 +470,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
             if tmp_str in self.parents['reg_outcomes']:
                 #print('param dict values')
                 #print(param_dict[tmp_str].values[:, 0])
-                param_data[:, cnt] = param_dict[tmp_str].values.iloc[self.value.index, 0]
+                param_data[:, cnt] = param_dict[tmp_str].iloc[self.value.index, 0]
             else:
                 param_data[:, cnt] = param_dict[tmp_str]
             cnt += 1
