@@ -1540,7 +1540,7 @@ def caterpillar_plot(hddm_model = None,
     #     else: 
     
     if keep_key is None:
-        trace_cnt_tmp = traces.shape[1]
+        trace_cnt_tmp = trace.shape[1]
     else:
         trace_cnt_tmp = len(keep_key)
 
