@@ -7,7 +7,7 @@ import sys
 import pickle
 from statsmodels.distributions.empirical_distribution import ECDF
 from scipy.stats import truncnorm
-import patsy
+from patsy imoport dmatrix
 
 from hddm.simulators.basic_simulator import *
 
