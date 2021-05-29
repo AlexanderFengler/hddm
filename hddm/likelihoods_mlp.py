@@ -452,14 +452,10 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
     """
 
     # Need to rewrite these random parts !
-    def random(self):
+    def random(self, keep_negative_responses = True, add_model_parameters = False, keep_subj_idx = False):
         param_dict = deepcopy(self.parents.value)
-        #print('param dict')
-        #print(param_dict)
         del param_dict['reg_outcomes']
-        #sampled_rts = self.value.copy()
-        #print('sampled rts')
-        #print(sampled_rts)
+
 
         # size = sampled_rts.shape[0]
         n_params = model_config[model]['n_params']
@@ -468,8 +464,6 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
         cnt = 0
         for tmp_str in model_config[model]['params']: #['v', 'a', 'z', 't']:
             if tmp_str in self.parents['reg_outcomes']:
-                #print('param dict values')
-                #print(param_dict[tmp_str].values[:, 0])
                 param_data[:, cnt] = param_dict[tmp_str].iloc[self.value.index, 0]
             else:
                 param_data[:, cnt] = param_dict[tmp_str]
@@ -494,9 +488,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
         # sim_out_copy.append(np.squeeze(sim_out[1], axis = 0))
         # sim_out_copy.append(sim_out[2])
         return hddm_preprocess(sim_out, 
-                               keep_negative_responses = True, 
-                               add_model_parameters = False, 
-                               keep_subj_idx = False)
+                               keep_negative_responses = keep_negative_responses, 
+                               add_model_parameters = add_model_parameters, 
+                               keep_subj_idx = keep_subj_idx)
 
     if model == 'ddm':
         def wiener_multi_like_nn_ddm(value, v, a, z, t, 
