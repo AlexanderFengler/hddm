@@ -494,10 +494,10 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
     if model == 'ddm':
         def wiener_multi_like_nn_ddm(value, v, a, z, t, 
-                                    reg_outcomes, 
-                                    p_outlier = 0, 
-                                    w_outlier = 0.1,
-                                    **kwargs):
+                                     reg_outcomes, 
+                                     p_outlier = 0, 
+                                     w_outlier = 0.1,
+                                     **kwargs):
 
             """Log-likelihood for the full DDM using the interpolation method"""
 
@@ -509,9 +509,12 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
             cnt = 0
             for tmp_str in ['v', 'a', 'z', 't']: # model_config[model]['params']:
-
                 if tmp_str in reg_outcomes:
                     data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                    if (data[:, cnt].min < model_config[model]['param_bounds'][0][cnt]) or (data[:, cnt].max > model_config[model]['param_bounds'][1][cnt]):
+                        print('param set killed because of boundary violation of regressor part')
+                        return - np.inf
+
                 else:
                     data[:, cnt] = params[tmp_str]
 
