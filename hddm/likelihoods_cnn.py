@@ -352,6 +352,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
                 if tmp_str in reg_outcomes:
                     data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                    if (data[:, cnt].min() < model_config[model]['param_bounds'][0][cnt]) or (data[:, cnt].max() > model_config[model]['param_bounds'][1][cnt]):
+                        print('boundary violation of regressor part')
+                        return - np.inf
                 else:
                     data[:, cnt] = params[tmp_str]
 
@@ -386,6 +389,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
                 if tmp_str in reg_outcomes:
                     data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                    if (data[:, cnt].min() < model_config[model]['param_bounds'][0][cnt]) or (data[:, cnt].max() > model_config[model]['param_bounds'][1][cnt]):
+                        print('boundary violation of regressor part')
+                        return - np.inf
                 else:
                     data[:, cnt] = params[tmp_str]
 
@@ -421,6 +427,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
                 if tmp_str in reg_outcomes:
                     data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                    if (data[:, cnt].min() < model_config[model]['param_bounds'][0][cnt]) or (data[:, cnt].max() > model_config[model]['param_bounds'][1][cnt]):
+                        print('boundary violation of regressor part')
+                        return - np.inf
                 else:
                     data[:, cnt] = params[tmp_str]
 
@@ -455,6 +464,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
             for tmp_str in ['v', 'a', 'z', 'alpha', 't']:
                 if tmp_str in reg_outcomes:
                     data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                    if (data[:, cnt].min() < model_config[model]['param_bounds'][0][cnt]) or (data[:, cnt].max() > model_config[model]['param_bounds'][1][cnt]):
+                        print('boundary violation of regressor part')
+                        return - np.inf
                 else:
                     data[:, cnt] = params[tmp_str]
 
@@ -488,6 +500,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
                 if tmp_str in reg_outcomes:
                     data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                    if (data[:, cnt].min() < model_config[model]['param_bounds'][0][cnt]) or (data[:, cnt].max() > model_config[model]['param_bounds'][1][cnt]):
+                        print('boundary violation of regressor part')
+                        return - np.inf
                 else:
                     data[:, cnt] = params[tmp_str]
 
@@ -521,6 +536,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
                 if tmp_str in reg_outcomes:
                     data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
+                    if (data[:, cnt].min() < model_config[model]['param_bounds'][0][cnt]) or (data[:, cnt].max() > model_config[model]['param_bounds'][1][cnt]):
+                        print('boundary violation of regressor part')
+                        return - np.inf
                 else:
                     data[:, cnt] = params[tmp_str]
 
