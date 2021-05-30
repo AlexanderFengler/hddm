@@ -574,7 +574,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
             return 'Not yet implemented'
 
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ddm, **kwargs))
-        stoch.pdf = None
+        stoch.pdf = pdf_ddm
         stoch.cdf = None
         stoch.random = random
 
