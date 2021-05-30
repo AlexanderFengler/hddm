@@ -479,7 +479,7 @@ def _convert_params(data = None):
 # Plot bound
 # Mean posterior predictives
 def model_plot(hddm_model = None,
-               model_ground_truth = 'weibull_cdf',
+               model_ground_truth = None,
                n_posterior_parameters = 500, # optional / styling
                n_simulations_per_parameter = 10, # optional / stiling
                cols = 3, # styling
@@ -508,28 +508,11 @@ def model_plot(hddm_model = None,
        and the parameterizations supplied as posterior samples from a hddm sampling run. 
 
     Arguments:
-        posterior_samples: panda.DataFrame <default=None>
-            Holds the posterior samples. This will usually be the output of 
-            hddm_model.get_traces().
-        ground_truth_parameters: np.array <default=None>
-            Array holding ground truth parameters. Depending on the structure supplied under the 
-            datatype argument, this may be a 1d or 2d array.
-        ground_truth_data: panda.DataFrame
-            Ground truth dataset as supplied to hddm. Has a 'rt' column, a 'response' column and a 'subj_idx' column
-            and potentially a 'condition' column.
-        model_ground_truth: str <default='weibull_cdf'>
-            String that speficies which model was the ground truth. This is useful mainly for parameter recovery excercises,
-            one obviously doesn't usually have access to the ground truth.
-        model_fitted: str <default='angle'>
-            String that specifies which model the data was fitted to. This is necessary, for the plot to interpret the 
-            supplied traces correctly, and to choose the correct simulator for visualization.
-        datatype: str <default='single_subject'>
-            Three options as of now. 'single_subject', 'hierarchical', 'condition'
-        condition_column: str <default='condition'>
-            The column that specifies the condition in the data supplied under the ground_truth_data argument.
-        n_plots: int <default=4>
-            The plot attempts to be smart in trying to figure out how many plots are desired, however choosing it manual is a 
-            save option.
+        hddm_model: hddm model object <default=None>
+            If you supply a ground truth model, the data you supplied to the hddm model should include trial by trial parameters.
+        model_ground_truth: str <default=None>
+            Specify the ground truth model (mostly useful for parameter recovery studies). If you specify a ground truth model, make sure that the dataset
+            you supplied to your hddm model included trial by trial parameters.
         n_posterior_parameters: int <default=500>
             Number of posterior samples to draw for plotting. This needs to be smaller or equal to the number 
             of posterior samples supplied to the plot.
@@ -570,9 +553,6 @@ def model_plot(hddm_model = None,
             Salces the y axes o the graph
         delta_t_graph: float <default=0.01>
             Timesteps to use for the simulation runs performed for plotting.
-        input_is_hddm_trace: bin <default=True>>
-            Whether or not the posterior samples supplied are coming from hddm traces. 
-            NOTE, this does not accept False as of now.
     Return: plot object
     """
 
@@ -935,15 +915,6 @@ def model_plot(hddm_model = None,
     return plt.show()
 
 def posterior_predictive_plot(hddm_model = None,
-                              # posterior_samples = None,
-                              # ground_truth_parameters = None,
-                              # ground_truth_data = None,
-                              # n_plots = 9,
-                              #model_fitted = 'angle',
-                              # datatype = 'single_subject',
-                              #condition_column = 'condition',
-                              #input_from_hddmnn = False,
-                              #input_is_hddm_trace = True,
                               model_ground_truth = 'angle',
                               cols = 3,
                               n_posterior_parameters = 100,
@@ -961,25 +932,11 @@ def posterior_predictive_plot(hddm_model = None,
     """An alternative posterior predictive plot. Works for all models listed in hddm (e.g. 'ddm', 'angle', 'weibull', 'levy', 'ornstein')
 
     Arguments:
-        posterior_samples: panda.DataFrame <default=None>
-            Holds the posterior samples. This will usually be the output of 
-            hddm_model.get_traces().
-        ground_truth_parameters: np.array <default=None>
-            Array holding ground truth parameters. Depending on the structure supplied under the 
-            datatype argument, this may be a 1d or 2d array.
-        ground_truth_data: panda.DataFrame
-            Ground truth dataset as supplied to hddm. Has a 'rt' column, a 'response' column and a 'subj_idx' column
-            and potentially a 'condition' column.
-        model_ground_truth: str <default='weibull_cdf'>
-            String that speficies which model was the ground truth. This is useful mainly for parameter recovery excercises,
-            one obviously doesn't usually have access to the ground truth.
-        model_fitted: str <default='angle'>
-            String that specifies which model the data was fitted to. This is necessary, for the plot to interpret the 
-            supplied traces correctly, and to choose the correct simulator for visualization.
-        datatype: str <default='single_subject'>
-            Three options as of now. 'single_subject', 'hierarchical', 'condition'
-        condition_column: str <default='condition'>
-            The column that specifies the condition in the data supplied under the ground_truth_data argument.
+         hddm_model: hddm model object <default=None>
+            If you supply a ground truth model, the data you supplied to the hddm model should include trial by trial parameters.
+        model_ground_truth: str <default=None>
+            Specify the ground truth model (mostly useful for parameter recovery studies). If you specify a ground truth model, make sure that the dataset
+            you supplied to your hddm model included trial by trial parameters.
         n_plots: int <default=4>
             The plot attempts to be smart in trying to figure out how many plots are desired, however choosing it manual is a 
             save option.
@@ -1007,11 +964,6 @@ def posterior_predictive_plot(hddm_model = None,
             Salces the y axes o the graph
         delta_t_graph: float <default=0.01>
             Timesteps to use for the simulation runs performed for plotting.
-        input_is_hddm_trace: bin <default=True>>
-            Whether or not the posterior samples supplied are coming from hddm traces. 
-            NOTE, this does not accept False as of now.
-        input_from_hddmnn: bin <default=False>
-            Whether or not the input came from a HDDMnn fit or HDDM fit. This is used to convert parameters internally.
     Return: plot object
     """
     # Just to aid clarity of the code --> set model fitted
@@ -1219,14 +1171,11 @@ def posterior_predictive_plot(hddm_model = None,
 
 # Posterior Pair Plot
 def posterior_pair_plot(hddm_model = None, 
-                        # posterior_samples = None, # Here expects single subject's posterior samples as panda dataframe (dictionary may work)
                         axes_limits = 'samples', # 'samples' or dict({'parameter_name': [lower bound, upper bound]})
                         height = 10,
                         aspect_ratio = 1,
                         n_subsample = 1000,
                         kde_levels = 50,
-                        # ground_truth_parameters = None,
-                        # model_fitted = None,
                         model_ground_truth = None,
                         save = False,
                         save_path = None,
@@ -1237,9 +1186,8 @@ def posterior_pair_plot(hddm_model = None,
        Works for all models listed in hddm (e.g. 'ddm', 'angle', 'weibull', 'levy', 'ornstein')
 
     Arguments:
-        posterior_samples: pandas.DataFrame <default=None>
-            Supplies the posterior samples as a pandas DataFrame with columns determining the parameters for which rows 
-            store traces.
+        hddm_model: hddm model object <default=None>
+            If you supply a ground truth model, the data you supplied to the hddm model should include trial by trial parameters.
         axes_limits: str or dict <default='samples'>
             Either a string that says 'samples', which makes axes limits depends on the posterior sample values directly,
             (separately for each parameter). Or a dictionary with keys parameter names, and values a 2-list with a lower
@@ -1428,17 +1376,11 @@ def caterpillar_plot(hddm_model = None,
     """An alternative posterior predictive plot. Works for all models listed in hddm (e.g. 'ddm', 'angle', 'weibull', 'levy', 'ornstein')
 
     Arguments:
-        posterior_samples: panda.DataFrame <default=None>
-            Holds the posterior samples. This will usually be the output of 
-            hddm_model.get_traces().
-        ground_truth_parameters: np.array <default=None>
-            Array holding ground truth parameters. Depending on the structure supplied under the 
-            datatype argument, this may be a 1d or 2d array.
-        model_fitted: str <default='angle'>
-            String that specifies which model the data was fitted to. This is necessary, for the plot to interpret the 
-            supplied traces correctly, and to choose the correct simulator for visualization.
-        datatype: str <default='single_subject'>
-            Three options as of now. 'single_subject', 'hierarchical', 'condition'
+        hddm_model: hddm model object <default=None>
+            If you supply a ground truth model, the data you supplied to the hddm model should include trial by trial parameters.
+        model_ground_truth: str <default=None>
+            Specify the ground truth model (mostly useful for parameter recovery studies). If you specify a ground truth model, make sure that the dataset
+            you supplied to your hddm model included trial by trial parameters.
         drop_sd: bool <default=True>
             Whether or not to drop group level standard deviations from the caterpillar plot.
             This is sometimes useful because scales can be off if included.

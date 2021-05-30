@@ -822,7 +822,42 @@ def simulator_h_c(n_subjects = 10,
                    group_only = ['z'],
                    fixed_at_default = ['t'],
                    p_outlier = 0.0,
-                   outlier_max_t = 10):
+                   outlier_max_t = 10.0):
+
+    """Flexible simulator that allows specification of models very similar to the hddm model classes.
+
+    :Arguments:
+        n_subjects: int <default=5>
+            Number of subjects in the datasets
+        n_samples_by_subject: int <default=500>
+            Number of trials for each subject
+        conditions: dict <default={'c_one': ['high', 'low'], 'c_two': ['high', 'low'], 'c_three': ['high', 'medium', 'low']}>
+            Keys represent condition relevant columns, and values are lists of unique items for each condition relevant column.
+        depends_on: dict <default={'v': ['c_one', 'c_two']}>
+            Keys specify model parameters that depend on the values --> lists of condition relevant columns.
+        regression_models: list or strings <default = ['z ~ covariate_name']>
+            Specify regression model formulas for one or more dependent parameters in a list.
+        regression_covariates: dict <default={'covariate_name': {'type': 'categorical', 'range': (0, 4)}}>
+            Dictionary in dictionary. Specify the name of the covariate column as keys, and for each key supply the 'type' (categorical, continuous) and 
+            'range' ((lower bound, upper bound)) of the covariate.
+        group_only_regressors: bin <default=True>
+            Should regressors only be specified at the group level? If true then only intercepts are specified subject wise. 
+            Other covariates act globally.
+        group_only: list <default = ['z']>
+            List of parameters that are specified only at the group level.
+        fixed_at_default: list <default=['t']>
+            List of parameters for which defaults are to be used. These defaults are specified in the model_config dictionary, which you can access via: hddm.simulators.model_config.
+        p_outlier: float <default = 0.0>
+            Specifies the proportion of outliers in the data.
+        outlier_max_t: float <default = 10.0>
+            Outliers are generated from np.random.uniform(low = 0, high = outlier_max_t) with random choices.
+
+    Returns: 
+        (pandas.DataFrame, dict): The Dataframe holds the generated dataset, ready for constuction of an hddm model. The dictionary holds the groundtruth parameter (values) and parameter names (keys). Keys match 
+                                  the names of traces when fitting the equivalent hddm model. The parameter dictionary is useful for some graphs, otherwise not neccessary.
+    """
+
+    
 
     def check_params(data = None, model = None):
     
@@ -1196,14 +1231,14 @@ def simulator_h_c(n_subjects = 10,
             print('new round of data simulation because parameter bounds where violated')
 
         group_level_param_dict = make_group_level_params(conditions_df = conditions_df,
-                                                group_only = group_only,
-                                                depends_on = depends_on,
-                                                model = model,
-                                                fixed_at_default = fixed_at_default,
-                                                remainder = remainder,
-                                                group_only_regressors = group_only_regressors,
-                                                regression_models = regression_models,
-                                                regression_covariates = regression_covariates)
+                                                         group_only = group_only,
+                                                         depends_on = depends_on,
+                                                         model = model,
+                                                         fixed_at_default = fixed_at_default,
+                                                         remainder = remainder,
+                                                         group_only_regressors = group_only_regressors,
+                                                         regression_models = regression_models,
+                                                         regression_covariates = regression_covariates)
 
         data, full_parameter_dict = make_single_sub_cond_df(conditions_df = conditions_df,
                                                             group_only = group_only,

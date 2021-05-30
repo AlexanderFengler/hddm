@@ -77,7 +77,6 @@ def make_mlp_likelihood_complete(model,
                                                 w_outlier = w_outlier,
                                                 **kwargs)
 
-
         def pdf_ddm(self, x):
             #print('type of x')
             #print(type(x))
@@ -526,7 +525,57 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                                                       w_outlier = w_outlier,
                                                       **kwargs)
 
+        # ADD IN THE PDF PART HERE !
+        # def pdf_ddm(self, x):
+        #     #print('type of x')
+        #     #print(type(x))
+        #     #print(x)
+        #     #print(self.parents)
+        #     #print(**self.parents)
+        #     #print(self.parents['a'])
+        #     #print(dir(self.parents['a']))
+        #     #print(self.parents['a'].value)
+        #     #print(kwargs)
+        #     #print(self.parents['a'].value)
+        #     # Note as per kabuki it seems that x tends to come in as a 'value_range', which is essetially a 1d ndarray
+        #     # We could change this ...
+
+        #     rt = np.array(x, dtype = np.float32)
+        #     response = rt / np.abs(rt)
+        #     rt = np.abs(rt)
+            
+        #     #print(rt)
+        #     #print(response)
+        #     #print(response.shape)
+        #     #print(rt.shape)
+        #     # response = 
+        #     #pdf_fun = hddm.wfpt.wiener_like_nn_ddm_pdf
+        #     # model_config[] # TODO FILL THIS IN SO THAT WE CREATE THE APPROPRIATE ARRAY AS INPUT TO THE SIMULATOR
+        #     out = hddm.wfpt.wiener_like_nn_ddm_pdf(x = rt, response = response, network = kwargs['network'], **self.parents)# **kwargs) # This may still be buggy !
+        #     return out
+
+        def pdf_ddm(self, x):
+            print(self.parents)
+            print(x.shape)
+            return 'Tried to print pdf'
+
+            # rt = np.array(x, dtype = np.float32)
+            # response = rt / np.abs(rt)
+            # rt = np.abs(rt)
+
+            # params = self.params
+            # n_params = 4
+            # size = 
+
+
+
+        def cdf_ddm(self, x):
+            # TODO: Implement the CDF method for neural networks
+            return 'Not yet implemented'
+
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ddm, **kwargs))
+        stoch.pdf = None
+        stoch.cdf = None
         stoch.random = random
 
     if model == 'full_ddm' or model == 'full_ddm2':

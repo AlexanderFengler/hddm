@@ -724,6 +724,22 @@ def wiener_like_multi_nn_ddm(np.ndarray[float, ndim = 2] data,
     #log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
     return log_p 
 
+def wiener_like_multi_nn_ddm_pdf(np.ndarray[float, ndim = 2] data,
+                                 double p_outlier = 0, 
+                                 double w_outlier = 0,
+                                 **kwargs):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    # Call to network:
+    if p_outlier == 0: # previous ddm_model
+        log_p = np.squeeze(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min))
+    else:
+        log_p = np.squeeze(np.log(np.exp(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
+    #log_p = np.sum(np.core.umath.maximum(ddm_model.predict_on_batch(data), ll_min))
+    return log_p
+
 def wiener_like_multi_nn_angle(np.ndarray[float, ndim = 2] data,
                                double p_outlier = 0, 
                                double w_outlier = 0,
@@ -740,6 +756,24 @@ def wiener_like_multi_nn_angle(np.ndarray[float, ndim = 2] data,
 
     #log_p = np.sum(np.core.umath.maximum(angle_model.predict_on_batch(data), ll_min))
     return log_p 
+
+def wiener_like_multi_nn_angle_pdf(np.ndarray[float, ndim = 2] data,
+                                   double p_outlier = 0, 
+                                   double w_outlier = 0,
+                                   **kwargs):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    # Call to network:
+    if p_outlier == 0:
+        log_p = np.squeeze(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min))
+    else:
+        log_p = np.squeeze(np.log(np.exp(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
+
+    #log_p = np.sum(np.core.umath.maximum(angle_model.predict_on_batch(data), ll_min))
+    return log_p 
+
 
 def wiener_like_multi_nn_weibull(np.ndarray[float, ndim = 2] data,
                                  double p_outlier = 0, 
@@ -758,6 +792,23 @@ def wiener_like_multi_nn_weibull(np.ndarray[float, ndim = 2] data,
     #log_p = np.sum(np.core.umath.maximum(new_weibull_model.predict_on_batch(data), ll_min))
     return log_p 
 
+def wiener_like_multi_nn_weibull_pdf(np.ndarray[float, ndim = 2] data,
+                                     double p_outlier = 0, 
+                                     double w_outlier = 0,
+                                     **kwargs):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+    # NOTE THERE IS SOME QUESTIONMARK HERE REGARDING THE RIGHT CHOICE OF MODEL weibull_model / weibull_model_new ???!!!!
+    # Call to network:
+    if p_outlier == 0:
+        log_p = np.squeeze(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min))
+    else:
+        log_p = np.squeeze(np.log(np.exp(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
+
+    #log_p = np.sum(np.core.umath.maximum(new_weibull_model.predict_on_batch(data), ll_min))
+    return log_p 
+
 def wiener_like_multi_nn_levy(np.ndarray[float, ndim = 2] data,
                               double p_outlier = 0, 
                               double w_outlier = 0,
@@ -766,16 +817,38 @@ def wiener_like_multi_nn_levy(np.ndarray[float, ndim = 2] data,
     cdef float ll_min = -16.11809
     cdef float log_p
 
-    if (np.min(data[:, 3]) < 1.0):
-        return - np.inf
-    if (np.max(data[:, 3] > 2.0)):
-        return - np.inf
+    #if (np.min(data[:, 3]) < 1.0):
+    #    return - np.inf
+    #if (np.max(data[:, 3] > 2.0)):
+    #    return - np.inf
 
     # Call to network:
     if p_outlier == 0:
         log_p = np.sum(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min))
     else:
         log_p = np.sum(np.log(np.exp(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
+
+    return log_p 
+
+
+def wiener_like_multi_nn_levy_pdf(np.ndarray[float, ndim = 2] data,
+                                  double p_outlier = 0, 
+                                  double w_outlier = 0,
+                                  **kwargs):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    #if (np.min(data[:, 3]) < 1.0):
+    #    return - np.inf
+    #if (np.max(data[:, 3] > 2.0)):
+    #    return - np.inf
+
+    # Call to network:
+    if p_outlier == 0:
+        log_p = np.squeeze(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min))
+    else:
+        log_p = np.squeeze(np.log(np.exp(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
 
     return log_p 
 
@@ -796,6 +869,23 @@ def wiener_like_multi_nn_ornstein(np.ndarray[float, ndim = 2] data,
     # log_p = np.sum(np.core.umath.maximum(ornstein_model.predict_on_batch(data), ll_min))
     return log_p 
 
+def wiener_like_multi_nn_ornstein_pdf(np.ndarray[float, ndim = 2] data,
+                                      double p_outlier = 0, 
+                                      double w_outlier = 0,
+                                      **kwargs):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    # Call to network:
+    if p_outlier == 0:
+        log_p = np.squeeze(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min))
+    else:
+        log_p = np.squeeze(np.log(np.exp(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
+
+    # log_p = np.sum(np.core.umath.maximum(ornstein_model.predict_on_batch(data), ll_min))
+    return log_p 
+
 def wiener_like_multi_nn_full_ddm(np.ndarray[float, ndim = 2] data,
                                   double p_outlier = 0, 
                                   double w_outlier = 0,
@@ -808,6 +898,21 @@ def wiener_like_multi_nn_full_ddm(np.ndarray[float, ndim = 2] data,
         log_p = np.sum(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min))
     else:
         log_p = np.sum(np.log(np.exp(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
+
+    return log_p 
+
+def wiener_like_multi_nn_full_ddm_pdf(np.ndarray[float, ndim = 2] data,
+                                      double p_outlier = 0, 
+                                      double w_outlier = 0,
+                                      **kwargs):
+    
+    cdef float ll_min = -16.11809
+    cdef float log_p
+
+    if p_outlier == 0:
+        log_p = np.squeeze(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min))
+    else:
+        log_p = np.squeeze(np.log(np.exp(np.core.umath.maximum(kwargs['network'].predict_on_batch(data), ll_min)) * (1.0 - p_outlier) + (w_outlier * p_outlier)))
 
     return log_p 
 
