@@ -32,16 +32,18 @@ def generate_wfpt_reg_stochastic_class(wiener_params = None,
         # 
         for reg_outcome in reg_outcomes:
             params[reg_outcome] = params[reg_outcome].loc[value['rt'].index].values
-            print(reg_outcome)
-            print(params[reg_outcome].dtype)
+            #print(reg_outcome)
+            #print(params[reg_outcome].dtype)
 
         for key in params.keys():
             if type(params[key]) == np.ndarray:
-                print(key)
-                print(params[key].dtype)
+                #print(key)
+                #print(params[key].dtype)
+                pass
             else:
-                print(key)
-                print(type(params[key]))
+                pass
+                #print(key)
+                #print(type(params[key]))
             #print(params[key].dtype)
         
         return hddm.wfpt.wiener_like_multi(value['rt'].values,

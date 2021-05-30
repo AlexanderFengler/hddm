@@ -513,10 +513,8 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                     if (data[:, cnt].min() < model_config[model]['param_bounds'][0][cnt]) or (data[:, cnt].max() > model_config[model]['param_bounds'][1][cnt]):
                         print('boundary violation of regressor part')
                         return - np.inf
-
                 else:
                     data[:, cnt] = params[tmp_str]
-
                 cnt += 1
 
             # THIS IS NOT YET FINISHED !
@@ -566,8 +564,6 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
             # params = self.params
             # n_params = 4
             # size = 
-
-
 
         def cdf_ddm(self, x):
             # TODO: Implement the CDF method for neural networks
