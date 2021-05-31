@@ -90,6 +90,7 @@ def generate_wfpt_stochastic_class(wiener_params=None, sampling_method='cdf', cd
         return out 
 
     #create pdf function
+    # AF-comment: w_outlier is not taken into account for the pdf !
     def pdf(self, x):
         print(x)
         print(self.parents)

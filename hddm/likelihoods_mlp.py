@@ -524,38 +524,25 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                                                       **kwargs)
 
         # ADD IN THE PDF PART HERE !
+        # AF-COMMENT: This is left out for now because it is unclear what the pdf should accept as input 
+        # as well as produce as output. 
+        # 
+
         # def pdf_ddm(self, x):
-        #     #print('type of x')
-        #     #print(type(x))
-        #     #print(x)
-        #     #print(self.parents)
-        #     #print(**self.parents)
-        #     #print(self.parents['a'])
-        #     #print(dir(self.parents['a']))
-        #     #print(self.parents['a'].value)
-        #     #print(kwargs)
-        #     #print(self.parents['a'].value)
-        #     # Note as per kabuki it seems that x tends to come in as a 'value_range', which is essetially a 1d ndarray
-        #     # We could change this ...
+        #     print(self.parents)
+        #     print(x.shape)
+        #     #return 'Tried to print pdf'
+        #     params = self.parents
+        #     n_params = 4
+        #     size = int(x.shape[0])
+        #     if size != self.shape[0]:
+        #         return 'Error: The supplied data does not match '
+        #     data = np.zeros((size, 6), dtype = np.float32)
+        #     data[: n_params:] = np.stack([ np.absolute(x['rt']).astype(np.float32), x['response'].astype(np.float32) ], axis = 1)
 
-        #     rt = np.array(x, dtype = np.float32)
-        #     response = rt / np.abs(rt)
-        #     rt = np.abs(rt)
-            
-        #     #print(rt)
-        #     #print(response)
-        #     #print(response.shape)
-        #     #print(rt.shape)
-        #     # response = 
-        #     #pdf_fun = hddm.wfpt.wiener_like_nn_ddm_pdf
-        #     # model_config[] # TODO FILL THIS IN SO THAT WE CREATE THE APPROPRIATE ARRAY AS INPUT TO THE SIMULATOR
-        #     out = hddm.wfpt.wiener_like_nn_ddm_pdf(x = rt, response = response, network = kwargs['network'], **self.parents)# **kwargs) # This may still be buggy !
-        #     return out
-
-        def pdf_ddm(self, x):
-            print(self.parents)
-            print(x.shape)
-            return 'Tried to print pdf'
+        #     cnt = 0
+        #     for tmp_str in ['v', 'a', 'z', 't']:
+        #         data[:, cnt] = params[tmp_str].loc[value['rt']]
 
             # rt = np.array(x, dtype = np.float32)
             # response = rt / np.abs(rt)
@@ -564,6 +551,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
             # params = self.params
             # n_params = 4
             # size = 
+        
+        def pdf_ddm(self, x):
+            return 'Not yet implemented'
 
         def cdf_ddm(self, x):
             # TODO: Implement the CDF method for neural networks
@@ -571,7 +561,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
         stoch = stochastic_from_dist('wfpt_reg', partial(wiener_multi_like_nn_ddm, **kwargs))
         stoch.pdf = pdf_ddm
-        stoch.cdf = None
+        stoch.cdf = cdf_ddm
         stoch.random = random
 
     if model == 'full_ddm' or model == 'full_ddm2':
