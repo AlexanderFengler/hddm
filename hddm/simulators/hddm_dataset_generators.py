@@ -1210,7 +1210,7 @@ def simulator_h_c(n_subjects = 10,
 
         if regression_models is not None:
             for reg_model in regression_models:
-                separator = regression_model.find('~')
+                separator = reg_model.find('~')
                 outcome = reg_model[:separator].strip(' ')
                 reg_model_stripped = reg_model[(separator + 1):]
                 covariate_names = dmatrix(reg_model_stripped, cov_df).design_info.column_names
