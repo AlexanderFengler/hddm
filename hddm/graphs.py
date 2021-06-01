@@ -845,7 +845,7 @@ def model_plot(hddm_model = None,
 
                     elif j == n_posterior_parameters and model_ground_truth == None:
                         break
-                    elif j < n_posterior_parameters < (n_posterior_parameters - 1):
+                    elif j < (n_posterior_parameters - 1):
                         tmp_model = model_fitted
                         tmp_samples = sub_data[i]['traces'][idx[j], :] # posterior_samples[i, idx[j], :]
                         tmp_alpha = 0.05
