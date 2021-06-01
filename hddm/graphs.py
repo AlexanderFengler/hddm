@@ -774,8 +774,8 @@ def model_plot(hddm_model = None,
                 # These splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
                 # Wiser because either way we can have varying numbers of trials for each subject !
                 counts_2_up, bins = np.histogram(sub_data[i]['data'].loc[sub_data[i]['data']['response'] == 1, :]['rt'].values,
-                                                bins = np.linspace(0, max_t, nbins),
-                                                density = True)
+                                                 bins = np.linspace(0, max_t, nbins),
+                                                 density = True)
 
                 counts_2_down, _ = np.histogram(sub_data[i]['data'].loc[(sub_data[i]['data']['response'] == - 1) + (sub_data[i]['data']['response'] == 0), :]['rt'].values,
                                                 bins = np.linspace(0, max_t, nbins),
