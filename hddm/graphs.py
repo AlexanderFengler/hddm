@@ -620,6 +620,10 @@ def model_plot(hddm_model = None,
             rows = int(np.ceil(n_subplots / cols))
         else:
             rows = 1
+        
+        if grouped:
+            rows = 1
+            cols = 1
 
         print('rows')
         print(rows)
