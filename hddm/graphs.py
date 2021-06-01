@@ -118,7 +118,10 @@ def make_trace_plotready_h_c(trace_dict = None,
             # Dat gt_parameter_vector to dat_h_c dict 
             # If parameters not in the dataframe --> set to None
             if test_passed:
-                dat_h_c[key][subj_id]['gt_parameter_vector'] = dat_h_c[key][subj_id]['data'].loc[0, :][[param for param in model_config[model_ground_truth]['params']]].values
+                print('progressive testing')
+                print(dat_h_c[key][subj_id]['data'])
+                print( dat_h_c[key][subj_id]['data'].loc[0, :])
+                dat_h_c[key][subj_id]['gt_parameter_vector'] = dat_h_c[key][subj_id]['data'].iloc[0, :][[param for param in model_config[model_ground_truth]['params']]].values
                 #x.loc[0, :][['one', 'two']].values
             else: 
                 dat_h_c[key][subj_id]['gt_parameter_vector'] = None
