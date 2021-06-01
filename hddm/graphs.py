@@ -734,10 +734,10 @@ def model_plot(hddm_model = None,
                                             bins = np.linspace(0, max_t, nbins),
                                             density = True)
                 
-                if j == (n_posterior_parameters - 1) and row_tmp == 0 and col_tmp == 0:
-                    tmp_label = 'Posterior Predictive'
-                else:
-                    tmp_label = None
+                #if j == (n_posterior_parameters - 1) and row_tmp == 0 and col_tmp == 0:
+                tmp_label = 'Posterior Predictive'
+                #else:
+                    #tmp_label = None
 
                 ax_tmp_twin_up.hist(bins[:-1], 
                                     bins, 
