@@ -334,6 +334,9 @@ def filter_subject_condition_traces(hddm_model,
         # Have to add these parameters to the final trace objects
         params_default_fixed = list(includes_diff) # - set(group_only_nodes)) # was computed above
         traces = untransform_traces(hddm_model.get_traces(), model = model, is_nn = hddm_model.nn) #untransform_traces(hddm_model.get_traces())
+        
+        if not hddm_model.nn:
+            traces = _convert_params(traces)
 
         # Now for each 'frame' define the trace columns which we want to keep !
         # condition_wise_params_dict defines a dictionary which holds the necessary trace data for each 'condition'
@@ -392,6 +395,9 @@ def filter_subject_condition_traces(hddm_model,
     # Scenario 2: Single condition single subject model (or data collapsed across subjects)
     else:
         traces = untransform_traces(hddm_model.get_traces(), model = model) #untransform_traces(hddm_model.get_traces())
+        
+        if not hddm_model.nn:
+            traces = _convert_params(traces)
 
         # Traces transformed into plot-expected format:
         # dim 1: plot number
@@ -488,7 +494,7 @@ def _make_plot_sub_data(data = None, plot_n = None, multi_subject = None, multi_
 
 def _convert_params(data = None):
     for key in data.keys():
-        if 'a' in key:
+        if 'a' == key.split('_')[0]:
             data[key] = data[key] / 2
     return data
 # --------------------------------------------------------------------------------------------
