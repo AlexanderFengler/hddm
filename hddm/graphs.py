@@ -833,13 +833,15 @@ def model_plot(hddm_model = None,
 
                     elif j == n_posterior_parameters and model_ground_truth == None:
                         break
-                    else:
+                    elif j < n_posterior_parameters < (n_posterior_parameters - 1):
                         tmp_model = model_fitted
                         tmp_samples = sub_data[i]['traces'][idx[j], :] # posterior_samples[i, idx[j], :]
                         tmp_alpha = 0.05
                         tmp_color = 'black'
                         tmp_label = None
                         tmp_linewidth = posterior_linewidth
+                    else:
+                        continue
 
                     # MAKE BOUNDS (FROM MODEL CONFIG) !
                     if tmp_model == 'weibull_cdf' or tmp_model == 'weibull_cdf2' or tmp_model == 'weibull_cdf_concave' or tmp_model == 'weibull':
