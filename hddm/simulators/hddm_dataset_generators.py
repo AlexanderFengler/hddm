@@ -1289,7 +1289,7 @@ def simulator_h_c(n_subjects = 10,
                                                             regression_models = regression_models,
                                                             regression_covariates = regression_covariates,
                                                             group_only_regressors = group_only_regressors,
-                                                            full_parameter_dict = group_level_param_dict,
+                                                            group_level_parameter_dict = group_level_param_dict,
                                                             n_samples_by_subject = n_samples_by_subject,
                                                             n_subjects = n_subjects)
         
