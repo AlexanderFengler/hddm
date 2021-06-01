@@ -151,6 +151,7 @@ def make_trace_plotready_h_c(trace_dict = None,
                         full_condition_subj_label = pd.DataFrame(subj_id, columns = ['subj_idx'])
 
                     dat_h_c[key][subj_id]['cond_subj_label'] = full_condition_subj_label
+                    dat_h_c[key][subj_id]['condition_label'] = trace_dict[key]['condition_label']
 
                     # else:
                     #     dat_c[plot_n, :, model_config[model]['params'].index(key_param_only)] = trace_dict[key]['traces'][trace_key]
@@ -447,10 +448,22 @@ def extract_multi_cond_subj_plot_n(data = None):
 
     return multi_condition, multi_subject, n_plots
 
-def _make_plot_sub_data(data = None, plot_n = None, multi_subject = None, multi_condition = None):
+def _make_plot_sub_data(data = None, plot_n = None, multi_subject = None, multi_condition = None, grouped = False):
     if multi_subject and multi_condition:
         # Condition one
         sub_data = data[list(data.keys())[plot_n]]
+        
+        # We might want to return grouped data (collapse across subject)
+        if grouped:
+            grouped_sub_data = {}
+            grouped_sub_data['traces'] = np.vstack([sub_data[key]['traces'] for key in sub_data.keys()])
+            grouped_sub_data['data'] = pd.concatenta([sub_data[key]['data'] for key in sub_data.keys()], axis = 0)
+            # We don't have a real ground truth parameter vector for grouped data
+            grouped_sub_data['gt_parameter_vector'] = None
+            grouped_sub_data['cond_subj_label'] = sub_data['cond_subj_label']
+            grouped_sub_data['condition_label'] = sub_data['condition_label']
+            return grouped_sub_data
+
     if multi_condition and not multi_subject:
         # Condition two
         sub_data = {}
@@ -684,8 +697,7 @@ def model_plot(hddm_model = None,
                     #ax_ins = ax.inset_axes([1, 0.5, 0.2, 0.2]) --> important for levy ! AF TODO
                     #ax_ins.plot([0, 1, 2, 3])
     
-            # ADD HISTOGRAMS
-            # Run Model simulations for posterior samples
+
              # RUN SIMULATIONS: POSTERIOR SAMPLES
             if hddm_model is not None:
                 tmp_post = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
@@ -699,7 +711,10 @@ def model_plot(hddm_model = None,
                 tmp_post = np.column_stack([out[0].squeeze().flatten(), out[1].squeeze().flatten()])  
                 #post_dict[i] = np.column_stack([out[0].squeeze().flatten(), out[1].squeeze().flatten()])               
                 #tmp_post[(n_simulations_per_parameter * j):(n_simulations_per_parameter * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
-            # DRAW DATA HISTOGRAMS
+                
+                # ADD HISTOGRAMS
+                # Run Model simulations for posterior samples
+                # DRAW DATA HISTOGRAMS
                 choice_p_up_post = np.sum(tmp_post[:, 1] == 1) / tmp_post.shape[0]
 
                 counts_2_up, bins = np.histogram(tmp_post[tmp_post[:, 1] == 1, 0],
