@@ -497,6 +497,7 @@ def _convert_params(data = None):
 # Mean posterior predictives
 def model_plot(hddm_model = None,
                model_ground_truth = None,
+               grouped = False,
                n_posterior_parameters = 500, # optional / styling
                n_simulations_per_parameter = 10, # optional / stiling
                cols = 3, # styling
