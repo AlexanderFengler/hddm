@@ -777,9 +777,9 @@ def model_plot(hddm_model = None,
                                                  bins = np.linspace(0, max_t, nbins),
                                                  density = True)
                 
-                print(sub_data[i]['data'].loc[(sub_data[i]['data']['response'] == - 1.0) + (sub_data[i]['data']['response'] == 0.0), :]['rt'].values)
+                #print(sub_data[i]['data'].loc[(sub_data[i]['data']['response'] == - 1.0) + (sub_data[i]['data']['response'] == 0.0), :]['rt'].values)
                 
-                counts_2_down, _ = np.histogram(sub_data[i]['data'].loc[(sub_data[i]['data']['response'] == - 1.0) + (sub_data[i]['data']['response'] == 0.0), :]['rt'].values,
+                counts_2_down, _ = np.histogram(np.abs(sub_data[i]['data'].loc[(sub_data[i]['data']['response'] == - 1.0) + (sub_data[i]['data']['response'] == 0.0), :]['rt'].values),
                                                 bins = np.linspace(0, max_t, nbins),
                                                 density = True)
 
