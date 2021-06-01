@@ -740,7 +740,7 @@ def model_plot(hddm_model = None,
                                             bins = np.linspace(0, max_t, nbins),
                                             density = True)
 
-                counts_2_down, _ = np.histogram(tmp_post[tmp_post[:, 1] == -1, 0],
+                counts_2_down, _ = np.histogram(tmp_post[(tmp_post[:, 1] == -1) + (tmp_post[:, 1] == 0), 0],
                                             bins = np.linspace(0, max_t, nbins),
                                             density = True)
                 
@@ -777,7 +777,7 @@ def model_plot(hddm_model = None,
                                                 bins = np.linspace(0, max_t, nbins),
                                                 density = True)
 
-                counts_2_down, _ = np.histogram(sub_data[i]['data'].loc[sub_data[i]['data']['response'] == - 1, :]['rt'].values,
+                counts_2_down, _ = np.histogram(sub_data[i]['data'].loc[(sub_data[i]['data']['response'] == - 1) + (sub_data[i]['data']['response'] == 0), :]['rt'].values,
                                                 bins = np.linspace(0, max_t, nbins),
                                                 density = True)
 
