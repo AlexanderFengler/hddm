@@ -134,7 +134,7 @@ class HDDM(HDDMBase):
         super(HDDM, self).__init__(*args, **kwargs)
 
         print('Is Neural Net? ', self.nn)
-        if ('sv' in include) or ('st' in include) or ('sz' in include):
+        if ('sv' in self.include) or ('st' in self.include) or ('sz' in self.include):
             self.model = 'full_ddm'
         else:
             self.model = 'ddm'
