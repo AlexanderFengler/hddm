@@ -456,12 +456,13 @@ def _make_plot_sub_data(data = None, plot_n = None, multi_subject = None, multi_
         # We might want to return grouped data (collapse across subject)
         if grouped:
             grouped_sub_data = {}
-            grouped_sub_data['traces'] = np.vstack([sub_data[key]['traces'] for key in sub_data.keys()])
-            grouped_sub_data['data'] = pd.concatenta([sub_data[key]['data'] for key in sub_data.keys()], axis = 0)
+            grouped_sub_data[0] = {}
+            grouped_sub_data[0]['traces'] = np.vstack([sub_data[key]['traces'] for key in sub_data.keys()])
+            grouped_sub_data[0]['data'] = pd.concatenta([sub_data[key]['data'] for key in sub_data.keys()], axis = 0)
             # We don't have a real ground truth parameter vector for grouped data
-            grouped_sub_data['gt_parameter_vector'] = None
-            grouped_sub_data['cond_subj_label'] = sub_data['cond_subj_label']
-            grouped_sub_data['condition_label'] = sub_data['condition_label']
+            grouped_sub_data[0]['gt_parameter_vector'] = None
+            grouped_sub_data[0]['cond_subj_label'] = sub_data['cond_subj_label']
+            grouped_sub_data[0]['condition_label'] = sub_data['condition_label']
             return grouped_sub_data
 
     if multi_condition and not multi_subject:
@@ -603,7 +604,11 @@ def model_plot(hddm_model = None,
         nbins = int((max_t) / bin_size)
 
         # Make sub
-        sub_data = _make_plot_sub_data(data = data, plot_n = plot_n, multi_subject = multi_subject, multi_condition = multi_condition)
+        sub_data = _make_plot_sub_data(data = data, 
+                                       plot_n = plot_n, 
+                                       multi_subject = multi_subject, 
+                                       multi_condition = multi_condition,
+                                       grouped = grouped)
 
         # Define number of rows we need for display
         n_subplots = len(list(sub_data.keys()))
