@@ -827,7 +827,7 @@ def model_plot(hddm_model = None,
                         tmp_model = model_fitted
                         tmp_samples = sub_data[i]['traces'][idx[j], :] #posterior_samples[i, idx[j], :]
                         # tmp_samples = posterior_samples[i, idx[j], :]
-                        tmp_alpha = 0.5
+                        tmp_alpha = 0.05
                         tmp_color = 'black'
                         tmp_linewidth = posterior_linewidth
 
