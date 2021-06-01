@@ -819,7 +819,7 @@ def model_plot(hddm_model = None,
                         tmp_color = 'black'
                         tmp_linewidth = posterior_linewidth
 
-                    elif j == n_posterior_parameters and model_ground_truth is not None:
+                    elif (j == n_posterior_parameters) and (model_ground_truth is not None) and (not grouped):
                         tmp_samples = sub_data[i]['gt_parameter_vector'] # ground_truth_parameters[i, :]
                         tmp_model = model_ground_truth
                         
@@ -852,6 +852,7 @@ def model_plot(hddm_model = None,
                     
                     if tmp_model == 'ddm' or tmp_model == 'ornstein' or tmp_model == 'levy' or tmp_model == 'full_ddm':
                         print('tmp_samples')
+                        print()
                         print(tmp_samples)
                         b = tmp_samples[1] * np.ones(t_s.shape[0]) #model_config[tmp_model]['boundary'](t = t_s)                   
 
