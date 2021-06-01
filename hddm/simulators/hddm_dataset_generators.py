@@ -1164,7 +1164,7 @@ def simulator_h_c(n_subjects = 10,
                 group_level_parameter_dict[fixed_tmp] = np.random.uniform(low = model_config[model]['param_bounds'][0][model_config[model]['params'].index(fixed_tmp)],
                                                                    high = model_config[model]['param_bounds'][1][model_config[model]['params'].index(fixed_tmp)])
         # Group only part (excluding depends on)
-        if group_only is not None:
+        if (len(group_only) > 0):
             for group_only_tmp in group_only:
                 if group_only_tmp in list(depends_on.keys()):
                     pass
@@ -1196,8 +1196,13 @@ def simulator_h_c(n_subjects = 10,
                 
                 if depends_tmp not in group_only:
                     bound_to_bound_tmp = (model_config[model]['param_bounds'][1][model_config[model]['params'].index(depends_tmp)] - model_config[model]['param_bounds'][0][model_config[model]['params'].index(depends_tmp)])
-                    group_level_parameter_dict[depends_tmp + '_std'] = np.random.uniform(low = 0, 
-                                                                                  high = (1 / 10) * bound_to_bound_tmp)
+                    print('passed')
+                    print('depends_tmp')
+                    print(depends_tmp)
+                    print('btb')
+                    print(bound_to_bound_tmp)
+                    group_level_parameter_dict[depends_tmp + '_std'] = np.random.uniform(low = 0,
+                                                                                         high = (1 / 10) * bound_to_bound_tmp)
             
         # Regressor part
         if regression_covariates is not None:
@@ -1243,6 +1248,10 @@ def simulator_h_c(n_subjects = 10,
         return group_level_parameter_dict
 
     # MAIN PART OF THE FUNCTION
+
+    # Some checks
+    if group_only is None:
+        group_only = []
 
     # Specify 'remainder' parameters --> will be sampled randomly from the allowed range
     remainder = get_parameter_remainder(regression_models = regression_models,

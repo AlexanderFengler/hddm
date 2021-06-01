@@ -608,9 +608,34 @@ def model_plot(hddm_model = None,
                                figsize = (20 * scale_x, 20 * rows * scale_y), 
                                sharex = False, 
                                sharey = False)
+
+
+        # Run simulations
+        # subplot_cnt = 0
+        # post_dict = {}
+        # gt_dict = {}
+        #for i in sub_data.keys():
+            # RUN SIMULATIONS: POSTERIOR SAMPLES
+            #if hddm_model is not None:
+                # # Run Model simulations for posterior samples
+                # tmp_post = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
+                # idx = np.random.choice(sub_data[i]['traces'].shape[0], size = n_posterior_parameters, replace = False)
+                # # idx = np.random.choice(posterior_samples.shape[1], size = n_posterior_parameters, replace = False)
+
+                # out = simulator(theta = sub_data[i]['traces'][idx, :], # posterior_samples[plot_n, i, idx[j], :],
+                #                 model = model_fitted,
+                #                 n_samples = n_simulations_per_parameter,
+                #                 bin_dim = None)
+                
+                # #post_dict[i] = np.column_stack([out[0].squeeze().flatten(), out[1].squeeze().flatten()])               
+                # tmp_post[(n_simulations_per_parameter * j):(n_simulations_per_parameter * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
+            #subplot_cnt += 1
         
         subplot_cnt = 0
         for i in sub_data.keys():
+            if grouped and subplot_cnt > 0:
+                continue
+
             row_tmp = int(np.floor(subplot_cnt / cols))
             col_tmp = subplot_cnt - (cols * row_tmp)
             
@@ -644,7 +669,7 @@ def model_plot(hddm_model = None,
             ax_tmp_twin_down.set_yticks([])
                 
             # ADD TRAJECTORIES OF GROUND TRUTH VECTOR
-            if (show_trajectories == True) and (model_ground_truth is not None):
+            if (show_trajectories == True) and (model_ground_truth is not None) and (not grouped):
                 for k in range(n_trajectories):
                     out = simulator(theta = sub_data[i]['gt_parameter_vector'], #ground_truth_parameters[i, :],
                                     model = model_ground_truth, 
@@ -660,22 +685,20 @@ def model_plot(hddm_model = None,
                     #ax_ins.plot([0, 1, 2, 3])
     
             # ADD HISTOGRAMS
-            # RUN SIMULATIONS: POSTERIOR SAMPLES
+            # Run Model simulations for posterior samples
+             # RUN SIMULATIONS: POSTERIOR SAMPLES
             if hddm_model is not None:
-                
-                # Run Model simulations for posterior samples
                 tmp_post = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
                 idx = np.random.choice(sub_data[i]['traces'].shape[0], size = n_posterior_parameters, replace = False)
                 # idx = np.random.choice(posterior_samples.shape[1], size = n_posterior_parameters, replace = False)
+                out = simulator(theta = sub_data[i]['traces'][idx, :], # posterior_samples[plot_n, i, idx[j], :],
+                                model = model_fitted,
+                                n_samples = n_simulations_per_parameter,
+                                bin_dim = None)
 
-                for j in range(n_posterior_parameters):
-                    out = simulator(theta = sub_data[i]['traces'][idx[j], :], # posterior_samples[plot_n, i, idx[j], :],
-                                    model = model_fitted,
-                                    n_samples = n_simulations_per_parameter,
-                                    bin_dim = None)
-                                    
-                    tmp_post[(n_simulations_per_parameter * j):(n_simulations_per_parameter * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
-
+                tmp_post = np.column_stack([out[0].squeeze().flatten(), out[1].squeeze().flatten()])  
+                #post_dict[i] = np.column_stack([out[0].squeeze().flatten(), out[1].squeeze().flatten()])               
+                #tmp_post[(n_simulations_per_parameter * j):(n_simulations_per_parameter * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
             # DRAW DATA HISTOGRAMS
                 choice_p_up_post = np.sum(tmp_post[:, 1] == 1) / tmp_post.shape[0]
 
@@ -916,6 +939,7 @@ def model_plot(hddm_model = None,
 
 def posterior_predictive_plot(hddm_model = None,
                               model_ground_truth = 'angle',
+                              grouped = False,
                               cols = 3,
                               n_posterior_parameters = 100,
                               max_t = 20,
@@ -937,6 +961,8 @@ def posterior_predictive_plot(hddm_model = None,
         model_ground_truth: str <default=None>
             Specify the ground truth model (mostly useful for parameter recovery studies). If you specify a ground truth model, make sure that the dataset
             you supplied to your hddm model included trial by trial parameters.
+        grouped: bool <default=False>
+            If grouped is True, the graph will group over subjects and generate one plot per condition.
         n_plots: int <default=4>
             The plot attempts to be smart in trying to figure out how many plots are desired, however choosing it manual is a 
             save option.
@@ -966,8 +992,6 @@ def posterior_predictive_plot(hddm_model = None,
             Timesteps to use for the simulation runs performed for plotting.
     Return: plot object
     """
-    # Just to aid clarity of the code --> set model fitted
-    model_fitted = hddm_model.model
 
     if n_posterior_parameters <= 1:
         print('ERROR: n_posterior_parameters needs to be larger than 1')
@@ -988,12 +1012,12 @@ def posterior_predictive_plot(hddm_model = None,
     print('data prep finished')
 
     # Taking care of special case with 1 plot
-    if n_plots == 1:
+    if (not multi_condition and not multi_subject) or (grouped):
         cols = 1
     
     # General plot parameters
     nbins = int((2 * max_t) / bin_size)     
-    rows = int(np.ceil(n_plots / cols))
+    # rows = int(np.ceil(n_plots / cols))
     sns.set(style = "white", 
             palette = "muted", 
             color_codes = True,
@@ -1002,13 +1026,19 @@ def posterior_predictive_plot(hddm_model = None,
     sns.despine(right = True)
 
     # Cycle through plots
+    fig_title_tmp = ''
+    title_size = 24
     for plot_n in range(n_plots):
         sub_data = _make_plot_sub_data(data = data, 
                                        plot_n = plot_n, 
                                        multi_subject = multi_subject, 
                                        multi_condition = multi_condition)
 
-        n_subplots = len(list(sub_data.keys()))
+        if grouped:
+            n_subplots = 1
+        else:
+            n_subplots = len(list(sub_data.keys()))
+        
         if n_subplots > 1:
             rows = int(np.ceil(n_subplots / cols))
         else:
@@ -1019,42 +1049,61 @@ def posterior_predictive_plot(hddm_model = None,
                                sharex = False, 
                                sharey = False)
 
-        subplot_cnt = 0
-        for i in sub_data.keys():
 
-            print('n subplots to plot')
-            row_tmp = int(np.floor(subplot_cnt / cols))
-            col_tmp = subplot_cnt - (cols * row_tmp)
-            post_tmp = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
+        # Make condition label (and set global figure title depending on what kind of data we are dealing with)
+        condition_label = ''
+        for label_key in sub_data[list(sub_data.keys())[0]]['cond_subj_label'].keys():
+            if 'subj_idx' not in label_key:
+                condition_label += str(label_key) + ': '
+                condition_label += str(sub_data[list(sub_data.keys())[0]]['cond_subj_label'][[label_key]].values[0]) + ', '
+        condition_label = condition_label[:-2]
+
+        if ((multi_condition and multi_subject) or (not multi_condition and multi_subject)) and not grouped:
+            fig_title_tmp = condition_label
+        
+
+        # Plot global title
+        fig.suptitle(fig_title_tmp, fontsize = title_size)
+
+
+        # GET SIMULATIONS AND COLLECT GROUND TRUTHS FOR CONDITON
+
+        subplot_cnt = 0
+        gt_dict = []
+        post_dict = []
+        for i in sub_data.keys():
+            #post_tmp = np.zeros((n_subplots, n_posterior_parameters * n_simulations_per_parameter, 2))
+
             idx = np.random.choice(sub_data[i]['traces'].shape[0],
                                    size = n_posterior_parameters, 
                                    replace = False)
 
-            # MODEL SIMULATIONS FOR POSTERIOR PARAMETERS
-            # print('Simulations for plot: ', i)
-            #for j in range(n_posterior_parameters):
             out = simulator(theta = sub_data[i]['traces'][idx, :], # posterior_samples[i, idx[j], :], 
-                            model = model_fitted,
+                            model = hddm_model.model,
                             n_samples = n_simulations_per_parameter,
                             n_trials = sub_data[i]['traces'][idx, :].shape[0],
                             bin_dim = None)
-
-            post_tmp = np.squeeze()
             
-            post_tmp[:, :] = np.stack([out[0].flatten(), out[1].flatten()])
-            
-            # MODEL SIMULATIONS FOR TRUE PARAMETERS
-            # Supply data too !
-            if hddm_model is not None:
-                out = simulator(theta = sub_data[i]['gt_parameter_vector'],
-                                model = model_ground_truth,
-                                n_samples = 20000,
-                                bin_dim = None)
-    
-                gt_tmp = np.concatenate([out[0], out[1]], axis = 1)
-                gt_color = 'blue'
-                #print('passed through')
+            post_dict[i] = np.stack([out[0].flatten(), out[1].flatten()])
+            gt_dict[i] = (sub_data[i]['data'].values)
 
+            subplot_cnt += 1
+
+        # PLOTTING
+        subplot_cnt = 0
+        gt_color = 'blue'
+        for i in sub_data.keys():
+            # If data is grouped the inner loop has to be passed just once 
+            # to set the styling. 
+
+            if grouped and (subplot_cnt > 0):
+                break
+            print('n subplots to plot')
+
+            row_tmp = int(np.floor(subplot_cnt / cols))
+            col_tmp = subplot_cnt - (cols * row_tmp)
+
+            # Target the correct subplot 
             if rows > 1 and cols > 1:
                 ax_tmp = ax[row_tmp, col_tmp]
             
@@ -1063,8 +1112,88 @@ def posterior_predictive_plot(hddm_model = None,
             
             else:
                 ax_tmp = ax
+
+            # MODEL SIMULATIONS FOR POSTERIOR PARAMETERS
+            # print('Simulations for plot: ', i)
+            #for j in range(n_posterior_parameters):
+
+            # idx = np.random.choice(sub_data[i]['traces'].shape[0],
+            #                        size = n_posterior_parameters, 
+            #                        replace = False)
+
+            # out = simulator(theta = sub_data[i]['traces'][idx, :], # posterior_samples[i, idx[j], :], 
+            #                 model = hddm_model.model,
+            #                 n_samples = n_simulations_per_parameter,
+            #                 n_trials = sub_data[i]['traces'][idx, :].shape[0],
+            #                 bin_dim = None)
             
-            # ACTUAL PLOTTING
+            # post_tmp[:, :] = np.stack([out[0].flatten(), out[1].flatten()])
+            
+            # MODEL SIMULATIONS FOR TRUE PARAMETERS
+            # Supply data too !
+            # if hddm_model is not None:
+            #     # out = simulator(theta = sub_data[i]['gt_parameter_vector'],
+            #     #                 model = model_ground_truth,
+            #     #                 n_samples = 20000,
+            #     #                 bin_dim = None)
+    
+            #     #gt_tmp = np.concatenate([out[0], out[1]], axis = 1)
+            #     gt_tmp = sub_data[i]['data'].values
+            #     gt_color = 'blue'
+            #     #print('passed through')
+
+            # SUBPLOT LEVEL STYLING   
+           # Make Titles:
+            if ((multi_condition and multi_subject) or (not multi_condition and multi_subject)) and not grouped:
+                title_tmp = 'Subject: ' + str(i)
+            elif (multi_condition and not multi_subject) or grouped:
+                # condition label is subplot title if we are dealing with grouped data or datasets
+                # which are simply split by condition
+                title_tmp = condition_label
+                title_size = title_size / (0.5 * len(list(sub_data[list(sub_data.keys())[0]]['cond_subj_label'].keys())))
+            elif not multi_condition and not multi_subject:
+                # No extra title needed for simple single subject plot
+                title_tmp = ''
+
+            # subplot title
+            ax_tmp.set_title(title_tmp,
+                             fontsize = title_size)
+            
+            # subplot x-axis limits
+            ax_tmp.set_xlim(- xlimit, xlimit)
+            
+            # ground-truth and data labels if we are dealing with the upper right sub-plot in a figure
+            if row_tmp == 0 and col_tmp == 0:
+                if model_ground_truth is not None:
+                    label_0 = 'Ground Truth'
+                else:
+                    label_0 = 'DATA'
+                ax_tmp.legend(labels = ['Posterior Predictive', label_0], 
+                            fontsize = 12, 
+                            loc = 'upper right')
+            
+            # rt x-axis label if we are dealing with the last row of a figure
+            if row_tmp == (rows - 1):
+                ax_tmp.set_xlabel('rt', 
+                                fontsize = 24)
+
+            # unset ylabel if first column
+            if col_tmp == 0:
+                ax_tmp.set_ylabel('', 
+                                fontsize = 24)
+
+            # set ticks-size for x and y axis
+            ax_tmp.tick_params(axis = 'y', size = 22)
+            ax_tmp.tick_params(axis = 'x', size = 22)
+            
+            # PLOT DATA
+            if grouped:
+                post_tmp = np.vstack([post_dict[i] for i in post_dict.keys()])
+                gt_tmp = np.vstack([gt_dict[i] for i in gt_dict.keys()])
+            else:
+                post_tmp = post_dict[i]
+                gt_tmp = gt_dict[i]
+
             ax_tmp.hist(post_tmp[:, 0] * post_tmp[:, 1], 
                         bins = np.linspace(- max_t, max_t, nbins), #50, # kde = False, # rug = False, 
                         alpha =  1, 
@@ -1087,66 +1216,40 @@ def posterior_predictive_plot(hddm_model = None,
                         # kde = False, #rug = False,
                         )
 
-
-            # Make Title:
-            # Make condition label
-            condition_label = ''
-            for label_key in sub_data[i]['cond_subj_label'].keys():
-                if 'subj_idx' not in label_key:
-                    condition_label += str(label_key) + ': '
-                    condition_label += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
-            condition_label = condition_label[:-2]
-
-            title_size = 24
-            
-            if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
-                title_tmp = 'Subject: ' + str(i)
-                fig_title_tmp = condition_label
-            elif multi_condition and not multi_subject:
-                title_tmp = condition_label
-                title_size = title_size / (0.5 * len(list(sub_data[i]['cond_subj_label'].keys())))
-            elif not multi_condition and not multi_subject:
-                # No extra title needed for simple single subject plot
-                title_tmp = ''
-
-            # Set plot-global title
-            fig.suptitle(fig_title_tmp, fontsize = 24)
-            # fig.suptitle('Posterior Predictive: ', fontsize = 24)
-
-            # Set subplot title
-            ax_tmp.set_title(title_tmp,
-                            fontsize = title_size)
-            
-            # EXTRA STYLING    
-            ax_tmp.set_xlim(- xlimit, xlimit)
-                
-            if row_tmp == 0 and col_tmp == 0:
-                if model_ground_truth is not None:
-                    label_0 = 'Ground Truth'
-                else:
-                    label_0 = 'DATA'
-                ax_tmp.legend(labels = ['Posterior Predictive', label_0], 
-                            fontsize = 12, 
-                            loc = 'upper right')
-                
-            if row_tmp == (rows - 1):
-                ax_tmp.set_xlabel('rt', 
-                                fontsize = 24)
-
-            if col_tmp == 0:
-                ax_tmp.set_ylabel('', 
-                                fontsize = 24)
-
-            ax_tmp.tick_params(axis = 'y', size = 22)
-            ax_tmp.tick_params(axis = 'x', size = 22)
+            # Increment subplot counter
             subplot_cnt += 1
-        
+
+        # if grouped:
+        #         ax_tmp.hist(post_tmp[:, 0] * post_tmp[:, 1], 
+        #                     bins = np.linspace(- max_t, max_t, nbins), #50, # kde = False, # rug = False, 
+        #                     alpha =  1, 
+        #                     color = 'black',
+        #                     histtype = 'step', 
+        #                     density = 1, 
+        #                     edgecolor = 'black',
+        #                     linewidth = hist_linewidth
+        #                     )
+
+        #         #if ground_truth_data is not None:
+        #         ax_tmp.hist(gt_tmp[:, 0] * gt_tmp[:, 1], 
+        #                     alpha = 0.5, 
+        #                     color = gt_color, 
+        #                     density = 1, 
+        #                     edgecolor = gt_color,  
+        #                     histtype = 'step',
+        #                     linewidth = hist_linewidth, 
+        #                     bins = np.linspace(-max_t, max_t, nbins), #50, 
+        #                     # kde = False, #rug = False,
+        #                     )
+
+        # Turn off redundant subplots
         if rows > 1 and cols > 1:
             for i in range(n_plots, rows * cols, 1):
                 row_tmp = int(np.floor(i / cols))
                 col_tmp = i - (cols * row_tmp)
                 ax[row_tmp, col_tmp].axis('off')  
-            
+        
+        # save and return
         if save == True:
             if save_path is None:
                 save_path = 'figures/'
@@ -1167,7 +1270,6 @@ def posterior_predictive_plot(hddm_model = None,
         plt.close()
 
     return # plt.show()
-
 
 # Posterior Pair Plot
 def posterior_pair_plot(hddm_model = None, 
