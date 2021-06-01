@@ -83,8 +83,8 @@ def make_trace_plotready_h_c(trace_dict = None,
         #     dat_h_c[key] =  np.zeros((len(trace_dict[key]['data']['subj_idx'].unique()), trace_dict[key]['traces'].shape[0], len(model_config[model]['params'])))
         
         unique_subj_ids = trace_dict[key]['data']['subj_idx'].unique()
-        print('unique subject ids')
-        print(unique_subj_ids)
+        #print('unique subject ids')
+        #print(unique_subj_ids)
         #dat_traces_h_c[key] = {}
         #dat_traces_params_only_h_c[key] = {}
         #subplot_n = 0
@@ -101,16 +101,16 @@ def make_trace_plotready_h_c(trace_dict = None,
             # Check if data contais ground truth parameters
             test_passed = 1
             for check_param in model_config[model]['params']:
-                print('running test with')
-                print(check_param)
-                print(list(dat_h_c[key][subj_id]['data'].keys()))
+                #print('running test with')
+                #print(check_param)
+                #print(list(dat_h_c[key][subj_id]['data'].keys()))
                 if check_param in list(dat_h_c[key][subj_id]['data'].keys()):
-                    print('passed')
+                    #print('passed')
                     pass
                 else:
                     test_passed = 0
-            print('still passed ? ')
-            print(test_passed)
+            #print('still passed ? ')
+            #print(test_passed)
 
             if test_passed and (model_ground_truth is None):
                 model_ground_truth = model
@@ -118,16 +118,16 @@ def make_trace_plotready_h_c(trace_dict = None,
             # Dat gt_parameter_vector to dat_h_c dict 
             # If parameters not in the dataframe --> set to None
             if test_passed:
-                print('progressive testing')
-                print(dat_h_c[key][subj_id]['data'])
+                #print('progressive testing')
+                #print(dat_h_c[key][subj_id]['data'])
                 #print( dat_h_c[key][subj_id]['data'].loc[0, :])
                 dat_h_c[key][subj_id]['gt_parameter_vector'] = dat_h_c[key][subj_id]['data'].iloc[0, :][[param for param in model_config[model_ground_truth]['params']]].values
                 #x.loc[0, :][['one', 'two']].values
             else: 
                 dat_h_c[key][subj_id]['gt_parameter_vector'] = None
 
-            print('dat_h_c parameters vector')
-            print(dat_h_c[key][subj_id]['gt_parameter_vector'])
+            #print('dat_h_c parameters vector')
+            #print(dat_h_c[key][subj_id]['gt_parameter_vector'])
 
             trace_names_tmp = []
             trace_names_param_only_tmp = []
@@ -225,16 +225,16 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
                     param_str = param_tmp + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ')'
                     param_ids_by_condition.append(param_str)
             
-            print('params_depends')
-            print(params_depends)
-            print('params subj_only')
-            print(params_subj_only)
-            print('params group only')
-            print(params_group_only)
-            print('params_default_fixed')
-            print(params_default_fixed)
-            print('params')
-            print(param_ids_by_condition)
+            #print('params_depends')
+            #print(params_depends)
+            #print('params subj_only')
+            #print(params_subj_only)
+            #print('params group only')
+            #print(params_group_only)
+            #print('params_default_fixed')
+            #print(params_default_fixed)
+            #print('params')
+            #print(param_ids_by_condition)
             out_dict[i] = {'data': data_subset.copy(), 'params': param_ids_by_condition.copy(), 'condition_label': condition_dataframe.iloc[i]}
             
     else: 
@@ -348,12 +348,12 @@ def filter_subject_condition_traces(hddm_model,
                                                          params_group_only = group_only_nodes,
                                                          is_group_model = is_group_model)
         
-        print('keys of condition_wise_params dict')
-        print(condition_wise_params_dict.keys())
+        #print('keys of condition_wise_params dict')
+        #print(condition_wise_params_dict.keys())
         
         for key_tmp in condition_wise_params_dict.keys():
-            print('passed through with key ', key_tmp)
-            print('of keys: ', condition_wise_params_dict.keys())
+            #print('passed through with key ', key_tmp)
+            #print('of keys: ', condition_wise_params_dict.keys())
 
             # TODO: Add parameters which where not fit by extending traces with defaults for those!
             #print('includes diff')
@@ -486,10 +486,10 @@ def _make_plot_sub_data(data = None, plot_n = None, multi_subject = None, multi_
     if not multi_subject and not multi_condition:
         # Condition four
         sub_data = data[0]
-        print('sub_data')
-        print(sub_data)
-        print('sub_data[i][traces]')
-        print(sub_data[list(sub_data.keys())[0]]['traces'])
+        #print('sub_data')
+        #print(sub_data)
+        #print('sub_data[i][traces]')
+        #print(sub_data[list(sub_data.keys())[0]]['traces'])
     return sub_data
 
 def _convert_params(data = None):
