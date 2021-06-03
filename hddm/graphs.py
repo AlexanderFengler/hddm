@@ -23,6 +23,10 @@ from copy import deepcopy
 model_config = hddm.simulators.model_config
 
 def untransform_traces(traces = None, model = None, is_nn = False):
+    """ 
+        Check which traces are transformed and apply inverse logit transform to them. (This works only if the transformed variable was
+        originally transformed via a logistic function. In hddm this is the standard transform applied to for example the z, parameter.)
+    """
     # Check if any traces have the 'trans' label and apply inverse logit transform to get the trace back in original parameterization
     for key in traces.keys():
         
@@ -48,10 +52,16 @@ def untransform_traces(traces = None, model = None, is_nn = False):
     return traces
 
 def get_subj_ids(data):
+    """
+        Get unique subject ids from the supplied panda DataFrame. (expect to find a 'subj_idx' column.)
+    """
     # get unique subject ids corresponding to a data subset
     return data['subj_idx'].unique()
 
 def subset_data(data, row_tmp):
+    """
+        Subset data based on the values in row_tmp (pandas series)
+    """
     # note row_tmp is expected as a pandas series (shape (n,) DataFrame)
     data_subset = data
     #print(row_tmp)
@@ -64,78 +74,57 @@ def make_trace_plotready_h_c(trace_dict = None,
                              model = '', 
                              is_group_model = None,
                              model_ground_truth = None):
+    """
+        Brings the supplied trace dictionary into the final form. A dictionary of dictionaries, with first-level key indicating the 
+        condition number and second-level key indicating the subject id. 
+        Does not yet work for Regression based models.
+    """
     # This should make traces plotready for the scenarios -->  condition, hierarchical (single model is dealt with trivially by using the traces as is and simply reordering the parmeters to match simulator inputs)
     # Function returns enough data to be flexibly usable across a variety of graphs. One just has to fish out the relevant parts.
 
-    #n_subplots = [trace_dict[key]['traces'] for key in trace_dict.keys()]
-    # dat_c = np.zeros((len(trace_dict.keys()), trace_dict[0]['traces'].shape[0], len(model_config[model]['params'])))
-    dat_h_c = {}
-    # dat_traces_c = {}
-    # dat_traces_params_only_c = {}
-    # dat_traces_h_c = {}
-    # dat_traces_params_only_h_c = {}
-    #subplot_n = 0
-    #plot_n = 0
-
+    dat_h_c = {} # will store a dictionary of dictionaries of dictionaries. Level-one keys specify conditions, level-two keys specify subject level data
     for key in trace_dict.keys():
-        dat_h_c[key] = {}
-        # if is_group_model:
-        #     dat_h_c[key] =  np.zeros((len(trace_dict[key]['data']['subj_idx'].unique()), trace_dict[key]['traces'].shape[0], len(model_config[model]['params'])))
-        
-        unique_subj_ids = trace_dict[key]['data']['subj_idx'].unique()
-        #print('unique subject ids')
-        #print(unique_subj_ids)
-        #dat_traces_h_c[key] = {}
-        #dat_traces_params_only_h_c[key] = {}
-        #subplot_n = 0
-        #rint(unique_subj_ids)
+        dat_h_c[key] = {} # intialize condition level dict
+        unique_subj_ids = trace_dict[key]['data']['subj_idx'].unique() # get unique subject ids for conditions (number and id of subjects may differ across conditions)
 
         for subj_id in unique_subj_ids:
-            dat_h_c[key][subj_id] = {}
-            # print(trace_dict[key])
-            # print(key)
-            # print(trace_dict[key]['traces'])
-            dat_h_c[key][subj_id]['traces'] = np.zeros((trace_dict[key]['traces'].shape[0], len(model_config[model]['params'])))
-            dat_h_c[key][subj_id]['data'] = trace_dict[key]['data'].loc[trace_dict[key]['data']['subj_idx'] == subj_id, :]
+            dat_h_c[key][subj_id] = {} # initialize subject level dict
+            dat_h_c[key][subj_id]['traces'] = np.zeros((trace_dict[key]['traces'].shape[0], len(model_config[model]['params']))) # initialize trace container
+            dat_h_c[key][subj_id]['data'] = trace_dict[key]['data'].loc[trace_dict[key]['data']['subj_idx'] == subj_id, :] # add data from the given subject in given condition
             
             # Check if data contais ground truth parameters
+            # AF-TODO: Reorganize this so that we supply trial by trial parameters separately
             test_passed = 1
             for check_param in model_config[model]['params']:
-                #print('running test with')
-                #print(check_param)
-                #print(list(dat_h_c[key][subj_id]['data'].keys()))
                 if check_param in list(dat_h_c[key][subj_id]['data'].keys()):
-                    #print('passed')
                     pass
                 else:
                     test_passed = 0
-            #print('still passed ? ')
-            #print(test_passed)
 
+            # If the data contain the ground truth parameters for the fitted model, but no ground truth model was specified
+            # we can savely assume that the ground truth model was the fitted model.
             if test_passed and (model_ground_truth is None):
                 model_ground_truth = model
             
             # Dat gt_parameter_vector to dat_h_c dict 
             # If parameters not in the dataframe --> set to None
             if test_passed:
-                #print('progressive testing')
-                #print(dat_h_c[key][subj_id]['data'])
-                #print( dat_h_c[key][subj_id]['data'].loc[0, :])
                 dat_h_c[key][subj_id]['gt_parameter_vector'] = dat_h_c[key][subj_id]['data'].iloc[0, :][[param for param in model_config[model_ground_truth]['params']]].values
-                #x.loc[0, :][['one', 'two']].values
             else: 
                 dat_h_c[key][subj_id]['gt_parameter_vector'] = None
 
-            #print('dat_h_c parameters vector')
-            #print(dat_h_c[key][subj_id]['gt_parameter_vector'])
-
+            # We want to store two version of the trace_names in lists
+            # One that isolates the model parameter name, and the original
             trace_names_tmp = []
             trace_names_param_only_tmp = []
             
+            # Go through trace dictionary and add relevant traces to dat_h_c
             for trace_key in trace_dict[key]['traces'].keys():
+                # If the current subj_id is not in the trace name --> skip
                 if ('subj' in trace_key) and (not (subj_id in trace_key)):
                     continue
                 else:
+
                     trace_names_tmp.append(trace_key)
                     key_param_only = trace_key 
                     
@@ -148,6 +137,7 @@ def make_trace_plotready_h_c(trace_dict = None,
 
                     dat_h_c[key][subj_id]['traces'][:, model_config[model]['params'].index(key_param_only)] = trace_dict[key]['traces'][trace_key]
                     full_condition_subj_label = trace_dict[key]['condition_label'].copy()
+                    
                     if trace_dict[key]['condition_label'] is not None:
                         full_condition_subj_label['subj_idx'] = subj_id
                     else:
@@ -156,51 +146,44 @@ def make_trace_plotready_h_c(trace_dict = None,
                     dat_h_c[key][subj_id]['cond_subj_label'] = full_condition_subj_label
                     dat_h_c[key][subj_id]['condition_label'] = trace_dict[key]['condition_label']
 
-                    # else:
-                    #     dat_c[plot_n, :, model_config[model]['params'].index(key_param_only)] = trace_dict[key]['traces'][trace_key]
-                    #     #dat_traces_c
-
             dat_h_c[key][subj_id]['trace_names'] = trace_names_tmp
-            #dat_traces_params_only_h_c[key][subplot_n] = trace_names_param_only_tmp
-        #plot_n += 1
-
-    #if is_group_model:
-    return (dat_h_c) #, dat_traces_h_c, dat_traces_params_only_h_c)
-    #else:
-    #    return (dat_c, dat_traces_c, dat_traces_params_only_c)
+    return (dat_h_c)
           
 def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default_fixed = None, params_subj_only = None, params_depends = None, params_group_only = None, is_group_model = True):
-    
+    """
+        Function goes through the conditions defined implicitly in the dataset and picks out the condition relevant parameters.
+        Returns a dictionary which stores condition relevant data, parameters and condition labels.
+    """
     # params_default_fixed
-    # just store and add fixed vals
-
-    # params_subj_only
     param_ids = list(params_default_fixed)
-    ids = get_subj_ids(data = data)
 
     if not is_group_model:
        for param_tmp in params_subj_only:
            param_str = param_tmp
            param_ids.append(param_str)
     else:
+        # Parameters which do NOT depend on covariates --> consider only subject level
         for param_tmp in params_subj_only:
             for id_tmp in ids:
                 # make str
                 param_str = param_tmp + '_subj.' + str(id_tmp)
                 param_ids.append(param_str)
         
+        # There might be more group only parameters than the ones we find in params_depends
+        # --> we add these to our parameter ids directly
+        # Their traces carry simply the respective model parameter name
         if len(set(params_group_only) - set(params_depends)) > 0:
             for param_tmp in set(params_group_only) - set(params_depends):
                 param_str = str(param_tmp)
                 param_ids.append(param_str)
 
-    # params_depends
     out_dict = {}
+    # We now pick out all the parameters that are relevant for a particular group's data
+    # NOTE: The intended use of this is to get subject level posterior predictives, which leaves out group level parameters for which subj level 
+    # parameters are specified. Group level posteriors (samples from the posterior on the group level, without using subject level traces) are not considered here.
     if condition_dataframe is not None:
         n_ = condition_dataframe.shape[0]
         for i in range(n_):
-            #print(i)
-            
             param_ids_by_condition = param_ids.copy()
             
             for param_tmp in params_depends.keys():
@@ -208,9 +191,7 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
                 depend_cols_sorted = np.array(depend_cols)[np.argsort(np.array([list(condition_dataframe.keys()).index(col) for col in depend_cols]))]
                 row_tmp = condition_dataframe.iloc[i][depend_cols]
                 data_subset = subset_data(data = data, row_tmp = row_tmp)
-                #print('unique subject ids')
-
-                #print(data_subset['subj_idx'].unique())
+                # If group model --> consider subject level 
                 if is_group_model:
                     if param_tmp in params_group_only:
                         param_str = param_tmp + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ')'
@@ -221,26 +202,17 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
                             # make str 
                             param_str = param_tmp + '_subj' + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ').' + id_tmp 
                             param_ids_by_condition.append(param_str)
-                else: 
+                else: # otherwise --> no need for subject level 
                     param_str = param_tmp + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ')'
                     param_ids_by_condition.append(param_str)
             
-            #print('params_depends')
-            #print(params_depends)
-            #print('params subj_only')
-            #print(params_subj_only)
-            #print('params group only')
-            #print(params_group_only)
-            #print('params_default_fixed')
-            #print(params_default_fixed)
-            #print('params')
-            #print(param_ids_by_condition)
+            # Out dict should now include all parameters that are relevant for the particular condition i,
+            # in param_ids_by_condition.
             out_dict[i] = {'data': data_subset.copy(), 'params': param_ids_by_condition.copy(), 'condition_label': condition_dataframe.iloc[i]}
-            
+
     else: 
         out_dict[0] = {'data': data, 'params': param_ids, 'condition_label': None}
 
-    #print(out_dict)
     return out_dict
 
 def filter_subject_condition_traces(hddm_model,
@@ -250,11 +222,10 @@ def filter_subject_condition_traces(hddm_model,
 
     # TODO-AF: Take into account 'group-only-knodes'
 
-    
     # Since hddm asks only for parameters in addition to 'a', 'v', 't' in the include statement
     # for the logic applied here we add those back in to get the full set of parameters which where fit
 
-    # This works for all models thus far includes (since they follow the 'a', 'v', 't' parameterization)
+    # This works for all models thus far (since they follow the 'a', 'v', 't' parameterization)
 
     # AF-TODO: If adding in other models to HDDM --> we might need a condition here in case some models do not include ['a', 'v', 't'] in the parameters
 
@@ -282,11 +253,6 @@ def filter_subject_condition_traces(hddm_model,
 
     includes_diff = set(tmp_cfg['params']) - set(includes_full).union(set(list(depends.keys()))).union(set(group_only_nodes)) # - set(group_only_nodes))
 
-    # Note: There are two kinds of plots
-    # subject wise posterior predictive: -> using the subject level parameterizations
-    # global posterior predictive: -> sample parameterizations from the group distributions and simulate from there (loses any subject specific information other than what was 'learned' through the group level from the data)
-    # TODO: global posterior predictive
-
     # Here we care about subject wise posterior predictives
 
     # Scenario 1: We have multiple conditions and / or a group model
@@ -302,30 +268,16 @@ def filter_subject_condition_traces(hddm_model,
                     condition_list.append(depends[key])
                 elif type(depends[key]) == list:
                     for tmp_depend in depends[key]:
-                        # print('tmp_depend')
-                        # print(tmp_depend)
-                        # print('condition_list')
-                        # print(condition_list)
                         if not (tmp_depend in condition_list):
                             condition_list.append(tmp_depend)
                 else:
                     pass
     
-            #condition_list = [depends[key] for key in depends.keys()]
-            # print('condition_list')
-            # print(condition_list)
-            condition_dataframe = data.groupby(condition_list).size().reset_index().drop(labels = [0], axis = 1) #.rename(columns = {0: 'count'}).drop(labels = ['count'], axis = 1)
-            # print('condition dataframe')
-            # print(condition_dataframe)
+            condition_dataframe = data.groupby(condition_list).size().reset_index().drop(labels = [0], axis = 1)
         else:
             params_depends = []
             condition_dataframe = None
-    
-        #n_frames = condition_dataframe.shape[0]
 
-        #print(condition_dataframe)
-        #print(n_frames)
-        
         # Get parameters that have no condition dependence (only subj) (but were fit)
         params_subj_only = list(set(includes_full) - (set(params_depends).union(set(group_only_nodes))))
 
@@ -352,14 +304,6 @@ def filter_subject_condition_traces(hddm_model,
         #print(condition_wise_params_dict.keys())
         
         for key_tmp in condition_wise_params_dict.keys():
-            #print('passed through with key ', key_tmp)
-            #print('of keys: ', condition_wise_params_dict.keys())
-
-            # TODO: Add parameters which where not fit by extending traces with defaults for those!
-            #print('includes diff')
-            #print(includes_diff)
-            #print(condition_wise_params_dict[key]['params'])
-            
             # Condition wise params carries all expected parameter names for a given condition
             # Some of these might not have been fit so for the tracees we want to set those to the 'default' as specified by the model config
            
@@ -368,29 +312,19 @@ def filter_subject_condition_traces(hddm_model,
             for param_not_included in list(includes_diff):
                 included_params.remove(param_not_included)
 
-            # print('included params')
-            # print(included_params)
+
             condition_wise_params_dict[key_tmp]['traces'] = traces[included_params].copy()
 
             # --> Add in 'fake' traces for parameters that where fixed as 'default value' as specified by model config
-            #print('includes diff')
-            #print(includes_diff)
             for param_not_included in list(includes_diff):
-                #print(condition_wise_params_dict[key]['traces'])
                 condition_wise_params_dict[key_tmp]['traces'][param_not_included] = model_config[model]['default_params'][model_config[model]['params'].index(param_not_included)]
             
-
         plotready_traces = make_trace_plotready_h_c(trace_dict = condition_wise_params_dict, 
                                                     model = model, 
                                                     is_group_model = is_group_model,
                                                     model_ground_truth = model_ground_truth)
 
-        #print(other_data)
-
-        #else if depends is not None:
-        #    plotready_traces = make_plotready_condition()
-        return plotready_traces # , condition_wise_params_dict) #, other_data, other_data_2)
-        #return condition_wise_params_dict
+        return plotready_traces
     
     # Scenario 2: Single condition single subject model (or data collapsed across subjects)
     else:
@@ -433,6 +367,10 @@ def filter_subject_condition_traces(hddm_model,
         return out_dict
 
 def extract_multi_cond_subj_plot_n(data = None):
+    """
+        Function expects as data the output of a call to filter_subject_condition_traces(). 
+        We then deduce if we have multiple-conditions, multiple-subjects and the total number of plots we need to produce.
+    """
     # Classify plot type:
     # Check if dataset has multiple conditions
     multi_condition = 0
@@ -458,6 +396,11 @@ def extract_multi_cond_subj_plot_n(data = None):
     return multi_condition, multi_subject, n_plots
 
 def _make_plot_sub_data(data = None, plot_n = None, multi_subject = None, multi_condition = None, grouped = False):
+    """
+        Takes in the outputs of calls to filter_subject_condition_traces() and extract_multi_cond_subj_plot() and returns a dictionary
+        that contains the information needed for one plot/figure (subplot).
+    """
+
     if multi_subject and multi_condition:
         # Condition one
         sub_data = data[list(data.keys())[plot_n]]
@@ -493,6 +436,12 @@ def _make_plot_sub_data(data = None, plot_n = None, multi_subject = None, multi_
     return sub_data
 
 def _convert_params(data = None):
+    """
+        This is called if we supply a vanilla hddm model to the plot listed below. 
+        We need to execute some parameter conversion to allow the new simulators to generate
+        the correct rt distributions.
+        Specifically any (subject wise etc.) 'a' parameter needs to be converted to a / 2.
+    """
     for key in data.keys():
         if 'a' == key.split('_')[0]:
             data[key] = data[key] / 2
@@ -641,28 +590,6 @@ def model_plot(hddm_model = None,
                                sharex = False, 
                                sharey = False)
 
-
-        # Run simulations
-        # subplot_cnt = 0
-        # post_dict = {}
-        # gt_dict = {}
-        #for i in sub_data.keys():
-            # RUN SIMULATIONS: POSTERIOR SAMPLES
-            #if hddm_model is not None:
-                # # Run Model simulations for posterior samples
-                # tmp_post = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
-                # idx = np.random.choice(sub_data[i]['traces'].shape[0], size = n_posterior_parameters, replace = False)
-                # # idx = np.random.choice(posterior_samples.shape[1], size = n_posterior_parameters, replace = False)
-
-                # out = simulator(theta = sub_data[i]['traces'][idx, :], # posterior_samples[plot_n, i, idx[j], :],
-                #                 model = model_fitted,
-                #                 n_samples = n_simulations_per_parameter,
-                #                 bin_dim = None)
-                
-                # #post_dict[i] = np.column_stack([out[0].squeeze().flatten(), out[1].squeeze().flatten()])               
-                # tmp_post[(n_simulations_per_parameter * j):(n_simulations_per_parameter * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
-            #subplot_cnt += 1
-        
         subplot_cnt = 0
         for i in sub_data.keys():
             if grouped and subplot_cnt > 0:
@@ -1113,7 +1040,6 @@ def posterior_predictive_plot(hddm_model = None,
         gt_dict = []
         post_dict = []
         for i in sub_data.keys():
-            #post_tmp = np.zeros((n_subplots, n_posterior_parameters * n_simulations_per_parameter, 2))
 
             idx = np.random.choice(sub_data[i]['traces'].shape[0],
                                    size = n_posterior_parameters, 
@@ -1153,35 +1079,6 @@ def posterior_predictive_plot(hddm_model = None,
             
             else:
                 ax_tmp = ax
-
-            # MODEL SIMULATIONS FOR POSTERIOR PARAMETERS
-            # print('Simulations for plot: ', i)
-            #for j in range(n_posterior_parameters):
-
-            # idx = np.random.choice(sub_data[i]['traces'].shape[0],
-            #                        size = n_posterior_parameters, 
-            #                        replace = False)
-
-            # out = simulator(theta = sub_data[i]['traces'][idx, :], # posterior_samples[i, idx[j], :], 
-            #                 model = hddm_model.model,
-            #                 n_samples = n_simulations_per_parameter,
-            #                 n_trials = sub_data[i]['traces'][idx, :].shape[0],
-            #                 bin_dim = None)
-            
-            # post_tmp[:, :] = np.stack([out[0].flatten(), out[1].flatten()])
-            
-            # MODEL SIMULATIONS FOR TRUE PARAMETERS
-            # Supply data too !
-            # if hddm_model is not None:
-            #     # out = simulator(theta = sub_data[i]['gt_parameter_vector'],
-            #     #                 model = model_ground_truth,
-            #     #                 n_samples = 20000,
-            #     #                 bin_dim = None)
-    
-            #     #gt_tmp = np.concatenate([out[0], out[1]], axis = 1)
-            #     gt_tmp = sub_data[i]['data'].values
-            #     gt_color = 'blue'
-            #     #print('passed through')
 
             # SUBPLOT LEVEL STYLING   
            # Make Titles:
@@ -1259,29 +1156,6 @@ def posterior_predictive_plot(hddm_model = None,
 
             # Increment subplot counter
             subplot_cnt += 1
-
-        # if grouped:
-        #         ax_tmp.hist(post_tmp[:, 0] * post_tmp[:, 1], 
-        #                     bins = np.linspace(- max_t, max_t, nbins), #50, # kde = False, # rug = False, 
-        #                     alpha =  1, 
-        #                     color = 'black',
-        #                     histtype = 'step', 
-        #                     density = 1, 
-        #                     edgecolor = 'black',
-        #                     linewidth = hist_linewidth
-        #                     )
-
-        #         #if ground_truth_data is not None:
-        #         ax_tmp.hist(gt_tmp[:, 0] * gt_tmp[:, 1], 
-        #                     alpha = 0.5, 
-        #                     color = gt_color, 
-        #                     density = 1, 
-        #                     edgecolor = gt_color,  
-        #                     histtype = 'step',
-        #                     linewidth = hist_linewidth, 
-        #                     bins = np.linspace(-max_t, max_t, nbins), #50, 
-        #                     # kde = False, #rug = False,
-        #                     )
 
         # Turn off redundant subplots
         if rows > 1 and cols > 1:
@@ -1420,11 +1294,6 @@ def posterior_pair_plot(hddm_model = None,
                 #ax.yaxis.set_label_text('')
                 ax.set_ylabel('')
 
-            #print('xlabels: ')
-            #print(xlabels)
-            #print('ylabels: ')
-            #print(ylabels)
-            
             if axes_limits == 'model':
                 for i in range(len(xlabels)):
                     for j in range(len(ylabels)):
@@ -1450,7 +1319,6 @@ def posterior_pair_plot(hddm_model = None,
             
             for ax in g.axes.flat:
                 plt.setp(ax.get_xticklabels(), rotation = 45)
-                #plt.setp(ax.get_)
 
             g.fig.suptitle(model_fitted.upper(), 
                            y = 1.03, 
@@ -1632,8 +1500,7 @@ def caterpillar_plot(hddm_model = None,
     if show:
         plt.show()
 
-    return # plt.show()
-
+    return 
 
 # STRUCTURE
 # EXPECT A HDDM MODEL
