@@ -244,13 +244,11 @@ def filter_subject_condition_traces(hddm_model,
         if 'sv' in includes_full or 'st' in includes_full or 'sz' in includes_full:
             model = 'full_ddm'
             tmp_cfg = hddm.simulators.model_config['full_ddm']
-            # include_diff = set(hddm.simulators.model_config[hddm_model.model]) - set(includes)
-
         else:
             tmp_cfg = hddm.simulators.model_config['ddm']
             model = 'ddm'
-            # include_diff = set(hddm.simulators.model_config[hddm_model.model]) - set(includes) 
 
+    # identify the paraemters that are supposed to be fixed at default levels
     includes_diff = set(tmp_cfg['params']) - set(includes_full).union(set(list(depends.keys()))).union(set(group_only_nodes)) # - set(group_only_nodes))
 
     # Here we care about subject wise posterior predictives
@@ -258,11 +256,12 @@ def filter_subject_condition_traces(hddm_model,
     # Scenario 1: We have multiple conditions and / or a group model
     # Use Hierarchical DataFrame
     if depends is not None or (depends is None and is_group_model):
+        
         # Get parameters that have condition dependence (finally condition + subj)
         if depends is not None:
             params_depends = list(depends.keys())
-
             condition_list = []
+
             for key in depends.keys():
                 if type(depends[key]) == str and not (depends[key] in condition_list):
                     condition_list.append(depends[key])
@@ -272,7 +271,7 @@ def filter_subject_condition_traces(hddm_model,
                             condition_list.append(tmp_depend)
                 else:
                     pass
-    
+            # Make dataframe that holds all the unique conditions (via groupby and summarizing with size)
             condition_dataframe = data.groupby(condition_list).size().reset_index().drop(labels = [0], axis = 1)
         else:
             params_depends = []
@@ -282,7 +281,6 @@ def filter_subject_condition_traces(hddm_model,
         params_subj_only = list(set(includes_full) - (set(params_depends).union(set(group_only_nodes))))
 
         # Get parameters that were not even fit
-
         # Have to add these parameters to the final trace objects
         params_default_fixed = list(includes_diff) # - set(group_only_nodes)) # was computed above
         traces = untransform_traces(hddm_model.get_traces(), model = model, is_nn = hddm_model.nn) #untransform_traces(hddm_model.get_traces())
@@ -299,9 +297,6 @@ def filter_subject_condition_traces(hddm_model,
                                                          params_depends = depends,
                                                          params_group_only = group_only_nodes,
                                                          is_group_model = is_group_model)
-        
-        #print('keys of condition_wise_params dict')
-        #print(condition_wise_params_dict.keys())
         
         for key_tmp in condition_wise_params_dict.keys():
             # Condition wise params carries all expected parameter names for a given condition
@@ -529,15 +524,6 @@ def model_plot(hddm_model = None,
     Return: plot object
     """
 
-    # Set model fitted (just to aid clarity of the code)
-    model_fitted = hddm_model.model
-
-    if save == True:
-        pass
-        # matplotlib.rcParams['text.usetex'] = True
-        #matplotlib.rcParams['pdf.fonttype'] = 42
-        # matplotlib.rcParams['svg.fonttype'] = 'none'
-
     if hddm_model is None and model_ground_truth is None:
         return 'Please provide either posterior samples, \n or a ground truth model and parameter set to plot something here. \n Currently you are requesting an empty plot' 
 
@@ -556,13 +542,14 @@ def model_plot(hddm_model = None,
     print('n_plots')
     print(n_plots)
 
+    # Outer for loop loops over Figures
     for plot_n in range(n_plots):
         sns.despine(right = True)
 
         t_s = np.arange(0, max_t, delta_t_graph)
         nbins = int((max_t) / bin_size)
 
-        # Make sub
+        # Create data specifically for the current figure
         sub_data = _make_plot_sub_data(data = data, 
                                        plot_n = plot_n, 
                                        multi_subject = multi_subject, 
@@ -576,20 +563,20 @@ def model_plot(hddm_model = None,
         else:
             rows = 1
         
+        # If the data is grouped, by definition we will have a single plot for each figure --> rows and cols set to 1
         if grouped:
             rows = 1
             cols = 1
 
-        print('rows')
-        print(rows)
-        print('columns')
-        print(cols)
-
+        # set up figure
         fig, ax = plt.subplots(rows, cols, 
                                figsize = (20 * scale_x, 20 * rows * scale_y), 
                                sharex = False, 
                                sharey = False)
 
+        
+        # Inner for loop:
+        # Loops over subplots (could be 1)
         subplot_cnt = 0
         for i in sub_data.keys():
             if grouped and subplot_cnt > 0:
@@ -598,6 +585,7 @@ def model_plot(hddm_model = None,
             row_tmp = int(np.floor(subplot_cnt / cols))
             col_tmp = subplot_cnt - (cols * row_tmp)
             
+            # SET BASIC AXIS OBJECTS
             if rows > 1 and cols > 1:
                 ax[row_tmp, col_tmp].set_xlim(0, max_t)
                 ax[row_tmp, col_tmp].set_ylim(- ylimit, ylimit)
@@ -648,9 +636,8 @@ def model_plot(hddm_model = None,
             if hddm_model is not None:
                 tmp_post = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
                 idx = np.random.choice(sub_data[i]['traces'].shape[0], size = n_posterior_parameters, replace = False)
-                # idx = np.random.choice(posterior_samples.shape[1], size = n_posterior_parameters, replace = False)
-                out = simulator(theta = sub_data[i]['traces'][idx, :], # posterior_samples[plot_n, i, idx[j], :],
-                                model = model_fitted,
+                out = simulator(theta = sub_data[i]['traces'][idx, :],
+                                model = hddm_model.model,
                                 n_samples = n_simulations_per_parameter,
                                 bin_dim = None)
 
@@ -659,8 +646,7 @@ def model_plot(hddm_model = None,
                 #tmp_post[(n_simulations_per_parameter * j):(n_simulations_per_parameter * (j + 1)), :] = np.concatenate([out[0], out[1]], axis = 1)
                 
                 # ADD HISTOGRAMS
-                # Run Model simulations for posterior samples
-                # DRAW DATA HISTOGRAMS
+                # POSTERIOR BASED HISTOGRAM
                 choice_p_up_post = np.sum(tmp_post[:, 1] == 1) / tmp_post.shape[0]
 
                 counts_2_up, bins = np.histogram(tmp_post[tmp_post[:, 1] == 1, 0],
@@ -696,7 +682,8 @@ def model_plot(hddm_model = None,
                             edgecolor = 'black',
                             linewidth = hist_linewidth,
                             zorder = -1)
-
+            
+            # DATASET BASED HISTOGRAMS
             if sub_data[i]['data'] is not None:
                 # These splits here is neither elegant nor necessary --> can represent ground_truth_data simply as a dict !
                 # Wiser because either way we can have varying numbers of trials for each subject !
@@ -741,17 +728,22 @@ def model_plot(hddm_model = None,
                 if row_tmp == 0 and col_tmp == 0:
                     ax_tmp_twin_up.legend(loc = 'lower right')
 
-            # POSTERIOR SAMPLES: BOUNDS AND SLOPES (model)
+            # BOUNDS AND SLOPES (model)
             if show_model:
+                # This is a little tricky, basically because I ran into trouble with labels being drawn multiple times
+                # We have draw most bounds without adding labels to the plot
+                # Once we add bounds from ground truth parameters (if supplied) --> no label
+                # Once we add a label to our posterior trace based bounds
+
                 if hddm_model is None:
                     # If we didn't supply posterior_samples but want to show model
-                    # we set n_posterior_parameters to 1 and should be 
+                    # we set n_posterior_parameters to 0 
                     n_posterior_parameters = 0
                 for j in range(n_posterior_parameters + 1):
                     tmp_label = ""
                     if j == (n_posterior_parameters - 1):
                         tmp_label = 'Model Samples'
-                        tmp_model = model_fitted
+                        tmp_model = hddm_model.model
                         tmp_samples = sub_data[i]['traces'][idx[j], :] #posterior_samples[i, idx[j], :]
                         # tmp_samples = posterior_samples[i, idx[j], :]
                         tmp_alpha = 0.05
@@ -773,7 +765,7 @@ def model_plot(hddm_model = None,
                     elif j == n_posterior_parameters and model_ground_truth == None:
                         break
                     elif j < (n_posterior_parameters - 1):
-                        tmp_model = model_fitted
+                        tmp_model = hddm_model.model
                         tmp_samples = sub_data[i]['traces'][idx[j], :] # posterior_samples[i, idx[j], :]
                         tmp_alpha = 0.05
                         tmp_color = 'black'
@@ -792,12 +784,11 @@ def model_plot(hddm_model = None,
                         b = np.maximum(tmp_samples[1] + model_config[tmp_model]['boundary'](t = t_s, theta = tmp_samples[4]), 0)
                     
                     if tmp_model == 'ddm' or tmp_model == 'ornstein' or tmp_model == 'levy' or tmp_model == 'full_ddm':
-                        print('tmp_samples')
-                        print()
-                        print(tmp_samples)
-                        b = tmp_samples[1] * np.ones(t_s.shape[0]) #model_config[tmp_model]['boundary'](t = t_s)                   
+
+                        b = tmp_samples[1] * np.ones(t_s.shape[0])                   
 
                     # MAKE SLOPES (VIA TRAJECTORIES) !
+                    # AF-TODO: Can probably be optimized for speed by plotting only a few points to draw the slope line
                     out = simulator(theta = tmp_samples,
                                     model = tmp_model, 
                                     n_samples = 1,
@@ -808,6 +799,7 @@ def model_plot(hddm_model = None,
                     tmp_traj = out[2]['trajectory']
                     maxid = np.minimum(np.argmax(np.where(tmp_traj > - 999)), t_s.shape[0])
 
+                    # Upper bound
                     ax_tmp.plot(t_s + tmp_samples[model_config[tmp_model]['params'].index('t')], b, tmp_color,
                                 alpha = tmp_alpha,
                                 zorder = 1000 + j,
@@ -815,12 +807,14 @@ def model_plot(hddm_model = None,
                                 label = tmp_label,
                                 )
 
+                    # Lower bound
                     ax_tmp.plot(t_s + tmp_samples[model_config[tmp_model]['params'].index('t')], -b, tmp_color, 
                                 alpha = tmp_alpha,
                                 zorder = 1000 + j,
                                 linewidth = tmp_linewidth,
                                 )
 
+                    # Slope
                     ax_tmp.plot(t_s[:maxid] + tmp_samples[model_config[tmp_model]['params'].index('t')],
                                 tmp_traj[:maxid],
                                 c = tmp_color, 
@@ -828,6 +822,7 @@ def model_plot(hddm_model = None,
                                 zorder = 1000 + j,
                                 linewidth = tmp_linewidth) # TOOK AWAY LABEL
 
+                    # Starting point
                     ax_tmp.axvline(x = tmp_samples[model_config[tmp_model]['params'].index('t')], # this should identify the index of ndt directly via model config !
                                     ymin = - ylimit, 
                                     ymax = ylimit, 
@@ -844,8 +839,6 @@ def model_plot(hddm_model = None,
 
             subplot_cnt += 1
                         
-            # Set plot title
-            
             # Make condition label
             condition_label = ''
             for label_key in sub_data[i]['cond_subj_label'].keys():
@@ -853,7 +846,6 @@ def model_plot(hddm_model = None,
                     condition_label += str(label_key) + ': '
                     condition_label += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
             condition_label = condition_label[:-2]
-
 
             title_size = 24
             if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
@@ -867,8 +859,9 @@ def model_plot(hddm_model = None,
                 title_tmp = ''
 
             # Set plot-global title
-            fig.suptitle(fig_title_tmp, fontsize = 40)
+            fig.suptitle(fig_title_tmp, fontsize = 30 / (0.5 * len(list(sub_data[i]['cond_subj_label'].keys())))
 
+            # Set x and y axis labels
             if row_tmp == (rows - 1):
                 ax_tmp.set_xlabel('rt', 
                                   fontsize = 20);
@@ -885,7 +878,8 @@ def model_plot(hddm_model = None,
                 if show_model:
                     ax_tmp.axvline(x = sub_data[i]['gt_parameter_vector'][model_config[model_ground_truth]['params'].index('t')], ymin = - ylimit, ymax = ylimit, c = tmp_color, linestyle = '--')
                 ax_tmp.axhline(y = 0, xmin = 0, xmax = sub_data[i]['gt_parameter_vector'][model_config[model_ground_truth]['params'].index('t')] / max_t, c = tmp_color,  linestyle = '--')
-
+        
+        # Turn off subplots which were not needed in a given display
         if rows > 1 and cols > 1:
             for i in range(n_subplots, rows * cols, 1):
                 row_tmp = int(np.floor(i / cols))
@@ -965,12 +959,6 @@ def posterior_predictive_plot(hddm_model = None,
         print('ERROR: n_posterior_parameters needs to be larger than 1')
         return
 
-    if save == True:
-        pass
-        #matplotlib.rcParams['text.usetex'] = True
-        #matplotlib.rcParams['pdf.fonttype'] = 42
-        #matplotlib.rcParams['svg.fonttype'] = 'none'
-
      # AF-TODO: Shape checks
     if hddm_model is not None:
         data = filter_subject_condition_traces(hddm_model, 
@@ -985,7 +973,7 @@ def posterior_predictive_plot(hddm_model = None,
     
     # General plot parameters
     nbins = int((2 * max_t) / bin_size)     
-    # rows = int(np.ceil(n_plots / cols))
+
     sns.set(style = "white", 
             palette = "muted", 
             color_codes = True,
@@ -1017,7 +1005,6 @@ def posterior_predictive_plot(hddm_model = None,
                                sharex = False, 
                                sharey = False)
 
-
         # Make condition label (and set global figure title depending on what kind of data we are dealing with)
         condition_label = ''
         for label_key in sub_data[list(sub_data.keys())[0]]['cond_subj_label'].keys():
@@ -1029,18 +1016,14 @@ def posterior_predictive_plot(hddm_model = None,
         if ((multi_condition and multi_subject) or (not multi_condition and multi_subject)) and not grouped:
             fig_title_tmp = condition_label
         
-
         # Plot global title
         fig.suptitle(fig_title_tmp, fontsize = title_size)
 
-
         # GET SIMULATIONS AND COLLECT GROUND TRUTHS FOR CONDITON
-
         subplot_cnt = 0
         gt_dict = []
         post_dict = []
         for i in sub_data.keys():
-
             idx = np.random.choice(sub_data[i]['traces'].shape[0],
                                    size = n_posterior_parameters, 
                                    replace = False)
@@ -1060,9 +1043,9 @@ def posterior_predictive_plot(hddm_model = None,
         subplot_cnt = 0
         gt_color = 'blue'
         for i in sub_data.keys():
+            
             # If data is grouped the inner loop has to be passed just once 
             # to set the styling. 
-
             if grouped and (subplot_cnt > 0):
                 break
             print('n subplots to plot')
@@ -1132,6 +1115,7 @@ def posterior_predictive_plot(hddm_model = None,
                 post_tmp = post_dict[i]
                 gt_tmp = gt_dict[i]
 
+            # Posterior Predictive
             ax_tmp.hist(post_tmp[:, 0] * post_tmp[:, 1], 
                         bins = np.linspace(- max_t, max_t, nbins), #50, # kde = False, # rug = False, 
                         alpha =  1, 
@@ -1142,7 +1126,7 @@ def posterior_predictive_plot(hddm_model = None,
                         linewidth = hist_linewidth
                         )
 
-            #if ground_truth_data is not None:
+            # Ground Truth
             ax_tmp.hist(gt_tmp[:, 0] * gt_tmp[:, 1], 
                         alpha = 0.5, 
                         color = gt_color, 
@@ -1181,10 +1165,9 @@ def posterior_predictive_plot(hddm_model = None,
                         format = 'png')
         if show:
             plt.show()  
-        #plt.close()
         plt.close()
 
-    return # plt.show()
+    return
 
 # Posterior Pair Plot
 def posterior_pair_plot(hddm_model = None, 
@@ -1229,12 +1212,6 @@ def posterior_pair_plot(hddm_model = None,
         return 'No data supplied --> please supply a HDDM model (including traces)'
 
     model_fitted = hddm_model.model
-    
-    if save == True:
-        pass
-        #matplotlib.rcParams['text.usetex'] = True
-        #matplotlib.rcParams['pdf.fonttype'] = 42
-        #matplotlib.rcParams['svg.fonttype'] = 'none'
     
     data = filter_subject_condition_traces(hddm_model = hddm_model, model_ground_truth = model_ground_truth)
 
@@ -1417,12 +1394,6 @@ def caterpillar_plot(hddm_model = None,
     if hddm_model is None:
         return ('No HDDM object supplied')
 
-    if save == True:
-        pass
-        #matplotlib.rcParams['text.usetex'] = True
-        #matplotlib.rcParams['pdf.fonttype'] = 42
-        #matplotlib.rcParams['svg.fonttype'] = 'none'
-    
     sns.set(style = "white", 
             palette = "muted", 
             color_codes = True,
@@ -1431,7 +1402,11 @@ def caterpillar_plot(hddm_model = None,
     trace = untransform_traces(traces = hddm_model.get_traces(), 
                                model = hddm_model.model, 
                                is_nn = hddm_model.nn)
+    
+    if not hddm_model.nn:
+        traces = _convert_params(traces)
 
+    # TODO: Probably have to add parameter adjustments to account for LAN/no LAN case
     if keep_key is None:
         trace_cnt_tmp = trace.shape[1]
     else:
@@ -1447,8 +1422,6 @@ def caterpillar_plot(hddm_model = None,
     plot_vals = {} # [0.01, 0.9], [0.01, 0.99], [mean]
     
     for k in trace.keys():
-        print('print k')
-        print(k)
         # If we want to keep only a specific parameter we skip all traces which don't include it in 
         # their names !
         if keep_key is not None and keep_key not in k: 
@@ -1467,6 +1440,7 @@ def caterpillar_plot(hddm_model = None,
                 if 'sd' in k:
                     ok_ = 0
             if ok_:
+                # Make empirical CDFs and extract the 10th, 1th / 99th, 90th percentiles
                 ecdfs[k] = ECDF(trace[k_old])
                 tmp_sorted = sorted(trace[k_old])
                 _p01 =  tmp_sorted[np.sum(ecdfs[k](tmp_sorted) <= 0.01) - 1]
@@ -1477,16 +1451,21 @@ def caterpillar_plot(hddm_model = None,
                 plot_vals[k] = [[_p01, _p99], [_p1, _p9], _pmean]
     
     x = [plot_vals[k][2] for k in plot_vals.keys()]
+    
+    # Create y-axis labels first
     ax.scatter(x, plot_vals.keys(), c = 'black', marker = 's', alpha = 0)
     
+    # Plot the actual cdf-based data
     for k in plot_vals.keys():
         k = k.replace('_', '-')
         ax.plot(plot_vals[k][1], [k, k], c = 'grey', zorder = - 1, linewidth = 5)
         ax.plot(plot_vals[k][0] , [k, k], c = 'black', zorder = - 1)
         
+        # Add in ground truth if supplied
         if ground_truth_parameter_dict is not None:
             ax.scatter(ground_truth_parameter_dict[k.replace('-', '_')], k,  c = 'red', marker = "|")
-        
+    
+    # Styling
     ax.set_xlim(x_limits[0], x_limits[1])
     ax.tick_params(axis = 'y', size = tick_label_size_y)
     ax.tick_params(axis = 'x', size = tick_label_size_x)
@@ -1499,10 +1478,6 @@ def caterpillar_plot(hddm_model = None,
 
     if show:
         plt.show()
-
-    return 
-
-# STRUCTURE
-# EXPECT A HDDM MODEL
-# TRANSFORM TRACES INTO USABLE FORM
-# PRODUCE PLOT
+        return
+    
+    return

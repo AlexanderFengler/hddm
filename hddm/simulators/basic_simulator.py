@@ -298,7 +298,10 @@ def simulator(theta,
     #     print('ERROR number of trials does not match first dimension of theta array')
     #     return
     
-    n_trials = theta.shape[0]
+    if theta.ndim > 1:
+        n_trials = theta.shape[0]
+    else:
+        n_trials = 1
     
     # 2 choice models 
     if no_noise:

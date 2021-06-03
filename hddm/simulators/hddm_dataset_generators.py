@@ -9,8 +9,6 @@ from statsmodels.distributions.empirical_distribution import ECDF
 from scipy.stats import truncnorm
 from patsy import dmatrix
 from collections import OrderedDict
-
-
 from hddm.simulators.basic_simulator import *
 
 # Helper
@@ -110,8 +108,6 @@ def _add_outliers(sim_out = None,
             sim_out[0][-n_outliers:, 0] = outlier_data[:, 0]
             sim_out[1][-n_outliers:, 0] = outlier_data[:, 1]
     return 
-
-    
 
 # -------------------------------------------------------------------------------------
 # Parameter set generator
@@ -888,10 +884,11 @@ def simulator_h_c(n_subjects = 10,
 
         # Regression Part
         #reg_df = make_covariate_df(regression_covariates, n_samples_by_subject)
-        for regression_model in regression_models:
-            separator = regression_model.find('~')
-            assert separator != -1, 'No outcome variable specified.'
-            params_utilized += regression_model[:separator].strip(' ')
+        if regression_models is not None:
+            for regression_model in regression_models:
+                separator = regression_model.find('~')
+                assert separator != -1, 'No outcome variable specified.'
+                params_utilized += regression_model[:separator].strip(' ')
 
         # Group only Part
         params_utilized += group_only
@@ -900,8 +897,9 @@ def simulator_h_c(n_subjects = 10,
         params_utilized += fixed_at_default
         
         # Depends on Part
-        for depends_on_key in depends_on.keys():
-            params_utilized += [depends_on_key]
+        if depends_on is not None:
+            for depends_on_key in depends_on.keys():
+                params_utilized += [depends_on_key]
 
         params_utilized = list(set(params_utilized))
 

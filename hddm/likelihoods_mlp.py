@@ -22,17 +22,9 @@ def make_mlp_likelihood_complete(model,
     """
 
     def random(self):
-        # print(self.parents)
-        # print('printing the dir of self.parents directly')
-        # print(dir(self.parents))
-        # print('printing dir of the v variable')
-        # print(dir(self.parents['v']))
-        # print(self.parents['v'].value)
-        # print(self.parents.value)
-        # print('trying to print the value part of parents')
-        # print(dict(self.parents.value))
-        # print('tying to pring the values part of parents')
-        # print(self.parents.values)
+        """
+            Generate random samples from a given model (the dataset matches the size of the respective observated dataset supplied as an attribute of 'self').
+        """
 
         # this can be simplified so that we pass parameters directly to the simulator ...
         theta = np.array(model_config[model]['default_params'], dtype = np.float32)
@@ -44,18 +36,11 @@ def make_mlp_likelihood_complete(model,
                 theta[cnt] = np.array(self.parents.value[param]).astype(np.float32)
             cnt += 1
         
-        #print('print theta from random function in wfpt_nn')
-        #print(theta)
-
-        #new_func = partial(simulator, model = model, n_samples = self.shape, max_t = 20) # This may still be buggy !
-        #print('self shape: ')
-        #print(self.shape)
         sim_out = simulator(theta = theta, 
                             model = model, 
                             n_samples = self.shape[0], 
                             max_t = 20)
         return hddm_preprocess(sim_out, keep_negative_responses = True)
-
 
     if model == 'ddm':
         def wienernn_like_ddm(x, 
@@ -66,6 +51,9 @@ def make_mlp_likelihood_complete(model,
                               p_outlier = 0,
                               w_outlier = 0.1,
                               **kwargs):
+            """
+                LAN Log-likelihood for the DDM
+            """  
 
             return hddm.wfpt.wiener_like_nn_ddm(x['rt'].values,
                                                 x['response'].values,  
@@ -78,29 +66,10 @@ def make_mlp_likelihood_complete(model,
                                                 **kwargs)
 
         def pdf_ddm(self, x):
-            #print('type of x')
-            #print(type(x))
-            #print(x)
-            #print(self.parents)
-            #print(**self.parents)
-            #print(self.parents['a'])
-            #print(dir(self.parents['a']))
-            #print(self.parents['a'].value)
-            #print(kwargs)
-            #print(self.parents['a'].value)
-            # Note as per kabuki it seems that x tends to come in as a 'value_range', which is essetially a 1d ndarray
-            # We could change this ...
-
             rt = np.array(x, dtype = np.float32)
             response = rt / np.abs(rt)
             rt = np.abs(rt)
-            
-            #print(rt)
-            #print(response)
-            #print(response.shape)
-            #print(rt.shape)
-            # response = 
-            #pdf_fun = hddm.wfpt.wiener_like_nn_ddm_pdf
+ 
             # model_config[] # TODO FILL THIS IN SO THAT WE CREATE THE APPROPRIATE ARRAY AS INPUT TO THE SIMULATOR
             out = hddm.wfpt.wiener_like_nn_ddm_pdf(x = rt, response = response, network = kwargs['network'], **self.parents)# **kwargs) # This may still be buggy !
             return out
@@ -129,6 +98,10 @@ def make_mlp_likelihood_complete(model,
                                   p_outlier = 0,
                                   w_outlier = 0,
                                   **kwargs): #theta
+
+            """
+                LAN Log-likelihood for the WEIBULL MODEL
+            """  
 
             return hddm.wfpt.wiener_like_nn_weibull(x['rt'].values,
                                                     x['response'].values, 
@@ -172,6 +145,9 @@ def make_mlp_likelihood_complete(model,
                           p_outlier = 0,
                           w_outlier = 0,
                           **kwargs):
+            """
+                LAN Log-likelihood for the DDM-SDV MODEL
+            """  
 
             return hddm.wfpt.wiener_like_nn_ddm_sdv(x['rt'].values,
                                                     x['response'].values,  
@@ -214,6 +190,9 @@ def make_mlp_likelihood_complete(model,
                                            p_outlier = 0,
                                            w_outlier = 0,
                                            **kwargs):
+            """
+                LAN Log-likelihood for the DDM-SDV MODEL (Trained on analytic likelihoods).
+            """  
 
             return hddm.wfpt.wiener_like_nn_ddm_sdv_analytic(x['rt'].values,
                                                              x['response'].values,  
@@ -244,7 +223,6 @@ def make_mlp_likelihood_complete(model,
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_ddm_sdv_analytic
         wfpt_nn.random = random
-        #return wienernn_like_ddm_sdv_analytic
         return wfpt_nn
 
     if model == 'levy':
@@ -257,6 +235,9 @@ def make_mlp_likelihood_complete(model,
                                p_outlier = 0.1,
                                w_outlier = 0.1,
                                **kwargs): #theta
+            """
+                LAN Log-likelihood for the LEVY MODEL
+            """  
 
             return hddm.wfpt.wiener_like_nn_levy(x['rt'].values,
                                     x['response'].values, 
@@ -287,7 +268,6 @@ def make_mlp_likelihood_complete(model,
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_levy
         wfpt_nn.random = random
-        #return wienernn_like_ddm_sdv_analytic
         return wfpt_nn
 
     if model == 'ornstein':
@@ -300,6 +280,9 @@ def make_mlp_likelihood_complete(model,
                                    p_outlier = 0,
                                    w_outlier = 0,
                                    **kwargs): #theta
+            """
+                LAN Log-likelihood for the ORNSTEIN MODEL
+            """  
     
             return hddm.wfpt.wiener_like_nn_ornstein(x['rt'].values,
                                                      x['response'].values, 
@@ -311,7 +294,6 @@ def make_mlp_likelihood_complete(model,
                                                      p_outlier = p_outlier, # TODO: ACTUALLY USE THIS
                                                      w_outlier = w_outlier,
                                                      **kwargs)
-        #return wienernn_like_ornstein
 
         def pdf_ornstein(self, x):
             rt = np.array(x, dtype = np.float32)
@@ -331,8 +313,6 @@ def make_mlp_likelihood_complete(model,
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_ornstein
         wfpt_nn.random = random
-        #return wienernn_like_ddm_sdv_analytic
-        #return wienernn_like_ornstein
         return wfpt_nn
 
     if model == 'full_ddm' or model == 'full_ddm2':
@@ -347,6 +327,9 @@ def make_mlp_likelihood_complete(model,
                                    p_outlier = 0,
                                    w_outlier = 0,
                                    **kwargs):
+            """
+                LAN Log-likelihood for the FULL DDM MODEL
+            """  
 
             return hddm.wfpt.wiener_like_nn_full_ddm(x['rt'].values,
                                                      x['response'].values,
@@ -394,6 +377,9 @@ def make_mlp_likelihood_complete(model,
                                 p_outlier = 0,
                                 w_outlier = 0,
                                 **kwargs):
+            """
+                LAN Log-likelihood for the ANGLE MODEL
+            """  
 
             return hddm.wfpt.wiener_like_nn_angle(x['rt'].values,
                                                   x['response'].values,  
@@ -406,8 +392,6 @@ def make_mlp_likelihood_complete(model,
                                                   w_outlier = w_outlier,
                                                   **kwargs)
             
-        #return wienernn_like_full_ddm
-
         def pdf_angle(self, x):
             rt = np.array(x, dtype = np.float32)
             response = rt / np.abs(rt)
@@ -426,15 +410,11 @@ def make_mlp_likelihood_complete(model,
         wfpt_nn.cdf_vec = None # AF TODO: Implement this for neural nets (not a big deal actually but not yet sure where this is ever used finally)
         wfpt_nn.cdf = cdf_angle
         wfpt_nn.random = random
-        #return wienernn_like_ddm_sdv_analytic
-        #return wienernn_like_ornstein
-        
-        #return wienernn_like_angle
         return wfpt_nn
     else:
         return 'Not implemented errror: Failed to load likelihood because the model specified is not implemented'
 
-# Defining only the model likelihood at this point !
+# REGRESSOR LIKELIHOODS
 def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                                               **kwargs):
     """Defines the regressor likelihoods for the MLP networks.
@@ -452,9 +432,11 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
 
     # Need to rewrite these random parts !
     def random(self, keep_negative_responses = True, add_model_parameters = False, keep_subj_idx = False):
+        """
+            Function to sample from a regressor based likelihood. Conditions on the covariates.
+        """
         param_dict = deepcopy(self.parents.value)
         del param_dict['reg_outcomes']
-
 
         # size = sampled_rts.shape[0]
         n_params = model_config[model]['n_params']
@@ -482,10 +464,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                             model = model,
                             n_samples = 1,
                             max_t = 20)
-        # sim_out_copy = []
-        # sim_out_copy.append(np.squeeze(sim_out[0], axis = 0))
-        # sim_out_copy.append(np.squeeze(sim_out[1], axis = 0))
-        # sim_out_copy.append(sim_out[2])
+
         return hddm_preprocess(sim_out, 
                                keep_negative_responses = keep_negative_responses, 
                                add_model_parameters = add_model_parameters, 
@@ -498,7 +477,7 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                                      w_outlier = 0.1,
                                      **kwargs):
 
-            """Log-likelihood for the full DDM using the interpolation method"""
+            """LAN Log-likelihood for the DDM"""
 
             params = {'v': v, 'a': a, 'z': z, 't': t}
             n_params = 4 #model_config[model]['n_params']
@@ -570,6 +549,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                                          p_outlier = 0, 
                                          w_outlier = 0.1,
                                          **kwargs):
+            """
+                LAN Log-likelihood for the FULL DDM
+            """                             
 
             params = {'v': v, 'a': a, 'z': z, 't': t, 'sz': sz, 'sv': sv, 'st': st}
 
@@ -607,16 +589,11 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                                        w_outlier = 0.1,
                                        **kwargs):
 
-            """Log-likelihood for the full DDM using the interpolation method"""
+            """
+                LAN Log-likelihood for the ANGLE MODEL
+            """  
 
             params = {'v': v, 'a': a, 'z': z, 't': t, 'theta': theta}
-
-            # To print
-            # for key in params.keys():
-            #     #print('key')
-            #     print(key)
-            #     print('param shape')
-            #     print(params[key].shape)
 
             n_params = int(5)
             size = int(value.shape[0])
@@ -627,13 +604,6 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
             for tmp_str in ['v', 'a', 'z', 't', 'theta']:
 
                 if tmp_str in reg_outcomes:
-                    # print(params[tmp_str])
-                    # print(value['rt'])
-                    # print('value[rt].index.shape')
-                    # print(value['rt'].index.shape)
-                    # print(value['rt'].shape)
-                    # print(params[tmp_str].loc[value['rt'].index].shape)
-                    # print(params[tmp_str].loc[value['rt'].index].values[:, 0].shape)
                     data[:, cnt] = params[tmp_str].loc[value['rt'].index].values[:, 0]
                     if (data[:, cnt].min() < model_config[model]['param_bounds'][0][cnt]) or (data[:, cnt].max() > model_config[model]['param_bounds'][1][cnt]):
                         print('boundary violation of regressor part')
@@ -659,7 +629,9 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                                         w_outlier = 0.1,
                                         **kwargs):
 
-            """Log-likelihood for the full DDM using the interpolation method"""
+            """
+                LAN Log-likelihood for the LEVY MODEL
+            """  
 
             params = {'v': v, 'a': a, 'z': z, 'alpha': alpha, 't': t}
             n_params = int(5)
@@ -696,6 +668,10 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                                       w_outlier = 0.1,
                                       **kwargs):
 
+            """
+                LAN Log-likelihood for the ORNSTEIN MODEL
+            """  
+
             params = {'v': v, 'a': a, 'z': z, 'g': g, 't': t}
             
             n_params = int(5)
@@ -731,6 +707,10 @@ def generate_wfpt_nn_ddm_reg_stochastic_class(model = None,
                                          p_outlier = 0, 
                                          w_outlier = 0.1,
                                          **kwargs):
+
+            """
+                LAN Log-likelihood for the WEIBULL MODEL
+            """  
 
             params = {'v': v, 'a': a, 'z': z, 't': t, 'alpha': alpha, 'beta': beta}
             n_params = int(6)
