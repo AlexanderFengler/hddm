@@ -1271,6 +1271,7 @@ def simulator_h_c(n_subjects = 10,
                                         group_only = group_only,
                                         depends_on = depends_on,
                                         fixed_at_default = fixed_at_default)
+    print(fixed_at_default)
     print(remainder)
 
     # Make conditions df
