@@ -1100,6 +1100,7 @@ def simulator_h_c(n_subjects = 10,
                         
                 # Append full data:
                 full_data.append(subj_data.copy())
+                print(full_data)
                  
             remainder_set = 1
             regressor_set = 1
