@@ -851,6 +851,7 @@ def model_plot(hddm_model = None,
                         
             # Make condition label
             condition_label = ''
+            fig_title_tmp = ''
 
             if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
                 for label_key in sub_data[i]['cond_subj_label'].keys():
