@@ -973,6 +973,7 @@ def simulator_h_c(n_subjects = 10,
                 # Parameter vector
                 subj_data = pd.DataFrame(index = np.arange(0, n_samples_by_subject, 1))
                 subj_data['subj_idx'] = str(subj_idx)
+                print(subj_data)
 
                 # Fixed part
                 if fixed_at_default is not None:
