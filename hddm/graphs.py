@@ -165,6 +165,7 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
         # Parameters which do NOT depend on covariates --> consider only subject level
         for param_tmp in params_subj_only:
             for id_tmp in ids:
+                ids = get_subj_ids(data = data)
                 # make str
                 param_str = param_tmp + '_subj.' + str(id_tmp)
                 param_ids.append(param_str)
