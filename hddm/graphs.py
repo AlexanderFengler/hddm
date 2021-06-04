@@ -1032,8 +1032,8 @@ def posterior_predictive_plot(hddm_model = None,
 
         # GET SIMULATIONS AND COLLECT GROUND TRUTHS FOR CONDITON
         subplot_cnt = 0
-        gt_dict = []
-        post_dict = []
+        gt_dict = {}
+        post_dict = {}
         for i in sub_data.keys():
             idx = np.random.choice(sub_data[i]['traces'].shape[0],
                                    size = n_posterior_parameters, 
