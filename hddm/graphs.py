@@ -1035,6 +1035,8 @@ def posterior_predictive_plot(hddm_model = None,
         gt_dict = {}
         post_dict = {}
         for i in sub_data.keys():
+            print('sub_data_key')
+            print(i)
             idx = np.random.choice(sub_data[i]['traces'].shape[0],
                                    size = n_posterior_parameters, 
                                    replace = False)
@@ -1045,6 +1047,7 @@ def posterior_predictive_plot(hddm_model = None,
                             bin_dim = None)
             
             post_dict[i] = np.stack([out[0].flatten(), out[1].flatten()])
+            print(post_dict[i])
             gt_dict[i] = (sub_data[i]['data'].values)
 
             subplot_cnt += 1
