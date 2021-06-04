@@ -1258,9 +1258,12 @@ def simulator_h_c(n_subjects = 10,
                                         fixed_at_default = fixed_at_default)
 
     # Make conditions df
-    conditions_df = make_conditions_df(conditions = conditions)
-    print('Conditions created...')
-    print(conditions_df)
+    if depends_on is not None:
+        conditions_df = make_conditions_df(conditions = conditions)
+        print('Conditions created...')
+        print(conditions_df)
+    else:
+        conditions_df = None
     
     params_ok_all = 0
     cnt = 0   
