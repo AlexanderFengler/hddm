@@ -1042,7 +1042,6 @@ def posterior_predictive_plot(hddm_model = None,
             out = simulator(theta = sub_data[i]['traces'][idx, :], # posterior_samples[i, idx[j], :], 
                             model = hddm_model.model,
                             n_samples = n_simulations_per_parameter,
-                            n_trials = sub_data[i]['traces'][idx, :].shape[0],
                             bin_dim = None)
             
             post_dict[i] = np.stack([out[0].flatten(), out[1].flatten()])
