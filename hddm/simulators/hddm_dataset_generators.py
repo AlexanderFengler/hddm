@@ -1141,7 +1141,15 @@ def simulator_h_c(n_subjects = 10,
         # print(['rt', 'response'] + ['subj_idx'] + [key for key in regression_covariates.keys()] + [key for key in conditions.keys()] + model_config[model]['params'])
         # print(full_data)
         
-        full_data = full_data[['rt', 'response'] + ['subj_idx'] + [key for key in regression_covariates.keys()] + [key for key in conditions.keys()] + model_config[model]['params']]
+        full_data_cols = ['rt', 'response']
+        
+        if regression_covariates is not None:
+            full_data_cols += [key for key in regression_covariates.keys()]
+        if conditions is not None:
+            full_data_cols += [key for key in conditions.keys()]
+        
+        full_data_cols += model_config[model]['params']
+        full_data = full_data[full_data_cols]
         full_data.reset_index(drop = True, inplace = True)
         
         return full_data, full_parameter_dict
