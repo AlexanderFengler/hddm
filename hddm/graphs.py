@@ -173,10 +173,16 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
         # There might be more group only parameters than the ones we find in params_depends
         # --> we add these to our parameter ids directly
         # Their traces carry simply the respective model parameter name
-        if len(set(params_group_only) - set(params_depends)) > 0:
-            for param_tmp in set(params_group_only) - set(params_depends):
-                param_str = str(param_tmp)
-                param_ids.append(param_str)
+        if not params_group_only == None:
+            if params_depends == None:
+                params_depends_tmp = []
+            else:
+                params_depends_tmp = params_depends.copy()
+
+            if len(set(params_group_only) - set(params_depends_tmp)) > 0:
+                for param_tmp in set(params_group_only) - set(params_depends):
+                    param_str = str(param_tmp)
+                    param_ids.append(param_str)
 
     out_dict = {}
     # We now pick out all the parameters that are relevant for a particular group's data
