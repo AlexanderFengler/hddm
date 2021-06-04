@@ -1151,6 +1151,9 @@ def simulator_h_c(n_subjects = 10,
             full_data_cols += [key for key in regression_covariates.keys()]
         if conditions is not None:
             full_data_cols += [key for key in conditions.keys()]
+
+        print('full data cols')
+        print(full_data_cols)
         
         full_data_cols += model_config[model]['params']
         full_data = full_data[full_data_cols]
