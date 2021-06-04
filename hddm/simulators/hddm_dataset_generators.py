@@ -891,10 +891,12 @@ def simulator_h_c(n_subjects = 10,
                 params_utilized += regression_model[:separator].strip(' ')
 
         # Group only Part
-        params_utilized += group_only
+        if group_only is not None:
+            params_utilized += group_only
         
         # Fixed Part
-        params_utilized += fixed_at_default
+        if fixed_at_default is not None:
+            params_utilized += fixed_at_default
         
         # Depends on Part
         if depends_on is not None:
