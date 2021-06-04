@@ -958,8 +958,12 @@ def simulator_h_c(n_subjects = 10,
         # Subject part -----------------------
         full_data = []
         # Condition --------------------------
-        for condition_id in range(conditions_df.shape[0]):
-            conditions_tmp = conditions_df.iloc[condition_id]
+        if conditions_df is None:
+            n_conditions = 1
+        else:
+            n_conditions = conditions_df.shape[0]
+        
+        for condition_id in range(n_conditions):
             remainder_set = 0
             regressor_set = 0
             
@@ -996,6 +1000,7 @@ def simulator_h_c(n_subjects = 10,
                 
                 # Depends on part
                 if depends_on is not None:
+                    conditions_tmp = conditions_df.iloc[condition_id]
                     for depends_tmp in depends_on.keys():
                         # print('depends_tmp')
                         # print(depends_tmp)
@@ -1090,8 +1095,8 @@ def simulator_h_c(n_subjects = 10,
 
                         subj_data[outcome] = (design_matrix * reg_params_tmp).sum(axis = 1)
                         
-                        # Append full data:
-                        full_data.append(subj_data.copy())
+                # Append full data:
+                full_data.append(subj_data.copy())
                  
             remainder_set = 1
             regressor_set = 1
