@@ -642,7 +642,7 @@ def model_plot(hddm_model = None,
                                     model = model_ground_truth, 
                                     n_samples = 1,
                                     bin_dim = None)
-                    ax_tmp.plot(out[2]['ndt'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], 
+                    ax_tmp.plot(out[2]['t'] + np.arange(0, out[2]['max_t'] +  out[2]['delta_t'], out[2]['delta_t'])[out[2]['trajectory'][:, 0] > -999], 
                                 out[2]['trajectory'][out[2]['trajectory'] > -999], 
                                 color = color_trajectories, 
                                 alpha = alpha_trajectories,
