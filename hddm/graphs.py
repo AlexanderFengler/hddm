@@ -872,7 +872,10 @@ def model_plot(hddm_model = None,
                 title_tmp = ''
 
             # Set plot-global title
-            fig.suptitle(fig_title_tmp, fontsize = 30 / (0.5 * len(list(sub_data[i]['cond_subj_label'].keys()))))
+            if 'cond_subj_label' in list(sub_data[i].keys()):
+                fig.suptitle(fig_title_tmp, fontsize = 30 / (0.5 * len(list(sub_data[i]['cond_subj_label'].keys()))))
+            else:
+                pass
 
             # Set x and y axis labels
             if (row_tmp == (rows - 1)):
