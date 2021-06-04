@@ -141,7 +141,7 @@ def make_trace_plotready_h_c(trace_dict = None,
                     if trace_dict[key]['condition_label'] is not None:
                         full_condition_subj_label['subj_idx'] = subj_id
                     else:
-                        full_condition_subj_label = pd.DataFrame(subj_id, columns = ['subj_idx'])
+                        full_condition_subj_label = pd.DataFrame([subj_id], columns = ['subj_idx'])
 
                     dat_h_c[key][subj_id]['cond_subj_label'] = full_condition_subj_label
                     dat_h_c[key][subj_id]['condition_label'] = trace_dict[key]['condition_label']
