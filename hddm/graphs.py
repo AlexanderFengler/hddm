@@ -851,11 +851,13 @@ def model_plot(hddm_model = None,
                         
             # Make condition label
             condition_label = ''
-            for label_key in sub_data[i]['cond_subj_label'].keys():
-                if 'subj_idx' not in label_key:
-                    condition_label += str(label_key) + ': '
-                    condition_label += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
-            condition_label = condition_label[:-2]
+
+            if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
+                for label_key in sub_data[i]['cond_subj_label'].keys():
+                    if 'subj_idx' not in label_key:
+                        condition_label += str(label_key) + ': '
+                        condition_label += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
+                condition_label = condition_label[:-2]
 
             title_size = 24
             if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
