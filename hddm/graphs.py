@@ -1048,6 +1048,7 @@ def posterior_predictive_plot(hddm_model = None,
             
             post_dict[i] = np.stack([out[0].flatten(), out[1].flatten()])
             print(post_dict[i])
+            print(post_dict[i].shape)
             gt_dict[i] = (sub_data[i]['data'].values)
 
             subplot_cnt += 1
