@@ -994,13 +994,14 @@ def simulator_h_c(n_subjects = 10,
                         if not remainder_set:
                             tmp_mean = group_level_parameter_dict[remainder_tmp]
                             tmp_std = group_level_parameter_dict[remainder_tmp + '_std']
-                            group_level_parameter_dict[remainder_tmp + '_subj.' + str(subj_idx)] = np.random.normal(loc = tmp_mean, scale = tmp_std)
-                            subj_data[remainder_tmp] = group_level_parameter_dict[remainder_tmp + '_subj.' + str(subj_idx)]
+                            full_parameter_dict[remainder_tmp + '_subj.' + str(subj_idx)] = np.random.normal(loc = tmp_mean, scale = tmp_std)
+                            subj_data[remainder_tmp] = full_parameter_dict[remainder_tmp + '_subj.' + str(subj_idx)]
+                        
+                        # AF-TODO: IS THIS NECESSARY?
                         if remainder_set:
                             # print(group_level_parameter_dict)
-                            subj_data[remainder_tmp] = group_level_parameter_dict[remainder_tmp + '_subj.' + str(subj_idx)]
+                            subj_data[remainder_tmp] = full_parameter_dict[remainder_tmp + '_subj.' + str(subj_idx)]
 
-                
                 # Depends on part
                 if depends_on is not None:
                     conditions_tmp = conditions_df.iloc[condition_id]
