@@ -248,8 +248,14 @@ def filter_subject_condition_traces(hddm_model,
             tmp_cfg = hddm.simulators.model_config['ddm']
             model = 'ddm'
 
-    # identify the paraemters that are supposed to be fixed at default levels
-    includes_diff = set(tmp_cfg['params']) - set(includes_full).union(set(list(depends.keys()))).union(set(group_only_nodes)) # - set(group_only_nodes))
+    # identify the parameters that are supposed to be fixed at default levels
+    included_params = set(includes_full)
+    if depends is not None:
+        included_params = included_params.union(set(list(depends.keys())))
+    if group_only_nodes is not None:
+        included_params = included_params.union(set(group_only_nodes))
+
+    includes_diff = set(tmp_cfg['params']) - included_params # - set(group_only_nodes))
 
     # Here we care about subject wise posterior predictives
 
@@ -532,6 +538,10 @@ def model_plot(hddm_model = None,
         data = filter_subject_condition_traces(hddm_model, 
                                                model_ground_truth = model_ground_truth)
         multi_condition, multi_subject, n_plots = extract_multi_cond_subj_plot_n(data = data)
+    
+    #if ground_truth_parameters is not None:
+
+
 
     # Some style settings
     sns.set(style = "white", 
