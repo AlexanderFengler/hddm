@@ -980,7 +980,7 @@ def posterior_predictive_plot(hddm_model = None,
                                                model_ground_truth = model_ground_truth)
         multi_condition, multi_subject, n_plots = extract_multi_cond_subj_plot_n(data = data)
     
-    print('data prep finished')
+    # print('data prep finished')
 
     # Taking care of special case with 1 plot
     if (not multi_condition and not multi_subject) or (grouped):
@@ -1041,8 +1041,8 @@ def posterior_predictive_plot(hddm_model = None,
         gt_dict = {}
         post_dict = {}
         for i in sub_data.keys():
-            print('sub_data_key')
-            print(i)
+            # print('sub_data_key')
+            # print(i)
             idx = np.random.choice(sub_data[i]['traces'].shape[0],
                                    size = n_posterior_parameters, 
                                    replace = False)
@@ -1053,8 +1053,8 @@ def posterior_predictive_plot(hddm_model = None,
                             bin_dim = None)
             
             post_dict[i] = np.stack([out[0].flatten(), out[1].flatten()], axis = 1)
-            print(post_dict[i])
-            print(post_dict[i].shape)
+            # print(post_dict[i])
+            # print(post_dict[i].shape)
             gt_dict[i] = (sub_data[i]['data'].values)
 
             subplot_cnt += 1
@@ -1068,7 +1068,7 @@ def posterior_predictive_plot(hddm_model = None,
             # to set the styling. 
             if grouped and (subplot_cnt > 0):
                 break
-            print('n subplots to plot')
+            # print('n subplots to plot')
 
             row_tmp = int(np.floor(subplot_cnt / cols))
             col_tmp = subplot_cnt - (cols * row_tmp)
