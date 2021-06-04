@@ -1234,140 +1234,141 @@ def posterior_pair_plot(hddm_model = None,
     model_fitted = hddm_model.model
     
     data = filter_subject_condition_traces(hddm_model = hddm_model, model_ground_truth = model_ground_truth)
+    return data
 
-    plot_cnt = 0
-    for c_tmp in data.keys():
-        for s_tmp in data[c_tmp].keys():
-            # Turn traces into dataframe:
-            # Get all ground truths
-            gt_dict = {}
-            for c_tmp in data.keys():
-                for s_tmp in data[c_tmp].keys():
-                    sorted_trace_names_tmp = data[c_tmp][s_tmp]['trace_names'].copy()
-                    for trace_name_tmp in data[c_tmp][s_tmp]['trace_names']:
-                        if trace_name_tmp.split('_')[0].split('(')[0] in model_config['angle']['params']:
-                            tmp_param = trace_name_tmp.split('_')[0].split('(')[0]
-                            idx_tmp = model_config['angle']['params'].index(tmp_param)
-                            sorted_trace_names_tmp[idx_tmp] = trace_name_tmp
-                            if model_ground_truth is not None:
-                                gt_dict[trace_name_tmp] = data[c_tmp][s_tmp]['gt_parameter_vector'][idx_tmp]
-                        else:
-                            print('problem')
+    # plot_cnt = 0
+    # for c_tmp in data.keys():
+    #     for s_tmp in data[c_tmp].keys():
+    #         # Turn traces into dataframe:
+    #         # Get all ground truths
+    #         gt_dict = {}
+    #         for c_tmp in data.keys():
+    #             for s_tmp in data[c_tmp].keys():
+    #                 sorted_trace_names_tmp = data[c_tmp][s_tmp]['trace_names'].copy()
+    #                 for trace_name_tmp in data[c_tmp][s_tmp]['trace_names']:
+    #                     if trace_name_tmp.split('_')[0].split('(')[0] in model_config['angle']['params']:
+    #                         tmp_param = trace_name_tmp.split('_')[0].split('(')[0]
+    #                         idx_tmp = model_config['angle']['params'].index(tmp_param)
+    #                         sorted_trace_names_tmp[idx_tmp] = trace_name_tmp
+    #                         if model_ground_truth is not None:
+    #                             gt_dict[trace_name_tmp] = data[c_tmp][s_tmp]['gt_parameter_vector'][idx_tmp]
+    #                     else:
+    #                         print('problem')
                     
-                    data[c_tmp][s_tmp]['trace_names'] = sorted_trace_names_tmp.copy()
+    #                 data[c_tmp][s_tmp]['trace_names'] = sorted_trace_names_tmp.copy()
             
-            data[c_tmp][s_tmp]['traces'] = pd.DataFrame(data[c_tmp][s_tmp]['traces'], 
-                                                        columns = data[c_tmp][s_tmp]['trace_names'])
+    #         data[c_tmp][s_tmp]['traces'] = pd.DataFrame(data[c_tmp][s_tmp]['traces'], 
+    #                                                     columns = data[c_tmp][s_tmp]['trace_names'])
 
-            g = sns.PairGrid(data[c_tmp][s_tmp]['traces'].sample(n_subsample), 
-                             height = height, # / data[c_tmp][s_tmp]['traces'].shape[1], # len(list(posterior_samples.keys())),
-                             aspect = aspect_ratio,
-                             diag_sharey = False)
+    #         g = sns.PairGrid(data[c_tmp][s_tmp]['traces'].sample(n_subsample), 
+    #                          height = height, # / data[c_tmp][s_tmp]['traces'].shape[1], # len(list(posterior_samples.keys())),
+    #                          aspect = aspect_ratio,
+    #                          diag_sharey = False)
 
-            g = g.map_diag(sns.kdeplot, 
-                           color = 'black', 
-                           shade = False) # shade = True, 
+    #         g = g.map_diag(sns.kdeplot, 
+    #                        color = 'black', 
+    #                        shade = False) # shade = True, 
 
-            g = g.map_lower(sns.kdeplot, 
-                            thresh = 0.01,
-                            n_levels = kde_levels,
-                            shade = False,
-                            cmap = 'Purples_d') # 'Greys'
+    #         g = g.map_lower(sns.kdeplot, 
+    #                         thresh = 0.01,
+    #                         n_levels = kde_levels,
+    #                         shade = False,
+    #                         cmap = 'Purples_d') # 'Greys'
             
-            for i, j in zip(*np.triu_indices_from(g.axes, 1)):
-                g.axes[i, j].set_visible(False)
+    #         for i, j in zip(*np.triu_indices_from(g.axes, 1)):
+    #             g.axes[i, j].set_visible(False)
 
-            # Get x and y labels of graph as determined by the posterior_samples panda
-            xlabels, ylabels = [], []
+    #         # Get x and y labels of graph as determined by the posterior_samples panda
+    #         xlabels, ylabels = [], []
 
-            for ax in g.axes[-1, :]:
-                xlabel = ax.xaxis.get_label_text()
-                ax.set_xlabel(ax.get_xlabel(), rotation = 45)
-                xlabels.append(xlabel)
+    #         for ax in g.axes[-1, :]:
+    #             xlabel = ax.xaxis.get_label_text()
+    #             ax.set_xlabel(ax.get_xlabel(), rotation = 45)
+    #             xlabels.append(xlabel)
 
-            for ax in g.axes[:, 0]:
-                ylabel = ax.yaxis.get_label_text()
-                ylabels.append(ylabel)
-                #ax.yaxis.set_label_text('')
-                ax.set_ylabel('')
+    #         for ax in g.axes[:, 0]:
+    #             ylabel = ax.yaxis.get_label_text()
+    #             ylabels.append(ylabel)
+    #             #ax.yaxis.set_label_text('')
+    #             ax.set_ylabel('')
 
-            if axes_limits == 'model':
-                for i in range(len(xlabels)):
-                    for j in range(len(ylabels)):
-                        try:
-                            g.axes[j,i].set_xlim(model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(xlabels[i])], 
-                                                model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(xlabels[i])])
-                            g.axes[j,i].set_ylim(model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(ylabels[j])], 
-                                                model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(ylabels[j])])
-                        except:
-                            print('ERROR: It looks like you are trying to make axis limits dependend on model specific parameters, but the column-names of your posterior traces do not align with the requested model\'s parameters')
+    #         if axes_limits == 'model':
+    #             for i in range(len(xlabels)):
+    #                 for j in range(len(ylabels)):
+    #                     try:
+    #                         g.axes[j,i].set_xlim(model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(xlabels[i])], 
+    #                                             model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(xlabels[i])])
+    #                         g.axes[j,i].set_ylim(model_config[model_fitted]['param_bounds'][0][model_config[model_fitted]['params'].index(ylabels[j])], 
+    #                                             model_config[model_fitted]['param_bounds'][1][model_config[model_fitted]['params'].index(ylabels[j])])
+    #                     except:
+    #                         print('ERROR: It looks like you are trying to make axis limits dependend on model specific parameters, but the column-names of your posterior traces do not align with the requested model\'s parameters')
             
-            elif type(axes_limits) == dict:
-                for i in range(len(xlabels)):
-                    for j in range(len(ylabels)):
-                        try:
-                            g.axes[j,i].set_xlim(axes_limits[xlabels[i]][0], 
-                                                axes_limits[xlabels[i]][1])
-                            g.axes[j,i].set_ylim(axes_limits[ylabels[j]][0], 
-                                                axes_limits[ylabels[j]][1])
-                        except:
-                            print('ERROR: Does your axes_limits dictionary match the column names of your posterior_samples DataFrame?')
-                            return
+    #         elif type(axes_limits) == dict:
+    #             for i in range(len(xlabels)):
+    #                 for j in range(len(ylabels)):
+    #                     try:
+    #                         g.axes[j,i].set_xlim(axes_limits[xlabels[i]][0], 
+    #                                             axes_limits[xlabels[i]][1])
+    #                         g.axes[j,i].set_ylim(axes_limits[ylabels[j]][0], 
+    #                                             axes_limits[ylabels[j]][1])
+    #                     except:
+    #                         print('ERROR: Does your axes_limits dictionary match the column names of your posterior_samples DataFrame?')
+    #                         return
             
-            for ax in g.axes.flat:
-                plt.setp(ax.get_xticklabels(), rotation = 45)
+    #         for ax in g.axes.flat:
+    #             plt.setp(ax.get_xticklabels(), rotation = 45)
 
-            g.fig.suptitle(model_fitted.upper(), 
-                           y = 1.03, 
-                           fontsize = 24)
+    #         g.fig.suptitle(model_fitted.upper(), 
+    #                        y = 1.03, 
+    #                        fontsize = 24)
             
-            # posterior_samples_key_set = np.sort(posterior_samples.keys())
-            # If ground truth is available add it in:
-            if model_ground_truth is not None:
-                for i in range(g.axes.shape[0]):
-                    for j in range(i + 1, g.axes.shape[0], 1):
-                        g.axes[j,i].plot(data[c_tmp][s_tmp]['gt_parameter_vector'][i], #[xlabels[i]],
-                                         data[c_tmp][s_tmp]['gt_parameter_vector'][j], #[ylabels[j]], 
-                                        '.', 
-                                        color = 'red',
-                                        markersize = 10)
+    #         # posterior_samples_key_set = np.sort(posterior_samples.keys())
+    #         # If ground truth is available add it in:
+    #         if model_ground_truth is not None:
+    #             for i in range(g.axes.shape[0]):
+    #                 for j in range(i + 1, g.axes.shape[0], 1):
+    #                     g.axes[j,i].plot(data[c_tmp][s_tmp]['gt_parameter_vector'][i], #[xlabels[i]],
+    #                                      data[c_tmp][s_tmp]['gt_parameter_vector'][j], #[ylabels[j]], 
+    #                                     '.', 
+    #                                     color = 'red',
+    #                                     markersize = 10)
 
-                for i in range(g.axes.shape[0]):
-                    g.axes[i,i].plot(data[c_tmp][s_tmp]['gt_parameter_vector'][i], # [xlabels[i]], # ground_truth_parameters[xlabels[i]],
-                                    g.axes[i,i].get_ylim()[0], 
-                                    '.', 
-                                    color = 'red',
-                                    markersize = 10)
+    #             for i in range(g.axes.shape[0]):
+    #                 g.axes[i,i].plot(data[c_tmp][s_tmp]['gt_parameter_vector'][i], # [xlabels[i]], # ground_truth_parameters[xlabels[i]],
+    #                                 g.axes[i,i].get_ylim()[0], 
+    #                                 '.', 
+    #                                 color = 'red',
+    #                                 markersize = 10)
   
-            if save == True:
-                if save_path is None:
-                    save_path = 'figures/'
-                    if os.path.exists('figures'):
-                        pass
-                    else:
-                        os.mkdir('figures')
-                elif type(save_path) == str:
-                    pass
-                else:
-                    return 'Error: please specify a save_path as a string'
+    #         if save == True:
+    #             if save_path is None:
+    #                 save_path = 'figures/'
+    #                 if os.path.exists('figures'):
+    #                     pass
+    #                 else:
+    #                     os.mkdir('figures')
+    #             elif type(save_path) == str:
+    #                 pass
+    #             else:
+    #                 return 'Error: please specify a save_path as a string'
                 
-                plt.savefig(save_path + 'posterior_pair_plot_' + str(plot_cnt) + '.png',
-                            format = 'png', 
-                            transparent = True)
-            if show:
-                plt.show()
+    #             plt.savefig(save_path + 'posterior_pair_plot_' + str(plot_cnt) + '.png',
+    #                         format = 'png', 
+    #                         transparent = True)
+    #         if show:
+    #             plt.show()
             
-            if save == True:
-                plt.savefig('figures/' + 'pair_plot_' + model_fitted + '_' + datatype + '.png',
-                            format = 'png', 
-                            transparent = True,
-                            frameon = False)
-                plt.close()
-            plot_cnt += 1
+    #         if save == True:
+    #             plt.savefig('figures/' + 'pair_plot_' + model_fitted + '_' + datatype + '.png',
+    #                         format = 'png', 
+    #                         transparent = True,
+    #                         frameon = False)
+    #             plt.close()
+    #         plot_cnt += 1
 
-    # Show
-    return
-    #return plt.show(block = False)
+    # # Show
+    # return
+    # #return plt.show(block = False)
 
 def caterpillar_plot(hddm_model = None, 
                      ground_truth_parameter_dict = None,
