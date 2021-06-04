@@ -1192,7 +1192,7 @@ def posterior_predictive_plot(hddm_model = None,
 # Posterior Pair Plot
 def posterior_pair_plot(hddm_model = None, 
                         axes_limits = 'samples', # 'samples' or dict({'parameter_name': [lower bound, upper bound]})
-                        height = 10,
+                        height = 2,
                         aspect_ratio = 1,
                         n_subsample = 1000,
                         kde_levels = 50,
