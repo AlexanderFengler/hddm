@@ -973,7 +973,7 @@ def simulator_h_c(n_subjects = 10,
                 # Parameter vector
                 subj_data = pd.DataFrame(index = np.arange(0, n_samples_by_subject, 1))
                 subj_data['subj_idx'] = str(subj_idx)
-                print(subj_data)
+                # print(subj_data)
 
                 # Fixed part
                 if fixed_at_default is not None:
@@ -1100,7 +1100,7 @@ def simulator_h_c(n_subjects = 10,
                         
                 # Append full data:
                 full_data.append(subj_data.copy())
-                print(full_data)
+                # print(full_data)
                  
             remainder_set = 1
             regressor_set = 1
@@ -1152,8 +1152,8 @@ def simulator_h_c(n_subjects = 10,
         if conditions is not None:
             full_data_cols += [key for key in conditions.keys()]
 
-        print('full data cols')
-        print(full_data_cols)
+        # print('full data cols')
+        # print(full_data_cols)
         
         full_data_cols += model_config[model]['params']
         full_data = full_data[full_data_cols]
@@ -1214,11 +1214,11 @@ def simulator_h_c(n_subjects = 10,
                 
                 if depends_tmp not in group_only:
                     bound_to_bound_tmp = (model_config[model]['param_bounds'][1][model_config[model]['params'].index(depends_tmp)] - model_config[model]['param_bounds'][0][model_config[model]['params'].index(depends_tmp)])
-                    print('passed')
-                    print('depends_tmp')
-                    print(depends_tmp)
-                    print('btb')
-                    print(bound_to_bound_tmp)
+                    # print('passed')
+                    # print('depends_tmp')
+                    # print(depends_tmp)
+                    # print('btb')
+                    # print(bound_to_bound_tmp)
                     group_level_parameter_dict[depends_tmp + '_std'] = np.random.uniform(low = 0,
                                                                                          high = (1 / 10) * bound_to_bound_tmp)
             
