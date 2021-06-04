@@ -823,7 +823,6 @@ class AccumulatorModel(kabuki.Hierarchical):
             knodes['%s_bottom'%name] = g
 
         return knodes
-
 class HDDMBase(AccumulatorModel):
     """HDDM base class. Not intended to be used directly. Instead, use hddm.HDDM.
     """

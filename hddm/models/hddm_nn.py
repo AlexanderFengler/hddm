@@ -116,6 +116,9 @@ class HDDMnn(HDDM):
     """
 
     def __init__(self, *args, **kwargs):
+
+        print(kwargs)
+        
         kwargs['nn'] = True
         self.network_type = kwargs.pop('network_type', 'mlp')
         self.network = None #LAX

@@ -260,7 +260,6 @@ class HDDM(HDDMBase):
                                                            value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
                                                            )) # should have lower = 0.1, upper = 0.9
 
-        
         if self.model == 'ddm_sdv' or self.model == 'ddm_sdv_analytic':
             if 'a' in include:
                 tmp_param = 'a'
