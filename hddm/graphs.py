@@ -136,7 +136,7 @@ def make_trace_plotready_h_c(trace_dict = None,
                     trace_names_param_only_tmp.append(key_param_only)
 
                     dat_h_c[key][subj_id]['traces'][:, model_config[model]['params'].index(key_param_only)] = trace_dict[key]['traces'][trace_key]
-                    full_condition_subj_label = trace_dict[key]['condition_label'].copy()
+                    full_condition_subj_label = trace_dict[key]['condition_label']
                     
                     if trace_dict[key]['condition_label'] is not None:
                         full_condition_subj_label['subj_idx'] = subj_id
@@ -173,6 +173,9 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
         # There might be more group only parameters than the ones we find in params_depends
         # --> we add these to our parameter ids directly
         # Their traces carry simply the respective model parameter name
+
+        # Make sure that parms_group only is actually supplied
+        # If not we skip
         if not params_group_only == None:
             if params_depends == None:
                 params_depends_tmp = []
