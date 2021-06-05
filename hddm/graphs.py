@@ -1081,7 +1081,9 @@ def posterior_predictive_plot(hddm_model = None,
             # print(post_dict[i])
             # print(post_dict[i].shape)
             gt_dict[i] = (sub_data[i]['data'].values)
-
+            print('gt_dict[i]')
+            print(gt_dict[i])
+            
             subplot_cnt += 1
 
         # PLOTTING
