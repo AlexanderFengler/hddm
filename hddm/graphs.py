@@ -94,15 +94,18 @@ def make_trace_plotready_h_c(trace_dict = None,
             
             # Check if data contains ground truth parameters (once for the case where we supply 'model_ground_truth' and once where we didn't)
             # AF-TODO: Reorganize this so that we supply trial by trial parameters separately
+            print('model_ground_truth')
+            print(model_ground_truth)
+            print('data_h_c[key][subj_id[data]')
+            print(list(dat_h_c[key][subj_id]['data'].keys()))
+            test_passed = 1
             if model_ground_truth is None:
-                test_passed = 1
                 for check_param in model_config[model]['params']:
                     if check_param in list(dat_h_c[key][subj_id]['data'].keys()):
                         pass
                     else:
                         test_passed = 0
             else:
-                test_passed = 1
                 for check_param in model_config[model_ground_truth]['params']:
                     if check_param in list(dat_h_c[key][subj_id]['data'].keys()):
                         pass
@@ -111,6 +114,8 @@ def make_trace_plotready_h_c(trace_dict = None,
 
             # If the data contain the ground truth parameters for the fitted model, but no ground truth model was specified
             # we can savely assume that the ground truth model was the fitted model.
+            print('test_passed')
+            print(test_passed)
             if test_passed and (model_ground_truth is None):
                 model_ground_truth = model
                 
@@ -382,7 +387,7 @@ def filter_subject_condition_traces(hddm_model,
             gt_parameters = None
         ######
 
-        out_dict = {0:{0:{'data': data, 'params': hddm.simulators.model_config[model]['params'],'trace_names':  hddm.simulators.model_config[model]['params'], 'traces': traces_array, 'gt_parameter_vector': gt_parameters}}}
+        out_dict = {0:{0:{'data': data, 'params': hddm.simulators.model_config[model]['params'], 'trace_names':  hddm.simulators.model_config[model]['params'], 'traces': traces_array, 'gt_parameter_vector': gt_parameters}}}
         return out_dict
 
 def extract_multi_cond_subj_plot_n(data = None):
