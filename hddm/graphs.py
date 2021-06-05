@@ -135,7 +135,7 @@ def make_trace_plotready_h_c(trace_dict = None,
             # Go through trace dictionary and add relevant traces to dat_h_c
             for trace_key in trace_dict[key]['traces'].keys():
                 # If the current subj_id is not in the trace name --> skip
-                if ('subj' in trace_key) and (not subj_id in trace_key)):
+                if ('subj' in trace_key) and (not (subj_id in trace_key)):
                     continue
                 else:
 
