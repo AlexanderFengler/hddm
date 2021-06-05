@@ -1080,7 +1080,9 @@ def posterior_predictive_plot(hddm_model = None,
             post_dict[i] = np.stack([out[0].flatten(), out[1].flatten()], axis = 1)
             # print(post_dict[i])
             # print(post_dict[i].shape)
-            gt_dict[i] = (sub_data[i]['data'].values)
+            gt_dict[i] = (sub_data[i]['data'][['rt', 'response']].values)
+            # Make sure that zero responses are turned negative
+            gt_dict[i][:, 1][gt_dict[[i][:, 1] == 0]] = -1
             print('gt_dict[i]')
             print(gt_dict[i])
             
@@ -1137,8 +1139,8 @@ def posterior_predictive_plot(hddm_model = None,
                 else:
                     label_0 = 'DATA'
                 ax_tmp.legend(labels = ['Posterior Predictive', label_0], 
-                            fontsize = 12, 
-                            loc = 'upper right')
+                              fontsize = 12, 
+                              loc = 'upper right')
             
             # rt x-axis label if we are dealing with the last row of a figure
             if row_tmp == (rows - 1):
