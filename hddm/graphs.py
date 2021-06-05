@@ -85,7 +85,7 @@ def make_trace_plotready_h_c(trace_dict = None,
     dat_h_c = {} # will store a dictionary of dictionaries of dictionaries. Level-one keys specify conditions, level-two keys specify subject level data
     for key in trace_dict.keys():
         dat_h_c[key] = {} # intialize condition level dict
-        unique_subj_ids = trace_dict[key]['data']['subj_idx'].unique().astype(str) # get unique subject ids for conditions (number and id of subjects may differ across conditions)
+        unique_subj_ids = trace_dict[key]['data']['subj_idx'].unique() # get unique subject ids for conditions (number and id of subjects may differ across conditions)
 
         for subj_id in unique_subj_ids:
             dat_h_c[key][subj_id] = {} # initialize subject level dict
@@ -135,14 +135,14 @@ def make_trace_plotready_h_c(trace_dict = None,
             # Go through trace dictionary and add relevant traces to dat_h_c
             for trace_key in trace_dict[key]['traces'].keys():
                 # If the current subj_id is not in the trace name --> skip
-                if ('subj' in trace_key) and (not (subj_id in trace_key)):
+                if ('subj' in trace_key) and (not (str(subj_id) in trace_key)):
                     continue
                 else:
 
                     trace_names_tmp.append(trace_key)
                     key_param_only = trace_key 
                     
-                    if 'subj' in trace_key and (subj_id in trace_key):
+                    if 'subj' in trace_key and (str(subj_id) in trace_key):
                         key_param_only = trace_key.split('_')[0]
                     if not ('subj' in trace_key) and ('(' in trace_key):
                         key_param_only = trace_key.split('(')[0]
@@ -224,7 +224,7 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
                         ids = get_subj_ids(data = data_subset).astype(str)
                         for id_tmp in ids:
                             # make str 
-                            param_str = param_tmp + '_subj' + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ').' + id_tmp 
+                            param_str = param_tmp + '_subj' + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ').' + id_tmp
                             param_ids_by_condition.append(param_str)
                 else: # otherwise --> no need for subject level 
                     param_str = param_tmp + '(' + '.'.join([str(row_tmp[col_tmp]) for col_tmp in depend_cols_sorted]) + ')'
