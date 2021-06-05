@@ -651,7 +651,6 @@ def model_plot(hddm_model = None,
                     #ax_ins = ax.inset_axes([1, 0.5, 0.2, 0.2]) --> important for levy ! AF TODO
                     #ax_ins.plot([0, 1, 2, 3])
     
-
              # RUN SIMULATIONS: POSTERIOR SAMPLES
             if hddm_model is not None:
                 tmp_post = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
@@ -769,9 +768,9 @@ def model_plot(hddm_model = None,
                         tmp_alpha = 0.05
                         tmp_color = 'black'
                         tmp_linewidth = posterior_linewidth
-
                     elif (j == n_posterior_parameters) and (model_ground_truth is not None) and (not grouped):
                         tmp_samples = sub_data[i]['gt_parameter_vector'] # ground_truth_parameters[i, :]
+                        print(tmp_samples)
                         tmp_model = model_ground_truth
                         
                         # If we supplied ground truth data --> make ground truth model blue, otherwise red
@@ -781,7 +780,6 @@ def model_plot(hddm_model = None,
                         tmp_alpha = 1
                         tmp_label = 'Ground Truth Model'
                         tmp_linewidth = ground_truth_linewidth
-
                     elif j == n_posterior_parameters and model_ground_truth == None:
                         break
                     elif j < (n_posterior_parameters - 1):
@@ -1430,8 +1428,8 @@ def caterpillar_plot(hddm_model = None,
             color_codes = True,
             font_scale = 2)
 
-    trace = untransform_traces(traces = hddm_model.get_traces(), 
-                               model = hddm_model.model, 
+    trace = untransform_traces(traces = hddm_model.get_traces(),
+                               model = hddm_model.model,
                                is_nn = hddm_model.nn)
     
     if not hddm_model.nn:
