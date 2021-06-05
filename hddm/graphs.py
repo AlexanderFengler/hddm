@@ -92,25 +92,33 @@ def make_trace_plotready_h_c(trace_dict = None,
             dat_h_c[key][subj_id]['traces'] = np.zeros((trace_dict[key]['traces'].shape[0], len(model_config[model]['params']))) # initialize trace container
             dat_h_c[key][subj_id]['data'] = trace_dict[key]['data'].loc[trace_dict[key]['data']['subj_idx'] == subj_id, :] # add data from the given subject in given condition
             
-            # Check if data contais ground truth parameters
+            # Check if data contains ground truth parameters (once for the case where we supply 'model_ground_truth' and once where we didn't)
             # AF-TODO: Reorganize this so that we supply trial by trial parameters separately
-            test_passed = 1
-            for check_param in model_config[model]['params']:
-                if check_param in list(dat_h_c[key][subj_id]['data'].keys()):
-                    pass
-                else:
-                    test_passed = 0
+            if model_ground_truth is None:
+                test_passed = 1
+                for check_param in model_config[model]['params']:
+                    if check_param in list(dat_h_c[key][subj_id]['data'].keys()):
+                        pass
+                    else:
+                        test_passed = 0
+            else:
+                test_passed = 1
+                for check_param in model_config[model_ground_truth]['params']:
+                    if check_param in list(dat_h_c[key][subj_id]['data'].keys()):
+                        pass
+                    else:
+                        test_passed = 0
 
             # If the data contain the ground truth parameters for the fitted model, but no ground truth model was specified
             # we can savely assume that the ground truth model was the fitted model.
             if test_passed and (model_ground_truth is None):
                 model_ground_truth = model
-            
+                
             # Dat gt_parameter_vector to dat_h_c dict 
             # If parameters not in the dataframe --> set to None
             if test_passed:
                 dat_h_c[key][subj_id]['gt_parameter_vector'] = dat_h_c[key][subj_id]['data'].iloc[0, :][[param for param in model_config[model_ground_truth]['params']]].values
-            else: 
+            else:
                 dat_h_c[key][subj_id]['gt_parameter_vector'] = None
 
             # We want to store two version of the trace_names in lists
@@ -594,7 +602,6 @@ def model_plot(hddm_model = None,
                                sharex = False, 
                                sharey = False)
 
-        
         # Inner for loop:
         # Loops over subplots (could be 1)
         subplot_cnt = 0
