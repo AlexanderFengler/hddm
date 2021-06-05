@@ -98,6 +98,7 @@ def make_trace_plotready_h_c(trace_dict = None,
             print(model_ground_truth)
             print('data_h_c[key][subj_id[data]')
             print(list(dat_h_c[key][subj_id]['data'].keys()))
+            
             test_passed = 1
             if model_ground_truth is None:
                 for check_param in model_config[model]['params']:
@@ -370,20 +371,24 @@ def filter_subject_condition_traces(hddm_model,
         ######
         # Check if data contais ground truth parameters
         test_passed = 1
-        for check_param in model_config[model]['params']:
-            if check_param in list(data.keys()):
-                pass
-            else:
-                test_passed = 0
-        
+        if model_ground_truth is None:
+            for check_param in model_config[model]['params']:
+                if check_param in list(data.keys()):
+                    pass
+                else:
+                    test_passed = 0
+        else:
+            for check_param in model_config[model_ground_truth]['params']:
+                if check_param in list(data.keys()):
+                    pass
+                else:
+                    test_passed = 0
+
         # Dat gt_parameter_vector to dat_h_c dict 
         # If parameters not in the dataframe --> set to None
         if test_passed:
-            gt_parameters = data.loc[0, :][[param for param in model_config[model]['params']]].values
-
-            #dat_h_c[key][subj_id]['gt_parameter_vector'] = dat_h_c[key][subj_id]['data'].loc[0, :][[param for param in model_config[model]['params']]].values
-            #x.loc[0, :][['one', 'two']].values
-        else: 
+            gt_parameters = data.iloc[0, :][[param for param in model_config[model_ground_truth]['params']]].values
+        else:
             gt_parameters = None
         ######
 
