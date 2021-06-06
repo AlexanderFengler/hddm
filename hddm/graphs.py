@@ -568,7 +568,7 @@ def model_plot(hddm_model = None,
         data_dict[0] = {}
         for subj_id in data['subj_idx'].unique():
             data_dict[0][subj_id] = {}
-            data_dict[0][subj_id]['data'] = data.loc[data['subj_idx'] == subj_id, :][['rt', 'response']].values
+            data_dict[0][subj_id]['data'] = data.loc[data['subj_idx'] == subj_id, :][['rt', 'response']]
             if model_ground_truth is not None:
                 data_dict[0][subj_id]['gt_parameter_vector'] = data.loc[data['subj_idx'] == subj_id, :].iloc[0][[param for param in model_config[model_ground_truth]['params']]].values
         return data_dict
