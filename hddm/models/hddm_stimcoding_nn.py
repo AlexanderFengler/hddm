@@ -12,16 +12,6 @@ import hddm
 import wfpt
 from functools import partial
 
-# from wfpt import wiener_like_nn_weibull
-# from wfpt import wiener_like_nn_angle
-# from wfpt import wiener_like_nn_ddm
-# from wfpt import wiener_like_nn_ddm_analytic
-# from wfpt import wiener_like_nn_levy
-# from wfpt import wiener_like_nn_ornstein
-# from wfpt import wiener_like_nn_ddm_sdv
-# from wfpt import wiener_like_nn_ddm_sdv_analytic
-# from wfpt import wiener_like_nn_full_ddm
-
 class HDDMnnStimCoding(HDDM):
     """HDDMnn model that can be used when stimulus coding and estimation
     of bias (i.e. displacement of starting point z) is required.
@@ -77,6 +67,9 @@ class HDDMnnStimCoding(HDDM):
         self.model = kwargs.pop('model', 'ddm')
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
 
+        # AF-TODO: MAYBE NOT NECESSARY ?
+        self.is_informative = kwargs.pop('informative', False)
+
         self.nbin = kwargs.pop('nbin', 512)
 
         if self.nbin == 512:
@@ -84,14 +77,8 @@ class HDDMnnStimCoding(HDDM):
         elif self.nbin == 256:
             self.cnn_pdf_multiplier = 25.6
         
-
         print(kwargs['include'])
         # Attach likelihood corresponding to model
-        # if self.model == 'ddm':
-        #     self.mlp = hddm.keras_models.load_mlp(model = self.model)
-        #     print('Successfully loaded model')
-        #     self.wfpt_nn = stochastic_from_dist('Wienernn_ddm', wienernn_like_ddm)
-
         if self.network_type == 'mlp':
             self.network = load_mlp(model = self.model)
             network_dict = {'network': self.network}
@@ -102,9 +89,6 @@ class HDDMnnStimCoding(HDDM):
             network_dict = {'network': self.network}
             self.wfpt_nn = hddm.likelihoods_cnn.make_cnn_likelihood(model = self.model, pdf_multiplier = self.cnn_pdf_multiplier, **network_dict)
         
-        # self.wfpt_nn = stochastic_from_dist('Wiennernn' + '_' + self.model,
-        #                                     partial(likelihood_, **network_dict))
-
         if self.split_param == 'z':
             assert not self.drift_criterion, "Setting drift_criterion requires split_param='v'."
             print("Setting model to be non-informative")
@@ -122,6 +106,7 @@ class HDDMnnStimCoding(HDDM):
 
             print("Adding z to includes.")
 
+        # Get unique stimulus values for the stimcoding relevant column (has to be of length 2!)
         self.stims = np.asarray(np.sort(np.unique(args[0][self.stim_col])))
         assert len(self.stims) == 2, "%s must contain two stimulus types" % self.stim_col
 
@@ -138,7 +123,6 @@ class HDDMnnStimCoding(HDDM):
                                                                      g_mu = 0,
                                                                      g_tau = 3**-2,
                                                                      std_std = 2))
-
         return knodes
 
     def _create_wfpt_parents_dict(self, knodes):
@@ -152,47 +136,6 @@ class HDDMnnStimCoding(HDDM):
         print(wfpt_parents)
         return wfpt_parents
 
-    # def _create_wfpt_parents_dict(self, knodes):
-    #     print('passing through parent creator')
-    #     print(knodes)
-    #     wfpt_parents = OrderedDict()
-    #     wfpt_parents['a'] = knodes['a_bottom']
-    #     wfpt_parents['v'] = knodes['v_bottom']
-    #     wfpt_parents['t'] = knodes['t_bottom']
-    #     wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
-
-    #     wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
-    #     wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
-
-
-    #     # MODEL SPECIFIC PARAMETERS
-    #     if self.model == 'weibull' or self.model == 'weibull_cdf' or self.model == 'weibull_cdf_concave':
-    #         wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 3 
-    #         wfpt_parents['beta'] = knodes['beta_bottom'] if 'beta' in self.include else 3
-        
-    #     if self.model == 'ornstein':
-    #         wfpt_parents['g'] = knodes['g_bottom'] if 'g' in self.include else 0
-        
-    #     if self.model == 'levy':
-    #         wfpt_parents['alpha'] = knodes['alpha_bottom'] if 'alpha' in self.include else 2
-        
-    #     if self.model == 'angle':
-    #         wfpt_parents['theta'] = knodes['theta_bottom'] if 'theta' in self.include else 0
-
-    #     if self.model == 'full_ddm' or self.model =='full_ddm2':
-    #         wfpt_parents['sv'] = knodes['sv_bottom'] if 'sv' in self.include else 0 #self.default_intervars['sv']
-    #         wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else 0 #self.default_intervars['sz']
-    #         wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else 0 #self.default_intervars['st']
-
-
-    #     # SPECIFIC TO STIMCODING
-    #     if self.drift_criterion: 
-    #         wfpt_parents['dc'] = knodes['dc_bottom']
-
-    #     print('wfpt parents: ')
-    #     print(wfpt_parents)
-    #     return wfpt_parents
-
     def _create_wfpt_knode(self, knodes):
         
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
@@ -203,13 +146,12 @@ class HDDMnnStimCoding(HDDM):
         return KnodeWfptStimCoding(self.wfpt_nn, 
                                    'wfpt', # TD: ADD wfpt class we need
                                    observed = True, 
-                                   col_name = ['response', 'rt'], # col_name = 'rt',
+                                   col_name = ['rt', 'response'], # Note: This is different from vanilla stimcoding class where it was set to col_name = 'rt',
                                    depends = [self.stim_col],
                                    split_param = self.split_param,
                                    stims = self.stims,
                                    stim_col = self.stim_col,
                                    **wfpt_parents)
-
 class KnodeWfptStimCoding(Knode):
     def __init__(self, *args, **kwargs):
         self.split_param = kwargs.pop('split_param')
@@ -229,8 +171,12 @@ class KnodeWfptStimCoding(Knode):
 
         dc = kwargs.pop('dc', None)
         
+        # Data supplied here is split so that stim_col has only one value !
         if all(data[self.stim_col] == self.stims[1]): # AF NOTE: Reversed this, previously self.stims[0], compare what is expected as data to my simulator...
+            # 
             if self.split_param == 'z':
+                print('printing kwargs from create_node')
+                print(kwargs)
                 kwargs['z'] = 1 - kwargs['z']
             elif self.split_param == 'v' and dc is None:
                 kwargs['v'] = - kwargs['v']
@@ -243,4 +189,5 @@ class KnodeWfptStimCoding(Knode):
         else:
             if dc is not None:
                 kwargs['v'] = kwargs['v'] + dc
+
             return self.pymc_node(name, **kwargs)

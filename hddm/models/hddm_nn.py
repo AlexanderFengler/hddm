@@ -117,7 +117,7 @@ class HDDMnn(HDDM):
 
     def __init__(self, *args, **kwargs):
 
-        print(kwargs)
+        # print(kwargs)
 
         kwargs['nn'] = True
         self.network_type = kwargs.pop('network_type', 'mlp')
@@ -125,7 +125,7 @@ class HDDMnn(HDDM):
         self.non_centered = kwargs.pop('non_centered', False)
         self.w_outlier = kwargs.pop('w_outlier', 0.1)
         self.model = kwargs.pop('model', 'ddm')
-        print(self.model)
+        # print(self.model)
         self.nbin = kwargs.pop('nbin', 512)
         self.is_informative = kwargs.pop('informative', False)
 
@@ -176,7 +176,7 @@ class HDDMnn(HDDM):
         
         # Initialize super class
         super(HDDMnn, self).__init__(*args, **kwargs)
-        print(self.p_outlier)
+        # print(self.p_outlier)
     
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
