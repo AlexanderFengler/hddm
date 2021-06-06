@@ -935,8 +935,10 @@ def model_plot(hddm_model = None,
             # Some extra styling:
             if (model_ground_truth is not None) and (not grouped):
                 if show_model:
-                    ax_tmp.axvline(x = sub_data[i]['gt_parameter_vector'][model_config[model_ground_truth]['params'].index('t')], ymin = - ylimit, ymax = ylimit, c = tmp_color, linestyle = '--')
-                ax_tmp.axhline(y = 0, xmin = 0, xmax = sub_data[i]['gt_parameter_vector'][model_config[model_ground_truth]['params'].index('t')] / max_t, c = tmp_color,  linestyle = '--')
+                    # vertical dashed line at the gorund truth non-decision time
+                    ax_tmp.axvline(x = sub_data[i]['gt_parameter_vector'][model_config[model_ground_truth]['params'].index('t')], ymin = - ylimit, ymax = ylimit, c = 'blue', linestyle = '--')
+                # horizontal (y = 0) line connecting y-axis with the first datapoints 
+                ax_tmp.axhline(y = 0, xmin = 0, xmax = sub_data[i]['gt_parameter_vector'][model_config[model_ground_truth]['params'].index('t')] / max_t, c = 'blue',  linestyle = '--')
         
         # Turn off subplots which were not needed in a given display
         if rows > 1 and cols > 1:
