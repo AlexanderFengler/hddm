@@ -513,6 +513,9 @@ def model_plot(hddm_model = None,
     Arguments:
         hddm_model: hddm model object <default=None>
             If you supply a ground truth model, the data you supplied to the hddm model should include trial by trial parameters.
+        dataset: panda.DataFrame object <default=None>
+            Instead of a hddm_model you might supply a dataset which may include multiple subjects. This is mostly useful to investigate 
+            model behavior. Note, the plot considers only the 'subj_idx' column of the dataset to create subplots. 
         model_ground_truth: str <default=None>
             Specify the ground truth model (mostly useful for parameter recovery studies). If you specify a ground truth model, make sure that the dataset
             you supplied to your hddm model included trial by trial parameters.
@@ -567,7 +570,7 @@ def model_plot(hddm_model = None,
             data_dict[0][subj_id] = {}
             data_dict[0][subj_id]['data'] = data.loc[data['subj_idx'] == subj_id, :][['rt', 'response']].values
             if model_ground_truth is not None:
-                data_dict[0][subj_id]['gt_parameter_vector'] = data.loc[data['subj_idx'] == subj_id, :].iloc[0][[param for param in model_config[model]['params']]].values
+                data_dict[0][subj_id]['gt_parameter_vector'] = data.loc[data['subj_idx'] == subj_id, :].iloc[0][[param for param in model_config[model_ground_truth]['params']]].values
         return data_dict
     # ----------------------------------------
 
@@ -974,7 +977,7 @@ def posterior_predictive_plot(hddm_model = None,
     """An alternative posterior predictive plot. Works for all models listed in hddm (e.g. 'ddm', 'angle', 'weibull', 'levy', 'ornstein')
 
     Arguments:
-         hddm_model: hddm model object <default=None>
+        hddm_model: hddm model object <default=None>
             If you supply a ground truth model, the data you supplied to the hddm model should include trial by trial parameters.
         model_ground_truth: str <default=None>
             Specify the ground truth model (mostly useful for parameter recovery studies). If you specify a ground truth model, make sure that the dataset
