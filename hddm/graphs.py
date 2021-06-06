@@ -480,6 +480,7 @@ def _convert_params(data = None):
 # Plot bound
 # Mean posterior predictives
 def model_plot(hddm_model = None,
+               dataset = None,
                model_ground_truth = None,
                grouped = False,
                n_posterior_parameters = 500, # optional / styling
@@ -558,18 +559,32 @@ def model_plot(hddm_model = None,
     Return: plot object
     """
 
+    # Model-plot specific functions ---------
+    def split_dataset_model_plot(data = None, model_ground_truth = None):
+        data_dict = {}
+        data_dict[0] = {}
+        for subj_id in data['subj_idx'].unique():
+            data_dict[0][subj_id] = {}
+            data_dict[0][subj_id]['data'] = data.loc[data['subj_idx'] == subj_id, :][['rt', 'response']].values
+            if model_ground_truth is not None:
+                data_dict[0][subj_id]['gt_parameter_vector'] = data.loc[data['subj_idx'] == subj_id, :].iloc[0][[param for param in model_config[model]['params']]].values
+        return data_dict
+    # ----------------------------------------
+
     if hddm_model is None and model_ground_truth is None:
         return 'Please provide either posterior samples, \n or a ground truth model and parameter set to plot something here. \n Currently you are requesting an empty plot' 
+    if hddm_model is not None and dataset is not None:
+        return 'Plesae provide either a dataset directly OR a fitted hddm_model object. You seem to have supplied both'
 
     # AF-TODO: Shape checks
     if hddm_model is not None:
         data = filter_subject_condition_traces(hddm_model, 
                                                model_ground_truth = model_ground_truth)
         multi_condition, multi_subject, n_plots = extract_multi_cond_subj_plot_n(data = data)
-    
-    #if ground_truth_parameters is not None:
 
-
+    if dataset is not None:
+        data = split_dataset_model_plot(data = dataset, model_ground_truth = model_ground_truth)
+        multi_condition, multi_subject, n_plots = extract_multi_cond_subj_plot_n(data = data)
 
     # Some style settings
     sns.set(style = "white", 
@@ -669,6 +684,7 @@ def model_plot(hddm_model = None,
                     #ax_ins.plot([0, 1, 2, 3])
     
              # RUN SIMULATIONS: POSTERIOR SAMPLES
+             # AF - NOT NEEDED IF JUST DATASET / NO INTERFERENCE
             if hddm_model is not None:
                 tmp_post = np.zeros((n_posterior_parameters * n_simulations_per_parameter, 2))
                 idx = np.random.choice(sub_data[i]['traces'].shape[0], size = n_posterior_parameters, replace = False)
@@ -777,7 +793,7 @@ def model_plot(hddm_model = None,
                     n_posterior_parameters = 0
                 for j in range(n_posterior_parameters + 1):
                     tmp_label = ""
-                    if j == (n_posterior_parameters - 1):
+                    if j == (n_posterior_parameters - 1): # attach label to one posterior samples
                         tmp_label = 'Model Samples'
                         tmp_model = hddm_model.model
                         tmp_samples = sub_data[i]['traces'][idx[j], :] #posterior_samples[i, idx[j], :]
@@ -785,9 +801,8 @@ def model_plot(hddm_model = None,
                         tmp_alpha = 0.05
                         tmp_color = 'black'
                         tmp_linewidth = posterior_linewidth
-                    elif (j == n_posterior_parameters) and (model_ground_truth is not None) and (not grouped):
+                    elif (j == n_posterior_parameters) and (model_ground_truth is not None) and (not grouped): # ground truth parameters
                         tmp_samples = sub_data[i]['gt_parameter_vector'] # ground_truth_parameters[i, :]
-                        print(tmp_samples)
                         tmp_model = model_ground_truth
                         
                         # If we supplied ground truth data --> make ground truth model blue, otherwise red
@@ -797,9 +812,9 @@ def model_plot(hddm_model = None,
                         tmp_alpha = 1
                         tmp_label = 'Ground Truth Model'
                         tmp_linewidth = ground_truth_linewidth
-                    elif j == n_posterior_parameters and model_ground_truth == None:
+                    elif j == n_posterior_parameters and model_ground_truth == None: # If no ground truth model and we are at j = n_posterior samples --> break out of loop
                         break
-                    elif j < (n_posterior_parameters - 1):
+                    elif j < (n_posterior_parameters - 1): # run through posterior samples, but don't include label
                         tmp_model = hddm_model.model
                         tmp_samples = sub_data[i]['traces'][idx[j], :] # posterior_samples[i, idx[j], :]
                         tmp_alpha = 0.05
@@ -877,19 +892,20 @@ def model_plot(hddm_model = None,
             # Make condition label
             condition_label = ''
             fig_title_tmp = ''
-
-            if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
-                for label_key in sub_data[i]['cond_subj_label'].keys():
-                    if 'subj_idx' not in label_key:
-                        condition_label += str(label_key) + ': '
-                        condition_label += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
-                condition_label = condition_label[:-2]
+            if hddm_model is not None:
+                if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
+                    for label_key in sub_data[i]['cond_subj_label'].keys():
+                        if 'subj_idx' not in label_key:
+                            condition_label += str(label_key) + ': '
+                            condition_label += str(sub_data[i]['cond_subj_label'][[label_key]].values[0]) + ', '
+                    condition_label = condition_label[:-2]
 
             title_size = 24
             if (multi_condition and multi_subject) or (not multi_condition and multi_subject):
                 title_tmp = 'Subject: ' + str(i)
                 fig_title_tmp = condition_label
             elif multi_condition and not multi_subject:
+                # NOTE: We should never end up here if only a dataset was supplied
                 title_tmp = condition_label
                 title_size = title_size / (0.5 * len(list(sub_data[i]['cond_subj_label'].keys())))
             elif not multi_condition and not multi_subject:
@@ -1082,7 +1098,7 @@ def posterior_predictive_plot(hddm_model = None,
             # print(post_dict[i].shape)
             gt_dict[i] = (sub_data[i]['data'][['rt', 'response']].values)
             # Make sure that zero responses are turned negative
-            gt_dict[i][:, 1][gt_dict[[i][:, 1] == 0]] = -1
+            gt_dict[i][:, 1][gt_dict[i][:, 1] == 0] = -1
             print('gt_dict[i]')
             print(gt_dict[i])
             
