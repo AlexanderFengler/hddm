@@ -425,6 +425,7 @@ def mlp_manifold(parameters = [],
 
     if type(parameters) == pd.core.frame.DataFrame:
         parameters = parameters[model_config[model]['params']].values.astype(np.float32)
+        print()
     
     # Load Keras model and initialize batch container
     keras_model = get_mlp(model = model)
@@ -432,21 +433,21 @@ def mlp_manifold(parameters = [],
     # Prepare data structures
     
     # Data template
-    plot_data = np.zeros((n_rt_steps * 2 + 1, 2))
-    plot_data[:, 0] = np.concatenate(([i * (max_rt / n_rt_steps) for i in range(n_rt_steps, -1, -1)], [i * (max_rt / n_rt_steps) for i in range(1, n_rt_steps + 1, 1)]))
+    plot_data = np.zeros((n_rt_steps * 2, 2))
+    plot_data[:, 0] = np.concatenate(([i * (max_rt / n_rt_steps) for i in range(n_rt_steps, 0, -1)], [i * (max_rt / n_rt_steps) for i in range(1, n_rt_steps + 1, 1)]))
     plot_data[:, 1] = np.concatenate((np.repeat(-1, n_rt_steps + 1), np.repeat(1, n_rt_steps)))
 
     n_params = model_config[model]['n_params']
     n_levels = vary_dict[list(vary_dict.keys())[0]].shape[0]
-    data_var = np.zeros(((n_rt_steps * 2 + 1) * n_levels, n_params + 3))
+    data_var = np.zeros(((n_rt_steps * 2) * n_levels, n_params + 3))
     
     cnt = 0 
     vary_param_name = list(vary_dict.keys())[0]
     
     for par_tmp in vary_dict[vary_param_name]: #range(vary_dict[list(vary_dict.keys())[0]].shape[0]):
         
-        tmp_begin = (n_rt_steps * 2 + 1) * cnt
-        tmp_end = (n_rt_steps * 2 + 1) * (cnt + 1)
+        tmp_begin = (n_rt_steps * 2) * cnt
+        tmp_end = (n_rt_steps * 2) * (cnt + 1)
         parameters[model_config[model]['params'].index(vary_param_name)] = par_tmp
         
         data_var[tmp_begin:tmp_end, :n_params] = parameters
