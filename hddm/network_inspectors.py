@@ -443,7 +443,7 @@ def mlp_manifold(parameters = [],
     cnt = 0 
     vary_param_name = list(vary_dict.keys())[0]
     
-    for par_tmp in range(vary_dict[list(vary_dict.keys())[0]].shape[0]):
+    for par_tmp in vary_dict[vary_param_name]: #range(vary_dict[list(vary_dict.keys())[0]].shape[0]):
         
         tmp_begin = (n_rt_steps * 2 + 1) * cnt
         tmp_end = (n_rt_steps * 2 + 1) * (cnt + 1)
