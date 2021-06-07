@@ -408,7 +408,7 @@ def kde_vs_mlp_likelihoods(#ax_titles = [],
     return
    
 # Predict
-def mlp_manifold(params = [],
+def mlp_manifold(parameters = [],
                  vary_dict = {},
                  model = 'ddm',
                  n_rt_steps = 2000,
@@ -423,8 +423,8 @@ def mlp_manifold(params = [],
     # #matplotlib.rcParams['pdf.fonttype'] = 42
     # mpl.rcParams['svg.fonttype'] = 'none'
 
-    if type(params) == pd.core.frameDataFrame:
-        params = params[model_config[model]['params']].values.astype(np.float32)
+    if type(parameters) == pd.core.frameDataFrame:
+        parameters = parameters[model_config[model]['params']].values.astype(np.float32)
     
     # Load Keras model and initialize batch container
     keras_model = get_mlp(model = model)
@@ -447,9 +447,9 @@ def mlp_manifold(params = [],
         
         tmp_begin = (n_rt_steps * 2 + 1) * cnt
         tmp_end = (n_rt_steps * 2 + 1) * (cnt + 1)
-        params[model_config[model]['params'].index(vary_param_name)] = par_tmp
+        parameters[model_config[model]['params'].index(vary_param_name)] = par_tmp
         
-        data_var[tmp_begin:tmp_end, :n_params] = params
+        data_var[tmp_begin:tmp_end, :n_params] = parameters
         data_var[tmp_begin:tmp_end, n_params:(n_params + 2)] = plot_data
         data_var[tmp_begin:tmp_end, (n_params + 2)] = np.squeeze(np.exp(keras_model(data_var[tmp_begin:tmp_end, :-1].astype(np.float32))))
         
