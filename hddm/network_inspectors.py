@@ -319,39 +319,38 @@ def kde_vs_mlp_likelihoods(#ax_titles = [],
         keras_input_batch[:, :parameter_df.shape[1]] = parameter_df.iloc[i, :].values
         ll_out_keras = keras_model(keras_input_batch)
         
-        if not traindatanalytic:
-            for j in range(nreps):
-                out = simulator(theta = parameter_df.iloc[i, :].values,
-                                model = model,
-                                n_samples = n_samples,
-                                max_t = 20,
-                                delta_t = 0.001)
+        for j in range(nreps):
+            out = simulator(theta = parameter_df.iloc[i, :].values,
+                            model = model,
+                            n_samples = n_samples,
+                            max_t = 20,
+                            delta_t = 0.001)
 
-                mykde = logkde((out[0], out[1], out[2]))
-                ll_out_gt = mykde.kde_eval((plot_data[:, 0], plot_data[:, 1]))
+            mykde = logkde((out[0], out[1], out[2]))
+            ll_out_gt = mykde.kde_eval((plot_data[:, 0], plot_data[:, 1]))
 
-                # Plot kde predictions
-                if j == 0:
-                    sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
-                                 np.exp(ll_out_gt),
-                                 color = 'black',
-                                 alpha = 0.5,
-                                 label = 'KDE',
-                                 ax = ax[row_tmp, col_tmp])
-                elif j > 0:
-                    sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
-                                 np.exp(ll_out_gt),
-                                 color = 'black',
-                                 alpha = 0.5,
-                                 ax = ax[row_tmp, col_tmp])
+            # Plot kde predictions
+            if j == 0:
+                sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
+                                np.exp(ll_out_gt),
+                                color = 'black',
+                                alpha = 0.5,
+                                label = 'KDE',
+                                ax = ax[row_tmp, col_tmp])
+            elif j > 0:
+                sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
+                                np.exp(ll_out_gt),
+                                color = 'black',
+                                alpha = 0.5,
+                                ax = ax[row_tmp, col_tmp])
 
-            # Plot keras predictions
-            sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
-                         np.exp(ll_out_keras[:, 0]),
-                         color = 'green',
-                         label = 'MLP',
-                         alpha = 1,
-                         ax = ax[row_tmp, col_tmp])
+        # Plot keras predictions
+        sns.lineplot(plot_data[:, 0] * plot_data[:, 1], 
+                        np.exp(ll_out_keras[:, 0]),
+                        color = 'green',
+                        label = 'MLP',
+                        alpha = 1,
+                        ax = ax[row_tmp, col_tmp])
 
         # Legend adjustments
         if row_tmp == 0 and col_tmp == 0:
