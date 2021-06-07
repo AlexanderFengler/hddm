@@ -425,7 +425,8 @@ def mlp_manifold(parameters = [],
 
     if type(parameters) == pd.core.frame.DataFrame:
         parameters = parameters[model_config[model]['params']].values.astype(np.float32)
-        print()
+        print('parameters')
+        print(parameters)
     
     # Load Keras model and initialize batch container
     keras_model = get_mlp(model = model)
@@ -434,8 +435,11 @@ def mlp_manifold(parameters = [],
     
     # Data template
     plot_data = np.zeros((n_rt_steps * 2, 2))
-    plot_data[:, 0] = np.concatenate(([i * (max_rt / n_rt_steps) for i in range(n_rt_steps, 0, -1)], [i * (max_rt / n_rt_steps) for i in range(1, n_rt_steps + 1, 1)]))
-    plot_data[:, 1] = np.concatenate((np.repeat(-1, n_rt_steps + 1), np.repeat(1, n_rt_steps)))
+    plot_data[:, 0] = np.concatenate(([(i * (max_rt / n_rt_steps)) for i in range(n_rt_steps, 0, -1)], [(i * (max_rt / n_rt_steps)) for i in range(1, n_rt_steps + 1, 1)]))
+    plot_data[:, 1] = np.concatenate((np.repeat(-1, n_rt_steps), np.repeat(1, n_rt_steps)))
+
+    print('plot_data')
+    print(plot_data)
 
     n_params = model_config[model]['n_params']
     n_levels = vary_dict[list(vary_dict.keys())[0]].shape[0]
