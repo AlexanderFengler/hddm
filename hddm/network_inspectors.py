@@ -375,12 +375,12 @@ def kde_vs_mlp_likelihoods(#ax_titles = [],
         # tmp title
 
 
-        ax[row_tmp, col_tmp].set_title(ax_titles[i],
+        ax[row_tmp, col_tmp].set_title(str(i), #ax_titles[i],
                                        fontsize = 20)
         ax[row_tmp, col_tmp].tick_params(axis = 'y', size = 16)
         ax[row_tmp, col_tmp].tick_params(axis = 'x', size = 16)
         
-    for i in range(len(ax_titles), rows * cols, 1):
+    for i in range(len(parameter_df.shape[0]), rows * cols, 1):
         row_tmp = int(np.floor(i / cols))
         col_tmp = i - (cols * row_tmp)
         ax[row_tmp, col_tmp].axis('off')
