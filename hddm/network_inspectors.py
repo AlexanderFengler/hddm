@@ -407,3 +407,105 @@ def kde_vs_mlp_likelihoods(#ax_titles = [],
 
     return
    
+# Predict
+def mlp_manifold(params = [],
+                 vary_dict = {},
+                 model = 'ddm',
+                 n_rt_steps = 2000,
+                 fig_scale = 1.0,
+                 max_rt = 5,
+                 save = True,
+                 show = True,
+                ):
+
+    # mpl.rcParams.update(mpl.rcParamsDefault)
+    # mpl.rcParams['text.usetex'] = True
+    # #matplotlib.rcParams['pdf.fonttype'] = 42
+    # mpl.rcParams['svg.fonttype'] = 'none'
+
+    if type(params) == pd.core.frameDataFrame:
+        params = params[model_config[model]['params']].values.astype(np.float32)
+    
+    # Load Keras model and initialize batch container
+    keras_model = get_mlp(model = model)
+
+    # Prepare data structures
+    
+    # Data template
+    plot_data = np.zeros((n_rt_steps * 2 + 1, 2))
+    plot_data[:, 0] = np.concatenate(([i * (max_rt / n_rt_steps) for i in range(n_rt_steps, -1, -1)], [i * (max_rt / n_rt_steps) for i in range(0, n_rt_steps + 1, 1)]))
+    plot_data[:, 1] = np.concatenate((np.repeat(-1, 2000), np.repeat(1, 2000)))
+
+    n_params = model_config[model]['n_params']
+    n_levels = vary_dict[list(vary_dict.keys())[0]].shape[0]
+    data_var = np.zeros(((n_rt_steps * 2 + 1) * n_levels, n_params + 3))
+    
+    cnt = 0 
+    vary_param_name = list(vary_dict.keys())[0]
+    
+    for par_tmp in vary_dict[list(vary_dict.keys())[0]].shape[0]:
+        
+        tmp_begin = (n_rt_steps * 2 + 1) * cnt
+        tmp_end = (n_rt_steps * 2 + 1) * (cnt + 1)
+        params[model_config[model]['params'].index(vary_param_name)] = par_tmp
+        
+        data_var[tmp_begin:tmp_end, :n_params] = params
+        data_var[tmp_begin:tmp_end, n_params:(n_params + 2)] = plot_data
+        data_var[tmp_begin:tmp_end, (n_params + 2)] = np.squeeze(np.exp(keras_model(data_var[tmp_begin:tmp_end, :-1].astype(np.float32))))
+        
+        cnt += 1
+
+    fig = plt.figure(figsize=(8 * fig_scale, 5.5 * fig_scale))
+    ax = fig.add_subplot(111, projection = '3d')
+    ax.plot_trisurf(data_var[:, -2] * data_var[:, -3], 
+                    data_var[:, model_config[model]['params'].index(vary_param_name)], 
+                    data_var[:, -1],
+                    linewidth = 0.5, 
+                    alpha = 1.0, 
+                    cmap = cm.coolwarm)
+    
+    ax.set_ylabel(vary_param_name.upper().replace('_', '-'),  
+                  fontsize = 16,
+                  labelpad = 20)
+    
+    ax.set_xlabel('RT',  
+                  fontsize = 16, 
+                  labelpad = 20)
+    
+    ax.set_zlabel('Likelihood',  
+                  fontsize = 16, 
+                  labelpad = 20)
+    
+    ax.set_zticks(np.round(np.linspace(min(data_var[:, -1]), 
+                                       max(data_var[:, -1]), 
+                                       5), 
+                                1))
+
+    ax.set_yticks(np.round(np.linspace(min(data_var[:, model_config[model]['params'].index(vary_param_name)]), 
+                                       max(data_var[:, model_config[model]['params'].index(vary_param_name)]), 
+                                       5),
+                                1))
+
+    ax.set_xticks(np.round(np.linspace(min(data_var[:, -2] * data_var[:, -3]), 
+                                       max(data_var[:, -2] * data_var[:, -3]), 
+                                       5), 
+                                1))
+    
+    ax.tick_params(labelsize = 16)
+    ax.set_title(model.upper().replace('_', '-') + ' - MLP: Manifold', 
+                 fontsize = 20, 
+                 pad = 20)
+
+    ax.w_xaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+    ax.w_yaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+    ax.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+   
+    if save:
+        plt.savefig('figures/mlp_manifold_' + model + 'png',
+                    format = 'png')
+
+    if show:
+        return plt.show()
+    
+    plt.close()
+    return
