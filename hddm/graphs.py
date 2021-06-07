@@ -72,7 +72,7 @@ def subset_data(data, row_tmp):
 
 def make_trace_plotready_h_c(trace_dict = None,
                              model = '', 
-                             is_group_model = None,
+                             is_group_model = None, # Not used ?
                              model_ground_truth = None):
     """
         Brings the supplied trace dictionary into the final form. A dictionary of dictionaries, with first-level key indicating the 

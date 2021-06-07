@@ -253,7 +253,7 @@ def simulator(theta,
 
 
     :Arguments:
-        theta : list or numpy.array
+        theta : list or numpy.array or panda DataFrame
             Parameters of the simulator. If 2d array, each row is treated as a 'trial' 
             and the function runs n_sample * n_trials simulations.
         model: str <default='angle'>
@@ -287,8 +287,10 @@ def simulator(theta,
         theta = np.asarray(theta).astype(np.float32)
     elif type(theta) == np.ndarray:
         theta = theta.astype(np.float32)
+    elif type(theta) == pd.core.frameDataFrame:
+        theta = theta[model_config[model]['params']].values.astype(np.float32)
     else:
-        theta = theta.numpy()
+        theta = theta.numpy().astype(float32)
     
     if len(theta.shape) < 2:
         theta = np.expand_dims(theta, axis = 0)

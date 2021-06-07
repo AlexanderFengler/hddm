@@ -16,9 +16,6 @@ def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_respo
     #print(simulator_data)
     # Define dataframe if simulator output is normal (comes out as list tuple [rts, choices, metadata])
     if len(simulator_data) == 3:
-        #print('Simulator data: ')
-        #print(simulator_data[0])
-        #print(simulator_data[0].shape)
         df = pd.DataFrame(simulator_data[0].astype(np.double), columns = ['rt'])
         df['response'] = simulator_data[1].astype(int)
     # Define dataframe if simulator output is binned pointwise (comes out as tuple [np.array, metadata])
@@ -38,9 +35,6 @@ def hddm_preprocess(simulator_data = None, subj_id = 'none', keep_negative_respo
     # Add ground truth parameters to dataframe
     if add_model_parameters:
         for param in model_config[simulator_data[2]['model']]['params']:
-            #print(simulator_data[2][param])
-            #print(type(simulator_data[2][param]))
-            #print(simulator_data[2][param].shape)
             if len(simulator_data[2][param]) > 1:
                 df[param] = simulator_data[2][param]
             else:
@@ -253,9 +247,9 @@ def simulator_single_subject(parameters = [0, 0, 0],
                       n_samples = n_samples,
                       max_rt_outlier = max_rt_outlier)
         
-    data_out = hddm_preprocess(x)
+    data_out = hddm_preprocess(x, add_model_parameters = True)
 
-    return (data_out, gt, np.array(parameters))
+    return (data_out, gt)
 
 # TD: DIDN'T GO OVER THIS ONE YET !
 def simulator_stimcoding(model = 'angle',
@@ -341,15 +335,15 @@ def simulator_stimcoding(model = 'angle',
 #                                                       high = model_config[model]['param_bounds'][1][id_tmp])
             if 'v' in split_by:
                 id_tmp = model_config[model]['params'].index('v')
-                param_base[i, id_tmp] = drift_criterion + param_base[i, id_tmp]
+                param_base[i, id_tmp] = drift_criterion - param_base[i, id_tmp]
                 gt['v'] = param_base[i, id_tmp]
-                gt['drift_criterion'] = drift_criterion
+                gt['dc'] = drift_criterion
    
         if i == 1:
             
             if 'v' in split_by:
                 id_tmp = model_config[model]['params'].index('v')
-                param_base[i, id_tmp] = drift_criterion - param_base[i, id_tmp]
+                param_base[i, id_tmp] = drift_criterion + param_base[i, id_tmp]
             if 'z' in split_by:
                 id_tmp = model_config[model]['params'].index('z')
                 param_base[i, id_tmp] = 1 - param_base[i, id_tmp]
@@ -372,12 +366,13 @@ def simulator_stimcoding(model = 'angle',
                                 max_rt_outlier = max_rt_outlier)
         
 
-        dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i + 1))
+        dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i + 1), keep_model_parameters = True)
     
     data_out = pd.concat(dataframes)
     data_out = data_out.rename(columns = {'subj_idx': "stim"})
+    data_out['subj_idx'] = 'none'
     # print(param_base.shape)
-    return (data_out, gt, param_base)
+    return (data_out, gt)
 
 def simulator_condition_effects(n_conditions = 4,
                                 n_samples_by_condition = 1000,
@@ -427,7 +422,8 @@ def simulator_condition_effects(n_conditions = 4,
             then the takes the form of a histogram, with bin-wise frequencies.
 
     Returns: 
-        pandas.DataFrame: Holds a 'reaction time' column and a 'response' column. Ready to be fit with hddm.
+       tuple (pandas.DataFrame, dictionary): The DataFrame holds 'reaction time', 'response', 'stim' columns as well as trial by trial parameters. Ready to be fit with hddm.
+       The dictionary holds the ground truth parameters with names as one expects from hddm model traces.
     """
 
     # Sanity checks
@@ -448,7 +444,6 @@ def simulator_condition_effects(n_conditions = 4,
                                             high = model_config[model]['param_bounds'][1], 
                                             size = (1, len(model_config[model]['params']))),
                                             (n_conditions, 1))
-    
     
          
     # Reassign parameters according to the information in prespecified params and condition_effect_on_param
@@ -504,7 +499,7 @@ def simulator_condition_effects(n_conditions = 4,
                                 n_samples = n_samples_by_condition,
                                 max_rt_outlier = max_rt_outlier)
         
-        dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i))
+        dataframes.append(hddm_preprocess(simulator_data = sim_out, subj_id = i, add_model_parameters = True))
     
     data_out = pd.concat(dataframes)
     
@@ -518,7 +513,7 @@ def simulator_condition_effects(n_conditions = 4,
         data_out['response'] = data_out['response'].astype(np.int_)
         #data_out['nn_response'] = data_out['nn_response'].astype(np.int_)
 
-    return (data_out, gt, param_base)
+    return (data_out, gt)
 
 def simulator_covariate(dependent_params = ['v'],
                         model = 'angle',
@@ -571,12 +566,8 @@ def simulator_covariate(dependent_params = ['v'],
             then the takes the form of a histogram, with bin-wise frequencies.
 
     Returns: 
-        (pandas.DataFrame, dict, numpy.array): 
-            The Dataframe holds a 'reaction time' column, a 'response' column and a 'BOLD' column (for the covariate). 
-            The dictionary holds the groundtruth parameter (values) and parameter names (keys).
-            The numpy.array hold trial-wise parameterizations as resulting from applying the regression on the covariates.
-            Ready to be fit with hddm.
-    
+      tuple (pandas.DataFrame, dictionary): The DataFrame holds 'reaction time', 'response', 'BOLD' (the covariate) columns as well as trial by trial parameters. Ready to be fit with hddm.
+       The dictionary holds the ground truth parameters with names as one expects from hddm model traces.
     """
 
     # Sanity checks
@@ -612,6 +603,8 @@ def simulator_covariate(dependent_params = ['v'],
 
     # TD: Be more clever about covariate magnitude (maybe supply?)
     # Parameters that have a
+    param_base_before_adj = param_base.copy()
+
     for covariate in dependent_params:
         id_tmp = model_config[model]['params'].index(covariate)
 
@@ -626,17 +619,15 @@ def simulator_covariate(dependent_params = ['v'],
 
         # If the current covariate has a beta parameter attached to it 
         if covariate in betas.keys():
+
             param_base[:, id_tmp] = param_base[:, id_tmp] + (betas[covariate] * tmp_covariate_by_sample)
         else: 
             param_base[:, id_tmp] = param_base[:, id_tmp] + (0.1 * tmp_covariate_by_sample)
     
-    #rts = []
-    #choices = []
-
     # TD: IMPROVE THIS SIMULATOR SO THAT WE CAN PASS MATRICES OF PARAMETERS
     # WAY TOO SLOW RIGHT NOW
-    #for i in range(n_samples):
-    sim_out = simulator(param_base, # param_base[i, :],
+    
+    sim_out = simulator(param_base,
                         model = model,
                         n_samples = 1,
                         n_trials = n_samples,
@@ -650,19 +641,8 @@ def simulator_covariate(dependent_params = ['v'],
                             n_samples = n_samples,
                             max_rt_outlier = max_rt_outlier)
     
-    # sim_out_copy = []
-    # sim_out_copy.append(np.squeeze(sim_out[0], axis = 0))
-    # sim_out_copy.append(np.squeeze(sim_out[1], axis = 0))
-    # sim_out_copy.append(sim_out[2])
-        
-        #rts.append(sim_out[0])
-        #choices.append(sim_out[1])
-    
-    # rts = np.squeeze(np.stack(rts, axis = 0))
-    # choices = np.squeeze(np.stack(choices, axis = 0))
-    
     # Preprocess 
-    data = hddm_preprocess(sim_out, subj_id)
+    data = hddm_preprocess(sim_out, subj_id, add_model_parameters = True)
     # data = hddm_preprocess([rts, choices], subj_id)
     
     # Call the covariate BOLD (unnecessary but in style)
@@ -676,12 +656,18 @@ def simulator_covariate(dependent_params = ['v'],
         
         # If a parameter actually had a covariate attached then we add the beta coefficient as a parameter as well
         # Now intercept, beta
-        if param in betas.keys():
-            gt[param + '_beta'] = betas[param]
-        
-        gt[param] = param_base[0, id_tmp]
+        if param in dependent_params:
+            if param in betas.keys():
+            # gt[param + '_Intercept'] = param_base[:, ]
+                gt[param + '_BOLD'] = betas[param]
+            else:
+                gt[param + '_BOLD'] = 0.1
+            gt[param + '_Intercept'] = param_base_before_adj[0, id_tmp]
+            
+        else:
+            gt[param] = param_base[0, id_tmp]
     
-    return (data, gt, param_base)
+    return (data, gt)
 
 # ALEX TD: Change n_samples_by_subject --> n_trials_per_subject (but apply consistently)
 def simulator_hierarchical(n_subjects = 5,
@@ -738,7 +724,7 @@ def simulator_hierarchical(n_subjects = 5,
     assert max_rt_outlier > 0, 'max_rt__outlier needs to be > 0'
 
     # AF TD: Why is this unused ?!
-    param_ranges_half = (np.array(model_config[model]['param_bounds'][1]) - np.array(model_config[model]['param_bounds'][0])) / 2
+    # param_ranges_half = (np.array(model_config[model]['param_bounds'][1]) - np.array(model_config[model]['param_bounds'][0])) / 2
     # Fill in some global parameter vectors
     global_means = np.random.uniform(low = model_config[model]['param_bounds'][0],
                                      high = model_config[model]['param_bounds'][1],
@@ -748,10 +734,6 @@ def simulator_hierarchical(n_subjects = 5,
                                     high = np.minimum(abs(global_means - model_config[model]['param_bounds'][0]), 
                                                       abs(model_config[model]['param_bounds'][1] - global_means)) / 3, # previously param_ranges_half / 6,
                                     size = (1, len(model_config[model]['param_bounds'][0])))
-    
-    # global_means = np.random.uniform(low = model_config[model]['param_bounds'][0],
-    #                                  high = model_config[model]['param_bounds'][1],
-    #                                  size = (1, len(model_config[model]['param_bounds'][0])))                         
     
     dataframes = []
     subject_parameters = np.zeros((n_subjects, 
@@ -796,7 +778,8 @@ def simulator_hierarchical(n_subjects = 5,
                                 max_rt_outlier = max_rt_outlier)
         
         dataframes.append(hddm_preprocess(simulator_data = sim_out, 
-                                          subj_id = subj_id))
+                                          subj_id = subj_id,
+                                          add_model_parameters = True))
         
         for param in model_config[model]['params']:
             id_tmp = model_config[model]['params'].index(param)
@@ -804,7 +787,7 @@ def simulator_hierarchical(n_subjects = 5,
         
     data_out = pd.concat(dataframes)
     
-    return (data_out, gt, subject_parameters)
+    return (data_out, gt)
 
 ### NEW
 def simulator_h_c(n_subjects = 10,
@@ -941,12 +924,12 @@ def simulator_h_c(n_subjects = 10,
         condition_rows = np.meshgrid(*arg_tuple)
         return pd.DataFrame(np.column_stack([x_tmp.flatten() for x_tmp in condition_rows]), columns = [key for key in conditions.keys()])
 
-    def make_single_sub_cond_df(conditions_df, 
+    def make_single_sub_cond_df(conditions_df,
                                 depends_on, 
                                 regression_models, 
                                 regression_covariates, 
                                 group_only_regressors, 
-                                group_only, 
+                                group_only,
                                 fixed_at_default, 
                                 remainder,
                                 model, 
@@ -973,7 +956,6 @@ def simulator_h_c(n_subjects = 10,
                 # Parameter vector
                 subj_data = pd.DataFrame(index = np.arange(0, n_samples_by_subject, 1))
                 subj_data['subj_idx'] = str(subj_idx)
-                # print(subj_data)
 
                 # Fixed part
                 if fixed_at_default is not None:
@@ -999,15 +981,12 @@ def simulator_h_c(n_subjects = 10,
                         
                         # AF-TODO: IS THIS NECESSARY?
                         if remainder_set:
-                            # print(group_level_parameter_dict)
                             subj_data[remainder_tmp] = full_parameter_dict[remainder_tmp + '_subj.' + str(subj_idx)]
 
                 # Depends on part
                 if depends_on is not None:
-                    conditions_tmp = conditions_df.iloc[condition_id]
+                    # conditions_tmp = conditions_df.iloc[condition_id]
                     for depends_tmp in depends_on.keys():
-                        # print('depends_tmp')
-                        # print(depends_tmp)
                         conditions_df_tmp = conditions_df[depends_on[depends_tmp]].iloc[condition_id]
                         condition_elem = '.'.join(conditions_df_tmp)
                 
@@ -1016,21 +995,11 @@ def simulator_h_c(n_subjects = 10,
                             tmp_std = group_level_parameter_dict[depends_tmp + '_std']
 
                             full_parameter_dict[depends_tmp + '_subj(' + condition_elem + ').' + str(subj_idx)] = np.random.normal(loc = tmp_mean, scale = tmp_std)
-                            # print('depends_tmp NOT group only')
-                            # print(depends_tmp)
-
                             subj_data[depends_tmp] = full_parameter_dict[depends_tmp + '_subj(' + condition_elem + ').' + str(subj_idx)]
                         else:
-
-                            # print('depends_tmp group only')
-                            # print(depends_tmp)
-
                             subj_data[depends_tmp] =  full_parameter_dict[depends_tmp + '(' + condition_elem + ')']
 
-                        for condition_key_tmp in conditions_df_tmp.keys():
-                            # print('condition_key_tmp')
-                            # print(condition_key_tmp)
-                            # print(conditions_df_tmp)   
+                        for condition_key_tmp in conditions_df_tmp.keys():  
                             subj_data[condition_key_tmp] = conditions_df_tmp[condition_key_tmp] ##############################################################
 
                 # Regressor part
@@ -1047,28 +1016,7 @@ def simulator_h_c(n_subjects = 10,
                         outcome = reg_model[:separator].strip(' ')
                         reg_model_stripped = reg_model[(separator + 1):]
                         design_matrix = dmatrix(reg_model_stripped, cov_df)
-                        #covariate_names = design_matrix.design_info.column_names
                         
-                        # if group_only_regressors:
-                        #     #reg_params_tmp_dict = full_parameter_dict[outcome + '_reg']
-                        #     reg_params_tmp = []
-                        #     reg_param_names_tmp = []
-                            
-                        #     for reg_param_key in full_parameter_dict[outcome + '_reg'].keys():
-                        #         if 'Intercept' in reg_param_key:
-                        #             reg_params_tmp.append(np.random.normal(loc = full_parameter_dict[outcome + '_reg'][reg_param_key], 
-                        #                                                    scale = full_parameter_dict[outcome + '_reg_std'][reg_param_key]))
-                        #         else:
-                        #             reg_params_tmp.append(full_parameter_dict[outcome + '_reg'][reg_param_key])
-
-                        #     reg_params_tmp = np.array(reg_params_tmp)
-
-                        #     for key in full_parameter_dict[outcome + '_reg'].keys():
-                        #         full_parameter_dict[key] = full_parameter_dict[outcome + '_reg'][key]
-
-                            # subj_data[outcome] = (design_matrix * reg_params_tmp).sum(axis = 1)
-                        
-                        #else:
                         reg_params_tmp = []
                         reg_param_names_tmp = []
                         
@@ -1092,10 +1040,6 @@ def simulator_h_c(n_subjects = 10,
                         if not regressor_set:
                             for k in range(len(reg_param_names_tmp)):
                                 full_parameter_dict[reg_param_names_tmp[k]] = reg_params_tmp[k]
-
-                        # I think this is unnecessary !
-                        # else:
-                        #     reg_params_tmp = np.array([full_parameter_dict[reg_param_names_tmp[k]] for k in range(len(reg_param_names_tmp))])
 
                         subj_data[outcome] = (design_matrix * reg_params_tmp).sum(axis = 1)
                         
@@ -1142,10 +1086,6 @@ def simulator_h_c(n_subjects = 10,
             full_data['outlier']  = 0
             full_data[outlier_idx, [list(full_data.keys()).index('outlier')]] = 1
 
-        # print([key for key in depends_on.keys()])
-        # print(['rt', 'response'] + ['subj_idx'] + [key for key in regression_covariates.keys()] + [key for key in conditions.keys()] + model_config[model]['params'])
-        # print(full_data)
-        
         full_data_cols = ['rt', 'response', 'subj_idx']
         
         if regression_covariates is not None:
@@ -1153,13 +1093,9 @@ def simulator_h_c(n_subjects = 10,
         if conditions is not None:
             full_data_cols += [key for key in conditions.keys()]
 
-        # print('full data cols')
-        # print(full_data_cols)
-        
         full_data_cols += model_config[model]['params']
         full_data = full_data[full_data_cols]
         full_data.reset_index(drop = True, inplace = True)
-        
         return full_data, full_parameter_dict
 
     def make_group_level_params(conditions_df,
@@ -1215,11 +1151,6 @@ def simulator_h_c(n_subjects = 10,
                 
                 if depends_tmp not in group_only:
                     bound_to_bound_tmp = (model_config[model]['param_bounds'][1][model_config[model]['params'].index(depends_tmp)] - model_config[model]['param_bounds'][0][model_config[model]['params'].index(depends_tmp)])
-                    # print('passed')
-                    # print('depends_tmp')
-                    # print(depends_tmp)
-                    # print('btb')
-                    # print(bound_to_bound_tmp)
                     group_level_parameter_dict[depends_tmp + '_std'] = np.random.uniform(low = 0,
                                                                                          high = (1 / 10) * bound_to_bound_tmp)
             
@@ -1233,7 +1164,6 @@ def simulator_h_c(n_subjects = 10,
                 outcome = reg_model[:separator].strip(' ')
                 reg_model_stripped = reg_model[(separator + 1):]
                 covariate_names = dmatrix(reg_model_stripped, cov_df).design_info.column_names
-                #patsy.dmatrix(, cov_df)
 
                 reg_trace_dict = OrderedDict()
                 reg_std_trace_dict = OrderedDict()
@@ -1241,9 +1171,7 @@ def simulator_h_c(n_subjects = 10,
                 for covariate in covariate_names:
                     if 'Intercept' in covariate:
                         bound_to_bound_tmp = model_config[model]['param_bounds'][1][model_config[model]['params'].index(outcome)] - model_config[model]['param_bounds'][0][model_config[model]['params'].index(outcome)]
-                        
-                        # print('covariate')
-                        # print(covariate)
+
                         reg_trace_dict[outcome + '_' + covariate] = np.random.uniform(low =  model_config[model]['param_bounds'][0][model_config[model]['params'].index(outcome)] + 0.3 *  bound_to_bound_tmp,
                                                                                       high = model_config[model]['param_bounds'][0][model_config[model]['params'].index(outcome)] + 0.7 *  bound_to_bound_tmp)
                         print(reg_trace_dict[outcome + '_' + covariate])
@@ -1263,7 +1191,7 @@ def simulator_h_c(n_subjects = 10,
                 
                 #if not group_only_regressors:
                 group_level_parameter_dict[outcome + '_reg' + '_std'] = reg_std_trace_dict.copy()
-            # print(group_level_parameter_dict)
+
         return group_level_parameter_dict
 
     # MAIN PART OF THE FUNCTION
