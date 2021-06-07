@@ -434,7 +434,7 @@ def mlp_manifold(parameters = [],
     # Data template
     plot_data = np.zeros((n_rt_steps * 2 + 1, 2))
     plot_data[:, 0] = np.concatenate(([i * (max_rt / n_rt_steps) for i in range(n_rt_steps, -1, -1)], [i * (max_rt / n_rt_steps) for i in range(1, n_rt_steps + 1, 1)]))
-    plot_data[:, 1] = np.concatenate((np.repeat(-1, 2000), np.repeat(1, 2000)))
+    plot_data[:, 1] = np.concatenate((np.repeat(-1, n_rt_steps + 1), np.repeat(1, n_rt_steps)))
 
     n_params = model_config[model]['n_params']
     n_levels = vary_dict[list(vary_dict.keys())[0]].shape[0]
