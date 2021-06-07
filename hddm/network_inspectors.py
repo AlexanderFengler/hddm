@@ -397,8 +397,8 @@ def kde_vs_mlp_likelihoods(#ax_titles = [],
 
         plt.savefig('figures/' + 'kde_vs_mlp_plot' + '.png',
                     format = 'png',
-                    transparent = True,
-                    frameon = False)
+                    transparent = False)
+                    # transparent = True)
     
     if show:
         plt.show()
