@@ -427,6 +427,7 @@ def mlp_manifold(parameters = [],
         parameters = parameters[model_config[model]['params']].values.astype(np.float32)
         print('parameters')
         print(parameters)
+        print(parameters.shape)
     
     # Load Keras model and initialize batch container
     keras_model = get_mlp(model = model)
