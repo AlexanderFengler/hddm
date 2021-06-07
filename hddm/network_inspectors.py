@@ -317,8 +317,7 @@ def kde_vs_mlp_likelihoods(#ax_titles = [],
         
         # Get predictions from keras model
         keras_input_batch[:, :parameter_df.shape[1]] = parameter_df.iloc[i, :].values
-        ll_out_keras = keras_model.predict(keras_input_batch, 
-                                           batch_size = 100)
+        ll_out_keras = keras_model(keras_input_batch)
         
         if not traindatanalytic:
             for j in range(nreps):
