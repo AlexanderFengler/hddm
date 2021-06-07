@@ -308,6 +308,7 @@ def kde_vs_mlp_likelihoods(#ax_titles = [],
     keras_input_batch = np.zeros((4000, parameter_df.shape[1] + 2))
     keras_input_batch[:, parameter_df.shape[1]:] = plot_data
 
+    #n_subplot = 0
     for i in range(parameter_df.shape[0]):
         
         print('Making Plot: ', i)
@@ -380,7 +381,7 @@ def kde_vs_mlp_likelihoods(#ax_titles = [],
         ax[row_tmp, col_tmp].tick_params(axis = 'y', size = 16)
         ax[row_tmp, col_tmp].tick_params(axis = 'x', size = 16)
         
-    for i in range(len(parameter_df.shape[0]), rows * cols, 1):
+    for i in range(parameter_df.shape[0], rows * cols, 1):
         row_tmp = int(np.floor(i / cols))
         col_tmp = i - (cols * row_tmp)
         ax[row_tmp, col_tmp].axis('off')
