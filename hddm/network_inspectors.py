@@ -423,7 +423,7 @@ def mlp_manifold(parameters = [],
     # #matplotlib.rcParams['pdf.fonttype'] = 42
     # mpl.rcParams['svg.fonttype'] = 'none'
 
-    if type(parameters) == pd.core.frameDataFrame:
+    if type(parameters) == pd.core.frame.DataFrame:
         parameters = parameters[model_config[model]['params']].values.astype(np.float32)
     
     # Load Keras model and initialize batch container

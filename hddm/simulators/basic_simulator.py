@@ -287,7 +287,7 @@ def simulator(theta,
         theta = np.asarray(theta).astype(np.float32)
     elif type(theta) == np.ndarray:
         theta = theta.astype(np.float32)
-    elif type(theta) == pd.core.frameDataFrame:
+    elif type(theta) == pd.core.frame.DataFrame:
         theta = theta[model_config[model]['params']].values.astype(np.float32)
     else:
         theta = theta.numpy().astype(float32)

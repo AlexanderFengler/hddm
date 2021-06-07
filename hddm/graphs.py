@@ -950,7 +950,7 @@ def model_plot(hddm_model = None,
         plt.tight_layout(rect = [0, 0.03, 1, 0.9])
         
         if save == True:
-            plt.savefig('figures/' + '_model_plot_' + str(plot_n) + '_' + str(i) + '.png',
+            plt.savefig('figures/' + 'model_plot_' + str(plot_n) + '_' + str(i) + '.png',
                         format = 'png',
                         transparent = True,
                         frameon = False)
