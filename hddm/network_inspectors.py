@@ -424,10 +424,12 @@ def mlp_manifold(parameters = [],
     # mpl.rcParams['svg.fonttype'] = 'none'
 
     if type(parameters) == pd.core.frame.DataFrame:
-        parameters = parameters[model_config[model]['params']].values.astype(np.float32)
+        parameters = np.squeeze(parameters[model_config[model]['params']].values.astype(np.float32))
         print('parameters')
         print(parameters)
         print(parameters.shape)
+        print('parameters[0, :]')
+        #print(parameters[0,:])
     
     # Load Keras model and initialize batch container
     keras_model = get_mlp(model = model)
@@ -455,9 +457,9 @@ def mlp_manifold(parameters = [],
         tmp_end = (n_rt_steps * 2) * (cnt + 1)
         parameters[model_config[model]['params'].index(vary_param_name)] = par_tmp
         
-        data_var[tmp_begin:tmp_end, :n_params] = parameters[0, :]
+        data_var[tmp_begin:tmp_end, :n_params] = parameters
         print('parameters')
-        print(parameters[0, :])
+        print(parameters)
         print('data_var')
         print(data_var[tmp_begin:tmp_end, :n_params])
         data_var[tmp_begin:tmp_end, n_params:(n_params + 2)] = plot_data
