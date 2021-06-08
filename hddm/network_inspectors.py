@@ -468,7 +468,7 @@ def mlp_manifold(parameters = [],
     ax.plot_trisurf(data_var[:, -2] * data_var[:, -3], 
                     data_var[:, model_config[model]['params'].index(vary_param_name)], 
                     data_var[:, -1],
-                    linewidth = 0.5, 
+                    linewidth = 0.5,
                     alpha = 1.0, 
                     cmap = cm.coolwarm)
     
