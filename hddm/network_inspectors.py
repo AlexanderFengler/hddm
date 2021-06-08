@@ -456,6 +456,8 @@ def mlp_manifold(parameters = [],
         parameters[model_config[model]['params'].index(vary_param_name)] = par_tmp
         
         data_var[tmp_begin:tmp_end, :n_params] = parameters[0, :]
+        print('data_var')
+        print(data_var)
         data_var[tmp_begin:tmp_end, n_params:(n_params + 2)] = plot_data
         data_var[tmp_begin:tmp_end, (n_params + 2)] = np.squeeze(np.exp(keras_model(data_var[tmp_begin:tmp_end, :-1].astype(np.float32))))
         
