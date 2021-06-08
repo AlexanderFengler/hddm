@@ -456,6 +456,8 @@ def mlp_manifold(parameters = [],
         parameters[model_config[model]['params'].index(vary_param_name)] = par_tmp
         
         data_var[tmp_begin:tmp_end, :n_params] = parameters[0, :]
+        print('parameters')
+        print(parameters[0, :])
         print('data_var')
         print(data_var[tmp_begin:tmp_end, :n_params])
         data_var[tmp_begin:tmp_end, n_params:(n_params + 2)] = plot_data
