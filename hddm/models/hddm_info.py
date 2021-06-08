@@ -126,6 +126,7 @@ class HDDM(HDDMBase):
         self.emcee_dispersions = {'a': 1, 't': 0.1, 'a_std': 1, 't_std': 0.15, 'sz': 1.1, 'v': 1.5,
                                   'st': 0.1, 'sv': 3, 'z_trans': 0.2, 'z': 0.1,
                                   'p_outlier': 1., 'v_std': 1,'alpha': 1.5,'dual_alpha': 1.5,'theta': 0.1}
+        
         if hasattr(self, 'is_informative'):
             pass
         else:
@@ -165,8 +166,8 @@ class HDDM(HDDMBase):
             param_bnd_str = 'param_bounds_cnn'
 
         # PARAMETERS COMMON TO ALL MODELS
-        print('printing include: ')
-        print(include)
+        #print('printing include: ')
+        #print(include)
 
         if 'p_outlier' in include:
             knodes.update(self._create_family_invlogit('p_outlier',
@@ -424,7 +425,7 @@ class HDDM(HDDMBase):
                                                               lower = model_config[self.model][param_bnd_str][0][model_config[self.model]['params'].index(tmp_param)],
                                                               upper = model_config[self.model][param_bnd_str][1][model_config[self.model]['params'].index(tmp_param)],
                                                               value = model_config[self.model]['default_params'][model_config[self.model]['params'].index(tmp_param)],
-                                                               std_upper = 1.5
+                                                              std_upper = 1.5
                                                                ))
             if 't' in include:
                 tmp_param = 't'
@@ -496,8 +497,8 @@ class HDDM(HDDMBase):
                                                                ))
                                                                # should have lower = 0.1, upper = 0.9
                       
-        print('knodes')
-        print(knodes)
+        #print('knodes')
+        #print(knodes)
         return knodes
 
     def _create_stochastic_knodes_info(self, include):

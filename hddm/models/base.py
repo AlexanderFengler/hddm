@@ -572,7 +572,7 @@ class AccumulatorModel(kabuki.Hierarchical):
                       eval = lambda x:  lower + ((upper - lower) * (np.exp(x)) / (1 + np.exp(x))),
                       x = g_trans, plot = True, trace = True)
 
-            print('passed through invlog node generation with deterministic invlogit')
+            #print('passed through invlog node generation with deterministic invlogit')
 
             # Original version
             # g = Knode(pm.InvLogit, '%s'%name, ltheta=g_trans, plot=True,
@@ -834,9 +834,9 @@ class HDDMBase(AccumulatorModel):
 
         self._kwargs = kwargs
 
-        print('Now adding the HDDMBase include:')
+        #print('Now adding the HDDMBase include:')
         self.include = set(['v', 'a', 't']) # Doesn't seem to execute when this is initialized as part of HDDMnn __init__ --> this is correct, but check what is going on there
-        print('Include from inside HDDMBase: ', self.include)
+        #print('Include from inside HDDMBase: ', self.include)
         
         if include is not None:
             if include == 'all':
@@ -896,8 +896,8 @@ class HDDMBase(AccumulatorModel):
         
         if self.nn:
             # Define parents for HDDMnn across included models
-            print('printing knodes')
-            print(knodes)
+            #print('printing knodes')
+            #print(knodes)
             wfpt_parents['p_outlier'] = knodes['p_outlier_bottom'] if 'p_outlier' in self.include else self.p_outlier
             wfpt_parents['w_outlier'] = self.w_outlier # likelihood of an outlier point
 
@@ -926,12 +926,12 @@ class HDDMBase(AccumulatorModel):
                 wfpt_parents['sz'] = knodes['sz_bottom'] if 'sz' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index('sz')] #self.default_intervars['sz']
                 wfpt_parents['st'] = knodes['st_bottom'] if 'st' in self.include else  model_config[self.model]['default_params'][model_config[self.model]['params'].index('st')] #self.default_intervars['st']
 
-            print('wfpt parents: ')
-            print(wfpt_parents)
+            #print('wfpt parents: ')
+            #print(wfpt_parents)
 
         else:
-            print('printing knodes')
-            print(knodes)
+            #print('printing knodes')
+            #print(knodes)
             # This defines parents for basic hddm
             wfpt_parents['a'] = knodes['a_bottom']
             wfpt_parents['v'] = knodes['v_bottom']

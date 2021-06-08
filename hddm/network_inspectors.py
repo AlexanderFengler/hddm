@@ -358,8 +358,7 @@ def kde_vs_lan_likelihoods(#ax_titles = [],
 
     #n_subplot = 0
     for i in range(parameter_df.shape[0]):
-        
-        print('Making Plot: ', i)
+        print(str(i) + ' of ' +  str(parameter_df.shape[0]))
         
         row_tmp = int(np.floor(i / cols))
         col_tmp = i - (cols * row_tmp)

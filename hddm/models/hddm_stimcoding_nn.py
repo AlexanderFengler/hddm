@@ -77,7 +77,7 @@ class HDDMnnStimCoding(HDDM):
         elif self.nbin == 256:
             self.cnn_pdf_multiplier = 25.6
         
-        print(kwargs['include'])
+        #print(kwargs['include'])
         # Attach likelihood corresponding to model
         if self.network_type == 'mlp':
             self.network = load_mlp(model = self.model)
@@ -91,32 +91,32 @@ class HDDMnnStimCoding(HDDM):
         
         if self.split_param == 'z':
             assert not self.drift_criterion, "Setting drift_criterion requires split_param='v'."
-            print("Setting model to be non-informative")
+            #print("Setting model to be non-informative")
             kwargs['informative'] = False
 
             # Add z if it is split parameter but not included in 'include'
             if 'include' in kwargs and 'z' not in kwargs['include']:
                 kwargs['include'].append('z')
             else:
-                print('passing through here...')
+                #print('passing through here...')
                 if 'include' not in kwargs:
                     kwargs['include'] = ['z']
                 else:
                     pass
 
-            print("Adding z to includes.")
+            #print("Adding z to includes.")
 
         # Get unique stimulus values for the stimcoding relevant column (has to be of length 2!)
         self.stims = np.asarray(np.sort(np.unique(args[0][self.stim_col])))
         assert len(self.stims) == 2, "%s must contain two stimulus types" % self.stim_col
 
         super(HDDMnnStimCoding, self).__init__(*args, **kwargs)
-        print(self.p_outlier)
+        #print(self.p_outlier)
 
     def _create_stochastic_knodes(self, include):
         knodes = super(HDDMnnStimCoding, self)._create_stochastic_knodes(include)
-        print('knodes')
-        print(knodes)
+        #print('knodes')
+        #print(knodes)
         if self.drift_criterion:
             knodes.update(self._create_family_normal_normal_hnormal('dc',
                                                                      value = 0,
@@ -132,14 +132,14 @@ class HDDMnnStimCoding(HDDM):
         if self.drift_criterion: 
             wfpt_parents['dc'] = knodes['dc_bottom']
 
-        print('wfpt parents: ')
-        print(wfpt_parents)
+        #print('wfpt parents: ')
+        #print(wfpt_parents)
         return wfpt_parents
 
     def _create_wfpt_knode(self, knodes):
         
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
-        print('wfpt parents in _create_wfpt_knode', wfpt_parents)
+        #print('wfpt parents in _create_wfpt_knode', wfpt_parents)
         # Here we use a special Knode (see below) that either inverts v or z
         # depending on what the correct stimulus was for that trial type.
         
@@ -175,8 +175,8 @@ class KnodeWfptStimCoding(Knode):
         if all(data[self.stim_col] == self.stims[1]): # AF NOTE: Reversed this, previously self.stims[0], compare what is expected as data to my simulator...
             # 
             if self.split_param == 'z':
-                print('printing kwargs from create_node')
-                print(kwargs)
+                #print('printing kwargs from create_node')
+                #print(kwargs)
                 kwargs['z'] = 1 - kwargs['z']
             elif self.split_param == 'v' and dc is None:
                 kwargs['v'] = - kwargs['v']
