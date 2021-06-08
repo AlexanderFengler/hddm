@@ -32,6 +32,8 @@ import os
 
 model_config = hddm.simulators.model_config
 
+# NETWORK LOADERS -------------------------------------------------------------------------
+
 def get_mlp(model = 'angle'):
     """ Returns the keras network which is the basis of the MLP likelihoods
 
@@ -80,7 +82,55 @@ def get_cnn(model = 'angle', nbin = 512):
     network = load_cnn(model = model, nbin = nbin)
     return network
 
+# KDE CLASS --------------------------------------------------------------------------------
+
+# Support functions (accessible from outside the main class (logkde class) defined in script)
+def _bandwidth_silverman(sample = [0,0,0], 
+                        std_cutoff = 1e-3, 
+                        std_proc = 'restrict', # options 'kill', 'restrict'
+                        std_n_1 = 1e-1 # HERE WE CAN ALLOW FOR SOMETHING MORE INTELLIGENT
+                        ):  
+    """Function returns a bandwidth for kernel density estimators from a sample of data
+        :Arguments:
+            sample: np.array or list <default=[0, 0, 0]
+                The dataset which to base the final bandwidth on.
+            std_cutoff: numeric <default=1e-3>
+                The lowest acceptable standard deviation in a sample
+            std_proc: str <default='restrict'>
+                Accepts two values, ('restrict' and 'kill'). If you set it to 'restrict' then you return the std_cutoff in case
+                the sample standard deviation is < std_cutoff. If you set it to 'kill', the bandwidth returns 0 if the sample standard deviation < std_cutoff.
+            std_n_1: numeric <default=1e-1>
+                If the sample size is 1, set the sample standard deviation to this value.
+
+    Returns:
+        numeric
+            Returns a bandwidth value for a kernel density estimator
+    """             
+    
+    # Compute sample std and number of samples
+    std = np.std(sample)
+    n = len(sample)
+    
+    # Deal with very small stds and n = 1 case
+    if n > 1:
+        if std < std_cutoff:
+            if std_proc == 'restrict':
+                std = std_cutoff
+            if std_proc == 'kill':
+                std = 0
+    else:
+        std = std_n_1
+    return np.power((4/3), 1/5) * std * np.power(n, (-1/5))
 class logkde():
+    """Class that takes in simulator data and constructs a kernel density estimator from it.
+    :Arguments: 
+        simulator_data: tuple 
+            Output of a call to hddm.simulators.simulator()
+        bandwidth_type: str <default='silverman'>
+            At this point only 'silverman' is allowed. 
+        auto_bandwidth: bool <default=True>
+            At this point only true is allowed. Kernel Bandwidth is going to be determined automatically.  
+    """
     def __init__(self,
                  simulator_data, # Simulator_data is the kind of data returned by the simulators in ddm_data_simulatoin.py
                  bandwidth_type = 'silverman',
@@ -102,7 +152,7 @@ class logkde():
                 if len(self.data['rts'][i]) == 0:
                     self.bandwidths.append('no_base_data')
                 else:
-                    bandwidth_tmp = bandwidth_silverman(sample = np.log(self.data['rts'][i]))
+                    bandwidth_tmp = _bandwidth_silverman(sample = np.log(self.data['rts'][i]))
                     if bandwidth_tmp > 0:
                         self.bandwidths.append(bandwidth_tmp)
                     else:
@@ -139,8 +189,6 @@ class logkde():
         log_rts = np.log(data[0])
         log_kde_eval = np.log(data[0])
         choices = np.unique(data[1])
-        #print('choices to iterate:', choices)
-        #print('choices from kde:', self.data['choices'])
         
         # Main loop
         for c in choices:
@@ -169,7 +217,7 @@ class logkde():
         # sorting the which list in ascending order 
         # this implies that we return the kde_samples array so that the
         # indices reflect 'choice-labels' as provided in 'which' in ascending order
-        kde_samples = []
+        #kde_samples = []
         
         rts = np.zeros((n_samples, 1))
         choices = np.zeros((n_samples, 1))
@@ -227,39 +275,39 @@ class logkde():
             prop_tmp = len(rts_tmp) / n
             self.data['rts'].append(rts_tmp)
             self.data['choice_proportions'].append(prop_tmp)
+
+# PLOTTNG -------------------------------------------------------------------------------------
             
-
-# Support functions (accessible from outside the main class defined in script)
-def bandwidth_silverman(sample = [0,0,0], 
-                        std_cutoff = 1e-3, 
-                        std_proc = 'restrict', # options 'kill', 'restrict'
-                        std_n_1 = 1e-1 # HERE WE CAN ALLOW FOR SOMETHING MORE INTELLIGENT
-                       ): 
-    
-    # Compute sample std and number of samples
-    std = np.std(sample)
-    n = len(sample)
-    
-    # Deal with very small stds and n = 1 case
-    if n > 1:
-        if std < std_cutoff:
-            if std_proc == 'restrict':
-                std = std_cutoff
-            if std_proc == 'kill':
-                std = 0
-    else:
-        std = std_n_1
-    
-    return np.power((4/3), 1/5) * std * np.power(n, (-1/5))
-
-def kde_vs_mlp_likelihoods(#ax_titles = [],
-                           parameter_df = [],
-                           cols = 3,
-                           model = 'angle',
+def kde_vs_lan_likelihoods(#ax_titles = [],
+                           parameter_df = None,
+                           model = None,
                            n_samples = 10,
-                           nreps = 10,
-                           save = True,
-                           show = False):
+                           n_reps = 10,
+                           cols = 3,
+                           save = False,
+                           show = True):
+    """ Function creates a plot that compares kernel density estimates from simulation data with mlp output.
+
+    :Arguments:
+        parameter_df: pandas.core.frame.DataFrame
+            DataFrame hold a parameter vector in each row. (Parameter vector has to be compatible with the model string supplied to the 
+            'model' argument)
+        model: str <default=None>
+            String that specifies the model which should be used for the graph (find allowed models listed under hddm.simulators.model_config).
+        n_samples: int <default=10>
+            How many model samples to base kernel density estimates on.
+        n_reps: int <default=10>
+            How many kernel density estimates to include in a given subplot.
+        cols: int <default=3>
+            How many columns to use when creating subplots.
+        save: bool <default=False>
+            Whether to save the plot.
+        show: bool <default=True
+            Wheter to show the plot.
+        
+    Returns:
+        empty     
+    """
     
     # Get prediction from navarro if traindatanalytic = 1
     # if traindatanalytic:
@@ -320,7 +368,7 @@ def kde_vs_mlp_likelihoods(#ax_titles = [],
         keras_input_batch[:, :parameter_df.shape[1]] = parameter_df.iloc[i, :].values
         ll_out_keras = keras_model(keras_input_batch)
         
-        for j in range(nreps):
+        for j in range(n_reps):
             out = simulator(theta = parameter_df.iloc[i, :].values,
                             model = model,
                             n_samples = n_samples,
@@ -374,8 +422,6 @@ def kde_vs_mlp_likelihoods(#ax_titles = [],
                                             fontsize = 24);
         
         # tmp title
-
-
         ax[row_tmp, col_tmp].set_title(str(i), #ax_titles[i],
                                        fontsize = 20)
         ax[row_tmp, col_tmp].tick_params(axis = 'y', size = 16)
@@ -406,31 +452,62 @@ def kde_vs_mlp_likelihoods(#ax_titles = [],
     plt.close()
 
     return
-   
+
+
 # Predict
-def mlp_manifold(parameters = [],
-                 vary_dict = {},
+def lan_manifold(parameter_df = None,
+                 vary_dict = {'v': [-1.0, -0.75, -.5, -0.25, 0, 0.25, 0.5, 0.75, 1.0]},
                  model = 'ddm',
-                 n_rt_steps = 2000,
-                 fig_scale = 1.0,
+                 n_rt_steps = 200,
                  max_rt = 5,
-                 save = True,
+                 fig_scale = 1.0,
+                 save = False,
                  show = True,
                 ):
+    """ Plots lan likelihoods in a 3d-plot. 
+
+    :Arguments:
+        parameter_df: pandas.core.frame.DataFrame <default=None>
+            DataFrame that holds a parameter vector and has parameter names as keys.
+        vary_dict: dict <default={'v': [-1.0, -0.75, -.5, -0.25, 0, 0.25, 0.5, 0.75, 1.0]}>
+            Dictionary where key is a valid parameter name, and value is either a list of numpy.ndarray() of values 
+            of the respective parameter that you want to plot.
+        model: str <default='ddm'>
+            String that specifies the model to be used to plotting. (The plot loads the corresponding LAN)
+        n_rt_steps: int <default=200>
+            Numer of rt steps to include (x-axis)
+        max_rt: numeric <default=5.0>
+            The n_rt_steps argument splits the reaction time axis in to n_rt_step from 0 to max_rt.
+        fig_scale: numeric <default=1.0>
+            Basic handle to scale the figure.
+        save: bool <default=False>
+            Whether to save the plot.
+        show: bool <default=True>
+            Whether to show the plot.
+
+    :Returns:
+        empty
+    """
 
     # mpl.rcParams.update(mpl.rcParamsDefault)
     # mpl.rcParams['text.usetex'] = True
     # #matplotlib.rcParams['pdf.fonttype'] = 42
     # mpl.rcParams['svg.fonttype'] = 'none'
-
-    if type(parameters) == pd.core.frame.DataFrame:
-        parameters = np.squeeze(parameters[model_config[model]['params']].values.astype(np.float32))
-        print('parameters')
-        print(parameters)
-        print(parameters.shape)
-        print('parameters[0, :]')
-        #print(parameters[0,:])
     
+    if parameter_df.shape[0] > 0:
+        parameters = parameter_df.iloc[0, :]
+        print('Using only the first row of the supplied parameter array !')
+        
+    if type(parameter_df) == pd.core.frame.DataFrame:
+        parameters = np.squeeze(parameters[model_config[model]['params']].values.astype(np.float32))
+        #print('parameters')
+        #print(parameters)
+        #print(parameters.shape)
+        #print('parameters[0, :]')
+        #print(parameters[0,:])
+    else:
+        parameters = parameter_df
+
     # Load Keras model and initialize batch container
     keras_model = get_mlp(model = model)
 
@@ -441,8 +518,8 @@ def mlp_manifold(parameters = [],
     plot_data[:, 0] = np.concatenate(([(i * (max_rt / n_rt_steps)) for i in range(n_rt_steps, 0, -1)], [(i * (max_rt / n_rt_steps)) for i in range(1, n_rt_steps + 1, 1)]))
     plot_data[:, 1] = np.concatenate((np.repeat(-1, n_rt_steps), np.repeat(1, n_rt_steps)))
 
-    print('plot_data')
-    print(plot_data)
+    #print('plot_data')
+    #print(plot_data)
 
     n_params = model_config[model]['n_params']
     n_levels = vary_dict[list(vary_dict.keys())[0]].shape[0]
@@ -451,17 +528,13 @@ def mlp_manifold(parameters = [],
     cnt = 0 
     vary_param_name = list(vary_dict.keys())[0]
     
-    for par_tmp in vary_dict[vary_param_name]: #range(vary_dict[list(vary_dict.keys())[0]].shape[0]):
+    for par_tmp in vary_dict[vary_param_name]:
         
         tmp_begin = (n_rt_steps * 2) * cnt
         tmp_end = (n_rt_steps * 2) * (cnt + 1)
         parameters[model_config[model]['params'].index(vary_param_name)] = par_tmp
         
         data_var[tmp_begin:tmp_end, :n_params] = parameters
-        print('parameters')
-        print(parameters)
-        print('data_var')
-        print(data_var[tmp_begin:tmp_end, :n_params])
         data_var[tmp_begin:tmp_end, n_params:(n_params + 2)] = plot_data
         data_var[tmp_begin:tmp_end, (n_params + 2)] = np.squeeze(np.exp(keras_model(data_var[tmp_begin:tmp_end, :-1].astype(np.float32))))
         
@@ -513,7 +586,7 @@ def mlp_manifold(parameters = [],
     ax.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
    
     if save:
-        plt.savefig('figures/mlp_manifold_' + model + 'png',
+        plt.savefig('figures/mlp_manifold_' + model + '.png',
                     format = 'png')
 
     if show:
