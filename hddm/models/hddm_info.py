@@ -133,13 +133,15 @@ class HDDM(HDDMBase):
             self.is_informative = kwargs.pop('informative', True)
 
         super(HDDM, self).__init__(*args, **kwargs)
-
+        
+        # AF ADDED ----------------------------------------------------------------------------
         print('Is Neural Net? ', self.nn)
         if not self.nn:
             if ('sv' in self.include) or ('st' in self.include) or ('sz' in self.include):
                 self.model = 'full_ddm'
             else:
                 self.model = 'ddm'
+        # -------------------------------------------------------------------------------------
 
     def _create_stochastic_knodes(self, include):
         if self.nn:
