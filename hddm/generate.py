@@ -1,12 +1,13 @@
 
 
 import kabuki
+from pymc.diagnostics import raftery_lewis
 import hddm
 import numpy as np
 import pandas as pd
 
 from numpy.random import rand
-from scipy.stats import uniform, norm
+from scipy.stats import uniform, norm, mode
 from copy import copy
 
 
@@ -493,6 +494,7 @@ def gen_rand_rlddm_data(a, t, scaler, alpha, size=1, p_upper=1, p_lower=0, z=0.5
                 df.loc[i, 'q_up'] - df.loc[i, 'q_low']) * (scaler)
             data, params = hddm.generate.gen_rand_data(
                 {'a': a, 't': t, 'v': df.loc[i, 'sim_drift'] , 'z': z}, subjs=1, size=1)
+            # print(data.rt[0], params)
             df.loc[i, 'response'] = data.response[0]
             df.loc[i, 'rt'] = data.rt[0]
             if (data.response[0] == 1.0):
@@ -601,6 +603,56 @@ def gen_rand_rl_data(scaler, alpha, size=1, p_upper=1, p_lower=0, z=0.5, q_init=
                          'response', 'feedback', 'subj_idx', 'split_by', 'trial']]
 
     return all_data
+
+
+# Multi(two)-armed bandit with RT
+def gen_rl_data_MAB_with_RT(num_trials, mu, mu_sd, a, t, scaler, z=0.5):
+    k = 2 # number of bandits/actions
+    np_eps = 2.718281828459
+    q_val = [0.5, 0.5] # q-values
+    num_act = np.zeros(k) # keep count of every action
+
+    response = list()
+    feedback = list()
+    trial_no = list()
+    rt = list()
+
+    for i in range(0, num_trials):
+        # Compute softmax and prob. action selection
+        sim_drift = (q_val[0] - q_val[1]) * scaler
+        data, params = hddm.generate.gen_rand_data({'a': a, 't': t, 'v': sim_drift, 'z': z}, subjs=1, size=1)
+
+        # data_response = data.response.values
+        # data_rt = data.rt.values
+        # action = mode(data_response)[0][0]
+        # action_rts = list()
+        # for itr in range(len(data_response)):
+        #     if data_response[itr] == action:
+        #         action_rts.append(data_rt[itr])
+        # action = int(action)
+        # react_time = np.mean(action_rts)
+
+        action = int(data.response[0])
+        react_time = data.rt[0]
+
+        # print("> ", q_val, sim_drift, action, react_time)
+        
+        # reward obtained on taking action a
+        reward = np.random.normal(mu[action], mu_sd, 1)[0]
+
+        # q-value update
+        num_act[action] += 1
+        q_val[action] = q_val[action] + (reward-q_val[action])/num_act[action]
+
+        trial_no.append(i)
+        response.append(action)
+        feedback.append(reward)
+        rt.append(react_time)
+
+    trial_data = {'trial': trial_no, 'response': response, 'feedback': feedback, 'rt': rt}
+    data = pd.DataFrame(data=trial_data)
+
+    return data
 
 
 # Multi(two)-armed bandit

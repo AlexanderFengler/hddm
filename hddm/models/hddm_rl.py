@@ -10,7 +10,9 @@ import wfpt
 from kabuki.hierarchical import Knode
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
-from wfpt import wiener_like_rlddm
+from wfpt import wiener_like_rlddm, full_pdf
+
+from hddm.generate import pdf_with_params
 
 
 class HDDMrl(HDDM):
@@ -20,14 +22,18 @@ class HDDMrl(HDDM):
 
     def __init__(self, *args, **kwargs):
         self.non_centered = kwargs.pop('non_centered', False)
-        self.dual = kwargs.pop('dual', False)
-        self.alpha = kwargs.pop('alpha', True)
-        self.wfpt_rl_class = WienerRL
+        # self.dual = kwargs.pop('dual', False)
+        # self.alpha = kwargs.pop('alpha', True)
+        self.wfpt_rl_class = RLDDM_like_MAB
+        self.param_list = kwargs.pop('params')
 
         super(HDDMrl, self).__init__(*args, **kwargs)
 
     def _create_stochastic_knodes(self, include):
+        include = set(self.param_list)
+
         knodes = super(HDDMrl, self)._create_stochastic_knodes(include)
+
         if self.non_centered:
             print('setting learning rate parameter(s) to be non-centered')
             if self.alpha:
@@ -37,20 +43,19 @@ class HDDMrl(HDDM):
                 knodes.update(self._create_family_normal_non_centered(
                     'pos_alpha', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
         else:
-            if self.alpha:
+            for param in self.param_list:
                 knodes.update(self._create_family_normal(
-                    'alpha', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
-            if self.dual:
-                knodes.update(self._create_family_normal(
-                    'pos_alpha', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
+                    param, value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
 
         return knodes
 
     def _create_wfpt_parents_dict(self, knodes):
         wfpt_parents = super(HDDMrl, self)._create_wfpt_parents_dict(knodes)
-        wfpt_parents['alpha'] = knodes['alpha_bottom']
-        wfpt_parents['pos_alpha'] = knodes[
-            'pos_alpha_bottom'] if self.dual else 100.00
+        for param in self.param_list:
+            wfpt_parents[param] = knodes[param + '_bottom']
+        # wfpt_parents['alpha'] = knodes['alpha_bottom']
+        # wfpt_parents['pos_alpha'] = knodes[
+        #     'pos_alpha_bottom'] if self.dual else 100.00
         return wfpt_parents
 
     def _create_wfpt_knode(self, knodes):
@@ -70,3 +75,43 @@ def wienerRL_like(x, v, alpha, pos_alpha, sv, a, z, sz, t, st, p_outlier=0):
     split_by = x['split_by'].values.astype(int)
     return wiener_like_rlddm(x['rt'].values, response, feedback, split_by, q, alpha, pos_alpha, v, sv, a, z, sz, t, st, p_outlier=p_outlier, **wp)
 WienerRL = stochastic_from_dist('wienerRL', wienerRL_like)
+
+
+def RLDDM_like_MAB(x, scaler): # sv, a, z, sz, t, st
+    sv =  
+    a = 
+    z = 
+    sz = 
+    t =  
+    st = 
+    p_outlier = 0
+    wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
+                     'use_adaptive': 1,
+                     'simps_err': 1e-3}
+
+    response = x['response'].values.astype(int)
+    rt = x['rt'].values.astype(float)
+    feedback = x['feedback'].values.astype(float)
+    split_by = x['split_by'].values.astype(int)
+    #return wiener_like_rlddm(x['rt'].values, response, feedback, split_by, q, alpha, pos_alpha, v, sv, a, z, sz, t, st, p_outlier=p_outlier, **wp)
+
+    k = 2 # number of bandits/actions
+    s_size = response.shape[0]
+    qs = np.array([0.5]*k) # q-values
+    num_act = np.zeros(k) # keep count of every action
+
+    sum_logp = 0
+
+    for i in range(0, s_size):
+        sim_drift = (qs[0] - qs[1]) * scaler
+        p = full_pdf(rt[i], sim_drift, sv, a, z, sz, t, st, **wiener_params)
+        # If one probability = 0, the log sum will be -Inf
+        p = p * (1 - p_outlier) + wp_outlier
+        if p == 0:
+            return -np.inf
+        sum_logp += np.log(p)
+
+        num_act[a] += 1
+        qs[a] = qs[a] + (feedback[i]-qs[a])/num_act[a]
+
+RLDDM_like_MAB = stochastic_from_dist('RLDDM_MAB', RLDDM_like_MAB)

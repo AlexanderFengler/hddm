@@ -25,6 +25,7 @@ class Hrl(HDDM):
         # self.alpha = kwargs.pop('alpha', True)
         # self.z = kwargs.pop('z', False)
         self.rl_class = RL_like_MAB
+        self.param_list = kwargs.pop('params')
 
         super(Hrl, self).__init__(*args, **kwargs)
     
@@ -32,12 +33,7 @@ class Hrl(HDDM):
         hddm.utils.plot_posteriors_az(self)
 
     def _create_stochastic_knodes(self, include):
-        params = ['beta']
-        # if 'p_outlier' in self.include:
-        #     params.append('p_outlier')
-        # if 'z' in self.include:
-        #     params.append('z')
-        include = set(params)
+        include = set(self.param_list)
 
         knodes = super(Hrl, self)._create_stochastic_knodes(include)
         if self.non_centered:
@@ -49,24 +45,17 @@ class Hrl(HDDM):
                 knodes.update(self._create_family_normal_non_centered(
                     'pos_alpha', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
         else:
-            # if self.alpha:
-            # knodes.update(self._create_family_normal(
-            #    'alpha', value=0.5, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
-            knodes.update(self._create_family_normal(
-                'beta', value=0.5, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
-            # if self.dual:
-            #     knodes.update(self._create_family_normal(
-            #         'pos_alpha', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
+            for param in self.param_list:
+                knodes.update(self._create_family_normal(
+                    param, value=0.5, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
 
         return knodes
 
     def _create_wfpt_parents_dict(self, knodes):
         wfpt_parents = OrderedDict()
-        #wfpt_parents['v'] = knodes['v_bottom']
-        #wfpt_parents['alpha'] = knodes['alpha_bottom']
-        wfpt_parents['beta'] = knodes['beta_bottom']
-        #wfpt_parents['pos_alpha'] = knodes['pos_alpha_bottom'] if self.dual else 100.00
-        #wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
+
+        for param in self.param_list:
+            wfpt_parents[param] = knodes[param + '_bottom']
 
         return wfpt_parents
 
@@ -93,7 +82,6 @@ RL = stochastic_from_dist('RL', RL_like)
 # Multi(two)-armed bandit
 def RL_like_MAB(x, beta):
     response = x['response'].values.astype(int)
-    q = x['q_init'].iloc[0]
     feedback = x['feedback'].values.astype(float)
     split_by = x['split_by'].values.astype(int)
 
