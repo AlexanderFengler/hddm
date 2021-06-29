@@ -73,8 +73,8 @@ def flip_errors_nn(data, network_type = 'cnn'):
             data.loc[idx, 'response'] = -1.0
         
         # Check if data is already flipped
-        if np.any(data['rt'] < 0) != False:
-            return data
+        # if np.any(data['rt'] < 0) != False:
+        #     return data
 
         # Copy data
         #data = pd.DataFrame(data.copy())

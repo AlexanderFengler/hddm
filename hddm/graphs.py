@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 import pymc as pm
 import os
 import hddm
-import sys
+#import sys
 import kabuki
 import pandas as pd
 import seaborn as sns
-import string
-import argparse
+#import string
+#import argparse
 from kabuki.analyze import post_pred_gen, post_pred_compare_stats
 from hddm.keras_models import load_mlp
 from hddm.cnn.wrapper import load_cnn
@@ -21,6 +21,8 @@ from scipy.stats.mstats import mquantiles
 from copy import deepcopy
 
 model_config = hddm.simulators.model_config
+
+# PREPROCESSING FUNCTIONS ------------------------------------------------------------------------------------------------------------------
 
 def untransform_traces(traces = None, model = None, is_nn = False):
     """ 
@@ -203,6 +205,7 @@ def pick_out_params_h_c(condition_dataframe = None,  data = None, params_default
 
     out_dict = {}
     # We now pick out all the parameters that are relevant for a particular group's data
+    
     # NOTE: The intended use of this is to get subject level posterior predictives, which leaves out group level parameters for which subj level 
     # parameters are specified. Group level posteriors (samples from the posterior on the group level, without using subject level traces) are not considered here.
     if condition_dataframe is not None:
@@ -477,6 +480,7 @@ def _convert_params(data = None):
     return data
 # --------------------------------------------------------------------------------------------
 
+# PLOTS --------------------------------------------------------------------------------------
 # Plot bound
 # Mean posterior predictives
 def model_plot(hddm_model = None,

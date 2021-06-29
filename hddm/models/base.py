@@ -512,7 +512,7 @@ class AccumulatorModel(kabuki.Hierarchical):
             #           trace = True
             #           )
 
-            # Using pm.deterministic here, better would be soemthing like pm.InvLogitGeneral
+            # Using pm.deterministic here, better would be something like pm.InvLogitGeneral
             g = Knode(pm.Deterministic, name, 
                       eval = lambda x:  lower + ((upper - lower) * (np.exp(x)) / (1 + np.exp(x))),
                       x = g_trans, plot = True, trace = True)
@@ -853,6 +853,7 @@ class HDDMBase(AccumulatorModel):
             self.include.add('z')
 
         # AF Todo: Make this model specific ?
+        print('printing self.nn from HDDMBase')
         possible_parameters = ('v', 'a', 't', 'z', 'st', 'sz', 'sv', 'p_outlier','dual_alpha','theta','alpha','beta', 'g', 'alpha_diff')
         assert self.include.issubset(possible_parameters), """Received and invalid parameter using the 'include' keyword.
         parameters received: %s
