@@ -853,10 +853,9 @@ class HDDMBase(AccumulatorModel):
             self.include.add('z')
 
         # AF Todo: Make this model specific ?
-        print('printing self.nn from HDDMBase')
-        print(self.nn)
-        print('printing model from HDDMBase')
-        print(self.model)
+        print('printing kwargs from HDDMBase')
+        print(kwargs)
+
         possible_parameters = ('v', 'a', 't', 'z', 'st', 'sz', 'sv', 'p_outlier','dual_alpha','theta','alpha','beta', 'g', 'alpha_diff')
         assert self.include.issubset(possible_parameters), """Received and invalid parameter using the 'include' keyword.
         parameters received: %s
